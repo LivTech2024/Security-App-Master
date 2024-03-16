@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Dialog from "../../../common/Dialog";
 import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
 import InputSelect from "../../../common/inputs/InputSelect";
@@ -17,6 +17,8 @@ import {
 import { errorHandler } from "../../../utilities/CustomError";
 import { REACT_QUERY_KEYS } from "../../../@types/enum";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEditFormStore } from "../../../store";
+import { openContextModal } from "@mantine/modals";
 
 const addEmployeeFormSchema = z.object({
   first_name: z.string().min(2, { message: "First name is required" }),
@@ -48,12 +50,42 @@ const AddEmployeeModal = ({
     resolver: zodResolver(addEmployeeFormSchema),
   });
 
+  const { employeeEditData } = useEditFormStore();
+
+  const isEdit = !!employeeEditData;
+
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    let allFieldValues: AddEmployeeFormField = {
+      first_name: "",
+      last_name: "",
+      phone_number: "",
+      email: "",
+      role: EmployeeRoles.supervisor,
+    };
+    if (isEdit) {
+      allFieldValues = {
+        first_name: employeeEditData.EmployeeName.split(" ")[0],
+        last_name: employeeEditData.EmployeeName.split(" ")[1],
+        phone_number: employeeEditData.EmployeePhone,
+        email: employeeEditData.EmployeeEmail,
+        role: employeeEditData.EmployeeRole,
+      };
+    }
+
+    methods.reset(allFieldValues);
+  }, [isEdit, employeeEditData, methods, opened]);
 
   const onSubmit = async (data: AddEmployeeFormField) => {
     try {
       showModalLoader({});
-      await DbEmployee.addEmployee(data);
+
+      if (isEdit) {
+        await DbEmployee.updateEmployee(data, employeeEditData.EmployeeId);
+      } else {
+        await DbEmployee.addEmployee(data);
+      }
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.EMPLOYEE_LIST],
@@ -67,6 +99,33 @@ const AddEmployeeModal = ({
       });
       methods.reset();
     } catch (error) {
+      console.log(error);
+      closeModalLoader();
+      errorHandler(error);
+    }
+  };
+
+  const onDelete = async () => {
+    if (!isEdit) return;
+    try {
+      showModalLoader({});
+
+      await DbEmployee.deleteEmployee(employeeEditData.EmployeeId);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.EMPLOYEE_LIST],
+      });
+
+      showSnackbar({
+        message: "Employee deleted successfully",
+        type: "success",
+      });
+
+      closeModalLoader();
+      methods.reset();
+      setOpened(false);
+    } catch (error) {
+      console.log(error);
       closeModalLoader();
       errorHandler(error);
     }
@@ -81,6 +140,32 @@ const AddEmployeeModal = ({
         size="80%"
         isFormModal
         positiveCallback={methods.handleSubmit(onSubmit)}
+        negativeCallback={() =>
+          isEdit
+            ? openContextModal({
+                modal: "confirmModal",
+                withCloseButton: false,
+                centered: true,
+                closeOnClickOutside: true,
+                innerProps: {
+                  title: "Confirm",
+                  body: "Are you sure to delete this employee",
+                  onConfirm: () => {
+                    onDelete();
+                  },
+                  onCancel: () => {
+                    setOpened(true);
+                  },
+                },
+                size: "30%",
+                styles: {
+                  body: { padding: "0px" },
+                },
+              })
+            : setOpened(false)
+        }
+        negativeLabel={isEdit ? "Delete" : "Cancel"}
+        positiveLabel={isEdit ? "Update" : "Save"}
       >
         <FormProvider {...methods}>
           <form

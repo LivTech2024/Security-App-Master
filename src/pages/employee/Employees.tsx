@@ -14,9 +14,14 @@ import { IEmployeesCollection } from "../../@types/database";
 import NoSearchResult from "../../common/NoSearchResult";
 import NotFound from "../../common/NotFound";
 import TableShimmer from "../../common/shimmer/TableShimmer";
+import { useEditFormStore } from "../../store";
+import { firebaseDataToObject } from "../../utilities/misc";
+import { Employee } from "../../store/slice/editForm.slice";
 
 const Employees = () => {
   const [addEmployeeDialog, setAddEmployeeDialog] = useState(false);
+
+  const { setEmployeeEditData } = useEditFormStore();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [query, setQuery] = useState("");
@@ -101,7 +106,10 @@ const Employees = () => {
         <span className="font-semibold text-xl">Employees</span>
 
         <button
-          onClick={() => setAddEmployeeDialog(true)}
+          onClick={() => {
+            setAddEmployeeDialog(true);
+            setEmployeeEditData(null);
+          }}
           className="bg-primary text-surface px-4 py-2 rounded"
         >
           Create Employee
@@ -146,7 +154,14 @@ const Employees = () => {
             data.map((emp) => {
               return (
                 <tr
-                  onClick={() => setAddEmployeeDialog(true)}
+                  onClick={() => {
+                    setEmployeeEditData(
+                      firebaseDataToObject(
+                        emp as unknown as Record<string, unknown>
+                      ) as unknown as Employee
+                    );
+                    setAddEmployeeDialog(true);
+                  }}
                   className="cursor-pointer"
                 >
                   <td className="px-4 py-2 text-center">

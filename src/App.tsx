@@ -11,11 +11,14 @@ import "@mantine/dates/styles.css";
 import Shifts from "./pages/shifts/Shifts";
 import Schedule from "./pages/schedule/Schedule";
 import LoaderModal from "./common/modals/LoaderModal";
+import { ContextConfirmModal } from "./common/modals/ContextConfirmModal";
 
 function App() {
   return (
     <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
-      <ModalsProvider modals={{ loader: LoaderModal }}>
+      <ModalsProvider
+        modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
+      >
         <Layout>
           <Notifications />
           <Routes>

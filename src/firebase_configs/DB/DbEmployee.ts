@@ -2,6 +2,7 @@ import {
   DocumentData,
   QueryConstraint,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   limit,
@@ -111,6 +112,11 @@ class DbEmployee {
     };
 
     return updateDoc(docRef, newEmployee);
+  };
+
+  static deleteEmployee = (empId: string) => {
+    const empRef = doc(db, CollectionName.employees, empId);
+    return deleteDoc(empRef);
   };
 
   static getEmployees = ({
