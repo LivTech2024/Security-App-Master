@@ -15,6 +15,8 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import { errorHandler } from "../../../utilities/CustomError";
+import { REACT_QUERY_KEYS } from "../../../@types/enum";
+import { useQueryClient } from "@tanstack/react-query";
 
 const addEmployeeFormSchema = z.object({
   first_name: z.string().min(2, { message: "First name is required" }),
@@ -46,16 +48,24 @@ const AddEmployeeModal = ({
     resolver: zodResolver(addEmployeeFormSchema),
   });
 
+  const queryClient = useQueryClient();
+
   const onSubmit = async (data: AddEmployeeFormField) => {
     try {
       showModalLoader({});
       await DbEmployee.addEmployee(data);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.EMPLOYEE_LIST],
+      });
+
       closeModalLoader();
       setOpened(false);
       showSnackbar({
         message: "Employee created successfully",
         type: "success",
       });
+      methods.reset();
     } catch (error) {
       closeModalLoader();
       errorHandler(error);

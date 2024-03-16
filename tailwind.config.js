@@ -33,6 +33,8 @@ export default {
         blackButtonActiveBg: "#000000d9",
 
         onHoverBg: "#F4F4F4",
+
+        shimmerColor: "#e3e3e3",
       },
     },
   },

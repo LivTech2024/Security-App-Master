@@ -9,6 +9,7 @@ export enum EmployeeRoles {
 export interface IEmployeesCollection {
   EmployeeId: string;
   EmployeeName: string;
+  EmployeeNameSearchIndex: string[];
   EmployeePhone: string;
   EmployeeEmail: string;
   EmployeeRole: EmployeeRoles;
