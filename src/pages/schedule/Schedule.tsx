@@ -1,91 +1,19 @@
 import { DatePickerInput } from "@mantine/dates";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import dayjs from "dayjs";
 import { MdCalendarToday } from "react-icons/md";
 import AddShiftModal from "../../component/shifts/modal/AddShiftModal";
-import AssignShiftModal from "../../component/schedule/modal/AssignShiftModal";
-
-export interface Shift {
-  _id: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-  position: string;
-  description?: string;
-  isAssigned?: boolean;
-}
-
-export interface User {
-  _id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  role: string;
-  shifts: string[];
-}
+import { useEditFormStore } from "../../store";
 
 const Schedule = () => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [shifts, setShifts] = useState<Shift[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [addShiftModal, setAddShiftModal] = useState(false);
+
   const [assignShiftModal, setAssignShiftModal] = useState(false);
-  const [selectedEmp, setSelectedEmp] = useState<User | null>(null);
-  const [selectedEmpDate, setSelectedEmpDate] = useState<string | null>(null);
-  console.log(users);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-  useEffect(() => {
-    const fetchShifts = async () => {
-      try {
-        const response = await fetch("/api/shift/getshifts");
+  const { setShiftEditData } = useEditFormStore();
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setShifts(data);
-      } catch (error) {
-        console.error("Error fetching shifts:", error);
-      }
-    };
-
-    fetchShifts();
-  }, []);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch("/api/user/getusers");
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
-  // Function to get shifts for a user on a specific day
-  const getUserShiftForDay = (userId: string, date: string) => {
-    return shifts.filter(
-      (shift) => shift._id === userId && dayjs(shift.date).isSame(dayjs(date))
-    );
-  };
-
-  //* To get the available shift of a particular date
-  const getShiftForDay = (date: string | null) => {
-    return shifts.filter((shift) =>
-      dayjs(shift.date).isSame(dayjs(date), "date")
-    );
-  };
+  console.log(assignShiftModal);
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -93,7 +21,10 @@ const Schedule = () => {
         <span className="font-semibold text-xl">Schedule</span>
 
         <button
-          onClick={() => setAddShiftModal(true)}
+          onClick={() => {
+            setShiftEditData(null);
+            setAddShiftModal(true);
+          }}
           className="bg-primary text-surface px-4 py-2 rounded"
         >
           Add new shift
@@ -113,7 +44,7 @@ const Schedule = () => {
             </label>
           }
           value={selectedDate}
-          onChange={(e) => setSelectedDate(e)}
+          onChange={(e) => setSelectedDate(e as Date)}
         />
       </div>
 
@@ -224,13 +155,13 @@ const Schedule = () => {
       </table>
 
       <div className="hidden">
-        <AssignShiftModal
+        {/* <AssignShiftModal
           opened={assignShiftModal}
           setOpened={setAssignShiftModal}
           selectedEmp={selectedEmp}
           selectedEmpDate={selectedEmpDate}
           availableShifts={getShiftForDay(selectedEmpDate)}
-        />
+        /> */}
       </div>
     </div>
   );

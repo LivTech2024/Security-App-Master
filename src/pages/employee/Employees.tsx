@@ -22,10 +22,9 @@ const Employees = () => {
 
   const { setEmployeeEditData } = useEditFormStore();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [query, setQuery] = useState("");
+  //const [query, setQuery] = useState("");
 
-  const [debouncedQuery] = useDebouncedValue(query, 200);
+  const [debouncedQuery] = useDebouncedValue("", 200);
 
   const {
     data: snapshotData,
@@ -137,7 +136,7 @@ const Employees = () => {
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
-          {data.length === 0 ? (
+          {data.length === 0 && !isLoading ? (
             <tr>
               <td colSpan={5}>
                 <NoSearchResult text="No employee" />

@@ -6,7 +6,6 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { DocumentData } from "firebase/firestore";
 import { IShiftsCollection } from "../../@types/database";
 import { useInView } from "react-intersection-observer";
-import NotFound from "../../common/NotFound";
 import NoSearchResult from "../../common/NoSearchResult";
 import TableShimmer from "../../common/shimmer/TableShimmer";
 import { firebaseDataToObject, formatDate } from "../../utilities/misc";
@@ -127,12 +126,6 @@ const Shifts = () => {
             <tr>
               <td colSpan={5}>
                 <NoSearchResult />
-              </td>
-            </tr>
-          ) : data.length === 0 && !isLoading ? (
-            <tr>
-              <td colSpan={5}>
-                <NotFound />
               </td>
             </tr>
           ) : (

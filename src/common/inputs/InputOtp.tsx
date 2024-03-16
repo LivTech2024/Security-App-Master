@@ -37,7 +37,7 @@ const InputOtp = ({
   const attemptsLeftRef = useRef(3);
 
   useEffect(() => {
-    let interval: number | null = null;
+    let interval: NodeJS.Timeout | null = null;
     if (seconds > 0) {
       interval = setInterval(() => {
         setSeconds((seconds) => seconds - 1);

@@ -1,4 +1,4 @@
-import { DeepMap, FieldError, Path, UseFormRegister } from "react-hook-form";
+import { Path, UseFormRegister } from "react-hook-form";
 
 import InputError from "./InputError";
 import InputHeader from "./InputHeader";
@@ -15,7 +15,7 @@ interface TextareaWithTopHeaderProps<
   fontClassName?: string;
   register?: UseFormRegister<FormFields>;
   name?: Path<FormFields>;
-  errors?: Partial<DeepMap<FormFields, FieldError>>;
+  error?: string;
   value?: string;
   onChange?: React.ChangeEventHandler<HTMLTextAreaElement> | undefined;
   disabled?: boolean;
@@ -31,15 +31,13 @@ const TextareaWithTopHeader = <FormFields extends Record<string, unknown>>({
   tailIcon,
   onTailIconClick,
   register,
-  errors,
+  error,
   name,
   value,
   onChange,
   disabled = false,
   inputMaxLength,
 }: TextareaWithTopHeaderProps<FormFields>) => {
-  const errorMessage = errors && name && errors[name]?.message;
-  const hasError = !!(errors && errorMessage);
   return (
     <div className={`gap-1 flex flex-col ${className}`}>
       {title ? (
@@ -52,9 +50,7 @@ const TextareaWithTopHeader = <FormFields extends Record<string, unknown>>({
 
       <div
         className={`flex justify-center items-center border ${
-          hasError && errorMessage
-            ? "border-textPrimaryRed"
-            : "border-inputBorder"
+          error ? "border-textPrimaryRed" : "border-inputBorder"
         } bg-surfaceLight w-full rounded  focus-within:ring-[2px]`}
       >
         {leadingIcon ? (
@@ -106,7 +102,7 @@ const TextareaWithTopHeader = <FormFields extends Record<string, unknown>>({
           </div>
         ) : null}
       </div>
-      {hasError && errorMessage && <InputError errorMessage={errorMessage} />}
+      {error && <InputError errorMessage={error} />}
     </div>
   );
 };
