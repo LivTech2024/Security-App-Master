@@ -154,6 +154,7 @@ const Employees = () => {
             data.map((emp) => {
               return (
                 <tr
+                  key={emp.EmployeeId}
                   onClick={() => {
                     setEmployeeEditData(
                       firebaseDataToObject(

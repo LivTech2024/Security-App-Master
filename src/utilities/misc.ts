@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import dayjs from "dayjs";
 import { FieldValue, GeoPoint, Timestamp } from "firebase/firestore";
 
 export const fullTextSearchIndex = (text: string): string[] => {
@@ -59,4 +61,21 @@ export const firebaseDataToObject = (docData: Record<string, unknown>) => {
   });
 
   return docData;
+};
+
+export const toDate = (value: any): Date => {
+  if (value instanceof Date) {
+    return value;
+  } else if (value instanceof Timestamp) {
+    return value.toDate();
+  } else if (typeof value === "string" || typeof value === "number") {
+    return new Date(value);
+  } else {
+    throw new TypeError("Invalid date value");
+  }
+};
+
+export const formatDate = (dateText: any, dateFormat = "DD MMM") => {
+  const date = toDate(dateText);
+  return dayjs(date).format(dateFormat);
 };

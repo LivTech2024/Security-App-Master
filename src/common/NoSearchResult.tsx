@@ -9,7 +9,7 @@ interface NoSearchResultProps {
 const NoSearchResult = ({
   imgWidth = "120px",
   textSize = "18px",
-  text = "no_result_found",
+  text = "No result found",
 }: NoSearchResultProps) => {
   return (
     <div className="flex flex-col w-full  gap-4 items-center justify-center h-full p-8 min-h-full">
@@ -18,12 +18,11 @@ const NoSearchResult = ({
           src={noResultFoundImg}
           alt="No Search Result"
           style={{ width: imgWidth }}
-          className="dark:invert"
         />
       </div>
       <div
         style={{ fontSize: textSize }}
-        className={`font-semibold font-sfProTextSemibold text-textTertiaryLight`}
+        className={`font-semibold font-sfProTextSemibold text-textTertiary`}
       >
         {text}
       </div>

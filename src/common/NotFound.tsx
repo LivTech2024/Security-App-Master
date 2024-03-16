@@ -4,7 +4,7 @@ interface NotFoundProps {
   title?: string;
 }
 
-const NotFound = ({ title = "no_item" }: NotFoundProps) => {
+const NotFound = ({ title = "No item" }: NotFoundProps) => {
   return (
     <div className="flex flex-col w-full  gap-4 items-center justify-center h-full p-8 min-h-[50vh]">
       <div className="flex justify-center items-center">

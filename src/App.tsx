@@ -5,13 +5,13 @@ import Home from "./pages/home/Home";
 import { MantineProvider } from "@mantine/core";
 import Employees from "./pages/employee/Employees";
 import { ModalsProvider } from "@mantine/modals";
-import { Notifications } from "@mantine/notifications";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import Shifts from "./pages/shifts/Shifts";
 import Schedule from "./pages/schedule/Schedule";
 import LoaderModal from "./common/modals/LoaderModal";
 import { ContextConfirmModal } from "./common/modals/ContextConfirmModal";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
         modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
       >
         <Layout>
-          <Notifications />
+          <ToastContainer />
           <Routes>
             <Route path="/" Component={Home} />
             <Route path="/home" Component={Home} />

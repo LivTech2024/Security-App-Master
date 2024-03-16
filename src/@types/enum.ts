@@ -1,9 +1,11 @@
 export enum CollectionName {
   employees = "Employees",
+  shifts = "Shifts",
 }
 
 export const DisplayCount = {
   EMPLOYEE_LIST: 20,
+  SHIFT_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {

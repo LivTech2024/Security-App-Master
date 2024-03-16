@@ -6,13 +6,28 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputDate from "../../../common/inputs/InputDate";
 import TextareaWithTopHeader from "../../../common/inputs/TextareaWithTopHeader";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InputTime from "../../../common/inputs/InputTime";
 import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
+import { ShiftPositions } from "../../../@types/database";
+import { useEditFormStore } from "../../../store";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from "../../../utilities/TsxUtils";
+import DbShift from "../../../firebase_configs/DB/DbShift";
+import { REACT_QUERY_KEYS } from "../../../@types/enum";
+import { errorHandler } from "../../../utilities/CustomError";
+import { openContextModal } from "@mantine/modals";
 
 const addShiftFormSchema = z.object({
-  position: z.enum(["supervisor", "guard", "other"]),
+  position: z.enum([
+    ShiftPositions.guard,
+    ShiftPositions.supervisor,
+    ShiftPositions.other,
+  ]),
   date: z.date().default(new Date()),
   start_time: z.string().min(2, { message: "Start time is required" }),
   end_time: z.string().min(2, { message: "End time is required" }),
@@ -57,100 +72,179 @@ const AddShiftModal = ({
     }
   }, [endTime]);
 
+  const { shiftEditData } = useEditFormStore();
+
+  const isEdit = !!shiftEditData;
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    let allFieldValues: AddShiftFormFields = {
+      position: ShiftPositions.guard,
+      date: new Date(),
+      start_time: "",
+      end_time: "",
+      name: "",
+    };
+    if (isEdit) {
+      setStartTime(shiftEditData.ShiftStartTime);
+      setEndTime(shiftEditData.ShiftEndTime);
+      setShiftDate(new Date(shiftEditData.ShiftDate));
+      allFieldValues = {
+        position: shiftEditData.ShiftPosition,
+        date: new Date(shiftEditData.ShiftDate),
+        start_time: shiftEditData.ShiftStartTime,
+        end_time: shiftEditData.ShiftEndTime,
+        name: shiftEditData.ShiftName,
+      };
+    }
+
+    methods.reset(allFieldValues);
+  }, [isEdit, shiftEditData, methods, opened]);
+
   const onSubmit = async (data: AddShiftFormFields) => {
     try {
-      const res = await fetch("/api/shift/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      showModalLoader({});
+
+      if (isEdit) {
+        await DbShift.updateShift(data, shiftEditData.ShiftId);
+      } else {
+        await DbShift.addShift(data);
+      }
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.SHIFT_LIST],
       });
-      const responseData = await res.json();
-      if (!res.ok) {
-        toast.error(responseData.message);
-        return;
-      }
-      if (res.ok) {
-        methods.reset();
-        setOpened(false);
-        toast.success("Shift added successfully");
-      }
+
+      closeModalLoader();
+      setOpened(false);
+      showSnackbar({
+        message: "Shift created successfully",
+        type: "success",
+      });
+      methods.reset();
     } catch (error) {
-      toast.error("Something went wrong!");
+      console.log(error);
+      closeModalLoader();
+      errorHandler(error);
+    }
+  };
+
+  const onDelete = async () => {
+    if (!isEdit) return;
+    try {
+      showModalLoader({});
+
+      await DbShift.deleteShift(shiftEditData.ShiftId);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.SHIFT_LIST],
+      });
+
+      showSnackbar({
+        message: "Shift deleted successfully",
+        type: "success",
+      });
+
+      closeModalLoader();
+      methods.reset();
+      setOpened(false);
+    } catch (error) {
+      console.log(error);
+      closeModalLoader();
+      errorHandler(error);
     }
   };
 
   return (
-    <>
-      <Dialog
-        opened={opened}
-        setOpened={setOpened}
-        title="Add Shift"
-        size="80%"
-        isFormModal
-        positiveCallback={methods.handleSubmit(onSubmit)}
-      >
-        <FormProvider {...methods}>
-          <form
-            onSubmit={methods.handleSubmit(onSubmit)}
-            className="flex flex-col gap-4"
-          >
-            <div className="grid grid-cols-2 gap-4">
-              <InputSelect
-                label="Select Position"
-                options={[
-                  { title: "Supervisor", value: "supervisor" },
-                  { title: "Guard", value: "guard" },
-                  { title: "Other", value: "other" },
-                ]}
-                register={methods.register}
-                name="position"
-                error={methods.formState.errors.position?.message}
-              />
+    <Dialog
+      opened={opened}
+      setOpened={setOpened}
+      title="Add Shift"
+      size="80%"
+      isFormModal
+      positiveCallback={methods.handleSubmit(onSubmit)}
+      negativeCallback={() =>
+        isEdit
+          ? openContextModal({
+              modal: "confirmModal",
+              withCloseButton: false,
+              centered: true,
+              closeOnClickOutside: true,
+              innerProps: {
+                title: "Confirm",
+                body: "Are you sure to delete this shift",
+                onConfirm: () => {
+                  onDelete();
+                },
+                onCancel: () => {
+                  setOpened(true);
+                },
+              },
+              size: "30%",
+              styles: {
+                body: { padding: "0px" },
+              },
+            })
+          : setOpened(false)
+      }
+      negativeLabel={isEdit ? "Delete" : "Cancel"}
+      positiveLabel={isEdit ? "Update" : "Save"}
+    >
+      <FormProvider {...methods}>
+        <form
+          onSubmit={methods.handleSubmit(onSubmit)}
+          className="flex flex-col gap-4"
+        >
+          <div className="grid grid-cols-2 gap-4">
+            <InputSelect
+              label="Select Position"
+              options={[
+                { title: "Guard", value: "guard" },
+                { title: "Supervisor", value: "supervisor" },
+                { title: "Other", value: "other" },
+              ]}
+              register={methods.register}
+              name="position"
+              error={methods.formState.errors.position?.message}
+            />
 
-              <InputWithTopHeader
+            <InputWithTopHeader
+              className="mx-0"
+              label="Shift name"
+              register={methods.register}
+              name="name"
+              error={methods.formState.errors?.name?.message}
+            />
+
+            <InputDate label="Date" value={shiftDate} setValue={setShiftDate} />
+
+            <InputTime
+              label="Start time"
+              value={startTime}
+              onChange={setStartTime}
+              use12Hours={true}
+            />
+
+            <InputTime
+              label="End time"
+              value={endTime}
+              onChange={setEndTime}
+              use12Hours={true}
+            />
+
+            <div className="col-span-2">
+              <TextareaWithTopHeader
+                title="Description"
                 className="mx-0"
-                label="Shift name"
                 register={methods.register}
-                name="name"
-                error={methods.formState.errors?.name?.message}
+                name="description"
               />
-
-              <InputDate
-                label="Date"
-                value={shiftDate}
-                setValue={setShiftDate}
-              />
-
-              <InputTime
-                label="Start time"
-                value={startTime}
-                onChange={setStartTime}
-                use12Hours={true}
-              />
-
-              <InputTime
-                label="End time"
-                value={endTime}
-                onChange={setEndTime}
-                use12Hours={true}
-              />
-
-              <div className="col-span-2">
-                <TextareaWithTopHeader
-                  title="Description"
-                  className="mx-0"
-                  register={methods.register}
-                  name="description"
-                />
-              </div>
             </div>
-          </form>
-        </FormProvider>
-      </Dialog>
-      <ToastContainer />
-    </>
+          </div>
+        </form>
+      </FormProvider>
+    </Dialog>
   );
 };
 
