@@ -55,7 +55,7 @@ const Dialog = ({
         duration: 600,
         timingFunction: "ease",
       }}
-      zIndex={600}
+      zIndex={100}
     >
       <div className="flex flex-col remove-horizontal-scrollbar">
         <div className="flex flex-col sticky top-0 bg-surface dark:bg-backgroundDark  z-[2]">

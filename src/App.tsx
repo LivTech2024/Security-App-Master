@@ -10,13 +10,14 @@ import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import Shifts from "./pages/shifts/Shifts";
 import Schedule from "./pages/schedule/Schedule";
+import LoaderModal from "./common/modals/LoaderModal";
 
 function App() {
   return (
-    <MantineProvider>
-      <ModalsProvider>
-        <Notifications />
+    <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
+      <ModalsProvider modals={{ loader: LoaderModal }}>
         <Layout>
+          <Notifications />
           <Routes>
             <Route path="/" Component={Home} />
             <Route path="/home" Component={Home} />

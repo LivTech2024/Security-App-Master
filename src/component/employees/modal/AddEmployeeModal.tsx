@@ -1,12 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import Dialog from "../../../common/Dialog";
 import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
 import InputSelect from "../../../common/inputs/InputSelect";
 import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { EmployeeRoles } from "../../../@types/database";
+import DbEmployee from "../../../firebase_configs/DB/DbEmployee";
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from "../../../utilities/TsxUtils";
+import { errorHandler } from "../../../utilities/CustomError";
 
 const addEmployeeFormSchema = z.object({
   first_name: z.string().min(2, { message: "First name is required" }),
@@ -18,7 +26,11 @@ const addEmployeeFormSchema = z.object({
     .regex(/^(^[\w%+.-]+@[\d.A-Za-z-]+\.[A-Za-z]{2,}$)?$/, {
       message: "Invalid email",
     }),
-  role: z.enum(["supervisor", "guard", "admin", "other"]),
+  role: z.enum([
+    EmployeeRoles.guard,
+    EmployeeRoles.other,
+    EmployeeRoles.supervisor,
+  ]),
 });
 
 export type AddEmployeeFormField = z.infer<typeof addEmployeeFormSchema>;
@@ -30,46 +42,23 @@ const AddEmployeeModal = ({
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const [formData, setFormData] = useState<AddEmployeeFormField>({
-    first_name: "",
-    last_name: "",
-    phone_number: "",
-    email: "",
-    role: "supervisor",
-  });
-
   const methods = useForm<AddEmployeeFormField>({
     resolver: zodResolver(addEmployeeFormSchema),
-    defaultValues: formData,
   });
 
   const onSubmit = async (data: AddEmployeeFormField) => {
     try {
-      const res = await fetch("/api/user/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      showModalLoader({});
+      await DbEmployee.addEmployee(data);
+      closeModalLoader();
+      setOpened(false);
+      showSnackbar({
+        message: "Employee created successfully",
+        type: "success",
       });
-      const responseData = await res.json();
-      if (!res.ok) {
-        console.log(responseData.message);
-        return;
-      }
-      if (res.ok) {
-        setFormData({
-          first_name: "",
-          last_name: "",
-          phone_number: "",
-          email: "",
-          role: "supervisor",
-        });
-        setOpened(false);
-        toast.success("User created successfully");
-      }
     } catch (error) {
-      toast.error("Something went wrong!");
+      closeModalLoader();
+      errorHandler(error);
     }
   };
 
@@ -94,7 +83,6 @@ const AddEmployeeModal = ({
                 label="First Name"
                 register={methods.register}
                 name="first_name"
-                value={formData.first_name}
                 error={methods.formState.errors.first_name?.message}
               />
               <InputWithTopHeader
@@ -102,7 +90,6 @@ const AddEmployeeModal = ({
                 label="Last Name"
                 register={methods.register}
                 name="last_name"
-                value={formData.last_name}
                 error={methods.formState.errors.last_name?.message}
               />
               <InputWithTopHeader
@@ -110,16 +97,13 @@ const AddEmployeeModal = ({
                 label="Phone Number"
                 register={methods.register}
                 name="phone_number"
-                value={formData.phone_number}
                 error={methods.formState.errors.phone_number?.message}
-                leadingIcon={<div>+91</div>}
               />
               <InputWithTopHeader
                 className="mx-0"
                 label="Email"
                 register={methods.register}
                 name="email"
-                value={formData.email}
                 error={methods.formState.errors.email?.message}
               />
               <InputSelect
@@ -127,7 +111,6 @@ const AddEmployeeModal = ({
                 options={[
                   { title: "Supervisor", value: "supervisor" },
                   { title: "Guard", value: "guard" },
-                  { title: "Admin", value: "admin" },
                   { title: "Other", value: "other" },
                 ]}
                 register={methods.register}
