@@ -12,6 +12,9 @@ export interface IEmployeesCollection {
   EmployeeNameSearchIndex: string[];
   EmployeePhone: string;
   EmployeeEmail: string;
+  EmployeePassword: string;
+  EmployeeImg: string;
+  EmployeeAdditionalDoc: string;
   EmployeeRole: EmployeeRoles;
   EmployeeIsBanned: boolean;
   EmployeeCreatedAt: Timestamp | FieldValue;

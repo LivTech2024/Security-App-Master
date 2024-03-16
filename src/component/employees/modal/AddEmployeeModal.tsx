@@ -18,6 +18,7 @@ import { REACT_QUERY_KEYS } from "../../../@types/enum";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEditFormStore } from "../../../store";
 import { openContextModal } from "@mantine/modals";
+import ImageUpload from "../EmpOtherDetailsInput";
 
 const addEmployeeFormSchema = z.object({
   first_name: z.string().min(2, { message: "First name is required" }),
@@ -29,6 +30,7 @@ const addEmployeeFormSchema = z.object({
     .regex(/^(^[\w%+.-]+@[\d.A-Za-z-]+\.[A-Za-z]{2,}$)?$/, {
       message: "Invalid email",
     }),
+  password: z.string().min(6, { message: "Min 6 character is required" }),
   role: z.enum([
     EmployeeRoles.guard,
     EmployeeRoles.other,
@@ -62,6 +64,7 @@ const AddEmployeeModal = ({
       phone_number: "",
       email: "",
       role: EmployeeRoles.supervisor,
+      password: "",
     };
     if (isEdit) {
       allFieldValues = {
@@ -70,6 +73,7 @@ const AddEmployeeModal = ({
         phone_number: employeeEditData.EmployeePhone,
         email: employeeEditData.EmployeeEmail,
         role: employeeEditData.EmployeeRole,
+        password: employeeEditData.EmployeePassword,
       };
     }
 
@@ -171,45 +175,58 @@ const AddEmployeeModal = ({
           className="flex flex-col gap-4"
         >
           <div className="grid grid-cols-2 gap-4">
-            <InputWithTopHeader
-              className="mx-0"
-              label="First Name"
-              register={methods.register}
-              name="first_name"
-              error={methods.formState.errors.first_name?.message}
-            />
-            <InputWithTopHeader
-              className="mx-0"
-              label="Last Name"
-              register={methods.register}
-              name="last_name"
-              error={methods.formState.errors.last_name?.message}
-            />
-            <InputWithTopHeader
-              className="mx-0"
-              label="Phone Number"
-              register={methods.register}
-              name="phone_number"
-              error={methods.formState.errors.phone_number?.message}
-            />
-            <InputWithTopHeader
-              className="mx-0"
-              label="Email"
-              register={methods.register}
-              name="email"
-              error={methods.formState.errors.email?.message}
-            />
-            <InputSelect
-              label="Select Role"
-              options={[
-                { title: "Supervisor", value: "supervisor" },
-                { title: "Guard", value: "guard" },
-                { title: "Other", value: "other" },
-              ]}
-              register={methods.register}
-              name="role"
-              error={methods.formState.errors.role?.message}
-            />
+            <div className="flex flex-col gap-4">
+              <ImageUpload />
+            </div>
+            <div className="flex flex-col gap-4">
+              <InputWithTopHeader
+                className="mx-0"
+                label="First Name"
+                register={methods.register}
+                name="first_name"
+                error={methods.formState.errors.first_name?.message}
+              />
+              <InputWithTopHeader
+                className="mx-0"
+                label="Last Name"
+                register={methods.register}
+                name="last_name"
+                error={methods.formState.errors.last_name?.message}
+              />
+              <InputWithTopHeader
+                className="mx-0"
+                label="Phone Number"
+                register={methods.register}
+                name="phone_number"
+                error={methods.formState.errors.phone_number?.message}
+              />
+              <InputWithTopHeader
+                className="mx-0"
+                label="Email"
+                register={methods.register}
+                name="email"
+                error={methods.formState.errors.email?.message}
+              />
+              <InputWithTopHeader
+                className="mx-0"
+                label="Password"
+                register={methods.register}
+                name="password"
+                error={methods.formState.errors.password?.message}
+                inputType="password"
+              />
+              <InputSelect
+                label="Select Role"
+                options={[
+                  { title: "Supervisor", value: "supervisor" },
+                  { title: "Guard", value: "guard" },
+                  { title: "Other", value: "other" },
+                ]}
+                register={methods.register}
+                name="role"
+                error={methods.formState.errors.role?.message}
+              />
+            </div>
           </div>
         </form>
       </FormProvider>
