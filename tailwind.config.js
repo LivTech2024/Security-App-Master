@@ -35,6 +35,7 @@ export default {
         onHoverBg: "#F4F4F4",
 
         shimmerColor: "#e3e3e3",
+        inputBorder: "#0000001A",
       },
     },
   },

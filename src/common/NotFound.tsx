@@ -14,9 +14,7 @@ const NotFound = ({ title = "No item" }: NotFoundProps) => {
           style={{ width: "150px", height: "150px" }}
         />
       </div>
-      <div className="font-semibold font-sfProTextSemibold text-lg text-textTertiaryLight">
-        {title}
-      </div>
+      <div className="font-semibold  text-lg text-textTertiary">{title}</div>
     </div>
   );
 };

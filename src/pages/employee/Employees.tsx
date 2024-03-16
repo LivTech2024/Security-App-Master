@@ -12,7 +12,6 @@ import DbEmployee from "../../firebase_configs/DB/DbEmployee";
 import { DocumentData } from "firebase/firestore";
 import { IEmployeesCollection } from "../../@types/database";
 import NoSearchResult from "../../common/NoSearchResult";
-import NotFound from "../../common/NotFound";
 import TableShimmer from "../../common/shimmer/TableShimmer";
 import { useEditFormStore } from "../../store";
 import { firebaseDataToObject } from "../../utilities/misc";
@@ -138,16 +137,10 @@ const Employees = () => {
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
-          {data.length === 0 && query && !isLoading ? (
+          {data.length === 0 ? (
             <tr>
               <td colSpan={5}>
-                <NoSearchResult />
-              </td>
-            </tr>
-          ) : data.length === 0 && !query && !isLoading ? (
-            <tr>
-              <td colSpan={5}>
-                <NotFound />
+                <NoSearchResult text="No employee" />
               </td>
             </tr>
           ) : (

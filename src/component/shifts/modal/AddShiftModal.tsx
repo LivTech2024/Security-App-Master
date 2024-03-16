@@ -96,6 +96,7 @@ const AddShiftModal = ({
         start_time: shiftEditData.ShiftStartTime,
         end_time: shiftEditData.ShiftEndTime,
         name: shiftEditData.ShiftName,
+        description: shiftEditData.ShiftDescription,
       };
     }
 

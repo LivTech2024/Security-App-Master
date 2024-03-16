@@ -29,6 +29,7 @@ const InputDate = ({ setValue, label, value, error, id }: InputDateProps) => {
         id={id ? id : label}
         value={value}
         onChange={setValue}
+        className="focus-within:ring-[2px] rounded "
         popoverProps={{
           styles: {
             dropdown: {
@@ -41,7 +42,8 @@ const InputDate = ({ setValue, label, value, error, id }: InputDateProps) => {
         }}
         styles={{
           input: {
-            border: `1px solid #ccc`,
+            border: `1px solid #0000001A`,
+            fontWeight: "normal",
             fontSize: "18px",
             borderRadius: "4px",
             background: "#FFFFFF",

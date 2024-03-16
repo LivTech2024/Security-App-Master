@@ -79,7 +79,7 @@ const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
         className={`flex justify-center items-center bg-white w-full h-11  rounded border border-[#ccc]  ${
           error
             ? "border-red-400"
-            : "border-inputBorder focus-within:border-primary"
+            : "border-inputBorder focus-within:ring-[2px]"
         }   overflow-hidden`}
       >
         {leadingIcon ? (

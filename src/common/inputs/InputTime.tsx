@@ -83,7 +83,7 @@ const InputTime = ({
       {label ? (
         <InputHeader title={label} fontClassName={fontClassName} />
       ) : null}
-      <div className="flex items-center w-full border-[1px] border-inputBorder  rounded ">
+      <div className="flex items-center w-full border-[1px] border-inputBorder focus-within:ring-[2px]  rounded ">
         <PopupMenu
           opened={dropdown}
           setOpened={setDropdown}
