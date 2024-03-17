@@ -75,6 +75,10 @@ export const toDate = (value: any): Date => {
   }
 };
 
+export const removeTimeFromDate = (date: Date) => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
 export const formatDate = (dateText: any, dateFormat = "DD MMM") => {
   const date = toDate(dateText);
   return dayjs(date).format(dateFormat);

@@ -18,6 +18,7 @@ import { AddShiftFormFields } from "../../component/shifts/modal/AddShiftModal";
 import { db } from "../config";
 import { getNewDocId } from "./utils";
 import { IShiftsCollection } from "../../@types/database";
+import { removeTimeFromDate } from "../../utilities/misc";
 
 class DbShift {
   static addShift = async (shiftData: AddShiftFormFields) => {
@@ -28,7 +29,7 @@ class DbShift {
       ShiftId: shiftId,
       ShiftName: shiftData.name,
       ShiftPosition: shiftData.position,
-      ShiftDate: shiftData.date as unknown as Timestamp,
+      ShiftDate: removeTimeFromDate(shiftData.date) as unknown as Timestamp,
       ShiftStartTime: shiftData.start_time,
       ShiftEndTime: shiftData.end_time,
       ShiftDescription: shiftData.description || null,
@@ -50,7 +51,7 @@ class DbShift {
     const newShift: Partial<IShiftsCollection> = {
       ShiftName: shiftData.name,
       ShiftPosition: shiftData.position,
-      ShiftDate: shiftData.date as unknown as Timestamp,
+      ShiftDate: removeTimeFromDate(shiftData.date) as unknown as Timestamp,
       ShiftStartTime: shiftData.start_time,
       ShiftEndTime: shiftData.end_time,
       ShiftDescription: shiftData.description || null,

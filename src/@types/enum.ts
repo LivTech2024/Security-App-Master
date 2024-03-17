@@ -11,6 +11,7 @@ export const DisplayCount = {
 export const REACT_QUERY_KEYS = {
   EMPLOYEE_LIST: "employee-list",
   SHIFT_LIST: "shift-list",
+  SCHEDULES: "schedules",
 } as const;
 
 export const MinimumQueryCharacter = {

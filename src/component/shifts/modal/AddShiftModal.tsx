@@ -142,6 +142,10 @@ const AddShiftModal = ({
         queryKey: [REACT_QUERY_KEYS.SHIFT_LIST],
       });
 
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.SCHEDULES],
+      });
+
       closeModalLoader();
       setOpened(false);
       showSnackbar({
