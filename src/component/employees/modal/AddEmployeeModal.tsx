@@ -75,6 +75,9 @@ const AddEmployeeModal = ({
         role: employeeEditData.EmployeeRole,
         password: employeeEditData.EmployeePassword,
       };
+      setEmpImageBase64(employeeEditData.EmployeeImg);
+    } else {
+      setEmpImageBase64(null);
     }
 
     methods.reset(allFieldValues);
@@ -91,7 +94,11 @@ const AddEmployeeModal = ({
       showModalLoader({});
 
       if (isEdit) {
-        await DbEmployee.updateEmployee(data, employeeEditData.EmployeeId);
+        await DbEmployee.updateEmployee(
+          data,
+          empImageBase64,
+          employeeEditData.EmployeeId
+        );
       } else {
         await DbEmployee.addEmployee(data, empImageBase64);
       }

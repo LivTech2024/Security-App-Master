@@ -2,15 +2,14 @@ import {
   DocumentData,
   QueryConstraint,
   collection,
-  deleteDoc,
   doc,
   getDocs,
   limit,
   query,
+  runTransaction,
   serverTimestamp,
   setDoc,
   startAfter,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import {
@@ -109,39 +108,93 @@ class DbEmployee {
 
   static updateEmployee = async (
     empData: AddEmployeeFormField,
+    empImage: string,
     empId: string
   ) => {
-    const isEmpExist = await this.isEmpExist(
-      empData.phone_number,
-      empData.role,
-      empId
-    );
+    try {
+      const isEmpExist = await this.isEmpExist(
+        empData.phone_number,
+        empData.role,
+        empId
+      );
 
-    if (isEmpExist) {
-      throw new CustomError("Employee with this phone already exist");
+      if (isEmpExist) {
+        throw new CustomError("Employee with this phone already exist");
+      }
+
+      await runTransaction(db, async (transaction) => {
+        const empDocRef = doc(db, CollectionName.employees, empId);
+        const empSnapshot = await transaction.get(empDocRef);
+        const oldEmpData = empSnapshot.data() as IEmployeesCollection;
+
+        let empImageUrl = empImage;
+        let empImageToBeDelete: string | null = null;
+
+        if (!empImageUrl.startsWith("https")) {
+          const imageEmployee = [
+            {
+              base64: empImage,
+              path:
+                CloudStoragePaths.EMPLOYEES_IMAGES +
+                "/" +
+                CloudStorageImageHandler.generateImageName(empId),
+            },
+          ];
+
+          const imageEmpUrl =
+            await CloudStorageImageHandler.getImageDownloadUrls(
+              imageEmployee,
+              ImageResolution.EMP_IMAGE_HEIGHT,
+              ImageResolution.EMP_IMAGE_WIDTH
+            );
+
+          empImageUrl = imageEmpUrl[0];
+
+          empImageToBeDelete = oldEmpData.EmployeeImg;
+        }
+
+        const newEmployee: Partial<IEmployeesCollection> = {
+          EmployeeName: `${empData.first_name} ${empData.last_name}`,
+          EmployeeImg: empImageUrl,
+          EmployeeNameSearchIndex: fullTextSearchIndex(
+            `${empData.first_name.trim().toLowerCase()} ${empData.last_name
+              .trim()
+              .toLowerCase()}`
+          ),
+          EmployeePhone: empData.phone_number,
+          EmployeePassword: empData.password,
+          EmployeeEmail: empData.email,
+          EmployeeRole: empData.role,
+          EmployeeModifiedAt: serverTimestamp(),
+        };
+
+        transaction.update(empDocRef, newEmployee);
+
+        if (empImageToBeDelete) {
+          await CloudStorageImageHandler.deleteImageByUrl(empImageToBeDelete);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
-
-    const docRef = doc(db, CollectionName.employees, empId);
-
-    const newEmployee: Partial<IEmployeesCollection> = {
-      EmployeeName: `${empData.first_name} ${empData.last_name}`,
-      EmployeeNameSearchIndex: fullTextSearchIndex(
-        `${empData.first_name.trim().toLowerCase()} ${empData.last_name
-          .trim()
-          .toLowerCase()}`
-      ),
-      EmployeePhone: empData.phone_number,
-      EmployeeEmail: empData.email,
-      EmployeeRole: empData.role,
-      EmployeeModifiedAt: serverTimestamp(),
-    };
-
-    return updateDoc(docRef, newEmployee);
   };
 
-  static deleteEmployee = (empId: string) => {
+  static deleteEmployee = async (empId: string) => {
     const empRef = doc(db, CollectionName.employees, empId);
-    return deleteDoc(empRef);
+    await runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(empRef);
+
+      const empData = snapshot.data() as IEmployeesCollection;
+
+      const { EmployeeImg } = empData;
+
+      transaction.delete(empRef);
+
+      if (EmployeeImg) {
+        await CloudStorageImageHandler.deleteImageByUrl(EmployeeImg);
+      }
+    });
   };
 
   static getEmployees = ({

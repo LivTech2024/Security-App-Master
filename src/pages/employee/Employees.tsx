@@ -98,6 +98,17 @@ const Employees = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  function splitName(fullName: string) {
+    const firstSpaceIndex = fullName.indexOf(" ");
+    if (firstSpaceIndex !== -1) {
+      const firstName = fullName.slice(0, firstSpaceIndex);
+      const lastName = fullName.slice(firstSpaceIndex + 1);
+      return { firstName, lastName };
+    } else {
+      return { firstName: fullName, lastName: "" };
+    }
+  }
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -144,6 +155,7 @@ const Employees = () => {
             </tr>
           ) : (
             data.map((emp) => {
+              const { firstName, lastName } = splitName(emp.EmployeeName);
               return (
                 <tr
                   key={emp.EmployeeId}
@@ -157,12 +169,8 @@ const Employees = () => {
                   }}
                   className="cursor-pointer"
                 >
-                  <td className="px-4 py-2 text-center">
-                    {emp.EmployeeName.split(" ")[0]}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {emp.EmployeeName.split(" ")[1]}
-                  </td>
+                  <td className="px-4 py-2 text-center">{firstName}</td>
+                  <td className="px-4 py-2 text-center">{lastName}</td>
                   <td className="px-4 py-2 text-center">{emp.EmployeeEmail}</td>
                   <td className="px-4 py-2 text-center">{emp.EmployeePhone}</td>
                   <td className="px-4 py-2 text-center capitalize">
