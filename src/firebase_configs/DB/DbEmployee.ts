@@ -13,9 +13,13 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { CollectionName } from "../../@types/enum";
+import {
+  CloudStoragePaths,
+  CollectionName,
+  ImageResolution,
+} from "../../@types/enum";
 import { db } from "../config";
-import { getNewDocId } from "./utils";
+import CloudStorageImageHandler, { getNewDocId } from "./utils";
 import { IEmployeesCollection } from "../../@types/database";
 import { AddEmployeeFormField } from "../../component/employees/modal/AddEmployeeModal";
 import CustomError from "../../utilities/CustomError";
@@ -47,7 +51,10 @@ class DbEmployee {
     return snapshot.size > 0;
   };
 
-  static addEmployee = async (empData: AddEmployeeFormField) => {
+  static addEmployee = async (
+    empData: AddEmployeeFormField,
+    empImage: string
+  ) => {
     const isEmpExist = await this.isEmpExist(
       empData.phone_number,
       empData.role,
@@ -61,6 +68,22 @@ class DbEmployee {
     const empId = getNewDocId(CollectionName.employees);
     const docRef = doc(db, CollectionName.employees, empId);
 
+    const imageEmployee = [
+      {
+        base64: empImage,
+        path:
+          CloudStoragePaths.EMPLOYEES_IMAGES +
+          "/" +
+          CloudStorageImageHandler.generateImageName(empId),
+      },
+    ];
+
+    const imageEmpUrl = await CloudStorageImageHandler.getImageDownloadUrls(
+      imageEmployee,
+      ImageResolution.EMP_IMAGE_HEIGHT,
+      ImageResolution.EMP_IMAGE_WIDTH
+    );
+
     const newEmployee: IEmployeesCollection = {
       EmployeeId: empId,
       EmployeeName: `${empData.first_name} ${empData.last_name}`,
@@ -69,8 +92,10 @@ class DbEmployee {
           .trim()
           .toLowerCase()}`
       ),
+      EmployeeImg: imageEmpUrl[0],
       EmployeePhone: empData.phone_number,
       EmployeeEmail: empData.email,
+      EmployeePassword: empData.password,
       EmployeeRole: empData.role,
       EmployeeIsBanned: false,
       EmployeeCreatedAt: serverTimestamp(),

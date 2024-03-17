@@ -6,6 +6,7 @@ import {
   persistentLocalCache,
   persistentSingleTabManager,
 } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -29,3 +30,5 @@ const firestore = initializeFirestore(app, {
 export const db = firestore;
 
 export const auth = getAuth();
+
+export const storage = getStorage();

@@ -16,3 +16,12 @@ export const REACT_QUERY_KEYS = {
 export const MinimumQueryCharacter = {
   EMPLOYEE: 1,
 } as const;
+
+export const CloudStoragePaths = {
+  EMPLOYEES_IMAGES: "employees/images/",
+};
+
+export const ImageResolution = {
+  EMP_IMAGE_WIDTH: 1200,
+  EMP_IMAGE_HEIGHT: 1200,
+};

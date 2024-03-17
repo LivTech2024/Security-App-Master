@@ -1,15 +1,19 @@
 import React, { ChangeEvent, useState } from "react";
 import empDefaultPlaceHolder from "../../../public/assets/avatar.png";
 
-const ImageUpload: React.FC = () => {
-  const [image, setImage] = useState<string | null>(null);
-
+const ImageUpload = ({
+  empImageBase64,
+  setEmpImageBase64,
+}: {
+  empImageBase64: string | null;
+  setEmpImageBase64: React.Dispatch<React.SetStateAction<string | null>>;
+}) => {
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result as string);
+        setEmpImageBase64(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -32,8 +36,8 @@ const ImageUpload: React.FC = () => {
         <div className="flex items-center">
           <label htmlFor="image" className="mr-4 cursor-pointer">
             <img
-              src={image || empDefaultPlaceHolder}
-              alt={image ? "Uploaded" : "No Image Uploaded"}
+              src={empImageBase64 || empDefaultPlaceHolder}
+              alt={empImageBase64 ? "Uploaded" : "No Image Uploaded"}
               className="w-32 h-32 object-cover rounded"
             />
             <input
@@ -58,7 +62,9 @@ const ImageUpload: React.FC = () => {
               onChange={handleImageUpload}
             />
             <div className="text-textTertiary leading-4">
-              {image ? "Image uploaded successfully" : "No image uploaded"}
+              {empImageBase64
+                ? "Image uploaded successfully"
+                : "No image uploaded"}
             </div>
           </div>
         </div>

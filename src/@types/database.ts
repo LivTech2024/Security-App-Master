@@ -14,7 +14,7 @@ export interface IEmployeesCollection {
   EmployeeEmail: string;
   EmployeePassword: string;
   EmployeeImg: string;
-  EmployeeAdditionalDoc: string;
+  EmployeeAdditionalDoc?: string;
   EmployeeRole: EmployeeRoles;
   EmployeeIsBanned: boolean;
   EmployeeCreatedAt: Timestamp | FieldValue;

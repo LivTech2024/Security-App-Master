@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Dialog from "../../../common/Dialog";
 import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
 import InputSelect from "../../../common/inputs/InputSelect";
@@ -80,14 +80,20 @@ const AddEmployeeModal = ({
     methods.reset(allFieldValues);
   }, [isEdit, employeeEditData, methods, opened]);
 
+  const [empImageBase64, setEmpImageBase64] = useState<string | null>(null);
+
   const onSubmit = async (data: AddEmployeeFormField) => {
+    if (!empImageBase64) {
+      showSnackbar({ message: "Please add employee image", type: "error" });
+      return;
+    }
     try {
       showModalLoader({});
 
       if (isEdit) {
         await DbEmployee.updateEmployee(data, employeeEditData.EmployeeId);
       } else {
-        await DbEmployee.addEmployee(data);
+        await DbEmployee.addEmployee(data, empImageBase64);
       }
 
       await queryClient.invalidateQueries({
@@ -176,7 +182,10 @@ const AddEmployeeModal = ({
         >
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-4">
-              <ImageUpload />
+              <ImageUpload
+                empImageBase64={empImageBase64}
+                setEmpImageBase64={setEmpImageBase64}
+              />
             </div>
             <div className="flex flex-col gap-4">
               <InputWithTopHeader
