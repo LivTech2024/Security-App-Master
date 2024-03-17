@@ -33,6 +33,7 @@ const addShiftFormSchema = z.object({
   end_time: z.string().min(2, { message: "End time is required" }),
   description: z.string().nullable().optional(),
   name: z.string().min(2, { message: "Shift name is required" }),
+  location: z.string().min(3, { message: "Location is required" }),
 });
 
 export type AddShiftFormFields = z.infer<typeof addShiftFormSchema>;
@@ -79,12 +80,18 @@ const AddShiftModal = ({
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    console.log(methods.formState.errors);
+  }, [methods.formState]);
+
+  useEffect(() => {
     let allFieldValues: AddShiftFormFields = {
       position: ShiftPositions.guard,
       date: new Date(),
-      start_time: "",
-      end_time: "",
+      start_time: "06:00 AM",
+      end_time: "10:00 PM",
       name: "",
+      location: "",
+      description: "",
     };
     if (isEdit) {
       setStartTime(shiftEditData.ShiftStartTime);
@@ -96,12 +103,30 @@ const AddShiftModal = ({
         start_time: shiftEditData.ShiftStartTime,
         end_time: shiftEditData.ShiftEndTime,
         name: shiftEditData.ShiftName,
+        location: shiftEditData.ShiftLocation,
         description: shiftEditData.ShiftDescription,
       };
     }
 
     methods.reset(allFieldValues);
   }, [isEdit, shiftEditData, methods, opened]);
+
+  /* const getLatLng = () => {
+    setKey("AIzaSyCXI2H1SSthFqN3zLiYYNbEzlReufuG-_U");
+    fromAddress("1600 Amphitheatre Parkway, Mountain View, CA")
+      .then((response) => {
+        const { lat, lng } = response.results[0].geometry.location;
+        console.log(lat, lng, "lat, lng");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    if (!opened) return;
+    getLatLng();
+  }, [opened]); */
 
   const onSubmit = async (data: AddShiftFormFields) => {
     try {
@@ -232,6 +257,13 @@ const AddShiftModal = ({
               value={endTime}
               onChange={setEndTime}
               use12Hours={true}
+            />
+
+            <InputWithTopHeader
+              label="Shift Location"
+              className="mx-0"
+              register={methods.register}
+              name="location"
             />
 
             <div className="col-span-2">

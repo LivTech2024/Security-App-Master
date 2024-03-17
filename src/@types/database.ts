@@ -34,6 +34,7 @@ export interface IShiftsCollection {
   ShiftDate: Timestamp | FieldValue;
   ShiftStartTime: string;
   ShiftEndTime: string;
+  ShiftLocation: string;
   ShiftDescription: string | null;
   ShiftAssignedUserId: string | null;
   ShiftCreatedAt: Timestamp | FieldValue;

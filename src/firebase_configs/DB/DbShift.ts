@@ -33,6 +33,7 @@ class DbShift {
       ShiftEndTime: shiftData.end_time,
       ShiftDescription: shiftData.description || null,
       ShiftAssignedUserId: null,
+      ShiftLocation: shiftData.location,
       ShiftCreatedAt: serverTimestamp(),
       ShiftModifiedAt: serverTimestamp(),
     };
@@ -53,6 +54,7 @@ class DbShift {
       ShiftStartTime: shiftData.start_time,
       ShiftEndTime: shiftData.end_time,
       ShiftDescription: shiftData.description || null,
+      ShiftLocation: shiftData.location,
       ShiftModifiedAt: serverTimestamp(),
     };
 
