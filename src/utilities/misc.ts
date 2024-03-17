@@ -83,3 +83,14 @@ export const formatDate = (dateText: any, dateFormat = "DD MMM") => {
   const date = toDate(dateText);
   return dayjs(date).format(dateFormat);
 };
+
+export const splitName = (fullName: string) => {
+  const firstSpaceIndex = fullName.indexOf(" ");
+  if (firstSpaceIndex !== -1) {
+    const firstName = fullName.slice(0, firstSpaceIndex);
+    const lastName = fullName.slice(firstSpaceIndex + 1);
+    return { firstName, lastName };
+  } else {
+    return { firstName: fullName, lastName: "" };
+  }
+};

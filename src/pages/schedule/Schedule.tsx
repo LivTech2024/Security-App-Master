@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { REACT_QUERY_KEYS } from "../../@types/enum";
 import DbSchedule, { ISchedule } from "../../firebase_configs/DB/DbSchedule";
 import { toDate } from "../../utilities/misc";
+import AssignShiftModal from "../../component/schedule/modal/AssignShiftModal";
 
 const Schedule = () => {
   const [addShiftModal, setAddShiftModal] = useState(false);
@@ -16,13 +17,9 @@ const Schedule = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const [datesArray, setDatesArray] = useState<Date[]>([]);
-  const [selectedTenure, setSelectedTenure] = useState<"weekly" | "monthly">(
-    "weekly"
-  );
+  const [selectedTenure] = useState<"weekly" | "monthly">("weekly");
 
   const { setShiftEditData } = useEditFormStore();
-
-  console.log(assignShiftModal);
 
   useEffect(() => {
     if (selectedTenure === "weekly") {
@@ -50,14 +47,16 @@ const Schedule = () => {
   });
 
   const getScheduleForDay = (date: Date, schedules?: ISchedule[]) => {
-    //console.log(date, schedules);
     if (!schedules) return [];
     return schedules.filter((schedule) =>
       dayjs(toDate(schedule.shift.ShiftDate)).isSame(date, "date")
     );
   };
 
-  console.log(schedules, "sche");
+  /*************Assign shift************** */
+  const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(
+    null
+  );
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -109,214 +108,61 @@ const Schedule = () => {
           {/* Map all the shifts according to date */}
 
           <tr>
-            <td className="text-center px-2 py-2 align-top">
-              <div className="flex flex-col gap-4">
-                {getScheduleForDay(datesArray[0], schedules).map((data) => {
-                  return (
-                    <div key={data.shift.ShiftId} className="flex flex-col">
-                      <div className="text-base font-medium">
-                        {data.shift.ShiftName}
-                      </div>
-                      <div className="font-semibold">
-                        {data.shift.ShiftStartTime}-{data.shift.ShiftEndTime}
-                      </div>
-                      {data.employee ? (
-                        <div
-                          onClick={() => setAssignShiftModal(true)}
-                          className="flex flex-col p-1 bg-[#faf9f9] cursor-pointer border hover:border-gray-500"
-                        >
-                          <div>{data.employee.EmployeeName}</div>
-                        </div>
-                      ) : (
-                        <div className="bg-[#ffff64] py-[2px]">
-                          (Unassigned)
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </td>
-            <td className="text-center px-2 py-2 align-top">
-              <div className="flex flex-col gap-4">
-                {getScheduleForDay(datesArray[1], schedules).map((data) => {
-                  return (
-                    <div key={data.shift.ShiftId} className="flex flex-col">
-                      <div className="text-base font-medium">
-                        {data.shift.ShiftName}
-                      </div>
-                      <div className="font-semibold">
-                        {data.shift.ShiftStartTime}-{data.shift.ShiftEndTime}
-                      </div>
-                      {data.employee ? (
-                        <div
-                          onClick={() => setAssignShiftModal(true)}
-                          className="flex flex-col p-1 bg-[#faf9f9] cursor-pointer border hover:border-gray-500"
-                        >
-                          <div>{data.employee.EmployeeName}</div>
-                        </div>
-                      ) : (
-                        <div className="bg-[#ffff64] py-[2px]">
-                          (Unassigned)
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </td>
-            <td className="text-center px-2 py-2 align-top">
-              <div className="flex flex-col gap-4">
-                {getScheduleForDay(datesArray[2], schedules).map((data) => {
-                  return (
-                    <div key={data.shift.ShiftId} className="flex flex-col">
-                      <div className="text-base font-medium">
-                        {data.shift.ShiftName}
-                      </div>
-                      <div className="font-semibold">
-                        {data.shift.ShiftStartTime}-{data.shift.ShiftEndTime}
-                      </div>
-                      {data.employee ? (
-                        <div
-                          onClick={() => setAssignShiftModal(true)}
-                          className="flex flex-col p-1 bg-[#faf9f9] cursor-pointer border hover:border-gray-500"
-                        >
-                          <div>{data.employee.EmployeeName}</div>
-                        </div>
-                      ) : (
-                        <div className="bg-[#ffff64] py-[2px]">
-                          (Unassigned)
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </td>
-            <td className="text-center px-2 py-2 align-top">
-              <div className="flex flex-col gap-4">
-                {getScheduleForDay(datesArray[3], schedules).map((data) => {
-                  return (
-                    <div key={data.shift.ShiftId} className="flex flex-col">
-                      <div className="text-base font-medium">
-                        {data.shift.ShiftName}
-                      </div>
-                      <div className="font-semibold">
-                        {data.shift.ShiftStartTime}-{data.shift.ShiftEndTime}
-                      </div>
-                      {data.employee ? (
-                        <div
-                          onClick={() => setAssignShiftModal(true)}
-                          className="flex flex-col p-1 bg-[#faf9f9] cursor-pointer border hover:border-gray-500"
-                        >
-                          <div>{data.employee.EmployeeName}</div>
-                        </div>
-                      ) : (
-                        <div className="bg-[#ffff64] py-[2px]">
-                          (Unassigned)
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </td>
-            <td className="text-center px-2 py-2 align-top">
-              <div className="flex flex-col gap-4">
-                {getScheduleForDay(datesArray[4], schedules).map((data) => {
-                  return (
-                    <div key={data.shift.ShiftId} className="flex flex-col">
-                      <div className="text-base font-medium">
-                        {data.shift.ShiftName}
-                      </div>
-                      <div className="font-semibold">
-                        {data.shift.ShiftStartTime}-{data.shift.ShiftEndTime}
-                      </div>
-                      {data.employee ? (
-                        <div
-                          onClick={() => setAssignShiftModal(true)}
-                          className="flex flex-col p-1 bg-[#faf9f9] cursor-pointer border hover:border-gray-500"
-                        >
-                          <div>{data.employee.EmployeeName}</div>
-                        </div>
-                      ) : (
-                        <div className="bg-[#ffff64] py-[2px]">
-                          (Unassigned)
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </td>
-            <td className="text-center px-2 py-2 align-top">
-              <div className="flex flex-col gap-4">
-                {getScheduleForDay(datesArray[5], schedules).map((data) => {
-                  return (
-                    <div key={data.shift.ShiftId} className="flex flex-col">
-                      <div className="text-base font-medium">
-                        {data.shift.ShiftName}
-                      </div>
-                      <div className="font-semibold">
-                        {data.shift.ShiftStartTime}-{data.shift.ShiftEndTime}
-                      </div>
-                      {data.employee ? (
-                        <div
-                          onClick={() => setAssignShiftModal(true)}
-                          className="flex flex-col p-1 bg-[#faf9f9] cursor-pointer border hover:border-gray-500"
-                        >
-                          <div>{data.employee.EmployeeName}</div>
-                        </div>
-                      ) : (
-                        <div className="bg-[#ffff64] py-[2px]">
-                          (Unassigned)
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </td>
-            <td className="text-center px-2 py-2 align-top">
-              <div className="flex flex-col gap-4">
-                {getScheduleForDay(datesArray[6], schedules).map((data) => {
-                  return (
-                    <div key={data.shift.ShiftId} className="flex flex-col">
-                      <div className="text-base font-medium">
-                        {data.shift.ShiftName}
-                      </div>
-                      <div className="font-semibold">
-                        {data.shift.ShiftStartTime}-{data.shift.ShiftEndTime}
-                      </div>
-                      {data.employee ? (
-                        <div
-                          onClick={() => setAssignShiftModal(true)}
-                          className="flex flex-col p-1 bg-[#faf9f9] cursor-pointer border hover:border-gray-500"
-                        >
-                          <div>{data.employee.EmployeeName}</div>
-                        </div>
-                      ) : (
-                        <div className="bg-[#ffff64] py-[2px]">
-                          (Unassigned)
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </td>
+            {datesArray.map((_, index) => {
+              return (
+                <td key={index} className="text-center px-2 py-2 align-top">
+                  <div className="flex flex-col gap-4">
+                    {getScheduleForDay(datesArray[index], schedules).map(
+                      (data) => {
+                        return (
+                          <div
+                            onClick={() => {
+                              setSelectedSchedule(data);
+                              setAssignShiftModal(true);
+                            }}
+                            key={data.shift.ShiftId}
+                            className={`flex flex-col ${
+                              data.employee ? "cursor-move" : "cursor-pointer"
+                            }`}
+                          >
+                            <div className="text-base font-medium">
+                              {data.shift.ShiftName}
+                            </div>
+                            <div className="font-semibold">
+                              {data.shift.ShiftStartTime}-
+                              {data.shift.ShiftEndTime}
+                            </div>
+                            {data.employee ? (
+                              <div
+                                onClick={() => setAssignShiftModal(true)}
+                                className="flex flex-col p-1 bg-[#faf9f9] border hover:border-gray-500"
+                              >
+                                <div>{data.employee.EmployeeName}</div>
+                              </div>
+                            ) : (
+                              <div className="bg-[#ffff64] py-[2px]">
+                                (Unassigned)
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
+                </td>
+              );
+            })}
           </tr>
         </tbody>
       </table>
 
       <div className="hidden">
-        {/* <AssignShiftModal
+        <AssignShiftModal
           opened={assignShiftModal}
           setOpened={setAssignShiftModal}
-          selectedEmp={selectedEmp}
-          selectedEmpDate={selectedEmpDate}
-          availableShifts={getShiftForDay(selectedEmpDate)}
-        /> */}
+          selectedDate={selectedDate}
+          schedule={selectedSchedule}
+        />
       </div>
     </div>
   );

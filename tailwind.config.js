@@ -23,6 +23,7 @@ export default {
         textSecondaryBlue: "#508BFF",
         textPrimaryBlue: "#0E5FFF",
         textPrimaryRed: "#ef4444",
+        textPrimaryGreen: "#23CFAB",
 
         //button hover bg
         greenButtonHoverBg: "#16a34a",

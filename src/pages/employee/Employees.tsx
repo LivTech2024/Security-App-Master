@@ -14,7 +14,7 @@ import { IEmployeesCollection } from "../../@types/database";
 import NoSearchResult from "../../common/NoSearchResult";
 import TableShimmer from "../../common/shimmer/TableShimmer";
 import { useEditFormStore } from "../../store";
-import { firebaseDataToObject } from "../../utilities/misc";
+import { firebaseDataToObject, splitName } from "../../utilities/misc";
 import { Employee } from "../../store/slice/editForm.slice";
 
 const Employees = () => {
@@ -97,17 +97,6 @@ const Employees = () => {
       fetchNextPage();
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
-
-  function splitName(fullName: string) {
-    const firstSpaceIndex = fullName.indexOf(" ");
-    if (firstSpaceIndex !== -1) {
-      const firstName = fullName.slice(0, firstSpaceIndex);
-      const lastName = fullName.slice(firstSpaceIndex + 1);
-      return { firstName, lastName };
-    } else {
-      return { firstName: fullName, lastName: "" };
-    }
-  }
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
