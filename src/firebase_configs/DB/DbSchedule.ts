@@ -106,18 +106,31 @@ class DbSchedule {
 
         // Calculate total work hours for the week
         const totalWorkHours = shifts.reduce((totalHours, shift) => {
-          const [startHour, startMinute] =
-            shift.ShiftStartTime.split(":").map(Number);
-          const [endHour, endMinute] =
-            shift.ShiftEndTime.split(":").map(Number);
+          const [startHourStr, startMinuteStr] =
+            shift.ShiftStartTime.split(":");
+          const [endHourStr, endMinuteStr] = shift.ShiftEndTime.split(":");
 
+          // Parse start and end times to integers
+          let startHour = parseInt(startHourStr, 10);
+          const startMinute = parseInt(startMinuteStr, 10);
+          let endHour = parseInt(endHourStr, 10);
+          const endMinute = parseInt(endMinuteStr, 10);
+
+          // Adjust hours for PM times
+          if (shift.ShiftStartTime.includes("PM") && startHour !== 12) {
+            startHour += 12;
+          }
+          if (shift.ShiftEndTime.includes("PM") && endHour !== 12) {
+            endHour += 12;
+          }
+
+          // Calculate shift duration in hours
           const startDateTime = dayjs(toDate(shift.ShiftDate))
             .hour(startHour)
             .minute(startMinute);
           const endDateTime = dayjs(toDate(shift.ShiftDate))
             .hour(endHour)
             .minute(endMinute);
-
           const shiftHours = endDateTime.diff(startDateTime, "hour", true);
 
           return totalHours + shiftHours;
@@ -133,7 +146,7 @@ class DbSchedule {
           )
             ? false
             : true,
-          EmpWeekHours: 7,
+          EmpWeekHours: totalWorkHours,
         });
       });
 

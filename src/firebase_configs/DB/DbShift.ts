@@ -89,6 +89,12 @@ class DbShift {
 
     return getDocs(shiftQuery);
   };
+
+  static changeShiftDate = (shiftId: string, newDate: Date) => {
+    const docRef = doc(db, CollectionName.shifts, shiftId);
+
+    return updateDoc(docRef, { ShiftDate: newDate as unknown as Timestamp });
+  };
 }
 
 export default DbShift;

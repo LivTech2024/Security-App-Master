@@ -1,15 +1,32 @@
 import { useDrag, useDrop } from "react-dnd";
 
-export const Box = ({ id, shift }: { id: string; shift: string }) => {
+interface DraggableProps {
+  children: React.ReactNode;
+  draggableId: string;
+  type: string;
+  canDrag?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  callback: (draggableId: string, dropPointId: string) => void;
+}
+
+export const Draggable = ({
+  children,
+  draggableId,
+  type,
+  canDrag,
+  callback,
+}: DraggableProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: "box",
-    item: { shift, id },
+    type,
+    item: { children, draggableId },
     end: (item, monitor) => {
       const dropResult = monitor.getDropResult<{ id: string }>();
       if (item && dropResult) {
-        alert(`You dropped ${item.shift} into user!`);
+        callback(item.draggableId, dropResult.id);
+        console.log(`You dropped ${item.draggableId} into ${dropResult.id}`);
       }
     },
+    canDrag,
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
       handlerId: monitor.getHandlerId(),
@@ -17,7 +34,7 @@ export const Box = ({ id, shift }: { id: string; shift: string }) => {
   }));
 
   return (
-    <div
+    <tr
       ref={drag}
       className=" pb-1 text-sm"
       style={{
@@ -25,15 +42,25 @@ export const Box = ({ id, shift }: { id: string; shift: string }) => {
         cursor: "move",
       }}
     >
-      {shift}
-    </div>
+      {children}
+    </tr>
   );
 };
 
-export const Dustbin = () => {
+interface DropPointProps {
+  accept: string;
+  className: string;
+  id: string;
+}
+
+export const DropPoint = ({
+  accept = "box",
+  className,
+  id,
+}: DropPointProps) => {
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
-    accept: "box",
-    drop: () => ({ name: "Dustbin" }),
+    accept,
+    drop: () => ({ id }),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
@@ -45,8 +72,8 @@ export const Dustbin = () => {
   return (
     <div
       ref={drop}
-      data-testid="dustbin"
-      className={`${isActive ? "bg-gray-300" : "bg-gray-200"} w-full h-[60px]`}
+      data-testid={id}
+      className={`${isActive && "bg-gray-200"} ${className} `}
     >
       &nbsp;
     </div>

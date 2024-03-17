@@ -37,6 +37,7 @@ const AssignShiftModal = ({
   >([]);
 
   useEffect(() => {
+    setSelectedEmpId(schedule?.employee ? schedule.employee.EmployeeId : null);
     const fetchEmpScheduleForWeek = async () => {
       if (!schedule) return;
       try {
@@ -133,7 +134,9 @@ const AssignShiftModal = ({
                     {data.EmpWeekHours.toFixed(1)}
                   </td>
                   <td className="text-center px-4 py-2">
-                    {data.EmpIsAvailable ? (
+                    {schedule?.employee ? (
+                      <span className="font-semibold">Currently assigned </span>
+                    ) : data.EmpIsAvailable ? (
                       <TiTick className="text-textPrimaryGreen text-xl text-center" />
                     ) : (
                       <RxCross1 className="text-textPrimaryRed text-xl text-center" />
