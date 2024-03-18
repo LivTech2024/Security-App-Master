@@ -23,7 +23,9 @@ const Schedule = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const [datesArray, setDatesArray] = useState<Date[]>([]);
-  const [selectedTenure] = useState<"weekly" | "monthly">("weekly");
+  const [selectedTenure, setSelectedTenure] = useState<"weekly" | "monthly">(
+    "weekly"
+  );
 
   const { setShiftEditData } = useEditFormStore();
 
@@ -34,6 +36,16 @@ const Schedule = () => {
       for (
         let i = dayjs(selectedDate).startOf("week");
         i.isBefore(dayjs(selectedDate).endOf("week"));
+        i = dayjs(i).add(1, "day")
+      ) {
+        setDatesArray((prev) => [...prev, i.toDate()]);
+      }
+    } else if (selectedTenure === "monthly") {
+      setDatesArray([]);
+
+      for (
+        let i = dayjs(selectedDate).startOf("month");
+        i.isBefore(dayjs(selectedDate).endOf("month"));
         i = dayjs(i).add(1, "day")
       ) {
         setDatesArray((prev) => [...prev, i.toDate()]);
@@ -112,15 +124,18 @@ const Schedule = () => {
           className="text-lg"
           styles={{
             input: {
-              fontWeight: 500,
+              border: `1px solid #0000001A`,
+              fontWeight: "normal",
               fontSize: "18px",
-              border: "1px solid #0000001A",
-              padding: "4px 8px",
+              borderRadius: "4px",
+              background: "#FFFFFF",
+              color: "#000000",
+              padding: "12px 12px",
             },
           }}
         />
 
-        <div className="flex items-center gap-4 mr-[10%]">
+        <div className="flex items-center gap-4">
           <FaCircleChevronLeft
             className="text-2xl cursor-pointer"
             onClick={() =>
@@ -157,90 +172,95 @@ const Schedule = () => {
             }
           />
         </div>
-        <div>&nbsp;</div>
+        <div>
+          <Select
+            allowDeselect={false}
+            value={selectedTenure}
+            onChange={(e) => setSelectedTenure(e as "monthly" | "weekly")}
+            data={[
+              { label: "Weekly", value: "weekly" },
+              { label: "Monthly", value: "monthly" },
+            ]}
+            className="text-lg"
+            styles={{
+              input: {
+                border: `1px solid #0000001A`,
+                fontWeight: "normal",
+                fontSize: "18px",
+                borderRadius: "4px",
+                background: "#FFFFFF",
+                color: "#000000",
+                padding: "12px 12px",
+              },
+            }}
+          />
+        </div>
       </div>
       <DndProvider backend={HTML5Backend}>
-        <table className="w-full">
-          <thead className="text-sm font-normal">
-            <tr className="border-b-[30px] border-gray-200">
-              {datesArray.map((dates, index) => {
-                return (
-                  <th key={index} className="w-[14.29%] text-center font-bold">
-                    {dayjs(dates).format("dddd MMM-DD")}
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
+        <div className="flex flex-wrap w-full overflow-hidden">
+          {datesArray.map((date, index) => {
+            return (
+              <div key={index} className="flex flex-col w-[14.28%]">
+                <div className="border-b-[30px] border-gray-200 font-semibold text-center">
+                  {dayjs(date).format("ddd MMM-DD")}
+                </div>
 
-          <tbody className="text-sm">
-            {/* Map all the shifts according to date */}
-
-            <tr>
-              {datesArray.map((date, index) => {
-                return (
-                  <td key={index} className="text-center px-2 py-2 align-top">
-                    <div className="flex flex-col gap-4">
-                      {getScheduleForDay(datesArray[index], schedules).map(
-                        (data, idx) => {
-                          return (
-                            <Draggable
-                              draggableId={data.shift.ShiftId}
-                              type="box"
-                              callback={dropResult}
-                              canDrag={
-                                getScheduleForDay(datesArray[index], schedules)
-                                  .length ===
-                                idx + 1
-                                  ? true
-                                  : false
-                              }
-                            >
-                              <div
-                                onClick={() => {
-                                  setSelectedSchedule(data);
-                                  setAssignShiftModal(true);
-                                }}
-                                key={data.shift.ShiftId}
-                                className={`flex flex-col border hover:border-gray-500 bg-[#5e5c5c23] p-1 rounded cursor-move`}
-                              >
-                                <div className="text-base font-medium">
-                                  {data.shift.ShiftName}
-                                </div>
-                                <div className="font-semibold">
-                                  {data.shift.ShiftStartTime}-
-                                  {data.shift.ShiftEndTime}
-                                </div>
-                                {data.employee ? (
-                                  <div
-                                    onClick={() => setAssignShiftModal(true)}
-                                    className="flex flex-col "
-                                  >
-                                    <div>{data.employee.EmployeeName}</div>
-                                  </div>
-                                ) : (
-                                  <div className="bg-[#ffff64] py-[2px] rounded">
-                                    (Unassigned)
-                                  </div>
-                                )}
+                <div className="flex flex-col gap-2 p-2 w-full justify-between h-full">
+                  {getScheduleForDay(datesArray[index], schedules).map(
+                    (data, idx) => {
+                      return (
+                        <Draggable
+                          draggableId={data.shift.ShiftId}
+                          type="box"
+                          callback={dropResult}
+                          canDrag={
+                            getScheduleForDay(datesArray[index], schedules)
+                              .length ===
+                            idx + 1
+                              ? true
+                              : false
+                          }
+                        >
+                          <div
+                            onClick={() => {
+                              setSelectedSchedule(data);
+                              setAssignShiftModal(true);
+                            }}
+                            key={data.shift.ShiftId}
+                            className={`flex flex-col border hover:border-gray-500 bg-[#5e5c5c23] p-1 rounded cursor-move min-w-full items-center`}
+                          >
+                            <div className="text-base font-medium">
+                              {data.shift.ShiftName}
+                            </div>
+                            <div className="font-semibold">
+                              {data.shift.ShiftStartTime}-
+                              {data.shift.ShiftEndTime}
+                            </div>
+                            {data.employee ? (
+                              <div className=" py-[2px] rounded w-full text-center">
+                                {data.employee.EmployeeName}
                               </div>
-                            </Draggable>
-                          );
-                        }
-                      )}
+                            ) : (
+                              <div className="bg-[#ffff64] py-[2px] rounded w-full text-center">
+                                (Unassigned)
+                              </div>
+                            )}
+                          </div>
+                        </Draggable>
+                      );
+                    }
+                  )}
 
-                      <DropPoint
-                        id={date.toDateString()}
-                        accept="box"
-                        className=" min-h-[75px]"
-                      />
-                    </div>
-                  </td>
-                );
-              })}
-            </tr>
-          </tbody>
-        </table>
+                  <DropPoint
+                    id={date.toDateString()}
+                    accept="box"
+                    className=" min-h-[75px]"
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </DndProvider>
 
       <div className="hidden">

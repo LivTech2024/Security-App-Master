@@ -38,7 +38,7 @@ const AssignShiftModal = ({
 
   useEffect(() => {
     setSelectedEmpId(schedule?.employee ? schedule.employee.EmployeeId : null);
-    const fetchEmpScheduleForWeek = async () => {
+    const fetchEmpSchedule = async () => {
       if (!schedule) return;
       try {
         const data = await DbSchedule.getEmployeesSchedule(
@@ -54,7 +54,7 @@ const AssignShiftModal = ({
         console.log(error, "error");
       }
     };
-    fetchEmpScheduleForWeek();
+    fetchEmpSchedule();
   }, [selectedDate, opened, schedule]);
 
   const onSubmit = async () => {
@@ -134,7 +134,8 @@ const AssignShiftModal = ({
                     {data.EmpWeekHours.toFixed(1)}
                   </td>
                   <td className="text-center px-4 py-2">
-                    {schedule?.employee ? (
+                    {schedule?.employee &&
+                    schedule.employee.EmployeeId === data.EmpId ? (
                       <span className="font-semibold">Currently assigned </span>
                     ) : data.EmpIsAvailable ? (
                       <TiTick className="text-textPrimaryGreen text-xl text-center" />

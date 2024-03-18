@@ -91,6 +91,8 @@ class DbSchedule {
         (doc) => doc.data() as IEmployeesCollection
       );
 
+      console.log(employees, "under here");
+
       const promise = employees.map(async (emp) => {
         const shiftRef = collection(db, CollectionName.shifts);
         const shiftQuery = query(
