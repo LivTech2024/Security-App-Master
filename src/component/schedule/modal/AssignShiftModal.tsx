@@ -16,6 +16,8 @@ import {
 import { errorHandler } from "../../../utilities/CustomError";
 import { useQueryClient } from "@tanstack/react-query";
 import { REACT_QUERY_KEYS } from "../../../@types/enum";
+import { sendEmail } from "../../../utilities/sendEmail";
+import { IEmployeesCollection } from "../../../@types/database";
 
 const AssignShiftModal = ({
   opened,
@@ -28,7 +30,9 @@ const AssignShiftModal = ({
   selectedDate: Date;
   schedule: ISchedule | null;
 }) => {
-  const [selectedEmpId, setSelectedEmpId] = useState<string | null>(null);
+  const [selectedEmp, setSelectedEmp] = useState<IEmployeesCollection | null>(
+    null
+  );
 
   const queryClient = useQueryClient();
 
@@ -37,7 +41,7 @@ const AssignShiftModal = ({
   >([]);
 
   useEffect(() => {
-    setSelectedEmpId(schedule?.employee ? schedule.employee.EmployeeId : null);
+    setSelectedEmp(schedule?.employee ? schedule.employee : null);
     const fetchEmpSchedule = async () => {
       if (!schedule) return;
       try {
@@ -58,11 +62,20 @@ const AssignShiftModal = ({
   }, [selectedDate, opened, schedule]);
 
   const onSubmit = async () => {
-    if (!schedule || !selectedEmpId) return;
+    if (!schedule || !selectedEmp) return;
     try {
       showModalLoader({});
 
-      await DbSchedule.assignShiftToEmp(schedule.shift.ShiftId, selectedEmpId);
+      await DbSchedule.assignShiftToEmp(
+        schedule.shift.ShiftId,
+        selectedEmp.EmployeeId
+      );
+      sendEmail({
+        to_email: selectedEmp.EmployeeEmail,
+        to_name: selectedEmp.EmployeeName,
+        message: `You have been assigned for the shift. Shift Name: ${schedule.shift.ShiftName}\n Timing: ${schedule.shift.ShiftStartTime}-${schedule.shift.ShiftEndTime} \n location: ${schedule.shift.ShiftLocation}`,
+        subject: "You schedule update",
+      });
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.SCHEDULES],
       });
@@ -84,7 +97,7 @@ const AssignShiftModal = ({
       size="auto"
       isFormModal
       positiveCallback={onSubmit}
-      disableSubmit={!selectedEmpId}
+      disableSubmit={!selectedEmp}
     >
       <div className="flex flex-col bg-gray-100 rounded-md p-4">
         <div className="font-semibold text-lg">
@@ -118,10 +131,15 @@ const AssignShiftModal = ({
                 <tr
                   onClick={() => {
                     if (!data.EmpIsAvailable) return;
-                    setSelectedEmpId(data.EmpId);
+                    const emp: Partial<IEmployeesCollection> = {
+                      EmployeeId: data.EmpId,
+                      EmployeeEmail: data.EmpEmail,
+                      EmployeeName: data.EmpName,
+                    };
+                    setSelectedEmp(emp as IEmployeesCollection);
                   }}
                   className={`${
-                    selectedEmpId === data.EmpId
+                    selectedEmp?.EmployeeId === data.EmpId
                       ? "bg-blue-500 text-surface"
                       : "bg-surface"
                   } cursor-pointer`}

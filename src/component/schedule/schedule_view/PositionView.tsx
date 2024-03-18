@@ -10,7 +10,11 @@ import DbSchedule, {
 } from "../../../firebase_configs/DB/DbSchedule";
 import { toDate } from "../../../utilities/misc";
 import { Draggable, DropPoint } from "../../../utilities/DragAndDropHelper";
-import { IEmployeesCollection, ShiftPositions } from "../../../@types/database";
+import {
+  IEmployeesCollection,
+  IShiftsCollection,
+  ShiftPositions,
+} from "../../../@types/database";
 import { MdOutlineClose } from "react-icons/md";
 import {
   closeModalLoader,
@@ -18,6 +22,7 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import { errorHandler } from "../../../utilities/CustomError";
+import { sendEmail } from "../../../utilities/sendEmail";
 
 interface PositionViewProps {
   datesArray: Date[];
@@ -58,10 +63,13 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
     IEmpScheduleForWeek[]
   >([]);
 
+  const [isEmpLoading, setIsEmpLoading] = useState(false);
+
   useEffect(() => {
     const fetchEmpSchedule = async () => {
       if (!showEmpListByPosition || !selectedDate) return;
       try {
+        setIsEmpLoading(true);
         const data = await DbSchedule.getEmployeesSchedule(
           dayjs(selectedDate).startOf("week").toDate(),
           dayjs(selectedDate).endOf("week").toDate(),
@@ -71,7 +79,10 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
         if (data) {
           setEmpAvailableForShift(data.filter((emp) => emp.EmpIsAvailable));
         }
+        setIsEmpLoading(false);
       } catch (error) {
+        errorHandler(error);
+        setIsEmpLoading(false);
         console.log(error, "error");
       }
     };
@@ -80,7 +91,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
 
   const [resultToBePublished, setResultToBePublished] = useState<
     {
-      shiftId: string;
+      shift: IShiftsCollection;
       emp: IEmpScheduleForWeek;
     }[]
   >([]);
@@ -105,7 +116,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
 
     setResultToBePublished((prev) => [
       ...prev,
-      { emp: selectedEmp, shiftId: selectedShift?.shift.ShiftId },
+      { emp: selectedEmp, shift: selectedShift.shift },
     ]);
 
     setEmpAvailableForShift((prev) =>
@@ -136,11 +147,28 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
     try {
       showModalLoader({});
 
-      const promise = resultToBePublished.map(async (result) => {
-        return DbSchedule.assignShiftToEmp(result.shiftId, result.emp.EmpId);
+      const shiftAssignPromise = resultToBePublished.map(async (result) => {
+        return DbSchedule.assignShiftToEmp(
+          result.shift.ShiftId,
+          result.emp.EmpId
+        );
       });
 
-      await Promise.all(promise);
+      await Promise.all(shiftAssignPromise);
+
+      const sendEmailPromise = resultToBePublished.map(async (res) => {
+        const { emp, shift } = res;
+        return sendEmail({
+          to_email: emp.EmpEmail,
+          to_name: emp.EmpName,
+          message: `You have been assigned for the shift. Shift Name: ${shift.ShiftName}\n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n location: ${shift.ShiftLocation}`,
+          subject: "You schedule update",
+        });
+      });
+
+      Promise.allSettled(sendEmailPromise).catch((error) => {
+        console.log(error, "Error while sending emails to employees");
+      });
 
       setResultToBePublished([]);
 
@@ -154,7 +182,6 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
       errorHandler(error);
       console.log(error);
     }
-    console.log(resultToBePublished, "result");
   };
 
   const onUndo = () => {
@@ -163,7 +190,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
 
     const resultToBeUndo = resultToBePublished[lastResultIndex];
 
-    const { emp, shiftId } = resultToBeUndo;
+    const { emp, shift } = resultToBeUndo;
 
     setResultToBePublished((prev) => prev.slice(0, -1));
 
@@ -171,7 +198,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
 
     setSchedules((prev) => {
       const updatedSchedules = prev.map((schedule) => {
-        if (schedule.shift.ShiftId === shiftId) {
+        if (schedule.shift.ShiftId === shift.ShiftId) {
           return {
             ...schedule,
             employee: null,
@@ -209,7 +236,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                 />
               </div>
               <div className="flex items-center gap-4 flex-wrap cursor-move">
-                {empAvailableForShift.length > 0 ? (
+                {empAvailableForShift.length > 0 && !isEmpLoading ? (
                   empAvailableForShift.map((data) => {
                     return (
                       <Draggable
@@ -243,9 +270,19 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                       </Draggable>
                     );
                   })
+                ) : isEmpLoading ? (
+                  Array.from({ length: 5 }).map((_, idx) => {
+                    return (
+                      <div
+                        key={idx}
+                        className="bg-shimmerColor animate-pulse w-[150px] h-[80px]"
+                      ></div>
+                    );
+                  })
                 ) : (
                   <div className="bg-primaryGold font-bold py-1 px-2 rounded">
-                    No {showEmpListByPosition} available for this shift
+                    No {showEmpListByPosition} available for{" "}
+                    {dayjs(selectedDate).format("ddd MMM-DD")}
                   </div>
                 )}
               </div>

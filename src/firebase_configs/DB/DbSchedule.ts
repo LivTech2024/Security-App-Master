@@ -26,6 +26,7 @@ export interface IEmpScheduleForWeek {
   EmpId: string;
   EmpName: string;
   EmpPhone: string;
+  EmpEmail: string;
   EmpWeekShifts: number;
   EmpWeekHours: number;
   EmpIsAvailable: boolean;
@@ -137,6 +138,7 @@ class DbSchedule {
           EmpId: emp.EmployeeId,
           EmpName: emp.EmployeeName,
           EmpPhone: emp.EmployeePhone,
+          EmpEmail: emp.EmployeeEmail,
           EmpWeekShifts: shifts.length,
           EmpIsAvailable: shifts.some((s) =>
             dayjs(toDate(s.ShiftDate)).isSame(currentDate, "date")
