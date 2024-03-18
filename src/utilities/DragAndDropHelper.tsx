@@ -5,7 +5,6 @@ interface DraggableProps {
   draggableId: string;
   type: string;
   canDrag?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   callback: (draggableId: string, dropPointId: string) => void;
 }
 
@@ -16,22 +15,25 @@ export const Draggable = ({
   canDrag,
   callback,
 }: DraggableProps) => {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type,
-    item: { children, draggableId },
-    end: (item, monitor) => {
-      const dropResult = monitor.getDropResult<{ id: string }>();
-      if (item && dropResult) {
-        callback(item.draggableId, dropResult.id);
-        console.log(`You dropped ${item.draggableId} into ${dropResult.id}`);
-      }
-    },
-    canDrag,
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-      handlerId: monitor.getHandlerId(),
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type,
+      item: { children, draggableId },
+      end: (item, monitor) => {
+        const dropResult = monitor.getDropResult<{ id: string }>();
+        if (item && dropResult) {
+          callback(item.draggableId, dropResult.id);
+          console.log(`You dropped ${item.draggableId} into ${dropResult.id}`);
+        }
+      },
+      canDrag,
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+        handlerId: monitor.getHandlerId(),
+      }),
     }),
-  }));
+    [draggableId, children]
+  );
 
   return (
     <tr
@@ -51,12 +53,16 @@ interface DropPointProps {
   accept: string;
   className: string;
   id: string;
+  children?: React.ReactNode;
+  activeClassName?: string;
 }
 
 export const DropPoint = ({
-  accept = "box",
+  accept,
   className,
   id,
+  children,
+  activeClassName,
 }: DropPointProps) => {
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept,
@@ -68,6 +74,20 @@ export const DropPoint = ({
   }));
 
   const isActive = canDrop && isOver;
+
+  if (children) {
+    return (
+      <div
+        ref={drop}
+        data-testid={id}
+        className={`${
+          isActive && (activeClassName ?? "bg-gray-200")
+        } ${className} `}
+      >
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div

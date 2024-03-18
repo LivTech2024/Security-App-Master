@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import TopSection from "../../component/schedule/TopSection";
 import CalendarView from "../../component/schedule/schedule_view/CalendarView";
+import PositionView from "../../component/schedule/schedule_view/PositionView";
 
 const Schedule = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -52,7 +53,7 @@ const Schedule = () => {
       {selectedView === "calendar" ? (
         <CalendarView datesArray={datesArray} selectedDate={selectedDate} />
       ) : (
-        <div>{selectedView}</div>
+        <PositionView datesArray={datesArray} />
       )}
     </div>
   );

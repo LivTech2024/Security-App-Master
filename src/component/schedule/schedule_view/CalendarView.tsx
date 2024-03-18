@@ -29,7 +29,7 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
   const { data } = useQuery({
     queryKey: [REACT_QUERY_KEYS.SCHEDULES, datesArray],
     queryFn: async () => {
-      const data = await DbSchedule.getScheduleForCalendarView(
+      const data = await DbSchedule.getSchedules(
         datesArray[0],
         datesArray[datesArray.length - 1]
       );
