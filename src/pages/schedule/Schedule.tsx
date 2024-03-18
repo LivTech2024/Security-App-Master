@@ -13,7 +13,7 @@ const Schedule = () => {
     "weekly"
   );
   const [selectedView, setSelectedView] = useState<"calendar" | "position">(
-    "calendar"
+    "position"
   );
 
   useEffect(() => {

@@ -72,21 +72,15 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
                   {dayjs(date).format("ddd MMM-DD")}
                 </div>
 
-                <div className="flex flex-col gap-2 p-2 w-full justify-between h-full">
+                <div className="flex flex-col gap-2 p-2 w-full h-full">
                   {getScheduleForDay(datesArray[index], schedules).map(
-                    (data, idx) => {
+                    (data) => {
                       return (
                         <Draggable
                           draggableId={data.shift.ShiftId}
                           type="box"
                           callback={dropResult}
-                          canDrag={
-                            getScheduleForDay(datesArray[index], schedules)
-                              .length ===
-                            idx + 1
-                              ? true
-                              : false
-                          }
+                          canDrag={!data.employee ? true : false}
                         >
                           <div
                             onClick={() => {
@@ -94,7 +88,9 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
                               setAssignShiftModal(true);
                             }}
                             key={data.shift.ShiftId}
-                            className={`flex flex-col border hover:border-gray-500 bg-[#5e5c5c23] p-1 rounded cursor-move min-w-full items-center`}
+                            className={`flex flex-col border hover:border-gray-500 bg-[#5e5c5c23] p-1 rounded min-w-full items-center ${
+                              !data.employee ? "cursor-move" : "cursor-pointer"
+                            }`}
                           >
                             <div className="text-base font-medium">
                               {data.shift.ShiftName}
@@ -121,7 +117,7 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
                   <DropPoint
                     id={date.toDateString()}
                     accept="box"
-                    className=" min-h-[75px]"
+                    className="min-h-[75px]"
                   />
                 </div>
               </div>
