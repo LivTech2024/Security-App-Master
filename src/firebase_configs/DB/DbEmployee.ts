@@ -5,6 +5,7 @@ import {
   doc,
   getDocs,
   limit,
+  orderBy,
   query,
   runTransaction,
   serverTimestamp,
@@ -183,6 +184,23 @@ class DbEmployee {
   static deleteEmployee = async (empId: string) => {
     const empRef = doc(db, CollectionName.employees, empId);
     await runTransaction(db, async (transaction) => {
+      //*Check if any shift is associated with this employee, if yes then this emp cannot be deleted
+
+      const shiftRef = collection(db, CollectionName.shifts);
+      const shiftQuery = query(
+        shiftRef,
+        where("ShiftAssignedUserId", "==", empId),
+        limit(1)
+      );
+
+      const shiftSnapshot = await getDocs(shiftQuery);
+
+      if (!shiftSnapshot.empty) {
+        throw new CustomError(
+          "This employee have shifts associated, please delete shifts first to delete this employee"
+        );
+      }
+
       const snapshot = await transaction.get(empRef);
 
       const empData = snapshot.data() as IEmployeesCollection;
@@ -208,7 +226,7 @@ class DbEmployee {
   }) => {
     const empRef = collection(db, CollectionName.employees);
 
-    let queryParams: QueryConstraint[] = [];
+    let queryParams: QueryConstraint[] = [orderBy("EmployeeCreatedAt", "desc")];
     if (lmt) {
       queryParams = [...queryParams, limit(lmt)];
     }

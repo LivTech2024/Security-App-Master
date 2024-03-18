@@ -233,6 +233,7 @@ const AddEmployeeModal = ({
               />
               <InputSelect
                 label="Select Role"
+                disabled={isEdit}
                 options={[
                   { title: "Supervisor", value: "supervisor" },
                   { title: "Guard", value: "guard" },

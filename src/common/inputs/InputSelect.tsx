@@ -15,6 +15,7 @@ interface InputSelectProps<FormFields extends Record<string, unknown>> {
   register?: UseFormRegister<FormFields>;
   name?: Path<FormFields>;
   error?: string | undefined;
+  disabled?: boolean;
 }
 
 const InputSelect = <FormFields extends Record<string, unknown>>({
@@ -28,6 +29,7 @@ const InputSelect = <FormFields extends Record<string, unknown>>({
   name,
   register,
   error,
+  disabled,
 }: InputSelectProps<FormFields>) => {
   return (
     <div className={` gap-1 flex flex-col ${className}`}>
@@ -41,6 +43,7 @@ const InputSelect = <FormFields extends Record<string, unknown>>({
         <div>{leadingIcon}</div>
         {register && name ? (
           <select
+            disabled={disabled}
             {...register(name)}
             className={`bg-surfaceLight  outline-none text-textPrimaryLight text-sm rounded focus:ring-secondaryLight focus:border-secondaryLight block w-full p-2  dark:border-inputBorder dark:placeholder-textQuaternaryLight  dark:text-textPrimaryDark dark:focus:ring-secondaryLight dark:focus:border-secondaryLight ${selectClassName} dark:bg-primaryVariantDark cursor-pointer`}
           >
@@ -59,6 +62,7 @@ const InputSelect = <FormFields extends Record<string, unknown>>({
           </select>
         ) : (
           <select
+            disabled={disabled}
             className={`bg-surfaceLight outline-none text-textPrimaryLight text-sm rounded focus:ring-secondaryLight focus:border-secondaryLight block w-full p-2  dark:border-inputBorder dark:placeholder-textQuaternaryLight  dark:text-textPrimaryDark dark:focus:ring-secondaryLight dark:focus:border-secondaryLight ${selectClassName} dark:bg-primaryVariantDark cursor-pointer`}
           >
             {selected && (
