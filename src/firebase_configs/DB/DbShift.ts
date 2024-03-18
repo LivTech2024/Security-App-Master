@@ -7,6 +7,7 @@ import {
   doc,
   getDocs,
   limit,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -76,7 +77,7 @@ class DbShift {
   }) => {
     const shiftRef = collection(db, CollectionName.shifts);
 
-    let queryParams: QueryConstraint[] = [];
+    let queryParams: QueryConstraint[] = [orderBy("ShiftDate", "desc")];
     if (lmt) {
       queryParams = [...queryParams, limit(lmt)];
     }

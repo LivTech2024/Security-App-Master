@@ -229,6 +229,7 @@ const AddShiftModal = ({
           <div className="grid grid-cols-2 gap-4">
             <InputSelect
               label="Select Position"
+              disabled={isEdit}
               options={[
                 { title: "Guard", value: "guard" },
                 { title: "Supervisor", value: "supervisor" },

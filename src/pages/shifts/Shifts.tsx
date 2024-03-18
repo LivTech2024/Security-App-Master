@@ -106,17 +106,18 @@ const Shifts = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[20%] text-center">Date</th>
-            <th className="uppercase px-4 py-2 w-[20%] text-center">
+            <th className="uppercase px-4 py-2 w-[16.67%] text-start">Name</th>
+            <th className="uppercase px-4 py-2 w-[16.67%] text-start">Date</th>
+            <th className="uppercase px-4 py-2 w-[16.67%] text-start">
               Start Time
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-center">
+            <th className="uppercase px-4 py-2 w-[16.67%] text-start">
               End Time
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-center">
+            <th className="uppercase px-4 py-2 w-[16.67%] text-start">
               Position
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-center">
+            <th className="uppercase px-4 py-2 w-[16.67%] text-end">
               Description
             </th>
           </tr>
@@ -143,19 +144,18 @@ const Shifts = () => {
                   }}
                   className="cursor-pointer "
                 >
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-start">{shift.ShiftName}</td>
+                  <td className="px-4 py-2 text-start">
                     {formatDate(shift.ShiftDate)}
                   </td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-start">
                     {shift.ShiftStartTime}
                   </td>
-                  <td className="px-4 py-2 text-center">
-                    {shift.ShiftEndTime}
-                  </td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-start">{shift.ShiftEndTime}</td>
+                  <td className="px-4 py-2 text-start capitalize">
                     {shift.ShiftPosition}
                   </td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2 text-end">
                     {shift.ShiftDescription || "N/A"}
                   </td>
                 </tr>
