@@ -1,4 +1,4 @@
-import type { FieldValue, Timestamp } from "firebase/firestore";
+import type { FieldValue, GeoPoint, Timestamp } from "firebase/firestore";
 
 export enum EmployeeRoles {
   supervisor = "supervisor",
@@ -34,7 +34,8 @@ export interface IShiftsCollection {
   ShiftDate: Timestamp | FieldValue;
   ShiftStartTime: string;
   ShiftEndTime: string;
-  ShiftLocation: string;
+  ShiftLocation: GeoPoint;
+  ShiftAddress: string;
   ShiftDescription: string | null;
   ShiftAssignedUserId: string | null;
   ShiftCreatedAt: Timestamp | FieldValue;

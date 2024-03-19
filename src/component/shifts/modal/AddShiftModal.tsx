@@ -21,6 +21,11 @@ import DbShift from "../../../firebase_configs/DB/DbShift";
 import { REACT_QUERY_KEYS } from "../../../@types/enum";
 import { errorHandler } from "../../../utilities/CustomError";
 import { openContextModal } from "@mantine/modals";
+import PlacesAutocomplete, {
+  geocodeByAddress,
+  getLatLng,
+} from "react-places-autocomplete";
+import InputHeader from "../../../common/inputs/InputHeader";
 
 const addShiftFormSchema = z.object({
   position: z.enum([
@@ -33,7 +38,8 @@ const addShiftFormSchema = z.object({
   end_time: z.string().min(2, { message: "End time is required" }),
   description: z.string().nullable().optional(),
   name: z.string().min(2, { message: "Shift name is required" }),
-  location: z.string().min(3, { message: "Location is required" }),
+  location: z.object({ lat: z.string(), lng: z.string() }),
+  address: z.string().min(3, { message: "Shift address is required" }),
 });
 
 export type AddShiftFormFields = z.infer<typeof addShiftFormSchema>;
@@ -51,9 +57,9 @@ const AddShiftModal = ({
 
   const [shiftDate, setShiftDate] = useState<Date | null>(new Date());
 
-  const [startTime, setStartTime] = useState("06:00 AM");
+  const [startTime, setStartTime] = useState("09:00 AM");
 
-  const [endTime, setEndTime] = useState("10:00 PM");
+  const [endTime, setEndTime] = useState("05:00 PM");
 
   useEffect(() => {
     if (shiftDate) {
@@ -84,13 +90,17 @@ const AddShiftModal = ({
   }, [methods.formState]);
 
   useEffect(() => {
+    setShiftDate(new Date());
+    setStartTime("09:00 AM");
+    setEndTime("05:00 PM");
     let allFieldValues: AddShiftFormFields = {
       position: ShiftPositions.guard,
       date: new Date(),
-      start_time: "06:00 AM",
-      end_time: "10:00 PM",
+      start_time: "09:00 AM",
+      end_time: "05:00 PM",
       name: "",
-      location: "",
+      location: { lat: "", lng: "" },
+      address: "",
       description: "",
     };
     if (isEdit) {
@@ -103,7 +113,11 @@ const AddShiftModal = ({
         start_time: shiftEditData.ShiftStartTime,
         end_time: shiftEditData.ShiftEndTime,
         name: shiftEditData.ShiftName,
-        location: shiftEditData.ShiftLocation,
+        location: {
+          lat: String(shiftEditData.ShiftLocation.latitude),
+          lng: String(shiftEditData.ShiftLocation.longitude),
+        },
+        address: shiftEditData.ShiftAddress,
         description: shiftEditData.ShiftDescription,
       };
     }
@@ -111,22 +125,19 @@ const AddShiftModal = ({
     methods.reset(allFieldValues);
   }, [isEdit, shiftEditData, methods, opened]);
 
-  /* const getLatLng = () => {
-    setKey("AIzaSyCXI2H1SSthFqN3zLiYYNbEzlReufuG-_U");
-    fromAddress("1600 Amphitheatre Parkway, Mountain View, CA")
-      .then((response) => {
-        const { lat, lng } = response.results[0].geometry.location;
-        console.log(lat, lng, "lat, lng");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  const address = methods.watch("address");
 
-  useEffect(() => {
-    if (!opened) return;
-    getLatLng();
-  }, [opened]); */
+  const handleSelect = async (selectedAddress: string) => {
+    try {
+      methods.setValue("address", selectedAddress);
+      const results = await geocodeByAddress(selectedAddress);
+      const latLng = await getLatLng(results[0]);
+      const { lat, lng } = latLng;
+      methods.setValue("location", { lat: String(lat), lng: String(lng) });
+    } catch (error) {
+      console.error("Error selecting address", error);
+    }
+  };
 
   const onSubmit = async (data: AddShiftFormFields) => {
     try {
@@ -263,13 +274,52 @@ const AddShiftModal = ({
               onChange={setEndTime}
               use12Hours={true}
             />
-
-            <InputWithTopHeader
-              label="Shift Location"
-              className="mx-0"
-              register={methods.register}
-              name="location"
-            />
+            <PlacesAutocomplete
+              value={address}
+              onChange={(val) => methods.setValue("address", val)}
+              onSelect={handleSelect}
+            >
+              {({
+                getInputProps,
+                suggestions,
+                getSuggestionItemProps,
+                loading,
+              }) => (
+                <div className="flex flex-col gap-1">
+                  <InputHeader title="Shift location" />
+                  <input
+                    {...getInputProps({
+                      className:
+                        "location-search-input py-2 px-2 rounded w-full text-lg outline-none border border-inputBorder focus-within:ring-[2px]",
+                    })}
+                  />
+                  <div className="relative">
+                    <div className="autocomplete-dropdown-container rounded-b-2xl border absolute max-h-[200px] w-full overflow-scroll remove-vertical-scrollbar">
+                      {loading && (
+                        <div className="cursor-pointer py-2 px-2 bg-white">
+                          Loading...
+                        </div>
+                      )}
+                      {suggestions.map((suggestion) => {
+                        const style = {
+                          backgroundColor: suggestion.active
+                            ? "#DAC0A3"
+                            : "#fff",
+                        };
+                        return (
+                          <div
+                            className="cursor-pointer py-2 px-2"
+                            {...getSuggestionItemProps(suggestion, { style })}
+                          >
+                            {suggestion.description}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </PlacesAutocomplete>
 
             <div className="col-span-2">
               <TextareaWithTopHeader

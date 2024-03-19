@@ -1,5 +1,6 @@
 import {
   DocumentData,
+  GeoPoint,
   QueryConstraint,
   Timestamp,
   collection,
@@ -35,7 +36,11 @@ class DbShift {
       ShiftEndTime: shiftData.end_time,
       ShiftDescription: shiftData.description || null,
       ShiftAssignedUserId: null,
-      ShiftLocation: shiftData.location,
+      ShiftLocation: new GeoPoint(
+        Number(shiftData.location.lat),
+        Number(shiftData.location.lng)
+      ),
+      ShiftAddress: shiftData.address,
       ShiftCreatedAt: serverTimestamp(),
       ShiftModifiedAt: serverTimestamp(),
     };
@@ -56,7 +61,11 @@ class DbShift {
       ShiftStartTime: shiftData.start_time,
       ShiftEndTime: shiftData.end_time,
       ShiftDescription: shiftData.description || null,
-      ShiftLocation: shiftData.location,
+      ShiftLocation: new GeoPoint(
+        Number(shiftData.location.lat),
+        Number(shiftData.location.lng)
+      ),
+      ShiftAddress: shiftData.address,
       ShiftModifiedAt: serverTimestamp(),
     };
 
