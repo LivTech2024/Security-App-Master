@@ -15,7 +15,7 @@ import {
 import { errorHandler } from "../../../utilities/CustomError";
 import { EmployeeRoles, REACT_QUERY_KEYS } from "../../../@types/enum";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEditFormStore } from "../../../store";
+import { useAuthState, useEditFormStore } from "../../../store";
 import { openContextModal } from "@mantine/modals";
 import ImageUpload from "../EmpOtherDetailsInput";
 
@@ -51,6 +51,8 @@ const AddEmployeeModal = ({
   });
 
   const { employeeEditData } = useEditFormStore();
+
+  const { company } = useAuthState();
 
   const isEdit = !!employeeEditData;
 
@@ -89,6 +91,7 @@ const AddEmployeeModal = ({
       showSnackbar({ message: "Please add employee image", type: "error" });
       return;
     }
+    if (!company) return;
     try {
       showModalLoader({});
 
@@ -96,10 +99,11 @@ const AddEmployeeModal = ({
         await DbEmployee.updateEmployee(
           data,
           empImageBase64,
-          employeeEditData.EmployeeId
+          employeeEditData.EmployeeId,
+          company.CompanyId
         );
       } else {
-        await DbEmployee.addEmployee(data, empImageBase64);
+        await DbEmployee.addEmployee(data, empImageBase64, company.CompanyId);
       }
 
       await queryClient.invalidateQueries({

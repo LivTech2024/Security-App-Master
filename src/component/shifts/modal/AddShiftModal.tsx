@@ -9,7 +9,7 @@ import TextareaWithTopHeader from "../../../common/inputs/TextareaWithTopHeader"
 import "react-toastify/dist/ReactToastify.css";
 import InputTime from "../../../common/inputs/InputTime";
 import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
-import { useEditFormStore } from "../../../store";
+import { useAuthState, useEditFormStore } from "../../../store";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   closeModalLoader,
@@ -80,6 +80,8 @@ const AddShiftModal = ({
 
   const { shiftEditData } = useEditFormStore();
 
+  const { company } = useAuthState();
+
   const isEdit = !!shiftEditData;
 
   const queryClient = useQueryClient();
@@ -139,13 +141,18 @@ const AddShiftModal = ({
   };
 
   const onSubmit = async (data: AddShiftFormFields) => {
+    if (!company) return;
     try {
       showModalLoader({});
 
       if (isEdit) {
-        await DbShift.updateShift(data, shiftEditData.ShiftId);
+        await DbShift.updateShift(
+          data,
+          shiftEditData.ShiftId,
+          company.CompanyId
+        );
       } else {
-        await DbShift.addShift(data);
+        await DbShift.addShift(data, company.CompanyId);
       }
 
       await queryClient.invalidateQueries({

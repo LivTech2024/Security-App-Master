@@ -32,6 +32,7 @@ export interface IEmployeesCollection {
   EmployeeAdditionalDoc?: string;
   EmployeeRole: EmployeeRoles;
   EmployeeIsBanned: boolean;
+  EmployeeCompanyId: string;
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;
 }
@@ -47,6 +48,7 @@ export interface IShiftsCollection {
   ShiftAddress: string;
   ShiftDescription: string | null;
   ShiftAssignedUserId: string | null;
+  ShiftCompanyId: string;
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;
 }

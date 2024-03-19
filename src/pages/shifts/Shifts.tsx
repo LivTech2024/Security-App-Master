@@ -9,13 +9,15 @@ import { useInView } from "react-intersection-observer";
 import NoSearchResult from "../../common/NoSearchResult";
 import TableShimmer from "../../common/shimmer/TableShimmer";
 import { firebaseDataToObject, formatDate } from "../../utilities/misc";
-import { useEditFormStore } from "../../store";
+import { useAuthState, useEditFormStore } from "../../store";
 import { Shift } from "../../store/slice/editForm.slice";
 
 const Shifts = () => {
   const [createShiftModal, setCreateShiftModal] = useState(false);
 
   const { setShiftEditData } = useEditFormStore();
+
+  const { company } = useAuthState();
 
   const {
     data: snapshotData,
@@ -26,11 +28,12 @@ const Shifts = () => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.SHIFT_LIST],
+    queryKey: [REACT_QUERY_KEYS.SHIFT_LIST, company!.CompanyId],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbShift.getShifts({
         lmt: DisplayCount.SHIFT_LIST,
         lastDoc: pageParam,
+        cmpId: company!.CompanyId,
       });
       return snapshot.docs;
     },

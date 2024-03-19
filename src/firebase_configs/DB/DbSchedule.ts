@@ -29,12 +29,17 @@ export interface IEmpScheduleForWeek {
 }
 
 class DbSchedule {
-  static getSchedules = async (startDate: Date, endDate: Date) => {
+  static getSchedules = async (
+    startDate: Date,
+    endDate: Date,
+    cmpId: string
+  ) => {
     const schedules: ISchedule[] = [];
 
     const shiftDocRef = collection(db, CollectionName.shifts);
     const shiftQuery = query(
       shiftDocRef,
+      where("ShiftCompanyId", "==", cmpId),
       where("ShiftDate", ">=", startDate),
       where("ShiftDate", "<=", endDate)
     );
@@ -69,17 +74,28 @@ class DbSchedule {
     return schedules;
   };
 
-  static getEmployeesSchedule = async (
-    startDate: Date,
-    endDate: Date,
-    currentDate: Date,
-    empRole: ShiftPositions
-  ) => {
+  static getEmployeesSchedule = async ({
+    currentDate,
+    empRole,
+    endDate,
+    startDate,
+    cmpId,
+  }: {
+    startDate: Date;
+    endDate: Date;
+    currentDate: Date;
+    empRole: ShiftPositions;
+    cmpId: string;
+  }) => {
     try {
       const employeesScheduleForWeek: IEmpScheduleForWeek[] = [];
 
       const empRef = collection(db, CollectionName.employees);
-      const empQuery = query(empRef, where("EmployeeRole", "==", empRole));
+      const empQuery = query(
+        empRef,
+        where("EmployeeCompanyId", "==", cmpId),
+        where("EmployeeRole", "==", empRole)
+      );
       const empSnapshot = await getDocs(empQuery);
       const employees = empSnapshot.docs.map(
         (doc) => doc.data() as IEmployeesCollection

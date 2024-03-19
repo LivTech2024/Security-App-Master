@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { REACT_QUERY_KEYS, ShiftPositions } from "../../../@types/enum";
@@ -22,6 +22,7 @@ import {
 } from "../../../utilities/TsxUtils";
 import { errorHandler } from "../../../utilities/CustomError";
 import { sendEmail } from "../../../utilities/sendEmail";
+import { useAuthState } from "../../../store";
 
 interface PositionViewProps {
   datesArray: Date[];
@@ -30,12 +31,15 @@ interface PositionViewProps {
 const PositionView = ({ datesArray }: PositionViewProps) => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
+  const { company } = useAuthState();
+
   const { data } = useQuery({
     queryKey: [REACT_QUERY_KEYS.SCHEDULES, datesArray],
     queryFn: async () => {
       const data = await DbSchedule.getSchedules(
         datesArray[0],
-        datesArray[datesArray.length - 1]
+        datesArray[datesArray.length - 1],
+        company!.CompanyId
       );
       return data;
     },
@@ -66,15 +70,16 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
 
   useEffect(() => {
     const fetchEmpSchedule = async () => {
-      if (!showEmpListByPosition || !selectedDate) return;
+      if (!showEmpListByPosition || !selectedDate || !company) return;
       try {
         setIsEmpLoading(true);
-        const data = await DbSchedule.getEmployeesSchedule(
-          dayjs(selectedDate).startOf("week").toDate(),
-          dayjs(selectedDate).endOf("week").toDate(),
-          toDate(selectedDate),
-          showEmpListByPosition
-        );
+        const data = await DbSchedule.getEmployeesSchedule({
+          startDate: dayjs(selectedDate).startOf("week").toDate(),
+          endDate: dayjs(selectedDate).endOf("week").toDate(),
+          currentDate: toDate(selectedDate),
+          empRole: showEmpListByPosition,
+          cmpId: company.CompanyId,
+        });
         if (data) {
           setEmpAvailableForShift(data.filter((emp) => emp.EmpIsAvailable));
         }

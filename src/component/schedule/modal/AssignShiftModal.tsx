@@ -18,6 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { REACT_QUERY_KEYS } from "../../../@types/enum";
 import { sendEmail } from "../../../utilities/sendEmail";
 import { IEmployeesCollection } from "../../../@types/database";
+import { useAuthState } from "../../../store";
 
 const AssignShiftModal = ({
   opened,
@@ -40,17 +41,20 @@ const AssignShiftModal = ({
     IEmpScheduleForWeek[]
   >([]);
 
+  const { company } = useAuthState();
+
   useEffect(() => {
     setSelectedEmp(schedule?.employee ? schedule.employee : null);
     const fetchEmpSchedule = async () => {
-      if (!schedule) return;
+      if (!schedule || !company) return;
       try {
-        const data = await DbSchedule.getEmployeesSchedule(
-          dayjs(selectedDate).startOf("week").toDate(),
-          dayjs(selectedDate).endOf("week").toDate(),
-          toDate(schedule?.shift.ShiftDate),
-          schedule.shift.ShiftPosition
-        );
+        const data = await DbSchedule.getEmployeesSchedule({
+          startDate: dayjs(selectedDate).startOf("week").toDate(),
+          endDate: dayjs(selectedDate).endOf("week").toDate(),
+          currentDate: toDate(schedule?.shift.ShiftDate),
+          empRole: schedule.shift.ShiftPosition,
+          cmpId: company.CompanyId,
+        });
         if (data) {
           setEmpSchedulesForWeek(data);
         }
