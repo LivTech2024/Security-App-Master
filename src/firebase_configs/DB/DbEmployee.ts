@@ -27,7 +27,7 @@ import { fullTextSearchIndex } from "../../utilities/misc";
 
 class DbEmployee {
   static isEmpExist = async (
-    empPhone: string,
+    empEmail: string,
     empRole: string,
     empId: string | null,
     empCmpId: string
@@ -35,7 +35,7 @@ class DbEmployee {
     const empDocRef = collection(db, CollectionName.employees);
 
     let queryParams: QueryConstraint[] = [
-      where("EmployeePhone", "==", empPhone),
+      where("EmployeeEmail", "==", empEmail),
       where("EmployeeRole", "==", empRole),
       where("EmployeeCompanyId", "==", empCmpId),
     ];
@@ -59,7 +59,7 @@ class DbEmployee {
     cmpId: string
   ) => {
     const isEmpExist = await this.isEmpExist(
-      empData.phone_number,
+      empData.email,
       empData.role,
       null,
       cmpId
@@ -120,7 +120,7 @@ class DbEmployee {
   ) => {
     try {
       const isEmpExist = await this.isEmpExist(
-        empData.phone_number,
+        empData.email,
         empData.role,
         empId,
         cmpId

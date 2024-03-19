@@ -34,7 +34,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
   const { company } = useAuthState();
 
   const { data } = useQuery({
-    queryKey: [REACT_QUERY_KEYS.SCHEDULES, datesArray],
+    queryKey: [REACT_QUERY_KEYS.SCHEDULES, datesArray, company!.CompanyId],
     queryFn: async () => {
       const data = await DbSchedule.getSchedules(
         datesArray[0],
@@ -165,8 +165,8 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
         return sendEmail({
           to_email: emp.EmpEmail,
           to_name: emp.EmpName,
-          message: `You have been assigned for the shift. Shift Name: ${shift.ShiftName}\n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n location: ${shift.ShiftLocation}`,
-          subject: "You schedule update",
+          message: `You have been assigned for the shift.\n Shift Name: ${shift.ShiftName}\n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n location: ${shift.ShiftLocation}`,
+          subject: "Your schedule update",
         });
       });
 
