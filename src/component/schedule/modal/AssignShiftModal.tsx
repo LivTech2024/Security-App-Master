@@ -77,7 +77,7 @@ const AssignShiftModal = ({
       sendEmail({
         to_email: selectedEmp.EmployeeEmail,
         to_name: selectedEmp.EmployeeName,
-        message: `You have been assigned for the shift.\n Shift Name: ${schedule.shift.ShiftName}\n Timing: ${schedule.shift.ShiftStartTime}-${schedule.shift.ShiftEndTime} \n location: ${schedule.shift.ShiftLocation}`,
+        message: `You have been assigned for the shift.\n Shift Name: ${schedule.shift.ShiftName}\n Timing: ${schedule.shift.ShiftStartTime}-${schedule.shift.ShiftEndTime} \n Address: ${schedule.shift.ShiftAddress}`,
         subject: "Your schedule update",
       });
       await queryClient.invalidateQueries({
