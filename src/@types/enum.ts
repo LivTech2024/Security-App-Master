@@ -26,3 +26,11 @@ export const ImageResolution = {
   EMP_IMAGE_WIDTH: 1200,
   EMP_IMAGE_HEIGHT: 1200,
 };
+
+export const PageRoutes = {
+  HOME: "/",
+  SHIFTS: "/shifts",
+  EMPLOYEES: "/employees",
+  SCHEDULES: "/schedules",
+  PATROLLING: "/patrolling",
+};
