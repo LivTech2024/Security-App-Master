@@ -40,7 +40,7 @@ const InputAutoComplete = ({
   data,
   bg,
   border = true,
-  className = "mx-4",
+  className,
   fontClassName,
   label,
   leadingIcon,
@@ -205,7 +205,7 @@ const InputAutoComplete = ({
         <InputHeader title={label} fontClassName={fontClassName} />
       ) : null}
       <div
-        className={`flex justify-center items-center  w-full h-9 rounded ${
+        className={`flex justify-center items-center  w-full h-11 rounded ${
           border &&
           "border border-inputBorderLight dark:border-inputBorderDark focus-within:ring-[2px] "
         } 
@@ -234,7 +234,7 @@ const InputAutoComplete = ({
                 }
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                className={`w-full text-sm py-1 dark:bg-primaryVariantDark ${
+                className={`w-full text-lg py-1 dark:bg-primaryVariantDark ${
                   leadingIcon ? "pl-0" : "pl-2"
                 } outline-none ${tailIcon ? "pr-0" : "pr-2"}`}
                 ref={inputRef}

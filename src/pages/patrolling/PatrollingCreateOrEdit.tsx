@@ -17,6 +17,8 @@ import InputHeader from "../../common/inputs/InputHeader";
 import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 import { useState } from "react";
 import CheckpointForm from "../../component/patrolling/CheckpointForm";
+import { generateBarcodesAndDownloadPDF } from "../../utilities/generateBarcodesAndDownloadPdf";
+import InputAutoComplete from "../../common/inputs/InputAutocomplete";
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -49,6 +51,18 @@ const PatrollingCreateOrEdit = () => {
       console.error("Error selecting address", error);
     }
   };
+
+  const testBarcode = async () => {
+    const barcodeData = [
+      { text: "123456", name: "First CheckPoint" },
+      { text: "789012", name: "Second CheckPoint" },
+      // Add more barcode data as needed
+    ];
+    console.log("started");
+    await generateBarcodesAndDownloadPDF(barcodeData);
+
+    console.log("done");
+  };
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex items-center justify-between w-full">
@@ -64,7 +78,9 @@ const PatrollingCreateOrEdit = () => {
         <Button
           label="Save"
           type="black"
-          onClick={() => {}}
+          onClick={() => {
+            testBarcode();
+          }}
           className="px-14 py-2"
         />
       </div>
@@ -124,7 +140,12 @@ const PatrollingCreateOrEdit = () => {
           )}
         </PlacesAutocomplete>
         <InputWithTopHeader className="mx-0" label="Time" />
-        <InputWithTopHeader className="mx-0" label="Guard" />
+        <InputAutoComplete
+          className="mx-0"
+          label="Guard"
+          data={[{ label: "Yuvraj Singh", value: "yy" }]}
+          onChange={(e) => console.log(e)}
+        />
         <div className="md:col-span-2 flex items-end w-full gap-4">
           <InputWithTopHeader
             className="mx-0 w-full"
