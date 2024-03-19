@@ -6,7 +6,6 @@ import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-toastify/dist/ReactToastify.css";
-import { EmployeeRoles } from "../../../@types/database";
 import DbEmployee from "../../../firebase_configs/DB/DbEmployee";
 import {
   closeModalLoader,
@@ -14,7 +13,7 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import { errorHandler } from "../../../utilities/CustomError";
-import { REACT_QUERY_KEYS } from "../../../@types/enum";
+import { EmployeeRoles, REACT_QUERY_KEYS } from "../../../@types/enum";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEditFormStore } from "../../../store";
 import { openContextModal } from "@mantine/modals";

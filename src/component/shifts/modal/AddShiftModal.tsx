@@ -9,7 +9,6 @@ import TextareaWithTopHeader from "../../../common/inputs/TextareaWithTopHeader"
 import "react-toastify/dist/ReactToastify.css";
 import InputTime from "../../../common/inputs/InputTime";
 import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
-import { ShiftPositions } from "../../../@types/database";
 import { useEditFormStore } from "../../../store";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -18,7 +17,7 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import DbShift from "../../../firebase_configs/DB/DbShift";
-import { REACT_QUERY_KEYS } from "../../../@types/enum";
+import { REACT_QUERY_KEYS, ShiftPositions } from "../../../@types/enum";
 import { errorHandler } from "../../../utilities/CustomError";
 import { openContextModal } from "@mantine/modals";
 import PlacesAutocomplete, {

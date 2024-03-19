@@ -1,6 +1,20 @@
 export enum CollectionName {
+  companies = "Companies",
+  admins = "Admins",
   employees = "Employees",
   shifts = "Shifts",
+}
+
+export enum ShiftPositions {
+  supervisor = "supervisor",
+  guard = "guard",
+  other = "other",
+}
+
+export enum EmployeeRoles {
+  supervisor = "supervisor",
+  guard = "guard",
+  other = "other",
 }
 
 export const DisplayCount = {

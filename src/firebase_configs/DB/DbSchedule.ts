@@ -7,13 +7,9 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { CollectionName } from "../../@types/enum";
+import { CollectionName, ShiftPositions } from "../../@types/enum";
 import { db } from "../config";
-import {
-  IEmployeesCollection,
-  IShiftsCollection,
-  ShiftPositions,
-} from "../../@types/database";
+import { IEmployeesCollection, IShiftsCollection } from "../../@types/database";
 import dayjs from "dayjs";
 import { toDate } from "../../utilities/misc";
 

@@ -1,9 +1,24 @@
 import type { FieldValue, GeoPoint, Timestamp } from "firebase/firestore";
+import { EmployeeRoles, ShiftPositions } from "./enum";
 
-export enum EmployeeRoles {
-  supervisor = "supervisor",
-  guard = "guard",
-  other = "other",
+export interface ICompaniesCollection {
+  CompanyId: string;
+  CompanyName: string;
+  CompanyEmail: string;
+  CompanyAddress: string;
+  CompanyLogo: string;
+  CompanyCreatedAt: Timestamp | FieldValue;
+  CompanyModifiedAt: Timestamp | FieldValue;
+}
+
+export interface IAdminsCollection {
+  AdminId: string;
+  AdminName: string;
+  AdminEmail: string;
+  AdminPhone: string;
+  AdminCompanyId: string;
+  AdminCreatedAt: Timestamp | FieldValue;
+  AdminModifiedAt: Timestamp | FieldValue;
 }
 
 export interface IEmployeesCollection {
@@ -19,12 +34,6 @@ export interface IEmployeesCollection {
   EmployeeIsBanned: boolean;
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;
-}
-
-export enum ShiftPositions {
-  supervisor = "supervisor",
-  guard = "guard",
-  other = "other",
 }
 
 export interface IShiftsCollection {

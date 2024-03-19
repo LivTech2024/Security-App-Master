@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { REACT_QUERY_KEYS } from "../../../@types/enum";
+import { REACT_QUERY_KEYS, ShiftPositions } from "../../../@types/enum";
 import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
@@ -13,7 +13,6 @@ import { Draggable, DropPoint } from "../../../utilities/DragAndDropHelper";
 import {
   IEmployeesCollection,
   IShiftsCollection,
-  ShiftPositions,
 } from "../../../@types/database";
 import { MdOutlineClose } from "react-icons/md";
 import {
