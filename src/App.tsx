@@ -13,6 +13,9 @@ import LoaderModal from "./common/modals/LoaderModal";
 import { ContextConfirmModal } from "./common/modals/ContextConfirmModal";
 import { ToastContainer } from "react-toastify";
 import { PageRoutes } from "./@types/enum";
+import PatrollingList from "./pages/patrolling/PatrollingList";
+import PatrollingCreateOrEdit from "./pages/patrolling/PatrollingCreateOrEdit";
+import PatrollingView from "./pages/patrolling/PatrollingView";
 
 function App() {
   return (
@@ -27,6 +30,18 @@ function App() {
             <Route path={PageRoutes.SHIFTS} Component={Shifts} />
             <Route path={PageRoutes.EMPLOYEES} Component={Employees} />
             <Route path={PageRoutes.SCHEDULES} Component={Schedule} />
+            <Route
+              path={PageRoutes.PATROLLING_LIST}
+              Component={PatrollingList}
+            />
+            <Route
+              path={PageRoutes.PATROLLING_CREATE_OR_EDIT}
+              Component={PatrollingCreateOrEdit}
+            />
+            <Route
+              path={PageRoutes.PATROLLING_VIEW}
+              Component={PatrollingView}
+            />
           </Routes>
         </Layout>
       </ModalsProvider>

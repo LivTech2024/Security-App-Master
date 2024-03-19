@@ -52,3 +52,27 @@ export interface IShiftsCollection {
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;
 }
+
+export interface IPatrolCheckPointsChild {
+  CheckPointId: string;
+  CheckPointName: string;
+  CheckPointStatus: "checked" | "not_checked";
+  CheckPointCheckedTime?: Timestamp | FieldValue;
+  CheckPointFailureReason?: string;
+}
+
+export interface IPatrolsCollection {
+  PatrolId: string;
+  PatrolName: string;
+  PatrolArea: string;
+  PatrolLocation: GeoPoint;
+  PatrolTime: Timestamp | FieldValue;
+  PatrolAssignedGuardId: string;
+  PatrolAssignedGuardName: string;
+  PatrolCheckPoints: IPatrolCheckPointsChild[];
+  PatrolCurrentStatus: "pending" | "started" | "completed";
+  PatrolFailureReason?: string;
+  PatrolRestrictedRadius: number;
+  PatrolKeepGuardInRadiusOfLocation: boolean;
+  PatrolCreatedAt: Timestamp | FieldValue;
+}

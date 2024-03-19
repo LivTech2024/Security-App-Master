@@ -23,8 +23,8 @@ const Nav = () => {
       <NavItem path={PageRoutes.SCHEDULES} name="Schedules" />
       <NavItem path={PageRoutes.EMPLOYEES} name="Employees" />
       <NavItem path={PageRoutes.SHIFTS} name="Shifts" />
+      <NavItem path={PageRoutes.PATROLLING_LIST} name="Patrolling" />
       <NavItem path="/trades" name="Trades" />
-      <NavItem path={PageRoutes.PATROLLING} name="Patrolling" />
       <NavItem path="/incident" name="Incident" />
       <NavItem path="/send-message" name="Send Message" />
     </div>

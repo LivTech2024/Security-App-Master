@@ -46,5 +46,7 @@ export const PageRoutes = {
   SHIFTS: "/shifts",
   EMPLOYEES: "/employees",
   SCHEDULES: "/schedules",
-  PATROLLING: "/patrolling",
+  PATROLLING_LIST: "/patrolling_list",
+  PATROLLING_CREATE_OR_EDIT: "/patrolling_create_or_edit",
+  PATROLLING_VIEW: "/patrolling_view",
 };
