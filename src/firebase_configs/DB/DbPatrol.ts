@@ -4,6 +4,7 @@ import {
   QueryConstraint,
   Timestamp,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -122,6 +123,11 @@ class DbPatrol {
     const patrolRef = doc(db, CollectionName.patrols, patrolId);
 
     return getDoc(patrolRef);
+  };
+
+  static deletePatrol = (patrolId: string) => {
+    const patrolRef = doc(db, CollectionName.patrols, patrolId);
+    return deleteDoc(patrolRef);
   };
 }
 
