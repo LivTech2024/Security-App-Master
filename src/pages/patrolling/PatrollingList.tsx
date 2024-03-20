@@ -37,34 +37,30 @@ const PatrollingList = () => {
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           <tr className="cursor-pointer">
-            <td className="px-4 py-2 text-start align-top">Building 49</td>
+            <td className="px-4 py-2 text-start align-top">Building 74</td>
             <td className="px-4 py-2 text-start align-top ">
               <span className="line-clamp-2">
                 The Capital Mall, Achole Road, Yashvant Viva Township,
                 Nalasopara East, Vasai-Virar, Nala Sopara, Maharashtra, India
               </span>
             </td>
-            <td className="px-4 py-2 text-start align-top">10-Mar-06:00 PM</td>
-            <td className="px-4 py-2 text-center align-top">3.0</td>
-            <td className="px-4 py-2 text-end align-top">Yuvraj Singh</td>
-            <td className="px-4 py-2 text-end capitalize align-top">
-              Not-started
-            </td>
+            <td className="px-4 py-2 text-start align-top">20-Mar-06:00 PM</td>
+            <td className="px-4 py-2 text-center align-top">5.0</td>
+            <td className="px-4 py-2 text-end align-top">Harsh Singh</td>
+            <td className="px-4 py-2 text-end capitalize align-top">Pending</td>
           </tr>
           <tr className="cursor-pointer">
             <td className="px-4 py-2 text-start align-top">Building 49</td>
             <td className="px-4 py-2 text-start align-top ">
               <span className="line-clamp-2">
-                The Capital Mall, Achole Road, Yashvant Viva Township,
-                Nalasopara East, Vasai-Virar, Nala Sopara, Maharashtra, India
+                Yashvant Viva Township, Nalasopara East, Vasai-Virar, Nala
+                Sopara, Maharashtra, India
               </span>
             </td>
             <td className="px-4 py-2 text-start align-top">10-Mar-06:00 PM</td>
             <td className="px-4 py-2 text-center align-top">3.0</td>
             <td className="px-4 py-2 text-end align-top">Yuvraj Singh</td>
-            <td className="px-4 py-2 text-end capitalize align-top">
-              Not-started
-            </td>
+            <td className="px-4 py-2 text-end capitalize align-top">Pending</td>
           </tr>
         </tbody>
       </table>

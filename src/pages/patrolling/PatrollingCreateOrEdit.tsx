@@ -56,6 +56,9 @@ const PatrollingCreateOrEdit = () => {
     const barcodeData = [
       { text: "123456", name: "First CheckPoint" },
       { text: "789012", name: "Second CheckPoint" },
+      { text: "123456", name: "First CheckPoint" },
+      { text: "789012", name: "Second CheckPoint" },
+
       // Add more barcode data as needed
     ];
     console.log("started");
