@@ -16,6 +16,7 @@ import {
 import {
   CloudStoragePaths,
   CollectionName,
+  EmployeeRoles,
   ImageResolution,
 } from "../../@types/enum";
 import { db } from "../config";
@@ -27,15 +28,17 @@ import { fullTextSearchIndex } from "../../utilities/misc";
 
 class DbEmployee {
   static isEmpExist = async (
-    empPhone: string,
+    empEmail: string,
     empRole: string,
-    empId: string | null
+    empId: string | null,
+    empCmpId: string
   ) => {
     const empDocRef = collection(db, CollectionName.employees);
 
     let queryParams: QueryConstraint[] = [
-      where("EmployeePhone", "==", empPhone),
+      where("EmployeeEmail", "==", empEmail),
       where("EmployeeRole", "==", empRole),
+      where("EmployeeCompanyId", "==", empCmpId),
     ];
 
     if (empId) {
@@ -53,12 +56,14 @@ class DbEmployee {
 
   static addEmployee = async (
     empData: AddEmployeeFormField,
-    empImage: string
+    empImage: string,
+    cmpId: string
   ) => {
     const isEmpExist = await this.isEmpExist(
-      empData.phone_number,
+      empData.email,
       empData.role,
-      null
+      null,
+      cmpId
     );
 
     if (isEmpExist) {
@@ -98,6 +103,7 @@ class DbEmployee {
       EmployeePassword: empData.password,
       EmployeeRole: empData.role,
       EmployeeIsBanned: false,
+      EmployeeCompanyId: cmpId,
       EmployeeCreatedAt: serverTimestamp(),
       EmployeeModifiedAt: serverTimestamp(),
     };
@@ -110,13 +116,15 @@ class DbEmployee {
   static updateEmployee = async (
     empData: AddEmployeeFormField,
     empImage: string,
-    empId: string
+    empId: string,
+    cmpId: string
   ) => {
     try {
       const isEmpExist = await this.isEmpExist(
-        empData.phone_number,
+        empData.email,
         empData.role,
-        empId
+        empId,
+        cmpId
       );
 
       if (isEmpExist) {
@@ -166,6 +174,7 @@ class DbEmployee {
           EmployeePassword: empData.password,
           EmployeeEmail: empData.email,
           EmployeeRole: empData.role,
+          EmployeeCompanyId: cmpId,
           EmployeeModifiedAt: serverTimestamp(),
         };
 
@@ -219,17 +228,21 @@ class DbEmployee {
     lmt,
     lastDoc,
     searchQuery,
+    cmpId,
+    empRole,
   }: {
     lmt: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
+    cmpId: string;
+    empRole?: EmployeeRoles;
   }) => {
     const empRef = collection(db, CollectionName.employees);
 
-    let queryParams: QueryConstraint[] = [orderBy("EmployeeCreatedAt", "desc")];
-    if (lmt) {
-      queryParams = [...queryParams, limit(lmt)];
-    }
+    let queryParams: QueryConstraint[] = [
+      where("EmployeeCompanyId", "==", cmpId),
+      orderBy("EmployeeCreatedAt", "desc"),
+    ];
 
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [
@@ -242,8 +255,16 @@ class DbEmployee {
       ];
     }
 
+    if (empRole) {
+      queryParams = [...queryParams, where("EmployeeRole", "==", empRole)];
+    }
+
     if (lastDoc) {
       queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
     }
 
     const empQuery = query(empRef, ...queryParams);

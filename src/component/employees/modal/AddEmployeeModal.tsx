@@ -6,7 +6,6 @@ import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-toastify/dist/ReactToastify.css";
-import { EmployeeRoles } from "../../../@types/database";
 import DbEmployee from "../../../firebase_configs/DB/DbEmployee";
 import {
   closeModalLoader,
@@ -14,9 +13,9 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import { errorHandler } from "../../../utilities/CustomError";
-import { REACT_QUERY_KEYS } from "../../../@types/enum";
+import { EmployeeRoles, REACT_QUERY_KEYS } from "../../../@types/enum";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEditFormStore } from "../../../store";
+import { useAuthState, useEditFormStore } from "../../../store";
 import { openContextModal } from "@mantine/modals";
 import ImageUpload from "../EmpOtherDetailsInput";
 
@@ -52,6 +51,8 @@ const AddEmployeeModal = ({
   });
 
   const { employeeEditData } = useEditFormStore();
+
+  const { company } = useAuthState();
 
   const isEdit = !!employeeEditData;
 
@@ -90,6 +91,7 @@ const AddEmployeeModal = ({
       showSnackbar({ message: "Please add employee image", type: "error" });
       return;
     }
+    if (!company) return;
     try {
       showModalLoader({});
 
@@ -97,10 +99,11 @@ const AddEmployeeModal = ({
         await DbEmployee.updateEmployee(
           data,
           empImageBase64,
-          employeeEditData.EmployeeId
+          employeeEditData.EmployeeId,
+          company.CompanyId
         );
       } else {
-        await DbEmployee.addEmployee(data, empImageBase64);
+        await DbEmployee.addEmployee(data, empImageBase64, company.CompanyId);
       }
 
       await queryClient.invalidateQueries({

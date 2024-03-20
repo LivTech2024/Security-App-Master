@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { REACT_QUERY_KEYS } from "../../../@types/enum";
+import { REACT_QUERY_KEYS, ShiftPositions } from "../../../@types/enum";
 import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
@@ -13,7 +13,6 @@ import { Draggable, DropPoint } from "../../../utilities/DragAndDropHelper";
 import {
   IEmployeesCollection,
   IShiftsCollection,
-  ShiftPositions,
 } from "../../../@types/database";
 import { MdOutlineClose } from "react-icons/md";
 import {
@@ -23,6 +22,7 @@ import {
 } from "../../../utilities/TsxUtils";
 import { errorHandler } from "../../../utilities/CustomError";
 import { sendEmail } from "../../../utilities/sendEmail";
+import { useAuthState } from "../../../store";
 
 interface PositionViewProps {
   datesArray: Date[];
@@ -31,12 +31,15 @@ interface PositionViewProps {
 const PositionView = ({ datesArray }: PositionViewProps) => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
+  const { company } = useAuthState();
+
   const { data } = useQuery({
-    queryKey: [REACT_QUERY_KEYS.SCHEDULES, datesArray],
+    queryKey: [REACT_QUERY_KEYS.SCHEDULES, datesArray, company!.CompanyId],
     queryFn: async () => {
       const data = await DbSchedule.getSchedules(
         datesArray[0],
-        datesArray[datesArray.length - 1]
+        datesArray[datesArray.length - 1],
+        company!.CompanyId
       );
       return data;
     },
@@ -67,15 +70,16 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
 
   useEffect(() => {
     const fetchEmpSchedule = async () => {
-      if (!showEmpListByPosition || !selectedDate) return;
+      if (!showEmpListByPosition || !selectedDate || !company) return;
       try {
         setIsEmpLoading(true);
-        const data = await DbSchedule.getEmployeesSchedule(
-          dayjs(selectedDate).startOf("week").toDate(),
-          dayjs(selectedDate).endOf("week").toDate(),
-          toDate(selectedDate),
-          showEmpListByPosition
-        );
+        const data = await DbSchedule.getEmployeesSchedule({
+          startDate: dayjs(selectedDate).startOf("week").toDate(),
+          endDate: dayjs(selectedDate).endOf("week").toDate(),
+          currentDate: toDate(selectedDate),
+          empRole: showEmpListByPosition,
+          cmpId: company.CompanyId,
+        });
         if (data) {
           setEmpAvailableForShift(data.filter((emp) => emp.EmpIsAvailable));
         }
@@ -161,8 +165,8 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
         return sendEmail({
           to_email: emp.EmpEmail,
           to_name: emp.EmpName,
-          message: `You have been assigned for the shift. Shift Name: ${shift.ShiftName}\n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n location: ${shift.ShiftLocation}`,
-          subject: "You schedule update",
+          message: `You have been assigned for the shift.\n Shift Name: ${shift.ShiftName}\n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n Address: ${shift.ShiftAddress}`,
+          subject: "Your schedule update",
         });
       });
 

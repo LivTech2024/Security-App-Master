@@ -32,8 +32,12 @@ export default {
         blueButtonActiveBg: "#0e5efffa",
         blackButtonHoverBg: "#000000bb",
         blackButtonActiveBg: "#000000d9",
+        tableOddColor: "#fbfbfb",
 
         secondaryBlueBg: "#60a5fa",
+        switchBg: "#C7C7C7",
+        switchPrimaryBlueBg: "#2563eb",
+        switchSecondaryBlueBg: "#60a5fa",
 
         onHoverBg: "#F4F4F4",
 

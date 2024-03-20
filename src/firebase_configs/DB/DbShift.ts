@@ -1,5 +1,6 @@
 import {
   DocumentData,
+  GeoPoint,
   QueryConstraint,
   Timestamp,
   collection,
@@ -13,6 +14,7 @@ import {
   setDoc,
   startAfter,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { CollectionName } from "../../@types/enum";
 import { AddShiftFormFields } from "../../component/shifts/modal/AddShiftModal";
@@ -22,7 +24,7 @@ import { IShiftsCollection } from "../../@types/database";
 import { removeTimeFromDate } from "../../utilities/misc";
 
 class DbShift {
-  static addShift = async (shiftData: AddShiftFormFields) => {
+  static addShift = async (shiftData: AddShiftFormFields, cmpId: string) => {
     const shiftId = getNewDocId(CollectionName.shifts);
     const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
 
@@ -35,7 +37,12 @@ class DbShift {
       ShiftEndTime: shiftData.end_time,
       ShiftDescription: shiftData.description || null,
       ShiftAssignedUserId: null,
-      ShiftLocation: shiftData.location,
+      ShiftLocation: new GeoPoint(
+        Number(shiftData.location.lat),
+        Number(shiftData.location.lng)
+      ),
+      ShiftCompanyId: cmpId,
+      ShiftAddress: shiftData.address,
       ShiftCreatedAt: serverTimestamp(),
       ShiftModifiedAt: serverTimestamp(),
     };
@@ -45,7 +52,8 @@ class DbShift {
 
   static updateShift = async (
     shiftData: AddShiftFormFields,
-    shiftId: string
+    shiftId: string,
+    cmpId: string
   ) => {
     const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
 
@@ -56,7 +64,12 @@ class DbShift {
       ShiftStartTime: shiftData.start_time,
       ShiftEndTime: shiftData.end_time,
       ShiftDescription: shiftData.description || null,
-      ShiftLocation: shiftData.location,
+      ShiftLocation: new GeoPoint(
+        Number(shiftData.location.lat),
+        Number(shiftData.location.lng)
+      ),
+      ShiftCompanyId: cmpId,
+      ShiftAddress: shiftData.address,
       ShiftModifiedAt: serverTimestamp(),
     };
 
@@ -71,13 +84,18 @@ class DbShift {
   static getShifts = ({
     lmt,
     lastDoc,
+    cmpId,
   }: {
     lmt: number;
     lastDoc?: DocumentData | null;
+    cmpId: string;
   }) => {
     const shiftRef = collection(db, CollectionName.shifts);
 
-    let queryParams: QueryConstraint[] = [orderBy("ShiftDate", "desc")];
+    let queryParams: QueryConstraint[] = [
+      where("ShiftCompanyId", "==", cmpId),
+      orderBy("ShiftDate", "desc"),
+    ];
     if (lmt) {
       queryParams = [...queryParams, limit(lmt)];
     }

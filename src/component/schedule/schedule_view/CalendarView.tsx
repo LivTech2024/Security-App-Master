@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { REACT_QUERY_KEYS } from "../../../@types/enum";
 import DbShift from "../../../firebase_configs/DB/DbShift";
 import AssignShiftModal from "../modal/AssignShiftModal";
+import { useAuthState } from "../../../store";
 
 interface CalendarViewProps {
   datesArray: Date[];
@@ -26,12 +27,15 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
     null
   );
 
+  const { company } = useAuthState();
+
   const { data } = useQuery({
-    queryKey: [REACT_QUERY_KEYS.SCHEDULES, datesArray],
+    queryKey: [REACT_QUERY_KEYS.SCHEDULES, datesArray, company!.CompanyId],
     queryFn: async () => {
       const data = await DbSchedule.getSchedules(
         datesArray[0],
-        datesArray[datesArray.length - 1]
+        datesArray[datesArray.length - 1],
+        company!.CompanyId
       );
       return data;
     },

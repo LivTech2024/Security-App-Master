@@ -13,7 +13,7 @@ import { DocumentData } from "firebase/firestore";
 import { IEmployeesCollection } from "../../@types/database";
 import NoSearchResult from "../../common/NoSearchResult";
 import TableShimmer from "../../common/shimmer/TableShimmer";
-import { useEditFormStore } from "../../store";
+import { useAuthState, useEditFormStore } from "../../store";
 import { firebaseDataToObject, splitName } from "../../utilities/misc";
 import { Employee } from "../../store/slice/editForm.slice";
 
@@ -21,6 +21,8 @@ const Employees = () => {
   const [addEmployeeDialog, setAddEmployeeDialog] = useState(false);
 
   const { setEmployeeEditData } = useEditFormStore();
+
+  const { company } = useAuthState();
 
   //const [query, setQuery] = useState("");
 
@@ -35,12 +37,17 @@ const Employees = () => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.EMPLOYEE_LIST, debouncedQuery],
+    queryKey: [
+      REACT_QUERY_KEYS.EMPLOYEE_LIST,
+      debouncedQuery,
+      company!.CompanyId,
+    ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbEmployee.getEmployees({
         lmt: DisplayCount.EMPLOYEE_LIST,
         lastDoc: pageParam,
         searchQuery: debouncedQuery,
+        cmpId: company!.CompanyId,
       });
       return snapshot.docs;
     },

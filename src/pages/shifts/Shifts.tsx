@@ -9,13 +9,15 @@ import { useInView } from "react-intersection-observer";
 import NoSearchResult from "../../common/NoSearchResult";
 import TableShimmer from "../../common/shimmer/TableShimmer";
 import { firebaseDataToObject, formatDate } from "../../utilities/misc";
-import { useEditFormStore } from "../../store";
+import { useAuthState, useEditFormStore } from "../../store";
 import { Shift } from "../../store/slice/editForm.slice";
 
 const Shifts = () => {
   const [createShiftModal, setCreateShiftModal] = useState(false);
 
   const { setShiftEditData } = useEditFormStore();
+
+  const { company } = useAuthState();
 
   const {
     data: snapshotData,
@@ -26,11 +28,12 @@ const Shifts = () => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.SHIFT_LIST],
+    queryKey: [REACT_QUERY_KEYS.SHIFT_LIST, company!.CompanyId],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbShift.getShifts({
         lmt: DisplayCount.SHIFT_LIST,
         lastDoc: pageParam,
+        cmpId: company!.CompanyId,
       });
       return snapshot.docs;
     },
@@ -125,7 +128,7 @@ const Shifts = () => {
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={5}>
+              <td colSpan={6}>
                 <NoSearchResult />
               </td>
             </tr>
@@ -163,7 +166,7 @@ const Shifts = () => {
             })
           )}
           <tr ref={ref}>
-            <td colSpan={5}>
+            <td colSpan={6}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />

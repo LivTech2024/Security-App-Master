@@ -58,6 +58,7 @@ const ImageUpload = ({
             <input
               id="fileInput"
               type="file"
+              accept="image/*"
               className="hidden"
               onChange={handleImageUpload}
             />
