@@ -94,3 +94,9 @@ export interface IIncidentsCollection {
   IncidentCreatedAt: Timestamp | FieldValue;
   IncidentUpdatedAt: Timestamp | FieldValue;
 }
+
+export interface ILocations {
+  LocationId: string;
+  LocationName: string;
+  LocationCoordinates: GeoPoint;
+}
