@@ -17,6 +17,33 @@ import TableShimmer from "../../common/shimmer/TableShimmer";
 import NoSearchResult from "../../common/NoSearchResult";
 import { formatDate, toDate } from "../../utilities/misc";
 
+const PatrolStatus = ({
+  status,
+}: {
+  status: "pending" | "started" | "completed";
+}) => {
+  return (
+    <div className="flex justify-end">
+      <div className="flex items-center gap-2">
+        {status === "pending" ? (
+          <div className="w-[12px] h-[12px] rounded-full bg-primaryGold">
+            &nbsp;
+          </div>
+        ) : status === "started" ? (
+          <div className="w-[12px] h-[12px] rounded-full bg-primaryRed">
+            &nbsp;
+          </div>
+        ) : (
+          <div className="w-[12px] h-[12px] rounded-full bg-primaryGreen">
+            &nbsp;
+          </div>
+        )}
+        <span className="capitalize font-medium">{status}</span>
+      </div>
+    </div>
+  );
+};
+
 const PatrollingList = () => {
   const navigate = useNavigate();
 
@@ -138,7 +165,7 @@ const PatrollingList = () => {
           {data.length === 0 && !isLoading ? (
             <tr>
               <td colSpan={6}>
-                <NoSearchResult text="No employee" />
+                <NoSearchResult text="No result found" />
               </td>
             </tr>
           ) : (
@@ -146,22 +173,31 @@ const PatrollingList = () => {
               return (
                 <tr className="cursor-pointer">
                   <td className="px-4 py-2 text-start align-top">
-                    {patrol.PatrolName}
+                    <span className="line-clamp-2">{patrol.PatrolName}</span>
                   </td>
                   <td className="px-4 py-2 text-start align-top ">
-                    <span className="line-clamp-2">{patrol.PatrolArea}</span>
+                    <span className="line-clamp-3">{patrol.PatrolArea}</span>
                   </td>
                   <td className="px-4 py-2 text-start align-top">
-                    {formatDate(toDate(patrol.PatrolTime), "DD-MM-YY hh:ss A")}
+                    <span className="line-clamp-2">
+                      {formatDate(
+                        toDate(patrol.PatrolTime),
+                        "DD MMM-YY hh:ss A"
+                      )}
+                    </span>
                   </td>
                   <td className="px-4 py-2 text-center align-top">
                     {patrol.PatrolCheckPoints.length.toFixed(1)}
                   </td>
                   <td className="px-4 py-2 text-end align-top">
-                    {patrol.PatrolAssignedGuardName}
+                    <span className="line-clamp-2">
+                      {patrol.PatrolAssignedGuardName}
+                    </span>
                   </td>
                   <td className="px-4 py-2 text-end capitalize align-top">
-                    {patrol.PatrolCurrentStatus}
+                    <span className="line-clamp-2">
+                      <PatrolStatus status={patrol.PatrolCurrentStatus} />
+                    </span>
                   </td>
                 </tr>
               );
