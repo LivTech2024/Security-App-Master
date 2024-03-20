@@ -48,7 +48,16 @@ const PatrollingView = () => {
   if (data) {
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
-        <div className="text-2xl font-bold mb-4">Patrolling Data</div>
+        <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
+          <span className="font-semibold text-xl">Patrolling data</span>
+
+          <button
+            //onClick={}
+            className="bg-primary text-surface px-4 py-2 rounded"
+          >
+            Delete
+          </button>
+        </div>
         <PatrolViewCard patrolData={data} />
       </div>
     );

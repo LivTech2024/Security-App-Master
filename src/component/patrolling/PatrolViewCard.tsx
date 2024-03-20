@@ -4,7 +4,7 @@ import { formatDate } from "../../utilities/misc";
 
 const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
   return (
-    <div className="bg-surface shadow-md rounded-lg px-4 pt-4 mb-4">
+    <div className="bg-surface border border-gray-300 shadow-md rounded-lg px-4 pt-4 mb-4">
       <div className="mb-2">
         <div className="text-xl font-semibold">{patrolData.PatrolName}</div>
         <span className="text-textTertiary">{patrolData.PatrolArea}</span>

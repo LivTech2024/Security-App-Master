@@ -4,6 +4,7 @@ export enum CollectionName {
   employees = "Employees",
   shifts = "Shifts",
   patrols = "Patrols",
+  incident = "Incidents",
 }
 
 export enum ShiftPositions {

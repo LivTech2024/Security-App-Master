@@ -16,8 +16,20 @@ import { PageRoutes } from "./@types/enum";
 import PatrollingList from "./pages/patrolling/PatrollingList";
 import PatrollingCreateOrEdit from "./pages/patrolling/PatrollingCreateOrEdit";
 import PatrollingView from "./pages/patrolling/PatrollingView";
+import useListenIncidents from "./hooks/listeners/useListenIncidents";
+import { useEffect } from "react";
+import { showSnackbar } from "./utilities/TsxUtils";
 
 function App() {
+  const { incident } = useListenIncidents();
+
+  useEffect(() => {
+    if (incident) {
+      const { IncidentNarrative } = incident;
+      showSnackbar({ message: IncidentNarrative, type: "info" });
+    }
+  }, [incident]);
+
   return (
     <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
       <ModalsProvider

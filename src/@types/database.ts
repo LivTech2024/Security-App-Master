@@ -80,3 +80,17 @@ export interface IPatrolsCollection {
   PatrolCreatedAt: Timestamp | FieldValue;
   PatrolModifiedAt: Timestamp | FieldValue;
 }
+
+export interface IIncidentsCollection {
+  IncidentId: string;
+  IncidentCompanyId: string;
+  IncidentEmployeeId: string;
+  IncidentEmployeeName: string;
+  IncidentEmployeeRole: EmployeeRoles;
+  IncidentFieldId: string;
+  IncidentArea: string;
+  IncidentLocation: GeoPoint;
+  IncidentNarrative: string;
+  IncidentCreatedAt: Timestamp | FieldValue;
+  IncidentUpdatedAt: Timestamp | FieldValue;
+}
