@@ -63,7 +63,9 @@ export interface IPatrolCheckPointsChild {
 
 export interface IPatrolsCollection {
   PatrolId: string;
+  PatrolCompanyId: string;
   PatrolName: string;
+  PatrolNameSearchIndex: string[];
   PatrolArea: string;
   PatrolLocation: GeoPoint;
   PatrolTime: Timestamp | FieldValue;
@@ -71,6 +73,7 @@ export interface IPatrolsCollection {
   PatrolAssignedGuardName: string;
   PatrolCheckPoints: IPatrolCheckPointsChild[];
   PatrolCurrentStatus: "pending" | "started" | "completed";
+  PatrolGuardCurrentLocation?: GeoPoint;
   PatrolFailureReason?: string;
   PatrolRestrictedRadius: number;
   PatrolKeepGuardInRadiusOfLocation: boolean;

@@ -57,6 +57,8 @@ const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
   isUppercase = false,
   inputType = "text",
   inputMode = "text",
+  inputMaxLength,
+  decimalCount,
 }: InputWithTopHeaderProps<FormFields>) => {
   const [isInputHidden, setIsInputHidden] = useState(
     inputType === "password" ? true : false
@@ -66,6 +68,25 @@ const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
     if (isUppercase) {
       const input = event.target as HTMLInputElement;
       input.value = input.value.toUpperCase();
+    }
+    const input = event.target as HTMLInputElement;
+    if (inputMaxLength && input.value.length > inputMaxLength) {
+      input.value = input.value.slice(0, inputMaxLength);
+    }
+    if (typeof decimalCount === "number") {
+      if (input.value.includes(".")) {
+        let decimalPart = input.value.split(".")[1];
+        if (decimalPart.length > decimalCount) {
+          decimalPart = decimalPart.slice(0, decimalCount);
+        }
+        input.value = input.value.split(".")[0] + "." + decimalPart;
+        input.value = input.value.replace(/[^\d.]/g, "");
+      } else {
+        input.value = input.value.replace(/[^\d.]/g, "");
+      }
+    } else if (decimalCount === 0) {
+      const input = event.target as HTMLInputElement;
+      input.value = input.value.replace(/\D/g, "");
     }
   };
 

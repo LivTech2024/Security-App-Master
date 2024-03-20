@@ -3,6 +3,7 @@ export enum CollectionName {
   admins = "Admins",
   employees = "Employees",
   shifts = "Shifts",
+  patrols = "Patrols",
 }
 
 export enum ShiftPositions {
@@ -20,16 +21,19 @@ export enum EmployeeRoles {
 export const DisplayCount = {
   EMPLOYEE_LIST: 20,
   SHIFT_LIST: 20,
+  PATROL_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
   EMPLOYEE_LIST: "employee-list",
   SHIFT_LIST: "shift-list",
   SCHEDULES: "schedules",
+  PATROL_LIST: "patrolling-list",
 } as const;
 
 export const MinimumQueryCharacter = {
   EMPLOYEE: 1,
+  PATROL: 1,
 } as const;
 
 export const CloudStoragePaths = {

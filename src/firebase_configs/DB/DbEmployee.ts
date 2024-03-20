@@ -16,6 +16,7 @@ import {
 import {
   CloudStoragePaths,
   CollectionName,
+  EmployeeRoles,
   ImageResolution,
 } from "../../@types/enum";
 import { db } from "../config";
@@ -228,11 +229,13 @@ class DbEmployee {
     lastDoc,
     searchQuery,
     cmpId,
+    empRole,
   }: {
     lmt: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId: string;
+    empRole?: EmployeeRoles;
   }) => {
     const empRef = collection(db, CollectionName.employees);
 
@@ -240,9 +243,6 @@ class DbEmployee {
       where("EmployeeCompanyId", "==", cmpId),
       orderBy("EmployeeCreatedAt", "desc"),
     ];
-    if (lmt) {
-      queryParams = [...queryParams, limit(lmt)];
-    }
 
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [
@@ -255,8 +255,16 @@ class DbEmployee {
       ];
     }
 
+    if (empRole) {
+      queryParams = [...queryParams, where("EmployeeRole", "==", empRole)];
+    }
+
     if (lastDoc) {
       queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
     }
 
     const empQuery = query(empRef, ...queryParams);
