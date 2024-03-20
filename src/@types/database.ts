@@ -78,4 +78,5 @@ export interface IPatrolsCollection {
   PatrolRestrictedRadius: number;
   PatrolKeepGuardInRadiusOfLocation: boolean;
   PatrolCreatedAt: Timestamp | FieldValue;
+  PatrolModifiedAt: Timestamp | FieldValue;
 }

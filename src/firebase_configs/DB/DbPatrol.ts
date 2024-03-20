@@ -5,6 +5,7 @@ import {
   Timestamp,
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
@@ -63,6 +64,7 @@ class DbPatrol {
       PatrolRestrictedRadius: Number(data.PatrolRestrictedRadius),
       PatrolKeepGuardInRadiusOfLocation: data.PatrolKeepGuardInRadiusOfLocation,
       PatrolCreatedAt: serverTimestamp(),
+      PatrolModifiedAt: serverTimestamp(),
     };
 
     await setDoc(patrolRef, newPatrol);
@@ -114,6 +116,12 @@ class DbPatrol {
     const patrolQuery = query(patrolRef, ...queryParams);
 
     return getDocs(patrolQuery);
+  };
+
+  static getPatrolById = (patrolId: string) => {
+    const patrolRef = doc(db, CollectionName.patrols, patrolId);
+
+    return getDoc(patrolRef);
   };
 }
 

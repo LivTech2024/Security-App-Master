@@ -17,7 +17,7 @@ import TableShimmer from "../../common/shimmer/TableShimmer";
 import NoSearchResult from "../../common/NoSearchResult";
 import { formatDate, toDate } from "../../utilities/misc";
 
-const PatrolStatus = ({
+export const PatrolStatus = ({
   status,
 }: {
   status: "pending" | "started" | "completed";
@@ -171,7 +171,15 @@ const PatrollingList = () => {
           ) : (
             data.map((patrol) => {
               return (
-                <tr className="cursor-pointer">
+                <tr
+                  key={patrol.PatrolId}
+                  onClick={() =>
+                    navigate(
+                      PageRoutes.PATROLLING_VIEW + `?id=${patrol.PatrolId}`
+                    )
+                  }
+                  className="cursor-pointer"
+                >
                   <td className="px-4 py-2 text-start align-top">
                     <span className="line-clamp-2">{patrol.PatrolName}</span>
                   </td>
@@ -182,7 +190,7 @@ const PatrollingList = () => {
                     <span className="line-clamp-2">
                       {formatDate(
                         toDate(patrol.PatrolTime),
-                        "DD MMM-YY hh:ss A"
+                        "DD MMM-YY hh:mm A"
                       )}
                     </span>
                   </td>
