@@ -35,9 +35,11 @@ const Nav = () => {
       <NavItem path={PageRoutes.EMPLOYEES} name="Employees" />
       <NavItem path={PageRoutes.SHIFTS} name="Shifts" />
       <NavItem path={PageRoutes.PATROLLING_LIST} name="Patrolling" />
-      <NavItem path="/trades" name="Trades" />
+      <NavItem path={PageRoutes.LOCATIONS} name="Locations" />
       <NavItem path="/incident" name="Incident" />
       <NavItem path="/send-message" name="Send Message" />
+      <NavItem path="/trades" name="Trades" />
+
       <NavItem
         name="Sign out"
         callback={() => {

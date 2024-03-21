@@ -1,4 +1,9 @@
-import { MdOutlineMessage, MdPeople, MdSecurity } from "react-icons/md";
+import {
+  MdAddLocationAlt,
+  MdOutlineMessage,
+  MdPeople,
+  MdSecurity,
+} from "react-icons/md";
 import { useAuthState } from "../../store";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineSchedule } from "react-icons/ai";
@@ -67,9 +72,9 @@ const Home = () => {
           name="Patrolling"
         />
         <HomeItem
-          path={PageRoutes.HOME}
-          icon={<GrTransaction className="text-3xl" />}
-          name="Trades"
+          path={PageRoutes.LOCATIONS}
+          icon={<MdAddLocationAlt className="text-2xl" />}
+          name="Locations"
         />
         <HomeItem
           path={PageRoutes.HOME}
@@ -81,6 +86,12 @@ const Home = () => {
           icon={<MdOutlineMessage className="text-3xl" />}
           name="Send Message"
         />
+        <HomeItem
+          path={PageRoutes.HOME}
+          icon={<GrTransaction className="text-3xl" />}
+          name="Trades"
+        />
+
         <HomeItem
           icon={<IoIosLogOut className="text-3xl" />}
           name="Sign Out"

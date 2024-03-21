@@ -6,6 +6,7 @@ export enum CollectionName {
   patrols = "Patrols",
   incident = "Incidents",
   loggedInUsers = "LoggedInUsers",
+  locations = "Locations",
 }
 
 export enum ShiftPositions {
@@ -24,6 +25,7 @@ export const DisplayCount = {
   EMPLOYEE_LIST: 20,
   SHIFT_LIST: 20,
   PATROL_LIST: 20,
+  LOCATION_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -31,11 +33,13 @@ export const REACT_QUERY_KEYS = {
   SHIFT_LIST: "shift-list",
   SCHEDULES: "schedules",
   PATROL_LIST: "patrolling-list",
+  LOCATION_LIST: "location-list",
 } as const;
 
 export const MinimumQueryCharacter = {
   EMPLOYEE: 1,
   PATROL: 1,
+  LOCATION: 1,
 } as const;
 
 export const CloudStoragePaths = {
@@ -55,6 +59,7 @@ export const PageRoutes = {
   PATROLLING_LIST: "/patrolling_list",
   PATROLLING_CREATE_OR_EDIT: "/patrolling_create_or_edit",
   PATROLLING_VIEW: "/patrolling_view",
+  LOCATIONS: "/locations",
 };
 
 export const LocalStorageKey = {

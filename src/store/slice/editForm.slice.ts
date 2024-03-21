@@ -1,5 +1,9 @@
 import { StateCreator } from "zustand";
-import { IEmployeesCollection, IShiftsCollection } from "../../@types/database";
+import {
+  IEmployeesCollection,
+  ILocationsCollection,
+  IShiftsCollection,
+} from "../../@types/database";
 
 export interface Employee
   extends Omit<
@@ -20,11 +24,19 @@ export interface Shift
   ShiftModifiedAt: string;
 }
 
+export interface Location
+  extends Omit<ILocationsCollection, "LocationCreatedAt"> {
+  LocationCreatedAt: string;
+}
+
 interface EditFormState {
   employeeEditData: Employee | null;
   setEmployeeEditData: (emp: Employee | null) => void;
   shiftEditData: Shift | null;
   setShiftEditData: (shift: Shift | null) => void;
+
+  locationEditData: Location | null;
+  setLocationEditData: (loc: Location | null) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -37,4 +49,9 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   shiftEditData: null,
   setShiftEditData: (shift) =>
     set((state) => ({ ...state, shiftEditData: shift })),
+
+  //Location
+  locationEditData: null,
+  setLocationEditData: (loc) =>
+    set((state) => ({ ...state, locationEditData: loc })),
 });

@@ -95,10 +95,14 @@ export interface IIncidentsCollection {
   IncidentUpdatedAt: Timestamp | FieldValue;
 }
 
-export interface ILocations {
+export interface ILocationsCollection {
   LocationId: string;
+  LocationCompanyId: string;
   LocationName: string;
+  LocationSearchIndex: string[];
+  LocationAddress: string;
   LocationCoordinates: GeoPoint;
+  LocationCreatedAt: Timestamp | FieldValue;
 }
 
 export interface ILoggedInUsersCollection {

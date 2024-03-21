@@ -23,6 +23,7 @@ import { useAuthState } from "./store";
 import Login from "./pages/login/Login";
 import useOnAuthStateChanged from "./hooks/useOnAuthStateChanged";
 import SplashScreen from "./component/splash_screen/SplashScreen";
+import Locations from "./pages/locations/Locations";
 
 function App() {
   useOnAuthStateChanged();
@@ -78,6 +79,7 @@ function App() {
               path={PageRoutes.PATROLLING_VIEW}
               Component={PatrollingView}
             />
+            <Route path={PageRoutes.LOCATIONS} Component={Locations} />
           </Routes>
         </Layout>
       </ModalsProvider>
