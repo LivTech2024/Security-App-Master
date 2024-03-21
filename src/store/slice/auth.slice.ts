@@ -18,28 +18,15 @@ interface AuthState {
   setCompany: (cmp: Company | null) => void;
   admin: Admin | null;
   setAdmin: (admin: Admin | null) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
 }
 
 export const createAuthSlice: StateCreator<AuthState> = (set) => ({
-  company: {
-    CompanyAddress: "",
-    CompanyCreatedAt: "",
-    CompanyModifiedAt: "",
-    CompanyEmail: "sapp69750@gmail.com",
-    CompanyId: "aSvLtwII6Cjs7uCISBRR",
-    CompanyLogo: "",
-    CompanyName: "Livtech",
-  },
+  company: null,
   setCompany: (cmp) => set((state) => ({ ...state, company: cmp })),
-
-  admin: {
-    AdminCompanyId: "aSvLtwII6Cjs7uCISBRR",
-    AdminEmail: "sapp69750@gmail.com",
-    AdminId: "LYVivgudt3LJU7qAEIDq",
-    AdminName: "Jhon Doe",
-    AdminPhone: "+918624016814",
-    AdminCreatedAt: "",
-    AdminModifiedAt: "",
-  },
+  admin: null,
   setAdmin: (admin) => set((state) => ({ ...state, admin })),
+  loading: true,
+  setLoading: (loading) => set((state) => ({ ...state, loading })),
 });

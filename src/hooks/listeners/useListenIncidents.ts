@@ -18,10 +18,11 @@ const useListenIncidents = () => {
   const [incident, setIncident] = useState<IIncidentsCollection | null>(null);
 
   useEffect(() => {
+    if (!company) return;
     const incidentRef = collection(db, CollectionName.incident);
     const incidentQuery = query(
       incidentRef,
-      where("IncidentCompanyId", "==", company?.CompanyId),
+      where("IncidentCompanyId", "==", company.CompanyId),
       where(
         "IncidentUpdatedAt",
         ">=",

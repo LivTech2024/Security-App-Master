@@ -1,4 +1,14 @@
-import { doc, serverTimestamp, setDoc } from "@firebase/firestore";
+import {
+  doc,
+  serverTimestamp,
+  setDoc,
+  getDoc,
+  where,
+  query,
+  collection,
+  getDocs,
+  limit,
+} from "@firebase/firestore";
 import { CollectionName } from "../../@types/enum";
 import { getNewDocId } from "./utils";
 import { db } from "../config";
@@ -37,6 +47,36 @@ class DbCompany {
     };
 
     return setDoc(adminRef, newAdmin);
+  };
+
+  static getAdminById = (adminId: string) => {
+    const adminRef = doc(db, CollectionName.admins, adminId);
+    return getDoc(adminRef);
+  };
+
+  static getCompanyById = (cmpId: string) => {
+    const cmpRef = doc(db, CollectionName.companies, cmpId);
+    return getDoc(cmpRef);
+  };
+
+  static getUserLoggedInData = async (
+    uId: string,
+    loggedInId: string,
+    loggedInCrypt: string,
+    isLoggedIn: boolean
+  ) => {
+    const loggedInRef = collection(db, CollectionName.loggedInUsers);
+
+    const loggedInQuery = query(
+      loggedInRef,
+      where("LoggedInId", "==", loggedInId),
+      where("LoggedInCrypt", "==", loggedInCrypt),
+      where("LoggedInUserId", "==", uId),
+      where("IsLoggedIn", "==", isLoggedIn),
+      limit(1)
+    );
+
+    return getDocs(loggedInQuery);
   };
 }
 

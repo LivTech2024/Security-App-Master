@@ -19,8 +19,15 @@ import PatrollingView from "./pages/patrolling/PatrollingView";
 import useListenIncidents from "./hooks/listeners/useListenIncidents";
 import { useEffect } from "react";
 import { showSnackbar } from "./utilities/TsxUtils";
+import { useAuthState } from "./store";
+import Login from "./pages/login/Login";
+import useOnAuthStateChanged from "./hooks/useOnAuthStateChanged";
 
 function App() {
+  useOnAuthStateChanged();
+
+  const { company, admin, loading } = useAuthState();
+
   const { incident } = useListenIncidents();
 
   useEffect(() => {
@@ -29,6 +36,26 @@ function App() {
       showSnackbar({ message: IncidentNarrative, type: "info" });
     }
   }, [incident]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full justify-center items-center">
+        Loading
+      </div>
+    );
+  }
+
+  if (!admin || !company) {
+    return (
+      <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
+        <ModalsProvider
+          modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
+        >
+          <ToastContainer /> <Login />
+        </ModalsProvider>
+      </MantineProvider>
+    );
+  }
 
   return (
     <MantineProvider withGlobalClasses withCssVariables withStaticClasses>

@@ -5,6 +5,7 @@ export enum CollectionName {
   shifts = "Shifts",
   patrols = "Patrols",
   incident = "Incidents",
+  loggedInUsers = "LoggedInUsers",
 }
 
 export enum ShiftPositions {
@@ -55,3 +56,13 @@ export const PageRoutes = {
   PATROLLING_CREATE_OR_EDIT: "/patrolling_create_or_edit",
   PATROLLING_VIEW: "/patrolling_view",
 };
+
+export const LocalStorageKey = {
+  LOGGEDIN_USER: "loggedInUser",
+};
+
+export interface LocalStorageLoggedInUserData {
+  LoggedInId: string;
+  LoggedInCrypt: string;
+  LoggedInAuthUserType: "admin" | "guard" | "supervisor";
+}

@@ -100,3 +100,12 @@ export interface ILocations {
   LocationName: string;
   LocationCoordinates: GeoPoint;
 }
+
+export interface ILoggedInUsersCollection {
+  LoggedInId: string;
+  LoggedInUserId: string;
+  IsLoggedIn: boolean;
+  LoggedInCrypt: string;
+  LoggedInUserType: "admin" | "guard" | "supervisor";
+  LoggedInCreatedAt: Timestamp | FieldValue;
+}
