@@ -22,6 +22,7 @@ import { showSnackbar } from "./utilities/TsxUtils";
 import { useAuthState } from "./store";
 import Login from "./pages/login/Login";
 import useOnAuthStateChanged from "./hooks/useOnAuthStateChanged";
+import SplashScreen from "./component/splash_screen/SplashScreen";
 
 function App() {
   useOnAuthStateChanged();
@@ -38,11 +39,7 @@ function App() {
   }, [incident]);
 
   if (loading) {
-    return (
-      <div className="flex h-screen w-full justify-center items-center">
-        Loading
-      </div>
-    );
+    return <SplashScreen />;
   }
 
   if (!admin || !company) {

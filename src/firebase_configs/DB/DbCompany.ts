@@ -8,6 +8,7 @@ import {
   collection,
   getDocs,
   limit,
+  deleteDoc,
 } from "@firebase/firestore";
 import { CollectionName } from "../../@types/enum";
 import { getNewDocId } from "./utils";
@@ -77,6 +78,11 @@ class DbCompany {
     );
 
     return getDocs(loggedInQuery);
+  };
+
+  static deleteUserLoggedInDoc = async (loggedInId: string) => {
+    const loggedInRef = doc(db, CollectionName.loggedInUsers, loggedInId);
+    await deleteDoc(loggedInRef);
   };
 }
 

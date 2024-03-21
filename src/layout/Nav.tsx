@@ -1,12 +1,22 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { PageRoutes } from "../@types/enum";
+import { useAuthState } from "../store";
+import { openContextModal } from "@mantine/modals";
 
-const NavItem = ({ name, path }: { name: string; path: string }) => {
+const NavItem = ({
+  name,
+  path,
+  callback,
+}: {
+  name: string;
+  path?: string;
+  callback?: () => void;
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   return (
     <div
-      onClick={() => navigate(path)}
+      onClick={() => (path ? navigate(path) : callback && callback())}
       className={`uppercase cursor-pointer p-2 ${
         location.pathname === path && "bg-surface text-textPrimary"
       }`}
@@ -17,6 +27,7 @@ const NavItem = ({ name, path }: { name: string; path: string }) => {
 };
 
 const Nav = () => {
+  const { userSignOut } = useAuthState();
   return (
     <div className="flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1">
       <NavItem path={PageRoutes.HOME} name="Home" />
@@ -27,6 +38,28 @@ const Nav = () => {
       <NavItem path="/trades" name="Trades" />
       <NavItem path="/incident" name="Incident" />
       <NavItem path="/send-message" name="Send Message" />
+      <NavItem
+        name="Sign out"
+        callback={() => {
+          openContextModal({
+            modal: "confirmModal",
+            withCloseButton: false,
+            centered: true,
+            closeOnClickOutside: true,
+            innerProps: {
+              title: "Confirm",
+              body: "Are you sure to sign out",
+              onConfirm: () => {
+                userSignOut();
+              },
+            },
+            size: "30%",
+            styles: {
+              body: { padding: "0px" },
+            },
+          });
+        }}
+      />
     </div>
   );
 };
