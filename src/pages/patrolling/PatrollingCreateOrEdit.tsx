@@ -9,11 +9,6 @@ import {
 } from "../../utilities/zod/schema";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng,
-} from "react-places-autocomplete";
-import InputHeader from "../../common/inputs/InputHeader";
 import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 import { useEffect, useState } from "react";
 import CheckpointForm from "../../component/patrolling/CheckpointForm";
@@ -29,6 +24,10 @@ import {
   showSnackbar,
 } from "../../utilities/TsxUtils";
 import DbPatrol from "../../firebase_configs/DB/DbPatrol";
+import useFetchLocations from "../../hooks/fetch/useFetchLocations";
+import InputError from "../../common/inputs/InputError";
+import { sendEmail } from "../../utilities/sendEmail";
+import { formatDate } from "../../utilities/misc";
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -37,11 +36,6 @@ const PatrollingCreateOrEdit = () => {
   });
 
   const { company } = useAuthState();
-
-  const [patrolArea, patrolLoc] = methods.watch([
-    "PatrolArea",
-    "PatrolLocation",
-  ]);
 
   const [checkPoints, setCheckPoints] = useState<{ checkPointName: string }[]>([
     { checkPointName: "" },
@@ -56,6 +50,15 @@ const PatrollingCreateOrEdit = () => {
     searchQuery: guard || undefined,
   });
 
+  const [locationName, setLocationName] = useState<string | null | undefined>(
+    ""
+  );
+
+  const { data: locData } = useFetchLocations({
+    limit: 5,
+    searchQuery: locationName,
+  });
+
   useEffect(() => {
     console.log(methods.formState.errors);
   }, [methods.formState.errors]);
@@ -64,15 +67,30 @@ const PatrollingCreateOrEdit = () => {
     if (!guard) {
       methods.setValue("PatrolAssignedGuardName", "");
       methods.setValue("PatrolAssignedGuardId", "");
+      methods.setValue("PatrolAssignedGuardEmail", "");
       return;
     }
-    methods.setValue("PatrolAssignedGuardName", guard);
-    const guardId = data.find((d) => d.EmployeeName === guard)?.EmployeeId;
-    console.log(guardId, "id");
-    if (guardId) {
-      methods.setValue("PatrolAssignedGuardId", guardId);
+    const guardData = data.find((d) => d.EmployeeName === guard);
+
+    if (guardData) {
+      methods.setValue("PatrolAssignedGuardName", guardData.EmployeeName);
+      methods.setValue("PatrolAssignedGuardId", guardData.EmployeeId);
+      methods.setValue("PatrolAssignedGuardEmail", guardData.EmployeeEmail);
     }
   }, [guard]);
+
+  useEffect(() => {
+    if (!locationName) return;
+    const location = locData.find((loc) => loc.LocationName === locationName);
+    if (location) {
+      methods.setValue("PatrolLocationName", locationName);
+      methods.setValue("PatrolArea", location?.LocationAddress);
+      methods.setValue("PatrolLocation", {
+        latitude: String(location.LocationCoordinates.latitude),
+        longitude: String(location.LocationCoordinates.longitude),
+      });
+    }
+  }, [locationName]);
 
   useEffect(() => {
     if (!patrolTime) return;
@@ -88,28 +106,23 @@ const PatrollingCreateOrEdit = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkPoints]);
 
-  const handleSelect = async (selectedAddress: string) => {
-    try {
-      methods.setValue("PatrolArea", selectedAddress);
-      const results = await geocodeByAddress(selectedAddress);
-      const latLng = await getLatLng(results[0]);
-      const { lat, lng } = latLng;
-      methods.setValue("PatrolLocation", {
-        latitude: String(lat),
-        longitude: String(lng),
-      });
-    } catch (error) {
-      console.error("Error selecting address", error);
-    }
-  };
-
   const onSubmit = async (data: PatrollingFormFields) => {
     if (!company) return;
     try {
-      console.log(data);
       showModalLoader({});
 
       await DbPatrol.createPatrol(company.CompanyId, data);
+
+      await sendEmail({
+        message: `You have been assigned for the patrol.\n Patrol Name: ${
+          data.PatrolName
+        }\n Timing: ${formatDate(data.PatrolTime, "DD/MM/YY")}\n Address: ${
+          data.PatrolArea
+        }`,
+        subject: "Your patrol update",
+        to_email: data.PatrolAssignedGuardEmail,
+        to_name: data.PatrolAssignedGuardName,
+      });
 
       showSnackbar({ message: "Patrol created successfully", type: "success" });
       closeModalLoader();
@@ -153,65 +166,21 @@ const PatrollingCreateOrEdit = () => {
             name="PatrolName"
             error={methods.formState.errors.PatrolName?.message}
           />
-          <PlacesAutocomplete
-            value={patrolArea}
-            onChange={(val) => methods.setValue("PatrolArea", val)}
-            onSelect={handleSelect}
-          >
-            {({
-              getInputProps,
-              suggestions,
-              getSuggestionItemProps,
-              loading,
-            }) => (
-              <div className="flex flex-col gap-1">
-                <InputHeader title="Patrolling Area" />
-                <input
-                  {...getInputProps({
-                    className:
-                      "location-search-input py-2 px-2 rounded w-full text-lg outline-none border border-inputBorder focus-within:ring-[2px]",
-                  })}
-                />
-                {methods.formState.errors.PatrolArea && (
-                  <small className="text-red-600 text-xs px-1 text-start">
-                    {methods.formState.errors.PatrolArea.message}
-                  </small>
-                )}
-                {(suggestions.length > 0 || loading) && (
-                  <div className="relative">
-                    <div className="autocomplete-dropdown-container rounded-b-2xl border absolute max-h-[200px] w-full overflow-scroll remove-vertical-scrollbar">
-                      {loading && (
-                        <div className="cursor-pointer py-2 px-2 bg-white">
-                          Loading...
-                        </div>
-                      )}
-                      {suggestions.map((suggestion) => {
-                        const style = {
-                          backgroundColor: suggestion.active
-                            ? "#DAC0A3"
-                            : "#fff",
-                        };
-                        return (
-                          <div
-                            className="cursor-pointer py-2 px-2"
-                            {...getSuggestionItemProps(suggestion, { style })}
-                          >
-                            {suggestion.description}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-                {patrolLoc?.latitude && patrolLoc?.longitude && (
-                  <div className="flex items-center gap-4 text-xs">
-                    <div>Lat: {patrolLoc.latitude}</div>
-                    <div>Lng: {patrolLoc.longitude}</div>
-                  </div>
-                )}
-              </div>
+          <div className="flex flex-col gap-2">
+            <InputAutoComplete
+              label="Patrolling location"
+              data={locData.map((loc) => {
+                return { label: loc.LocationName, value: loc.LocationName };
+              })}
+              value={locationName}
+              onChange={setLocationName}
+            />
+            {methods.formState.errors.PatrolArea?.message && (
+              <InputError
+                errorMessage={methods.formState.errors.PatrolArea.message}
+              />
             )}
-          </PlacesAutocomplete>
+          </div>
           {/* DateTime Input */}
           <div className="flex flex-col gap-1">
             <div className={`flex`}>

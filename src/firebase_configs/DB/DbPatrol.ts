@@ -57,6 +57,7 @@ class DbPatrol {
         Number(data.PatrolLocation.latitude),
         Number(data.PatrolLocation.longitude)
       ),
+      PatrolLocationName: data.PatrolLocationName,
       PatrolTime: data.PatrolTime as unknown as Timestamp,
       PatrolAssignedGuardId: data.PatrolAssignedGuardId,
       PatrolAssignedGuardName: data.PatrolAssignedGuardName,

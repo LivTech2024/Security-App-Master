@@ -43,6 +43,7 @@ class DbShift {
       ),
       ShiftCompanyId: cmpId,
       ShiftAddress: shiftData.address,
+      ShiftLocationName: shiftData.location_name,
       ShiftCreatedAt: serverTimestamp(),
       ShiftModifiedAt: serverTimestamp(),
     };
@@ -68,6 +69,7 @@ class DbShift {
         Number(shiftData.location.lat),
         Number(shiftData.location.lng)
       ),
+      ShiftLocationName: shiftData.location_name,
       ShiftCompanyId: cmpId,
       ShiftAddress: shiftData.address,
       ShiftModifiedAt: serverTimestamp(),

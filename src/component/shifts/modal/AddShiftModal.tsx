@@ -20,11 +20,9 @@ import DbShift from "../../../firebase_configs/DB/DbShift";
 import { REACT_QUERY_KEYS, ShiftPositions } from "../../../@types/enum";
 import { errorHandler } from "../../../utilities/CustomError";
 import { openContextModal } from "@mantine/modals";
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng,
-} from "react-places-autocomplete";
-import InputHeader from "../../../common/inputs/InputHeader";
+import useFetchLocations from "../../../hooks/fetch/useFetchLocations";
+import InputAutoComplete from "../../../common/inputs/InputAutocomplete";
+import InputError from "../../../common/inputs/InputError";
 
 const addShiftFormSchema = z.object({
   position: z.enum([
@@ -38,6 +36,7 @@ const addShiftFormSchema = z.object({
   description: z.string().nullable().optional(),
   name: z.string().min(2, { message: "Shift name is required" }),
   location: z.object({ lat: z.string(), lng: z.string() }),
+  location_name: z.string().min(3, { message: "Location name required" }),
   address: z.string().min(3, { message: "Shift address is required" }),
 });
 
@@ -60,6 +59,12 @@ const AddShiftModal = ({
 
   const [endTime, setEndTime] = useState("05:00 PM");
 
+  const [locationName, setLocationName] = useState<string | null | undefined>(
+    ""
+  );
+
+  const { data } = useFetchLocations({ limit: 5, searchQuery: locationName });
+
   useEffect(() => {
     if (shiftDate) {
       methods.setValue("date", shiftDate);
@@ -78,6 +83,19 @@ const AddShiftModal = ({
     }
   }, [endTime]);
 
+  useEffect(() => {
+    if (!locationName) return;
+    const location = data.find((loc) => loc.LocationName === locationName);
+    if (location) {
+      methods.setValue("location_name", locationName);
+      methods.setValue("address", location?.LocationAddress);
+      methods.setValue("location", {
+        lat: String(location.LocationCoordinates.latitude),
+        lng: String(location.LocationCoordinates.longitude),
+      });
+    }
+  }, [locationName]);
+
   const { shiftEditData } = useEditFormStore();
 
   const { company } = useAuthState();
@@ -94,6 +112,7 @@ const AddShiftModal = ({
     setShiftDate(new Date());
     setStartTime("09:00 AM");
     setEndTime("05:00 PM");
+    setLocationName("");
     let allFieldValues: AddShiftFormFields = {
       position: ShiftPositions.guard,
       date: new Date(),
@@ -103,11 +122,14 @@ const AddShiftModal = ({
       location: { lat: "", lng: "" },
       address: "",
       description: "",
+      location_name: "",
     };
     if (isEdit) {
       setStartTime(shiftEditData.ShiftStartTime);
       setEndTime(shiftEditData.ShiftEndTime);
       setShiftDate(new Date(shiftEditData.ShiftDate));
+      setLocationName(shiftEditData.ShiftLocationName);
+      console.log(shiftEditData.ShiftLocationName, "name");
       allFieldValues = {
         position: shiftEditData.ShiftPosition,
         date: new Date(shiftEditData.ShiftDate),
@@ -120,25 +142,12 @@ const AddShiftModal = ({
         },
         address: shiftEditData.ShiftAddress,
         description: shiftEditData.ShiftDescription,
+        location_name: shiftEditData.ShiftLocationName,
       };
     }
 
     methods.reset(allFieldValues);
   }, [isEdit, shiftEditData, methods, opened]);
-
-  const address = methods.watch("address");
-
-  const handleSelect = async (selectedAddress: string) => {
-    try {
-      methods.setValue("address", selectedAddress);
-      const results = await geocodeByAddress(selectedAddress);
-      const latLng = await getLatLng(results[0]);
-      const { lat, lng } = latLng;
-      methods.setValue("location", { lat: String(lat), lng: String(lng) });
-    } catch (error) {
-      console.error("Error selecting address", error);
-    }
-  };
 
   const onSubmit = async (data: AddShiftFormFields) => {
     if (!company) return;
@@ -280,52 +289,21 @@ const AddShiftModal = ({
               onChange={setEndTime}
               use12Hours={true}
             />
-            <PlacesAutocomplete
-              value={address}
-              onChange={(val) => methods.setValue("address", val)}
-              onSelect={handleSelect}
-            >
-              {({
-                getInputProps,
-                suggestions,
-                getSuggestionItemProps,
-                loading,
-              }) => (
-                <div className="flex flex-col gap-1">
-                  <InputHeader title="Shift location" />
-                  <input
-                    {...getInputProps({
-                      className:
-                        "location-search-input py-2 px-2 rounded w-full text-lg outline-none border border-inputBorder focus-within:ring-[2px]",
-                    })}
-                  />
-                  <div className="relative">
-                    <div className="autocomplete-dropdown-container rounded-b-2xl border absolute max-h-[200px] w-full overflow-scroll remove-vertical-scrollbar">
-                      {loading && (
-                        <div className="cursor-pointer py-2 px-2 bg-white">
-                          Loading...
-                        </div>
-                      )}
-                      {suggestions.map((suggestion) => {
-                        const style = {
-                          backgroundColor: suggestion.active
-                            ? "#DAC0A3"
-                            : "#fff",
-                        };
-                        return (
-                          <div
-                            className="cursor-pointer py-2 px-2"
-                            {...getSuggestionItemProps(suggestion, { style })}
-                          >
-                            {suggestion.description}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
+            <div className="flex flex-col gap-2">
+              <InputAutoComplete
+                label="Shift location"
+                data={data.map((loc) => {
+                  return { label: loc.LocationName, value: loc.LocationName };
+                })}
+                value={locationName}
+                onChange={setLocationName}
+              />
+              {methods.formState.errors.address?.message && (
+                <InputError
+                  errorMessage={methods.formState.errors.address.message}
+                />
               )}
-            </PlacesAutocomplete>
+            </div>
 
             <div className="col-span-2">
               <TextareaWithTopHeader

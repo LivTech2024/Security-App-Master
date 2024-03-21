@@ -8,11 +8,15 @@ export const patrollingSchema = z.object({
     latitude: z.string(),
     longitude: z.string(),
   }),
+  PatrolLocationName: z
+    .string()
+    .min(3, { message: "Location name is required" }),
   PatrolTime: z.date(),
   PatrolAssignedGuardId: z
     .string()
     .min(3, { message: "This field is required" }),
   PatrolAssignedGuardName: z.string().min(3, { message: "Guard is required" }),
+  PatrolAssignedGuardEmail: z.string().min(3, { message: "Guard is required" }),
   PatrolCheckPoints: z.array(z.string()),
   PatrolRestrictedRadius: numberString({
     message: "Restricted radius in meters is required",

@@ -45,6 +45,7 @@ export interface IShiftsCollection {
   ShiftStartTime: string;
   ShiftEndTime: string;
   ShiftLocation: GeoPoint;
+  ShiftLocationName: string;
   ShiftAddress: string;
   ShiftDescription: string | null;
   ShiftAssignedUserId: string | null;
@@ -68,6 +69,7 @@ export interface IPatrolsCollection {
   PatrolNameSearchIndex: string[];
   PatrolArea: string;
   PatrolLocation: GeoPoint;
+  PatrolLocationName: string;
   PatrolTime: Timestamp | FieldValue;
   PatrolAssignedGuardId: string;
   PatrolAssignedGuardName: string;
