@@ -1,18 +1,11 @@
-import {
-  MdAddLocationAlt,
-  MdOutlineMessage,
-  MdPeople,
-  MdSecurity,
-} from "react-icons/md";
+import { MdPeople, MdSecurity } from "react-icons/md";
 import { useAuthState } from "../../store";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineSchedule } from "react-icons/ai";
-import { SiAdguard, SiRedhatopenshift } from "react-icons/si";
-import { GrTransaction } from "react-icons/gr";
-import { FaExclamationTriangle } from "react-icons/fa";
-import { IoIosLogOut } from "react-icons/io";
+import { SiAdguard } from "react-icons/si";
+import { FaExclamationTriangle, FaToolbox } from "react-icons/fa";
 import { PageRoutes } from "../../@types/enum";
-import { openContextModal } from "@mantine/modals";
+import { RiBillLine } from "react-icons/ri";
 
 const HomeItem = ({
   name,
@@ -21,7 +14,7 @@ const HomeItem = ({
   icon,
 }: {
   name: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   path?: string;
   callback?: () => void;
 }) => {
@@ -29,17 +22,19 @@ const HomeItem = ({
   return (
     <div
       onClick={() => (path ? navigate(path) : callback && callback())}
-      className="bg-surface shadow rounded border border-gray-300 p-4 cursor-pointer w-full h-[100px] text-center flex flex-col items-center font-semibold gap-2 justify-between"
+      className={`bg-surface shadow rounded border border-gray-300 p-4 cursor-pointer w-full h-[100px] text-center flex flex-col items-center font-semibold gap-4 ${
+        icon ? "justify-between" : "justify-center"
+      }`}
     >
       {icon}
-      <span>{name}</span>
+
+      <span className="capitalize line-clamp-1">{name}</span>
     </div>
   );
 };
 
 const Home = () => {
   const { company } = useAuthState();
-  const { userSignOut } = useAuthState();
   return (
     <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center">
       <div className="flex w-full justify-center items-center">
@@ -50,71 +45,51 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full md:max-w-4xl">
-        <HomeItem
-          path={PageRoutes.SCHEDULES}
-          icon={<AiOutlineSchedule className="text-3xl text-primaryGold" />}
-          name="Schedules"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 w-full">
         <HomeItem
           path={PageRoutes.EMPLOYEES}
-          icon={<MdPeople className="text-3xl text-primaryGold" />}
-          name="Employees"
-        />
-        <HomeItem
-          path={PageRoutes.SHIFTS}
-          icon={<SiRedhatopenshift className="text-2xl text-primaryGold" />}
-          name="Shifts"
-        />
-        <HomeItem
-          path={PageRoutes.PATROLLING_LIST}
-          icon={<SiAdguard className="text-2xl text-primaryGold" />}
-          name="Patrolling"
-        />
-        <HomeItem
-          path={PageRoutes.LOCATIONS}
-          icon={<MdAddLocationAlt className="text-2xl text-primaryGold" />}
-          name="Locations"
+          icon={<MdPeople className="text-4xl text-primaryGold" />}
+          name="Employee Management"
         />
         <HomeItem
           path={PageRoutes.HOME}
           icon={<FaExclamationTriangle className="text-3xl text-primaryGold" />}
-          name="Incident"
+          name="Incident Reports"
         />
         <HomeItem
-          path={PageRoutes.HOME}
-          icon={<MdOutlineMessage className="text-3xl text-primaryGold" />}
-          name="Send Message"
-        />
-        <HomeItem
-          path={PageRoutes.HOME}
-          icon={<GrTransaction className="text-3xl text-primaryGold" />}
-          name="Trades"
+          path={PageRoutes.SCHEDULES}
+          icon={<AiOutlineSchedule className="text-3xl text-primaryGold" />}
+          name="Shift Scheduling"
         />
 
         <HomeItem
-          icon={<IoIosLogOut className="text-3xl text-primaryGold" />}
-          name="Sign Out"
-          callback={() => {
-            openContextModal({
-              modal: "confirmModal",
-              withCloseButton: false,
-              centered: true,
-              closeOnClickOutside: true,
-              innerProps: {
-                title: "Confirm",
-                body: "Are you sure to sign out",
-                onConfirm: () => {
-                  userSignOut();
-                },
-              },
-              size: "30%",
-              styles: {
-                body: { padding: "0px" },
-              },
-            });
-          }}
+          path={PageRoutes.PATROLLING_LIST}
+          icon={<SiAdguard className="text-2xl text-primaryGold" />}
+          name="Patrol Tracking"
         />
+
+        <HomeItem
+          path={PageRoutes.HOME}
+          icon={<FaToolbox className="text-2xl text-primaryGold" />}
+          name="Equipment Management"
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          icon={<RiBillLine className="text-2xl text-primaryGold" />}
+          name="Billing and Invoicing"
+        />
+        <HomeItem path={PageRoutes.HOME} name="Training & Certification" />
+        <HomeItem path={PageRoutes.HOME} name="Client portal" />
+        <HomeItem path={PageRoutes.HOME} name="Visitor management" />
+        <HomeItem path={PageRoutes.HOME} name="Reports & analysis" />
+        <HomeItem path={PageRoutes.HOME} name="Communication center" />
+        <HomeItem path={PageRoutes.HOME} name="Document repository" />
+        <HomeItem path={PageRoutes.HOME} name="Emergency response" />
+        <HomeItem path={PageRoutes.HOME} name="Environmental sensor" />
+        <HomeItem path={PageRoutes.HOME} name="Time & Attendance" />
+        <HomeItem path={PageRoutes.HOME} name="Audit" />
+        <HomeItem path={PageRoutes.HOME} name="Quality Assurance" />
+        <HomeItem path={PageRoutes.HOME} name="Task assignment and tracking" />
       </div>
     </div>
   );
