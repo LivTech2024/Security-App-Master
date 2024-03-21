@@ -44,7 +44,7 @@ const Home = () => {
     <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center">
       <div className="flex w-full justify-center items-center">
         <div className="flex flex-col items-center gap-2">
-          <MdSecurity className="text-7xl" />
+          <MdSecurity className="text-7xl text-primaryGold" />
           <div className="font-semibold text-lg">
             Welcome {company?.CompanyName}
           </div>
@@ -53,47 +53,47 @@ const Home = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full md:max-w-4xl">
         <HomeItem
           path={PageRoutes.SCHEDULES}
-          icon={<AiOutlineSchedule className="text-3xl" />}
+          icon={<AiOutlineSchedule className="text-3xl text-primaryGold" />}
           name="Schedules"
         />
         <HomeItem
           path={PageRoutes.EMPLOYEES}
-          icon={<MdPeople className="text-3xl" />}
+          icon={<MdPeople className="text-3xl text-primaryGold" />}
           name="Employees"
         />
         <HomeItem
           path={PageRoutes.SHIFTS}
-          icon={<SiRedhatopenshift className="text-2xl" />}
+          icon={<SiRedhatopenshift className="text-2xl text-primaryGold" />}
           name="Shifts"
         />
         <HomeItem
           path={PageRoutes.PATROLLING_LIST}
-          icon={<SiAdguard className="text-2xl" />}
+          icon={<SiAdguard className="text-2xl text-primaryGold" />}
           name="Patrolling"
         />
         <HomeItem
           path={PageRoutes.LOCATIONS}
-          icon={<MdAddLocationAlt className="text-2xl" />}
+          icon={<MdAddLocationAlt className="text-2xl text-primaryGold" />}
           name="Locations"
         />
         <HomeItem
           path={PageRoutes.HOME}
-          icon={<FaExclamationTriangle className="text-3xl" />}
+          icon={<FaExclamationTriangle className="text-3xl text-primaryGold" />}
           name="Incident"
         />
         <HomeItem
           path={PageRoutes.HOME}
-          icon={<MdOutlineMessage className="text-3xl" />}
+          icon={<MdOutlineMessage className="text-3xl text-primaryGold" />}
           name="Send Message"
         />
         <HomeItem
           path={PageRoutes.HOME}
-          icon={<GrTransaction className="text-3xl" />}
+          icon={<GrTransaction className="text-3xl text-primaryGold" />}
           name="Trades"
         />
 
         <HomeItem
-          icon={<IoIosLogOut className="text-3xl" />}
+          icon={<IoIosLogOut className="text-3xl text-primaryGold" />}
           name="Sign Out"
           callback={() => {
             openContextModal({
