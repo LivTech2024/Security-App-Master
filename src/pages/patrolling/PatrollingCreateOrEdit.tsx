@@ -28,6 +28,7 @@ import useFetchLocations from "../../hooks/fetch/useFetchLocations";
 import InputError from "../../common/inputs/InputError";
 import { sendEmail } from "../../utilities/sendEmail";
 import { formatDate } from "../../utilities/misc";
+import { AiOutlinePlus } from "react-icons/ai";
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -174,6 +175,19 @@ const PatrollingCreateOrEdit = () => {
               })}
               value={locationName}
               onChange={setLocationName}
+              dropDownHeader={
+                <div
+                  onClick={() => {
+                    navigate(PageRoutes.LOCATIONS);
+                  }}
+                  className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <AiOutlinePlus size={18} />
+                    <span>Add location</span>
+                  </div>
+                </div>
+              }
             />
             {methods.formState.errors.PatrolArea?.message && (
               <InputError
@@ -241,6 +255,19 @@ const PatrollingCreateOrEdit = () => {
                 return { label: d.EmployeeName, value: d.EmployeeName };
               })}
               onChange={setGuard}
+              dropDownHeader={
+                <div
+                  onClick={() => {
+                    navigate(PageRoutes.EMPLOYEES);
+                  }}
+                  className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <AiOutlinePlus size={18} />
+                    <span>Add guard</span>
+                  </div>
+                </div>
+              }
             />
             {methods.formState.errors.PatrolAssignedGuardName && (
               <small className="text-red-600 text-xs px-1 text-start">

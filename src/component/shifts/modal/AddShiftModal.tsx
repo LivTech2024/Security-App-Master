@@ -17,12 +17,18 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import DbShift from "../../../firebase_configs/DB/DbShift";
-import { REACT_QUERY_KEYS, ShiftPositions } from "../../../@types/enum";
+import {
+  PageRoutes,
+  REACT_QUERY_KEYS,
+  ShiftPositions,
+} from "../../../@types/enum";
 import { errorHandler } from "../../../utilities/CustomError";
 import { openContextModal } from "@mantine/modals";
 import useFetchLocations from "../../../hooks/fetch/useFetchLocations";
 import InputAutoComplete from "../../../common/inputs/InputAutocomplete";
 import InputError from "../../../common/inputs/InputError";
+import { AiOutlinePlus } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 const addShiftFormSchema = z.object({
   position: z.enum([
@@ -212,6 +218,8 @@ const AddShiftModal = ({
     }
   };
 
+  const navigate = useNavigate();
+
   return (
     <Dialog
       opened={opened}
@@ -297,6 +305,19 @@ const AddShiftModal = ({
                 })}
                 value={locationName}
                 onChange={setLocationName}
+                dropDownHeader={
+                  <div
+                    onClick={() => {
+                      navigate(PageRoutes.LOCATIONS);
+                    }}
+                    className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <AiOutlinePlus size={18} />
+                      <span>Add location</span>
+                    </div>
+                  </div>
+                }
               />
               {methods.formState.errors.address?.message && (
                 <InputError
