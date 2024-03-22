@@ -28,7 +28,7 @@ const HomeItem = ({
     >
       {icon}
 
-      <span className="capitalize line-clamp-1">{name}</span>
+      <span className={`capitalize ${icon && "line-clamp-1"}`}>{name}</span>
     </div>
   );
 };
@@ -45,7 +45,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 w-full">
         <HomeItem
           path={PageRoutes.EMPLOYEES}
           icon={<MdPeople className="text-4xl text-primaryGold" />}
@@ -79,7 +79,6 @@ const Home = () => {
           name="Billing and Invoicing"
         />
         <HomeItem path={PageRoutes.HOME} name="Training & Certification" />
-        <HomeItem path={PageRoutes.HOME} name="Client portal" />
         <HomeItem path={PageRoutes.HOME} name="Visitor management" />
         <HomeItem path={PageRoutes.HOME} name="Reports & analysis" />
         <HomeItem path={PageRoutes.HOME} name="Communication center" />
