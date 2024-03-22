@@ -7,7 +7,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { CollectionName, ShiftPositions } from "../../@types/enum";
+import { CollectionName } from "../../@types/enum";
 import { db } from "../config";
 import { IEmployeesCollection, IShiftsCollection } from "../../@types/database";
 import dayjs from "dayjs";
@@ -84,7 +84,7 @@ class DbSchedule {
     startDate: Date;
     endDate: Date;
     currentDate: Date;
-    empRole: ShiftPositions;
+    empRole: string;
     cmpId: string;
   }) => {
     try {

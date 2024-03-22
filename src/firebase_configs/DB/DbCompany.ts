@@ -36,6 +36,7 @@ class DbCompany {
       CompanyName: "Livtech",
       CompanyLogo: "",
       CompanyAddress: "",
+      CompanyPhone: "+912222222222",
       CompanyEmail: "",
       CompanyCreatedAt: serverTimestamp(),
       CompanyModifiedAt: serverTimestamp(),

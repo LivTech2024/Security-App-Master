@@ -13,7 +13,7 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import { errorHandler } from "../../../utilities/CustomError";
-import { EmployeeRoles, REACT_QUERY_KEYS } from "../../../@types/enum";
+import { REACT_QUERY_KEYS } from "../../../@types/enum";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthState, useEditFormStore } from "../../../store";
 import { openContextModal } from "@mantine/modals";
@@ -30,11 +30,7 @@ const addEmployeeFormSchema = z.object({
       message: "Invalid email",
     }),
   password: z.string().min(6, { message: "Min 6 character is required" }),
-  role: z.enum([
-    EmployeeRoles.guard,
-    EmployeeRoles.other,
-    EmployeeRoles.supervisor,
-  ]),
+  role: z.string().min(1, { message: "Employee role is required" }),
 });
 
 export type AddEmployeeFormField = z.infer<typeof addEmployeeFormSchema>;
@@ -64,7 +60,7 @@ const AddEmployeeModal = ({
       last_name: "",
       phone_number: "",
       email: "",
-      role: EmployeeRoles.supervisor,
+      role: "",
       password: "",
     };
     if (isEdit) {

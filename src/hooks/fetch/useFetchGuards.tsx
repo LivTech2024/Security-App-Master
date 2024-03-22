@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useAuthState } from "../../store";
 import { IEmployeesCollection } from "../../@types/database";
 import DbEmployee from "../../firebase_configs/DB/DbEmployee";
-import { EmployeeRoles } from "../../@types/enum";
 
 interface Props {
   limit: number;
@@ -32,7 +31,7 @@ const useFetchGuards = ({ limit, searchQuery }: Props) => {
             ? searchQuery.trim()
             : undefined,
         cmpId: company.CompanyId,
-        empRole: EmployeeRoles.guard,
+        empRole: "guard",
       });
       return snapshot.docs
         .map((doc) => {

@@ -17,11 +17,7 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import DbShift from "../../../firebase_configs/DB/DbShift";
-import {
-  PageRoutes,
-  REACT_QUERY_KEYS,
-  ShiftPositions,
-} from "../../../@types/enum";
+import { PageRoutes, REACT_QUERY_KEYS } from "../../../@types/enum";
 import { errorHandler } from "../../../utilities/CustomError";
 import { openContextModal } from "@mantine/modals";
 import useFetchLocations from "../../../hooks/fetch/useFetchLocations";
@@ -31,11 +27,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
 const addShiftFormSchema = z.object({
-  position: z.enum([
-    ShiftPositions.guard,
-    ShiftPositions.supervisor,
-    ShiftPositions.other,
-  ]),
+  position: z.string().min(1, { message: "Shift position is required" }),
   date: z.date().default(new Date()),
   start_time: z.string().min(2, { message: "Start time is required" }),
   end_time: z.string().min(2, { message: "End time is required" }),
@@ -120,7 +112,7 @@ const AddShiftModal = ({
     setEndTime("05:00 PM");
     setLocationName("");
     let allFieldValues: AddShiftFormFields = {
-      position: ShiftPositions.guard,
+      position: "",
       date: new Date(),
       start_time: "09:00 AM",
       end_time: "05:00 PM",

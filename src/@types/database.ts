@@ -1,14 +1,32 @@
 import type { FieldValue, GeoPoint, Timestamp } from "firebase/firestore";
-import { EmployeeRoles, ShiftPositions } from "./enum";
 
 export interface ICompaniesCollection {
   CompanyId: string;
   CompanyName: string;
   CompanyEmail: string;
+  CompanyPhone: string;
   CompanyAddress: string;
   CompanyLogo: string;
   CompanyCreatedAt: Timestamp | FieldValue;
   CompanyModifiedAt: Timestamp | FieldValue;
+}
+
+export interface ICompanyBranchesCollection {
+  CompanyBranchId: string;
+  CompanyId: string;
+  CompanyBranchName: string;
+  CompanyBranchEmail: string;
+  CompanyBranchPhone: string;
+  CompanyBranchAddress: string;
+  CompanyBranchCreatedAt: Timestamp | FieldValue;
+  CompanyBranchModifiedAt: Timestamp | FieldValue;
+}
+
+export interface IEmployeeRolesCollection {
+  EmployeeRoleId: string;
+  EmployeeRoleCompanyId: string;
+  EmployeeRoleName: string;
+  EmployeeRoleCreatedAt: Timestamp | FieldValue;
 }
 
 export interface IAdminsCollection {
@@ -30,7 +48,7 @@ export interface IEmployeesCollection {
   EmployeePassword: string;
   EmployeeImg: string;
   EmployeeAdditionalDoc?: string;
-  EmployeeRole: EmployeeRoles;
+  EmployeeRole: string;
   EmployeeIsBanned: boolean;
   EmployeeCompanyId: string;
   EmployeeCreatedAt: Timestamp | FieldValue;
@@ -40,7 +58,7 @@ export interface IEmployeesCollection {
 export interface IShiftsCollection {
   ShiftId: string;
   ShiftName: string;
-  ShiftPosition: ShiftPositions;
+  ShiftPosition: string;
   ShiftDate: Timestamp | FieldValue;
   ShiftStartTime: string;
   ShiftEndTime: string;
@@ -88,7 +106,7 @@ export interface IIncidentsCollection {
   IncidentCompanyId: string;
   IncidentEmployeeId: string;
   IncidentEmployeeName: string;
-  IncidentEmployeeRole: EmployeeRoles;
+  IncidentEmployeeRole: string;
   IncidentFieldId: string;
   IncidentArea: string;
   IncidentLocation: GeoPoint;
@@ -112,6 +130,6 @@ export interface ILoggedInUsersCollection {
   LoggedInUserId: string;
   IsLoggedIn: boolean;
   LoggedInCrypt: string;
-  LoggedInUserType: "admin" | "guard" | "supervisor";
+  LoggedInUserType: string;
   LoggedInCreatedAt: Timestamp | FieldValue;
 }

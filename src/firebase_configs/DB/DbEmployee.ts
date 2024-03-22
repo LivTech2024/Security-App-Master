@@ -16,7 +16,6 @@ import {
 import {
   CloudStoragePaths,
   CollectionName,
-  EmployeeRoles,
   ImageResolution,
 } from "../../@types/enum";
 import { db } from "../config";
@@ -235,7 +234,7 @@ class DbEmployee {
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId: string;
-    empRole?: EmployeeRoles;
+    empRole?: string;
   }) => {
     const empRef = collection(db, CollectionName.employees);
 
