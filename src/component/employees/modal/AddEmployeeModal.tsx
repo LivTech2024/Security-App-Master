@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Dialog from "../../../common/Dialog";
 import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
-import InputSelect from "../../../common/inputs/InputSelect";
 import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +17,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuthState, useEditFormStore } from "../../../store";
 import { openContextModal } from "@mantine/modals";
 import ImageUpload from "../EmpOtherDetailsInput";
+import InputAutoComplete from "../../../common/inputs/InputAutocomplete";
+import { AiOutlinePlus } from "react-icons/ai";
+import AddEmpRoleModal from "./AddEmpRoleModal";
 
 const addEmployeeFormSchema = z.object({
   first_name: z.string().min(2, { message: "First name is required" }),
@@ -48,7 +50,13 @@ const AddEmployeeModal = ({
 
   const { employeeEditData } = useEditFormStore();
 
-  const { company } = useAuthState();
+  const { company, empRoles } = useAuthState();
+
+  const [employeeRole, setEmployeeRole] = useState<string | null | undefined>(
+    ""
+  );
+
+  const [addEmpRoleModal, setAddEmpRoleModal] = useState(false);
 
   const isEdit = !!employeeEditData;
 
@@ -147,106 +155,122 @@ const AddEmployeeModal = ({
   };
 
   return (
-    <Dialog
-      opened={opened}
-      setOpened={setOpened}
-      title="Add Employee"
-      size="80%"
-      isFormModal
-      positiveCallback={methods.handleSubmit(onSubmit)}
-      negativeCallback={() =>
-        isEdit
-          ? openContextModal({
-              modal: "confirmModal",
-              withCloseButton: false,
-              centered: true,
-              closeOnClickOutside: true,
-              innerProps: {
-                title: "Confirm",
-                body: "Are you sure to delete this employee",
-                onConfirm: () => {
-                  onDelete();
+    <>
+      <Dialog
+        opened={opened}
+        setOpened={setOpened}
+        title="Add Employee"
+        size="80%"
+        isFormModal
+        positiveCallback={methods.handleSubmit(onSubmit)}
+        negativeCallback={() =>
+          isEdit
+            ? openContextModal({
+                modal: "confirmModal",
+                withCloseButton: false,
+                centered: true,
+                closeOnClickOutside: true,
+                innerProps: {
+                  title: "Confirm",
+                  body: "Are you sure to delete this employee",
+                  onConfirm: () => {
+                    onDelete();
+                  },
+                  onCancel: () => {
+                    setOpened(true);
+                  },
                 },
-                onCancel: () => {
-                  setOpened(true);
+                size: "30%",
+                styles: {
+                  body: { padding: "0px" },
                 },
-              },
-              size: "30%",
-              styles: {
-                body: { padding: "0px" },
-              },
-            })
-          : setOpened(false)
-      }
-      negativeLabel={isEdit ? "Delete" : "Cancel"}
-      positiveLabel={isEdit ? "Update" : "Save"}
-    >
-      <FormProvider {...methods}>
-        <form
-          onSubmit={methods.handleSubmit(onSubmit)}
-          className="flex flex-col gap-4"
-        >
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-4">
-              <ImageUpload
-                empImageBase64={empImageBase64}
-                setEmpImageBase64={setEmpImageBase64}
-              />
+              })
+            : setOpened(false)
+        }
+        negativeLabel={isEdit ? "Delete" : "Cancel"}
+        positiveLabel={isEdit ? "Update" : "Save"}
+      >
+        <FormProvider {...methods}>
+          <form
+            onSubmit={methods.handleSubmit(onSubmit)}
+            className="flex flex-col gap-4"
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-4">
+                <ImageUpload
+                  empImageBase64={empImageBase64}
+                  setEmpImageBase64={setEmpImageBase64}
+                />
+              </div>
+              <div className="flex flex-col gap-4">
+                <InputWithTopHeader
+                  className="mx-0"
+                  label="First Name"
+                  register={methods.register}
+                  name="first_name"
+                  error={methods.formState.errors.first_name?.message}
+                />
+                <InputWithTopHeader
+                  className="mx-0"
+                  label="Last Name"
+                  register={methods.register}
+                  name="last_name"
+                  error={methods.formState.errors.last_name?.message}
+                />
+                <InputWithTopHeader
+                  className="mx-0"
+                  label="Phone Number"
+                  register={methods.register}
+                  name="phone_number"
+                  error={methods.formState.errors.phone_number?.message}
+                />
+                <InputWithTopHeader
+                  className="mx-0"
+                  label="Email"
+                  register={methods.register}
+                  name="email"
+                  error={methods.formState.errors.email?.message}
+                />
+                <InputWithTopHeader
+                  className="mx-0"
+                  label="Password"
+                  register={methods.register}
+                  name="password"
+                  error={methods.formState.errors.password?.message}
+                  inputType="password"
+                />
+                <InputAutoComplete
+                  label="Role"
+                  value={employeeRole}
+                  onChange={setEmployeeRole}
+                  data={empRoles.map((role) => {
+                    return {
+                      label: role.EmployeeRoleName,
+                      value: role.EmployeeRoleName,
+                    };
+                  })}
+                  dropDownHeader={
+                    <div
+                      onClick={() => setAddEmpRoleModal(true)}
+                      className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <AiOutlinePlus size={18} />
+                        <span>Add employee roles</span>
+                      </div>
+                    </div>
+                  }
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-4">
-              <InputWithTopHeader
-                className="mx-0"
-                label="First Name"
-                register={methods.register}
-                name="first_name"
-                error={methods.formState.errors.first_name?.message}
-              />
-              <InputWithTopHeader
-                className="mx-0"
-                label="Last Name"
-                register={methods.register}
-                name="last_name"
-                error={methods.formState.errors.last_name?.message}
-              />
-              <InputWithTopHeader
-                className="mx-0"
-                label="Phone Number"
-                register={methods.register}
-                name="phone_number"
-                error={methods.formState.errors.phone_number?.message}
-              />
-              <InputWithTopHeader
-                className="mx-0"
-                label="Email"
-                register={methods.register}
-                name="email"
-                error={methods.formState.errors.email?.message}
-              />
-              <InputWithTopHeader
-                className="mx-0"
-                label="Password"
-                register={methods.register}
-                name="password"
-                error={methods.formState.errors.password?.message}
-                inputType="password"
-              />
-              <InputSelect
-                label="Select Role"
-                disabled={isEdit}
-                options={[
-                  { title: "Supervisor", value: "supervisor" },
-                  { title: "Guard", value: "guard" },
-                  { title: "Other", value: "other" },
-                ]}
-                register={methods.register}
-                name="role"
-                error={methods.formState.errors.role?.message}
-              />
-            </div>
-          </div>
-        </form>
-      </FormProvider>
-    </Dialog>
+          </form>
+        </FormProvider>
+      </Dialog>
+      <AddEmpRoleModal
+        opened={addEmpRoleModal}
+        setOpened={setAddEmpRoleModal}
+      />
+    </>
   );
 };
 

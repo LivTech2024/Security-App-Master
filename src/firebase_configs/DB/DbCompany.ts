@@ -45,6 +45,12 @@ class DbCompany {
     return setDoc(companyRef, newCompany);
   };
 
+  static getCompanyBranches = (cmpId: string) => {
+    const cmpBranchRef = collection(db, CollectionName.companyBranch);
+    const cmpBranchQuery = query(cmpBranchRef, where("CompanyId", "==", cmpId));
+    return getDocs(cmpBranchQuery);
+  };
+
   static createAdmin = (companyId: string) => {
     const adminId = getNewDocId(CollectionName.admins);
     const adminRef = doc(db, CollectionName.admins, adminId);

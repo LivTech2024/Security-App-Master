@@ -15,7 +15,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          "bg-secondary hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px] text-[14px] text-surface whitespace-nowrap overflow-hidden font-semibold  disabled:bg-secondaryBlueBg",
+          "bg-secondary hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px]  text-surface whitespace-nowrap overflow-hidden font-semibold  disabled:bg-secondaryBlueBg",
           className
         )}`}
       >
@@ -29,7 +29,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          "bg-primary hover:bg-blackButtonHoverBg active:bg-blackButtonActiveBg flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px] text-[14px] text-surface whitespace-nowrap overflow-hidden font-semibold  disabled:bg-primaryVariantDark dark:disabled:bg-switchSecondaryBlueBg",
+          "bg-primary hover:bg-blackButtonHoverBg active:bg-blackButtonActiveBg flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px]  text-surface whitespace-nowrap overflow-hidden font-semibold  disabled:bg-primaryVariantDark dark:disabled:bg-switchSecondaryBlueBg",
           className
         )}`}
       >
@@ -43,7 +43,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          "bg-grayButtonBgLight dark:bg-grayButtonBgDark hover:bg-grayButtonHoverBgLight dark:hover:bg-grayButtonHoverBgDark active:bg-grayButtonActiveBgLight dark:active:bg-grayButtonActiveBgDark flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px] text-[14px]  whitespace-nowrap overflow-hidden font-semibold ",
+          "bg-grayButtonBgLight dark:bg-grayButtonBgDark hover:bg-grayButtonHoverBgLight dark:hover:bg-grayButtonHoverBgDark active:bg-grayButtonActiveBgLight dark:active:bg-grayButtonActiveBgDark flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px]   whitespace-nowrap overflow-hidden font-semibold ",
           className
         )}`}
       >
@@ -57,7 +57,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          "bg-whiteButtonBgLight hover:bg-whiteButtonHoverBgLight active:bg-whiteButtonActiveBgLight dark:bg-whiteButtonBgDark dark:hover:bg-whiteButtonHoverBgDark dark:active:bg-whiteButtonActiveBgDark flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px] text-[14px] text-textPrimaryLight whitespace-nowrap overflow-hidden font-semibold ",
+          "bg-whiteButtonBgLight hover:bg-whiteButtonHoverBgLight active:bg-whiteButtonActiveBgLight dark:bg-whiteButtonBgDark dark:hover:bg-whiteButtonHoverBgDark dark:active:bg-whiteButtonActiveBgDark flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px]  text-textPrimaryLight whitespace-nowrap overflow-hidden font-semibold ",
           className
         )}`}
       >
@@ -71,7 +71,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          "bg-primaryGreen hover:bg-greenButtonHoverBg active:bg-greenButtonActiveBg flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px] text-[14px] text-surface whitespace-nowrap overflow-hidden font-semibold ",
+          "bg-primaryGreen hover:bg-greenButtonHoverBg active:bg-greenButtonActiveBg flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px]  text-surface whitespace-nowrap overflow-hidden font-semibold ",
           className
         )}`}
       >
@@ -85,7 +85,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          "bg-red-500 hover:bg-red-500/70 flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px] text-[14px] text-surface whitespace-nowrap overflow-hidden font-semibold ",
+          "bg-red-500 hover:bg-red-500/70 flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px]  text-surface whitespace-nowrap overflow-hidden font-semibold ",
           className
         )}`}
       >

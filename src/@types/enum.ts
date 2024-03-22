@@ -1,6 +1,8 @@
 export enum CollectionName {
   companies = "Companies",
+  companyBranch = "CompanyBranch",
   admins = "Admins",
+  employeeRoles = "EmployeeRoles",
   employees = "Employees",
   shifts = "Shifts",
   patrols = "Patrols",

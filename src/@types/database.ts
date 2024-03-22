@@ -68,6 +68,7 @@ export interface IShiftsCollection {
   ShiftDescription: string | null;
   ShiftAssignedUserId: string | null;
   ShiftCompanyId: string;
+  ShiftAcknowledged?: boolean;
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;
 }
@@ -97,6 +98,7 @@ export interface IPatrolsCollection {
   PatrolFailureReason?: string;
   PatrolRestrictedRadius: number;
   PatrolKeepGuardInRadiusOfLocation: boolean;
+  PatrolAcknowledged?: boolean;
   PatrolCreatedAt: Timestamp | FieldValue;
   PatrolModifiedAt: Timestamp | FieldValue;
 }

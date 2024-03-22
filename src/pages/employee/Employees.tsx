@@ -16,9 +16,13 @@ import TableShimmer from "../../common/shimmer/TableShimmer";
 import { useAuthState, useEditFormStore } from "../../store";
 import { firebaseDataToObject, splitName } from "../../utilities/misc";
 import { Employee } from "../../store/slice/editForm.slice";
+import Button from "../../common/button/Button";
+import AddEmpRoleModal from "../../component/employees/modal/AddEmpRoleModal";
 
 const Employees = () => {
   const [addEmployeeDialog, setAddEmployeeDialog] = useState(false);
+
+  const [addEmployeeRoleModal, setAddEmployeeRoleModal] = useState(false);
 
   const { setEmployeeEditData } = useEditFormStore();
 
@@ -110,20 +114,32 @@ const Employees = () => {
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
         <span className="font-semibold text-xl">Employees</span>
 
-        <button
-          onClick={() => {
-            setAddEmployeeDialog(true);
-            setEmployeeEditData(null);
-          }}
-          className="bg-primary text-surface px-4 py-2 rounded"
-        >
-          Create Employee
-        </button>
+        <div className="flex items-center gap-4">
+          <Button
+            type="blue"
+            label="Create Employee Role"
+            onClick={() => setAddEmployeeRoleModal(true)}
+            className="px-4 py-2"
+          />
+          <button
+            onClick={() => {
+              setAddEmployeeDialog(true);
+              setEmployeeEditData(null);
+            }}
+            className="bg-primary text-surface px-4 py-2 rounded"
+          >
+            Create Employee
+          </button>
+        </div>
       </div>
 
       <AddEmployeeModal
         opened={addEmployeeDialog}
         setOpened={setAddEmployeeDialog}
+      />
+      <AddEmpRoleModal
+        opened={addEmployeeRoleModal}
+        setOpened={setAddEmployeeRoleModal}
       />
 
       <table className="rounded overflow-hidden w-full">

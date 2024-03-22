@@ -12,15 +12,26 @@ import { firebaseDataToObject } from "../utilities/misc";
 import {
   IAdminsCollection,
   ICompaniesCollection,
+  ICompanyBranchesCollection,
+  IEmployeeRolesCollection,
   ILoggedInUsersCollection,
 } from "../@types/database";
 import { useAuthState } from "../store";
-import { Admin, Company } from "../store/slice/auth.slice";
+import {
+  Admin,
+  Company,
+  CompanyBranches,
+  EmployeeRoles,
+} from "../store/slice/auth.slice";
 import { useNavigate } from "react-router-dom";
+import DbEmployee from "../firebase_configs/DB/DbEmployee";
 
 const useOnAuthStateChanged = () => {
-  const { setAdmin, setCompany, setLoading } = useAuthState();
+  const { setAdmin, setCompany, setLoading, setEmpRoles, setCompanyBranches } =
+    useAuthState();
+
   const navigate = useNavigate();
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
       try {
@@ -66,8 +77,6 @@ const useOnAuthStateChanged = () => {
           loggedInUserData
         ) as unknown as ILoggedInUsersCollection;
 
-        console.log(_loggedInUser);
-
         //* Fetch admin and store in zustand
         const adminSnapshot = await DbCompany.getAdminById(
           _loggedInUser.LoggedInUserId
@@ -88,7 +97,28 @@ const useOnAuthStateChanged = () => {
             company as unknown as Record<string, unknown>
           ) as unknown as Company;
           setCompany(_company);
+
+          //*Fetch employee roles
+          const empRolesSnapshot = await DbEmployee.getEmpRoles({
+            cmpId: _admin.AdminCompanyId,
+          });
+          const empRoles = empRolesSnapshot.docs.map(
+            (doc) => doc.data() as IEmployeeRolesCollection
+          );
+
+          setEmpRoles(empRoles as unknown as EmployeeRoles[]);
+
+          //*Fetch company branches
+          const cmpBranchSnapshot = await DbCompany.getCompanyBranches(
+            admin.AdminCompanyId
+          );
+          const cmpBranches = cmpBranchSnapshot.docs.map(
+            (doc) => doc.data() as ICompanyBranchesCollection
+          );
+
+          setCompanyBranches(cmpBranches as unknown as CompanyBranches[]);
         }
+
         setLoading(false);
         navigate(PageRoutes.HOME);
       } catch (error) {

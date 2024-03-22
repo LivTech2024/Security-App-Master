@@ -2,6 +2,7 @@ import {
   DocumentData,
   QueryConstraint,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   limit,
@@ -11,6 +12,7 @@ import {
   serverTimestamp,
   setDoc,
   startAfter,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import {
@@ -20,12 +22,102 @@ import {
 } from "../../@types/enum";
 import { db } from "../config";
 import CloudStorageImageHandler, { getNewDocId } from "./utils";
-import { IEmployeesCollection } from "../../@types/database";
+import {
+  IEmployeeRolesCollection,
+  IEmployeesCollection,
+} from "../../@types/database";
 import { AddEmployeeFormField } from "../../component/employees/modal/AddEmployeeModal";
 import CustomError from "../../utilities/CustomError";
 import { fullTextSearchIndex } from "../../utilities/misc";
 
 class DbEmployee {
+  static isEmpRoleExist = async (empRole: string, empRoleId: string | null) => {
+    const empRoleDocRef = collection(db, CollectionName.employeeRoles);
+
+    let queryParams: QueryConstraint[] = [
+      where("EmployeeRoleName", "==", empRole),
+    ];
+
+    if (empRoleId) {
+      queryParams = [...queryParams, where("EmployeeRoleId", "!=", empRoleId)];
+    }
+
+    queryParams = [...queryParams, limit(1)];
+
+    const empRoleQuery = query(empRoleDocRef, ...queryParams);
+
+    const snapshot = await getDocs(empRoleQuery);
+
+    return snapshot.size > 0;
+  };
+
+  static addEmpRole = async (empRole: string, cmpId: string) => {
+    if (empRole === "admin" || empRole === "Admin") {
+      throw new CustomError("You cannot create admin role");
+    }
+    const isRoleExist = await this.isEmpRoleExist(empRole, null);
+
+    if (isRoleExist) {
+      throw new CustomError("This employee role already exist");
+    }
+
+    const empRoleId = getNewDocId(CollectionName.employeeRoles);
+    const empRoleRef = doc(db, CollectionName.employeeRoles, empRoleId);
+
+    const newEmpRole: IEmployeeRolesCollection = {
+      EmployeeRoleId: empRoleId,
+      EmployeeRoleCompanyId: cmpId,
+      EmployeeRoleName: empRole,
+      EmployeeRoleCreatedAt: serverTimestamp(),
+    };
+
+    await setDoc(empRoleRef, newEmpRole);
+
+    return newEmpRole;
+  };
+
+  static updateEmpRole = async (empRole: string, empRoleId: string) => {
+    if (empRole === "admin" || empRole === "Admin") {
+      throw new CustomError("You cannot create admin role");
+    }
+    const isRoleExist = await this.isEmpRoleExist(empRole, empRoleId);
+    if (isRoleExist) {
+      throw new CustomError("This employee role already exist");
+    }
+
+    const empRoleRef = doc(db, CollectionName.employeeRoles, empRoleId);
+
+    const newEmpRole: Partial<IEmployeeRolesCollection> = {
+      EmployeeRoleName: empRole,
+      EmployeeRoleCreatedAt: serverTimestamp(),
+    };
+
+    return updateDoc(empRoleRef, newEmpRole);
+  };
+
+  static deleteEmpRole = (empRoleId: string) => {
+    const empRoleRef = doc(db, CollectionName.employeeRoles, empRoleId);
+
+    return deleteDoc(empRoleRef);
+  };
+
+  static getEmpRoles = ({ cmpId, lmt }: { cmpId: string; lmt?: number }) => {
+    const empRoleRef = collection(db, CollectionName.employeeRoles);
+
+    let queryParams: QueryConstraint[] = [
+      where("EmployeeRoleCompanyId", "==", cmpId),
+      orderBy("EmployeeRoleCreatedAt", "desc"),
+    ];
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const empRoleQuery = query(empRoleRef, ...queryParams);
+
+    return getDocs(empRoleQuery);
+  };
+
   static isEmpExist = async (
     empEmail: string,
     empRole: string,

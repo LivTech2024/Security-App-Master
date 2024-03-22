@@ -80,7 +80,7 @@ const Dialog = ({
         <div
           className={`${
             !showBottomTool && "hidden"
-          } flex ml-auto gap-x-4 mt-4 sticky bottom-0 px-4 py-2 z-[2] bg-surfaceLight dark:bg-backgroundDark dark:text-textPrimaryDark w-full items-center`}
+          } flex ml-auto gap-x-4 mt-4 sticky bottom-0 px-4 py-2 z-[2] bg-surface  w-full items-center`}
         >
           {bottomToolbarChild}
           <div className="flex ml-auto gap-x-4 mb-2 ">
@@ -106,7 +106,7 @@ const Dialog = ({
                   }
                 }}
                 type="button"
-                className="font-medium bg- bg-secondary hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg duration-200 px-5 py-1 text-surface rounded capitalize"
+                className="font-medium bg-secondary hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg duration-200 px-5 py-1 text-surface rounded capitalize"
               >
                 {positiveLabel}
               </button>

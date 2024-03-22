@@ -2,6 +2,8 @@ import { StateCreator } from "zustand";
 import {
   IAdminsCollection,
   ICompaniesCollection,
+  ICompanyBranchesCollection,
+  IEmployeeRolesCollection,
   ILoggedInUsersCollection,
 } from "../../@types/database";
 import * as storage from "../../utilities/Storage";
@@ -20,11 +22,29 @@ export interface Admin
   AdminModifiedAt: string;
 }
 
+export interface EmployeeRoles
+  extends Omit<IEmployeeRolesCollection, "EmployeeRoleCreatedAt"> {
+  EmployeeRoleCreatedAt: string;
+}
+
+export interface CompanyBranches
+  extends Omit<
+    ICompanyBranchesCollection,
+    "CompanyBranchCreatedAt" | "CompanyBranchModifiedAt"
+  > {
+  CompanyBranchCreatedAt: string;
+  CompanyBranchModifiedAt: string;
+}
+
 interface AuthState {
   company: Company | null;
   setCompany: (cmp: Company | null) => void;
   admin: Admin | null;
   setAdmin: (admin: Admin | null) => void;
+  companyBranches: CompanyBranches[];
+  setCompanyBranches: (cmpBranches: CompanyBranches[]) => void;
+  empRoles: EmployeeRoles[];
+  setEmpRoles: (empRoles: EmployeeRoles[]) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
   userSignOut: () => void;
@@ -35,6 +55,11 @@ export const createAuthSlice: StateCreator<AuthState> = (set) => ({
   setCompany: (cmp) => set((state) => ({ ...state, company: cmp })),
   admin: null,
   setAdmin: (admin) => set((state) => ({ ...state, admin })),
+  companyBranches: [],
+  setCompanyBranches: (companyBranches) =>
+    set((state) => ({ ...state, companyBranches })),
+  empRoles: [],
+  setEmpRoles: (empRoles) => set((state) => ({ ...state, empRoles })),
   loading: true,
   setLoading: (loading) => set((state) => ({ ...state, loading })),
   // For logging out user
