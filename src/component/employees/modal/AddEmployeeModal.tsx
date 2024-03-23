@@ -20,6 +20,7 @@ import ImageUpload from "../EmpOtherDetailsInput";
 import InputAutoComplete from "../../../common/inputs/InputAutocomplete";
 import { AiOutlinePlus } from "react-icons/ai";
 import AddEmpRoleModal from "./AddEmpRoleModal";
+import InputError from "../../../common/inputs/InputError";
 
 const addEmployeeFormSchema = z.object({
   first_name: z.string().min(2, { message: "First name is required" }),
@@ -61,6 +62,11 @@ const AddEmployeeModal = ({
   const isEdit = !!employeeEditData;
 
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    methods.setValue("role", employeeRole || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employeeRole]);
 
   useEffect(() => {
     let allFieldValues: AddEmployeeFormField = {
@@ -231,6 +237,7 @@ const AddEmployeeModal = ({
                   name="email"
                   error={methods.formState.errors.email?.message}
                 />
+
                 <InputWithTopHeader
                   className="mx-0"
                   label="Password"
@@ -239,28 +246,36 @@ const AddEmployeeModal = ({
                   error={methods.formState.errors.password?.message}
                   inputType="password"
                 />
-                <InputAutoComplete
-                  label="Role"
-                  value={employeeRole}
-                  onChange={setEmployeeRole}
-                  data={empRoles.map((role) => {
-                    return {
-                      label: role.EmployeeRoleName,
-                      value: role.EmployeeRoleName,
-                    };
-                  })}
-                  dropDownHeader={
-                    <div
-                      onClick={() => setAddEmpRoleModal(true)}
-                      className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <AiOutlinePlus size={18} />
-                        <span>Add employee roles</span>
+                <div className="flex flex-col gap-1">
+                  <InputAutoComplete
+                    label="Role"
+                    value={employeeRole}
+                    onChange={setEmployeeRole}
+                    isFilterReq={true}
+                    data={empRoles.map((role) => {
+                      return {
+                        label: role.EmployeeRoleName,
+                        value: role.EmployeeRoleName,
+                      };
+                    })}
+                    dropDownHeader={
+                      <div
+                        onClick={() => setAddEmpRoleModal(true)}
+                        className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <AiOutlinePlus size={18} />
+                          <span>Add employee roles</span>
+                        </div>
                       </div>
-                    </div>
-                  }
-                />
+                    }
+                  />
+                  {methods.formState.errors.role?.message && (
+                    <InputError
+                      errorMessage={methods.formState.errors.role.message}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </form>

@@ -5,10 +5,11 @@ import DbEmployee from "../../firebase_configs/DB/DbEmployee";
 
 interface Props {
   limit: number;
+  empRole: string;
   searchQuery?: string;
 }
 
-const useFetchGuards = ({ limit, searchQuery }: Props) => {
+const useFetchGuards = ({ limit, searchQuery, empRole }: Props) => {
   const [data, setData] = useState<IEmployeesCollection[]>([]);
 
   const { company } = useAuthState();
@@ -31,7 +32,7 @@ const useFetchGuards = ({ limit, searchQuery }: Props) => {
             ? searchQuery.trim()
             : undefined,
         cmpId: company.CompanyId,
-        empRole: "guard",
+        empRole: empRole,
       });
       return snapshot.docs
         .map((doc) => {

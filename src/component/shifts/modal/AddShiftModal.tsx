@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Dialog from "../../../common/Dialog";
-import InputSelect from "../../../common/inputs/InputSelect";
 import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +24,7 @@ import InputAutoComplete from "../../../common/inputs/InputAutocomplete";
 import InputError from "../../../common/inputs/InputError";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
+import AddEmpRoleModal from "../../employees/modal/AddEmpRoleModal";
 
 const addShiftFormSchema = z.object({
   position: z.string().min(1, { message: "Shift position is required" }),
@@ -96,11 +96,22 @@ const AddShiftModal = ({
 
   const { shiftEditData } = useEditFormStore();
 
-  const { company } = useAuthState();
+  const { company, empRoles } = useAuthState();
+
+  const [shiftPosition, setShiftPosition] = useState<string | null | undefined>(
+    ""
+  );
+
+  const [addEmpRoleModal, setAddEmpRoleModal] = useState(false);
 
   const isEdit = !!shiftEditData;
 
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    methods.setValue("position", shiftPosition || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shiftPosition]);
 
   useEffect(() => {
     console.log(methods.formState.errors);
@@ -111,6 +122,7 @@ const AddShiftModal = ({
     setStartTime("09:00 AM");
     setEndTime("05:00 PM");
     setLocationName("");
+    setShiftPosition("");
     let allFieldValues: AddShiftFormFields = {
       position: "",
       date: new Date(),
@@ -127,7 +139,7 @@ const AddShiftModal = ({
       setEndTime(shiftEditData.ShiftEndTime);
       setShiftDate(new Date(shiftEditData.ShiftDate));
       setLocationName(shiftEditData.ShiftLocationName);
-      console.log(shiftEditData.ShiftLocationName, "name");
+      setShiftPosition(shiftEditData.ShiftPosition);
       allFieldValues = {
         position: shiftEditData.ShiftPosition,
         date: new Date(shiftEditData.ShiftDate),
@@ -213,123 +225,151 @@ const AddShiftModal = ({
   const navigate = useNavigate();
 
   return (
-    <Dialog
-      opened={opened}
-      setOpened={setOpened}
-      title="Add Shift"
-      size="80%"
-      isFormModal
-      positiveCallback={methods.handleSubmit(onSubmit)}
-      negativeCallback={() =>
-        isEdit
-          ? openContextModal({
-              modal: "confirmModal",
-              withCloseButton: false,
-              centered: true,
-              closeOnClickOutside: true,
-              innerProps: {
-                title: "Confirm",
-                body: "Are you sure to delete this shift",
-                onConfirm: () => {
-                  onDelete();
+    <>
+      <Dialog
+        opened={opened}
+        setOpened={setOpened}
+        title="Add Shift"
+        size="80%"
+        isFormModal
+        positiveCallback={methods.handleSubmit(onSubmit)}
+        negativeCallback={() =>
+          isEdit
+            ? openContextModal({
+                modal: "confirmModal",
+                withCloseButton: false,
+                centered: true,
+                closeOnClickOutside: true,
+                innerProps: {
+                  title: "Confirm",
+                  body: "Are you sure to delete this shift",
+                  onConfirm: () => {
+                    onDelete();
+                  },
+                  onCancel: () => {
+                    setOpened(true);
+                  },
                 },
-                onCancel: () => {
-                  setOpened(true);
+                size: "30%",
+                styles: {
+                  body: { padding: "0px" },
                 },
-              },
-              size: "30%",
-              styles: {
-                body: { padding: "0px" },
-              },
-            })
-          : setOpened(false)
-      }
-      negativeLabel={isEdit ? "Delete" : "Cancel"}
-      positiveLabel={isEdit ? "Update" : "Save"}
-    >
-      <FormProvider {...methods}>
-        <form
-          onSubmit={methods.handleSubmit(onSubmit)}
-          className="flex flex-col gap-4"
-        >
-          <div className="grid grid-cols-2 gap-4">
-            <InputSelect
-              label="Select Position"
-              disabled={isEdit}
-              options={[
-                { title: "Guard", value: "guard" },
-                { title: "Supervisor", value: "supervisor" },
-                { title: "Other", value: "other" },
-              ]}
-              register={methods.register}
-              name="position"
-              error={methods.formState.errors.position?.message}
-            />
-
-            <InputWithTopHeader
-              className="mx-0"
-              label="Shift name"
-              register={methods.register}
-              name="name"
-              error={methods.formState.errors?.name?.message}
-            />
-
-            <InputDate label="Date" value={shiftDate} setValue={setShiftDate} />
-
-            <InputTime
-              label="Start time"
-              value={startTime}
-              onChange={setStartTime}
-              use12Hours={true}
-            />
-
-            <InputTime
-              label="End time"
-              value={endTime}
-              onChange={setEndTime}
-              use12Hours={true}
-            />
-            <div className="flex flex-col gap-2">
-              <InputAutoComplete
-                label="Shift location"
-                data={data.map((loc) => {
-                  return { label: loc.LocationName, value: loc.LocationName };
-                })}
-                value={locationName}
-                onChange={setLocationName}
-                dropDownHeader={
-                  <div
-                    onClick={() => {
-                      navigate(PageRoutes.LOCATIONS);
-                    }}
-                    className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2">
-                      <AiOutlinePlus size={18} />
-                      <span>Add location</span>
+              })
+            : setOpened(false)
+        }
+        negativeLabel={isEdit ? "Delete" : "Cancel"}
+        positiveLabel={isEdit ? "Update" : "Save"}
+      >
+        <FormProvider {...methods}>
+          <form
+            onSubmit={methods.handleSubmit(onSubmit)}
+            className="flex flex-col gap-4"
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                <InputAutoComplete
+                  label="Shift position"
+                  value={shiftPosition}
+                  onChange={setShiftPosition}
+                  isFilterReq={true}
+                  data={empRoles.map((role) => {
+                    return {
+                      label: role.EmployeeRoleName,
+                      value: role.EmployeeRoleName,
+                    };
+                  })}
+                  dropDownHeader={
+                    <div
+                      onClick={() => setAddEmpRoleModal(true)}
+                      className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <AiOutlinePlus size={18} />
+                        <span>Add employee roles</span>
+                      </div>
                     </div>
-                  </div>
-                }
-              />
-              {methods.formState.errors.address?.message && (
-                <InputError
-                  errorMessage={methods.formState.errors.address.message}
+                  }
                 />
-              )}
-            </div>
+                {methods.formState.errors.position?.message && (
+                  <InputError
+                    errorMessage={methods.formState.errors.position.message}
+                  />
+                )}
+              </div>
 
-            <div className="col-span-2">
-              <TextareaWithTopHeader
-                title="Description"
+              <InputWithTopHeader
                 className="mx-0"
+                label="Shift name"
                 register={methods.register}
-                name="description"
+                name="name"
+                error={methods.formState.errors?.name?.message}
               />
+
+              <InputDate
+                label="Date"
+                value={shiftDate}
+                setValue={setShiftDate}
+              />
+
+              <InputTime
+                label="Start time"
+                value={startTime}
+                onChange={setStartTime}
+                use12Hours={true}
+              />
+
+              <InputTime
+                label="End time"
+                value={endTime}
+                onChange={setEndTime}
+                use12Hours={true}
+              />
+              <div className="flex flex-col gap-2">
+                <InputAutoComplete
+                  label="Shift location"
+                  data={data.map((loc) => {
+                    return { label: loc.LocationName, value: loc.LocationName };
+                  })}
+                  value={locationName}
+                  onChange={setLocationName}
+                  dropDownHeader={
+                    <div
+                      onClick={() => {
+                        navigate(PageRoutes.LOCATIONS);
+                      }}
+                      className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <AiOutlinePlus size={18} />
+                        <span>Add location</span>
+                      </div>
+                    </div>
+                  }
+                />
+                {methods.formState.errors.address?.message && (
+                  <InputError
+                    errorMessage={methods.formState.errors.address.message}
+                  />
+                )}
+              </div>
+
+              <div className="col-span-2">
+                <TextareaWithTopHeader
+                  title="Description"
+                  className="mx-0"
+                  register={methods.register}
+                  name="description"
+                />
+              </div>
             </div>
-          </div>
-        </form>
-      </FormProvider>
-    </Dialog>
+          </form>
+        </FormProvider>
+      </Dialog>
+      <AddEmpRoleModal
+        opened={addEmpRoleModal}
+        setOpened={setAddEmpRoleModal}
+      />
+    </>
   );
 };
 

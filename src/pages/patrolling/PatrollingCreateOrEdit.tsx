@@ -49,6 +49,7 @@ const PatrollingCreateOrEdit = () => {
   const { data } = useFetchGuards({
     limit: 5,
     searchQuery: guard || undefined,
+    empRole: "GUARD",
   });
 
   const [locationName, setLocationName] = useState<string | null | undefined>(

@@ -9,6 +9,7 @@ import { closeModalLoader, showModalLoader } from "../../../utilities/TsxUtils";
 import DbEmployee from "../../../firebase_configs/DB/DbEmployee";
 import { EmployeeRoles } from "../../../store/slice/auth.slice";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { openContextModal } from "@mantine/modals";
 
 const AddEmpRoleModal = ({
   opened,
@@ -41,11 +42,11 @@ const AddEmpRoleModal = ({
     }
   };
 
-  const onDelete = async (roleId: string) => {
+  const onDelete = async (roleId: string, empRole: string) => {
     try {
       showModalLoader({});
 
-      await DbEmployee.deleteEmpRole(roleId);
+      await DbEmployee.deleteEmpRole(roleId, empRole);
 
       setEmpRoles(empRoles.filter((role) => role.EmployeeRoleId !== roleId));
 
@@ -72,13 +73,13 @@ const AddEmpRoleModal = ({
             placeholder="Enter employee role"
             className="mx-0 w-full"
             value={employeeRole}
-            onChange={(e) => setEmployeeRole(e.target.value)}
+            onChange={(e) => setEmployeeRole(e.target.value.toUpperCase())}
           />
           <Button
             label="Save"
             onClick={onSave}
             type="black"
-            className="py-3 px-6"
+            className="py-[10px] px-6"
           />
         </div>
 
@@ -97,7 +98,31 @@ const AddEmpRoleModal = ({
                     <td className="py-2 px-2">{role.EmployeeRoleName}</td>
                     <td className="text-end flex justify-end py-2 px-2">
                       <FaRegTrashAlt
-                        onClick={() => onDelete(role.EmployeeRoleId)}
+                        onClick={() =>
+                          openContextModal({
+                            modal: "confirmModal",
+                            withCloseButton: false,
+                            centered: true,
+                            closeOnClickOutside: true,
+                            innerProps: {
+                              title: "Confirm",
+                              body: "Are you sure to delete this role",
+                              onConfirm: () => {
+                                onDelete(
+                                  role.EmployeeRoleId,
+                                  role.EmployeeRoleName
+                                );
+                              },
+                              onCancel: () => {
+                                setOpened(true);
+                              },
+                            },
+                            size: "30%",
+                            styles: {
+                              body: { padding: "0px" },
+                            },
+                          })
+                        }
                         className="cursor-pointer text-lg text-textPrimaryRed hover:scale-[1.1]"
                       />
                     </td>
@@ -107,7 +132,7 @@ const AddEmpRoleModal = ({
             ) : (
               <tr>
                 <td colSpan={2}>
-                  <NoSearchResult text="No employee role exist" />
+                  <NoSearchResult text="No role exist" />
                 </td>
               </tr>
             )}

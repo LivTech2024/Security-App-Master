@@ -109,7 +109,7 @@ const InputAutoComplete = ({
 
   useEffect(() => {
     setSuggestions(data);
-  }, [data]);
+  }, []);
 
   const handleSuggestionClick = (suggestion: string) => {
     onChange(suggestion);

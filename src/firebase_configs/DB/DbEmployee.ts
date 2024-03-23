@@ -67,7 +67,7 @@ class DbEmployee {
     const newEmpRole: IEmployeeRolesCollection = {
       EmployeeRoleId: empRoleId,
       EmployeeRoleCompanyId: cmpId,
-      EmployeeRoleName: empRole,
+      EmployeeRoleName: empRole.trim().toUpperCase(),
       EmployeeRoleCreatedAt: serverTimestamp(),
     };
 
@@ -88,15 +88,43 @@ class DbEmployee {
     const empRoleRef = doc(db, CollectionName.employeeRoles, empRoleId);
 
     const newEmpRole: Partial<IEmployeeRolesCollection> = {
-      EmployeeRoleName: empRole,
+      EmployeeRoleName: empRole.trim().toUpperCase(),
       EmployeeRoleCreatedAt: serverTimestamp(),
     };
 
     return updateDoc(empRoleRef, newEmpRole);
   };
 
-  static deleteEmpRole = (empRoleId: string) => {
+  static deleteEmpRole = async (empRoleId: string, empRole: string) => {
     const empRoleRef = doc(db, CollectionName.employeeRoles, empRoleId);
+
+    //*check if this role used in any employee
+    const empRef = collection(db, CollectionName.employees);
+    const empQuery = query(
+      empRef,
+      where("EmployeeRole", "==", empRole),
+      limit(1)
+    );
+    const empSnapshot = await getDocs(empQuery);
+    if (!empSnapshot.empty) {
+      throw new CustomError(
+        "This role is used for some employees, please delete that employee before deleting this role"
+      );
+    }
+
+    //*check if this role used in any shift
+    const shiftRef = collection(db, CollectionName.shifts);
+    const shiftQuery = query(
+      shiftRef,
+      where("ShiftPosition", "==", empRole),
+      limit(1)
+    );
+    const shiftSnapshot = await getDocs(shiftQuery);
+    if (!shiftSnapshot.empty) {
+      throw new CustomError(
+        "This role is used for some shifts, please delete that shifts before deleting this role"
+      );
+    }
 
     return deleteDoc(empRoleRef);
   };
