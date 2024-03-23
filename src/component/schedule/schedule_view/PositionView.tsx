@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { REACT_QUERY_KEYS, ShiftPositions } from "../../../@types/enum";
+import { REACT_QUERY_KEYS } from "../../../@types/enum";
 import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
@@ -57,8 +57,9 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
     );
   };
 
-  const [showEmpListByPosition, setShowEmpListByPosition] =
-    useState<ShiftPositions | null>(null);
+  const [showEmpListByPosition, setShowEmpListByPosition] = useState<
+    string | null
+  >(null);
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -331,18 +332,16 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                             key={idx}
                           >
                             <div
+                              onClick={() => {
+                                setSelectedDate(toDate(data.shift.ShiftDate));
+                                setShowEmpListByPosition(
+                                  data.shift.ShiftPosition
+                                );
+                              }}
                               key={data.shift.ShiftId + idx}
-                              className={`flex flex-col p-2`}
+                              className={`flex flex-col p-2 cursor-pointer`}
                             >
-                              <div
-                                onClick={() => {
-                                  setSelectedDate(toDate(data.shift.ShiftDate));
-                                  setShowEmpListByPosition(
-                                    data.shift.ShiftPosition
-                                  );
-                                }}
-                                className="h-[30px] bg-gray-200 py-1 text-sm font-semibold cursor-pointer text-textPrimaryBlue capitalize"
-                              >
+                              <div className="h-[30px] bg-gray-200 py-1 text-sm font-semibold  text-textPrimaryBlue capitalize">
                                 {data.shift.ShiftPosition}
                               </div>
 
