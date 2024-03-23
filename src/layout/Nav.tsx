@@ -36,6 +36,7 @@ const Nav = () => {
       <NavItem path={PageRoutes.SHIFTS} name="Shifts" />
       <NavItem path={PageRoutes.PATROLLING_LIST} name="Patrolling" />
       <NavItem path={PageRoutes.LOCATIONS} name="Locations" />
+      <NavItem path={PageRoutes.COMPANY_BRANCHES} name="Company Branches" />
       <NavItem path="/incident" name="Incident" />
       <NavItem path="/send-message" name="Send Message" />
       <NavItem path="/trades" name="Trades" />

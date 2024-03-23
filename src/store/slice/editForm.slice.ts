@@ -4,6 +4,7 @@ import {
   ILocationsCollection,
   IShiftsCollection,
 } from "../../@types/database";
+import { CompanyBranches } from "./auth.slice";
 
 export interface Employee
   extends Omit<
@@ -37,6 +38,9 @@ interface EditFormState {
 
   locationEditData: Location | null;
   setLocationEditData: (loc: Location | null) => void;
+
+  companyBranchEditData: CompanyBranches | null;
+  setCompanyBranchEditData: (branch: CompanyBranches | null) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -54,4 +58,10 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   locationEditData: null,
   setLocationEditData: (loc) =>
     set((state) => ({ ...state, locationEditData: loc })),
+
+  //Company Branch
+  //Location
+  companyBranchEditData: null,
+  setCompanyBranchEditData: (branch) =>
+    set((state) => ({ ...state, companyBranchEditData: branch })),
 });

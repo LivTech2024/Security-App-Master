@@ -50,6 +50,7 @@ export const PageRoutes = {
   PATROLLING_CREATE_OR_EDIT: "/patrolling_create_or_edit",
   PATROLLING_VIEW: "/patrolling_view",
   LOCATIONS: "/locations",
+  COMPANY_BRANCHES: "/company_branches",
 };
 
 export const LocalStorageKey = {

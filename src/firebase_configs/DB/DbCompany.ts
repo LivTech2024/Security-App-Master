@@ -4,6 +4,7 @@ import { db } from "../config";
 import {
   IAdminsCollection,
   ICompaniesCollection,
+  ICompanyBranchesCollection,
   ILocationsCollection,
 } from "../../@types/database";
 import {
@@ -25,6 +26,7 @@ import {
   DocumentData,
 } from "@firebase/firestore";
 import { fullTextSearchIndex } from "../../utilities/misc";
+import { CompanyBranchFormFields } from "../../utilities/zod/schema";
 
 class DbCompany {
   static createCompany = () => {
@@ -49,6 +51,75 @@ class DbCompany {
     const cmpBranchRef = collection(db, CollectionName.companyBranch);
     const cmpBranchQuery = query(cmpBranchRef, where("CompanyId", "==", cmpId));
     return getDocs(cmpBranchQuery);
+  };
+
+  static createCompanyBranch = async (
+    cmpId: string,
+    data: CompanyBranchFormFields
+  ) => {
+    const cpmBranchId = getNewDocId(CollectionName.companyBranch);
+    const cmpBranchRef = doc(db, CollectionName.companyBranch, cpmBranchId);
+
+    const {
+      CompanyBranchAddress,
+      CompanyBranchEmail,
+      CompanyBranchName,
+      CompanyBranchPhone,
+    } = data;
+
+    const newCmpBranch: ICompanyBranchesCollection = {
+      CompanyBranchId: cpmBranchId,
+      CompanyId: cmpId,
+      CompanyBranchName,
+      CompanyBranchEmail,
+      CompanyBranchPhone,
+      CompanyBranchAddress,
+      CompanyBranchCreatedAt: serverTimestamp(),
+      CompanyBranchModifiedAt: serverTimestamp(),
+    };
+
+    await setDoc(cmpBranchRef, newCmpBranch);
+
+    return newCmpBranch;
+  };
+
+  static updateCompanyBranch = async ({
+    cmpId,
+    cmpBranchId,
+    data,
+  }: {
+    cmpId: string;
+    cmpBranchId: string;
+    data: CompanyBranchFormFields;
+  }) => {
+    const cmpBranchRef = doc(db, CollectionName.companyBranch, cmpBranchId);
+
+    const {
+      CompanyBranchAddress,
+      CompanyBranchEmail,
+      CompanyBranchName,
+      CompanyBranchPhone,
+    } = data;
+
+    const updatedCmpBranch: Partial<ICompanyBranchesCollection> = {
+      CompanyBranchId: cmpBranchId,
+      CompanyId: cmpId,
+      CompanyBranchName,
+      CompanyBranchEmail,
+      CompanyBranchPhone,
+      CompanyBranchAddress,
+      CompanyBranchModifiedAt: serverTimestamp(),
+    };
+
+    await updateDoc(cmpBranchRef, updatedCmpBranch);
+
+    return updatedCmpBranch;
+  };
+
+  static deleteCompanyBranch = (cmpBranchId: string) => {
+    const docRef = doc(db, CollectionName.companyBranch, cmpBranchId);
+
+    return deleteDoc(docRef);
   };
 
   static createAdmin = (companyId: string) => {

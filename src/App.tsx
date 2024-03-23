@@ -24,6 +24,7 @@ import Login from "./pages/login/Login";
 import useOnAuthStateChanged from "./hooks/useOnAuthStateChanged";
 import SplashScreen from "./component/splash_screen/SplashScreen";
 import Locations from "./pages/locations/Locations";
+import CompanyBranches from "./pages/company_branches/CompanyBranches";
 
 function App() {
   useOnAuthStateChanged();
@@ -80,6 +81,10 @@ function App() {
               Component={PatrollingView}
             />
             <Route path={PageRoutes.LOCATIONS} Component={Locations} />
+            <Route
+              path={PageRoutes.COMPANY_BRANCHES}
+              Component={CompanyBranches}
+            />
           </Routes>
         </Layout>
       </ModalsProvider>

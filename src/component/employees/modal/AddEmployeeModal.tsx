@@ -21,6 +21,7 @@ import InputAutoComplete from "../../../common/inputs/InputAutocomplete";
 import { AiOutlinePlus } from "react-icons/ai";
 import AddEmpRoleModal from "./AddEmpRoleModal";
 import InputError from "../../../common/inputs/InputError";
+import { ConstRegex } from "../../../constants/ConstRegex";
 
 const addEmployeeFormSchema = z.object({
   first_name: z.string().min(2, { message: "First name is required" }),
@@ -29,7 +30,7 @@ const addEmployeeFormSchema = z.object({
   email: z
     .string()
     .min(3, { message: "Email is required" })
-    .regex(/^(^[\w%+.-]+@[\d.A-Za-z-]+\.[A-Za-z]{2,}$)?$/, {
+    .regex(ConstRegex.EMAIL_OPTIONAL, {
       message: "Invalid email",
     }),
   password: z.string().min(6, { message: "Min 6 character is required" }),
@@ -77,6 +78,7 @@ const AddEmployeeModal = ({
       role: "",
       password: "",
     };
+    setEmployeeRole("");
     if (isEdit) {
       allFieldValues = {
         first_name: employeeEditData.EmployeeName.split(" ")[0],
@@ -86,6 +88,7 @@ const AddEmployeeModal = ({
         role: employeeEditData.EmployeeRole,
         password: employeeEditData.EmployeePassword,
       };
+      setEmployeeRole(employeeEditData.EmployeeRole);
       setEmpImageBase64(employeeEditData.EmployeeImg);
     } else {
       setEmpImageBase64(null);
