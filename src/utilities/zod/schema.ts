@@ -2,6 +2,26 @@ import { z } from "zod";
 import { numberString } from "./helper";
 import { ConstRegex } from "../../constants/ConstRegex";
 
+//*Employee create schema
+export const addEmployeeFormSchema = z.object({
+  EmployeeFirstName: z.string().min(2, { message: "First name is required" }),
+  EmployeeLastName: z.string().min(2, { message: "Last name is required" }),
+  EmployeePhone: z.string().min(10, { message: "Phone number is required" }),
+  EmployeeEmail: z
+    .string()
+    .min(3, { message: "Email is required" })
+    .regex(ConstRegex.EMAIL_OPTIONAL, {
+      message: "Invalid email",
+    }),
+  EmployeePassword: z
+    .string()
+    .min(6, { message: "Min 6 character is required" }),
+  EmployeeRole: z.string().min(1, { message: "Employee role is required" }),
+});
+
+export type AddEmployeeFormField = z.infer<typeof addEmployeeFormSchema>;
+
+//* Patrolling create Schema
 export const patrollingSchema = z.object({
   PatrolName: z.string().min(3, { message: "Patrol name is required" }),
   PatrolArea: z.string().min(3, { message: "Patrol area is required" }),
@@ -27,7 +47,7 @@ export const patrollingSchema = z.object({
 
 export type PatrollingFormFields = z.infer<typeof patrollingSchema>;
 
-//*Company branch schema
+//*Company branch create schema
 export const companyBranchSchema = z.object({
   CompanyBranchName: z
     .string()

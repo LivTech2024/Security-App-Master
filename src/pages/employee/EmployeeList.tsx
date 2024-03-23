@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import AddEmployeeModal from "../../component/employees/modal/AddEmployeeModal";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import {
   DisplayCount,
   MinimumQueryCharacter,
+  PageRoutes,
   REACT_QUERY_KEYS,
 } from "../../@types/enum";
 import DbEmployee from "../../firebase_configs/DB/DbEmployee";
@@ -18,9 +18,10 @@ import { firebaseDataToObject, splitName } from "../../utilities/misc";
 import { Employee } from "../../store/slice/editForm.slice";
 import Button from "../../common/button/Button";
 import AddEmpRoleModal from "../../component/employees/modal/AddEmpRoleModal";
+import { useNavigate } from "react-router-dom";
 
-const Employees = () => {
-  const [addEmployeeDialog, setAddEmployeeDialog] = useState(false);
+const EmployeeList = () => {
+  const navigate = useNavigate();
 
   const [addEmployeeRoleModal, setAddEmployeeRoleModal] = useState(false);
 
@@ -123,8 +124,8 @@ const Employees = () => {
           />
           <button
             onClick={() => {
-              setAddEmployeeDialog(true);
               setEmployeeEditData(null);
+              navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT);
             }}
             className="bg-primary text-surface px-4 py-2 rounded"
           >
@@ -133,10 +134,6 @@ const Employees = () => {
         </div>
       </div>
 
-      <AddEmployeeModal
-        opened={addEmployeeDialog}
-        setOpened={setAddEmployeeDialog}
-      />
       <AddEmpRoleModal
         opened={addEmployeeRoleModal}
         setOpened={setAddEmployeeRoleModal}
@@ -177,7 +174,7 @@ const Employees = () => {
                         emp as unknown as Record<string, unknown>
                       ) as unknown as Employee
                     );
-                    setAddEmployeeDialog(true);
+                    navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT);
                   }}
                   className="cursor-pointer"
                 >
@@ -206,4 +203,4 @@ const Employees = () => {
   );
 };
 
-export default Employees;
+export default EmployeeList;

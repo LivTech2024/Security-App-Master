@@ -32,7 +32,7 @@ const Nav = () => {
     <div className="flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1">
       <NavItem path={PageRoutes.HOME} name="Home" />
       <NavItem path={PageRoutes.SCHEDULES} name="Schedules" />
-      <NavItem path={PageRoutes.EMPLOYEES} name="Employees" />
+      <NavItem path={PageRoutes.EMPLOYEE_LIST} name="Employees" />
       <NavItem path={PageRoutes.SHIFTS} name="Shifts" />
       <NavItem path={PageRoutes.PATROLLING_LIST} name="Patrolling" />
       <NavItem path={PageRoutes.LOCATIONS} name="Locations" />

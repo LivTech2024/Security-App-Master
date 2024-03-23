@@ -47,7 +47,7 @@ const Home = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 w-full">
         <HomeItem
-          path={PageRoutes.EMPLOYEES}
+          path={PageRoutes.EMPLOYEE_LIST}
           icon={<MdPeople className="text-4xl text-primaryGold" />}
           name="Employee Management"
         />

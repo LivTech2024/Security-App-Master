@@ -39,6 +39,14 @@ export default {
         switchPrimaryBlueBg: "#2563eb",
         switchSecondaryBlueBg: "#60a5fa",
 
+        whiteButtonBg: "#FFFF",
+        whiteButtonHoverBg: "#ffffff7e",
+        whiteButtonActiveBg: "#ffffffba",
+
+        grayButtonBg: "#e5e7eb",
+        grayButtonHoverBg: "#e2e8f0",
+        grayButtonActiveBg: "#d1d5db",
+
         onHoverBg: "#F4F4F4",
 
         shimmerColor: "#e3e3e3",

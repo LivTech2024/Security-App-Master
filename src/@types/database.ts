@@ -51,8 +51,18 @@ export interface IEmployeesCollection {
   EmployeeRole: string;
   EmployeeIsBanned: boolean;
   EmployeeCompanyId: string;
+  EmployeeCompanyBranchId?: string;
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;
+}
+
+export interface IShiftTasksChild {
+  ShiftTaskId: string;
+  ShiftTask: string;
+  ShiftTaskQrCodeReq: boolean;
+  ShiftTaskCompleted?: boolean;
+  ShiftTaskCompletionTime?: Timestamp | FieldValue;
+  ShiftTaskFailureReason?: string;
 }
 
 export interface IShiftsCollection {
@@ -68,7 +78,10 @@ export interface IShiftsCollection {
   ShiftDescription: string | null;
   ShiftAssignedUserId: string | null;
   ShiftCompanyId: string;
+  ShiftCompanyBranchId?: string;
   ShiftAcknowledged?: boolean;
+  ShiftTask: IShiftTasksChild[];
+  ShiftCurrentStatus: "pending" | "started" | "completed";
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;
 }
@@ -84,6 +97,7 @@ export interface IPatrolCheckPointsChild {
 export interface IPatrolsCollection {
   PatrolId: string;
   PatrolCompanyId: string;
+  PatrolCompanyBranchId?: string;
   PatrolName: string;
   PatrolNameSearchIndex: string[];
   PatrolArea: string;
@@ -106,6 +120,7 @@ export interface IPatrolsCollection {
 export interface IIncidentsCollection {
   IncidentId: string;
   IncidentCompanyId: string;
+  IncidentCompanyBranchId?: string;
   IncidentEmployeeId: string;
   IncidentEmployeeName: string;
   IncidentEmployeeRole: string;

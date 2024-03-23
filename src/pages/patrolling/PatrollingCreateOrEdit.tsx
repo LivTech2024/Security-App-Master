@@ -259,7 +259,7 @@ const PatrollingCreateOrEdit = () => {
               dropDownHeader={
                 <div
                   onClick={() => {
-                    navigate(PageRoutes.EMPLOYEES);
+                    navigate(PageRoutes.EMPLOYEE_LIST);
                   }}
                   className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                 >

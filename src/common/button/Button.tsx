@@ -43,7 +43,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          "bg-grayButtonBgLight dark:bg-grayButtonBgDark hover:bg-grayButtonHoverBgLight dark:hover:bg-grayButtonHoverBgDark active:bg-grayButtonActiveBgLight dark:active:bg-grayButtonActiveBgDark flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px]   whitespace-nowrap overflow-hidden font-semibold ",
+          "bg-grayButtonBg dark:bg-grayButtonBg hover:bg-grayButtonHoverBg  active:bg-grayButtonActiveBg flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px]   whitespace-nowrap overflow-hidden font-semibold ",
           className
         )}`}
       >
@@ -57,7 +57,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          "bg-whiteButtonBgLight hover:bg-whiteButtonHoverBgLight active:bg-whiteButtonActiveBgLight dark:bg-whiteButtonBgDark dark:hover:bg-whiteButtonHoverBgDark dark:active:bg-whiteButtonActiveBgDark flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px]  text-textPrimaryLight whitespace-nowrap overflow-hidden font-semibold ",
+          "bg-whiteButtonBg hover:bg-whiteButtonHoverBg active:bg-whiteButtonActiveBg flex items-center justify-center gap-2 px-[8px] py-[6px] rounded-[4px]  text-textPrimaryLight whitespace-nowrap overflow-hidden font-semibold shadow",
           className
         )}`}
       >

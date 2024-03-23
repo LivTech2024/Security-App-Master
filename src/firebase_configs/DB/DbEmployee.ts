@@ -26,9 +26,9 @@ import {
   IEmployeeRolesCollection,
   IEmployeesCollection,
 } from "../../@types/database";
-import { AddEmployeeFormField } from "../../component/employees/modal/AddEmployeeModal";
 import CustomError from "../../utilities/CustomError";
 import { fullTextSearchIndex } from "../../utilities/misc";
+import { AddEmployeeFormField } from "../../utilities/zod/schema";
 
 class DbEmployee {
   static isEmpRoleExist = async (empRole: string, empRoleId: string | null) => {
@@ -179,8 +179,8 @@ class DbEmployee {
     cmpId: string
   ) => {
     const isEmpExist = await this.isEmpExist(
-      empData.email,
-      empData.role,
+      empData.EmployeeEmail,
+      empData.EmployeeRole,
       null,
       cmpId
     );
@@ -210,24 +210,20 @@ class DbEmployee {
 
     const newEmployee: IEmployeesCollection = {
       EmployeeId: empId,
-      EmployeeName: `${empData.first_name} ${empData.last_name}`,
+      EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
       EmployeeNameSearchIndex: fullTextSearchIndex(
-        `${empData.first_name.trim().toLowerCase()} ${empData.last_name
-          .trim()
-          .toLowerCase()}`
+        `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
       ),
       EmployeeImg: imageEmpUrl[0],
-      EmployeePhone: empData.phone_number,
-      EmployeeEmail: empData.email,
-      EmployeePassword: empData.password,
-      EmployeeRole: empData.role,
+      EmployeePhone: empData.EmployeePhone,
+      EmployeeEmail: empData.EmployeeEmail,
+      EmployeePassword: empData.EmployeePassword,
+      EmployeeRole: empData.EmployeeRole,
       EmployeeIsBanned: false,
       EmployeeCompanyId: cmpId,
       EmployeeCreatedAt: serverTimestamp(),
       EmployeeModifiedAt: serverTimestamp(),
     };
-
-    console.log(newEmployee, "creating");
 
     return setDoc(docRef, newEmployee);
   };
@@ -240,8 +236,8 @@ class DbEmployee {
   ) => {
     try {
       const isEmpExist = await this.isEmpExist(
-        empData.email,
-        empData.role,
+        empData.EmployeeEmail,
+        empData.EmployeeRole,
         empId,
         cmpId
       );
@@ -282,17 +278,15 @@ class DbEmployee {
         }
 
         const newEmployee: Partial<IEmployeesCollection> = {
-          EmployeeName: `${empData.first_name} ${empData.last_name}`,
+          EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
           EmployeeImg: empImageUrl,
           EmployeeNameSearchIndex: fullTextSearchIndex(
-            `${empData.first_name.trim().toLowerCase()} ${empData.last_name
-              .trim()
-              .toLowerCase()}`
+            `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
           ),
-          EmployeePhone: empData.phone_number,
-          EmployeePassword: empData.password,
-          EmployeeEmail: empData.email,
-          EmployeeRole: empData.role,
+          EmployeePhone: empData.EmployeePhone,
+          EmployeePassword: empData.EmployeePassword,
+          EmployeeEmail: empData.EmployeeEmail,
+          EmployeeRole: empData.EmployeeRole,
           EmployeeCompanyId: cmpId,
           EmployeeModifiedAt: serverTimestamp(),
         };

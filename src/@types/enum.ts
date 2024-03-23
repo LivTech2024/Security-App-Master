@@ -44,7 +44,8 @@ export const ImageResolution = {
 export const PageRoutes = {
   HOME: "/",
   SHIFTS: "/shifts",
-  EMPLOYEES: "/employees",
+  EMPLOYEE_LIST: "/employee_list",
+  EMPLOYEE_CREATE_OR_EDIT: "/employee_create_or_edit",
   SCHEDULES: "/schedules",
   PATROLLING_LIST: "/patrolling_list",
   PATROLLING_CREATE_OR_EDIT: "/patrolling_create_or_edit",

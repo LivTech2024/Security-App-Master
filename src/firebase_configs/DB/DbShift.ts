@@ -41,6 +41,9 @@ class DbShift {
         Number(shiftData.location.lat),
         Number(shiftData.location.lng)
       ),
+      ShiftCurrentStatus: "pending",
+      ShiftTask: [],
+      ShiftAcknowledged: false,
       ShiftCompanyId: cmpId,
       ShiftAddress: shiftData.address,
       ShiftLocationName: shiftData.location_name,
@@ -65,6 +68,7 @@ class DbShift {
       ShiftStartTime: shiftData.start_time,
       ShiftEndTime: shiftData.end_time,
       ShiftDescription: shiftData.description || null,
+      ShiftTask: [],
       ShiftLocation: new GeoPoint(
         Number(shiftData.location.lat),
         Number(shiftData.location.lng)
