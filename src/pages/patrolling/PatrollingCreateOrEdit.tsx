@@ -142,7 +142,7 @@ const PatrollingCreateOrEdit = () => {
         onSubmit={methods.handleSubmit(onSubmit)}
         className="flex flex-col w-full h-full p-6 gap-6"
       >
-        <div className="flex items-center justify-between w-full">
+        <div className="flex items-center justify-between w-full bg-primaryGold rounded p-4 shadow">
           <div
             onClick={() => navigate(PageRoutes.PATROLLING_LIST)}
             className="flex items-center gap-4 cursor-pointer "

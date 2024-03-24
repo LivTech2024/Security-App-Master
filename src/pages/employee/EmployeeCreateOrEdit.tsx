@@ -164,7 +164,7 @@ const EmployeeCreateOrEdit = () => {
   };
   return (
     <div className="flex flex-col gap-4 p-6">
-      <div className="flex items-center justify-between w-full bg-surface rounded p-4 shadow">
+      <div className="flex items-center justify-between w-full bg-primaryGold rounded p-4 shadow">
         <div
           onClick={() => navigate(PageRoutes.EMPLOYEE_LIST)}
           className="flex items-center gap-4 cursor-pointer "
@@ -178,7 +178,7 @@ const EmployeeCreateOrEdit = () => {
           {isEdit && (
             <Button
               label="Delete"
-              type="gray"
+              type="white"
               onClick={() =>
                 openContextModal({
                   modal: "confirmModal",
