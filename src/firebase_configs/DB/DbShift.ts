@@ -17,11 +17,11 @@ import {
   where,
 } from "firebase/firestore";
 import { CollectionName } from "../../@types/enum";
-import { AddShiftFormFields } from "../../component/shifts/modal/AddShiftModal";
 import { db } from "../config";
 import { getNewDocId } from "./utils";
 import { IShiftsCollection } from "../../@types/database";
 import { removeTimeFromDate } from "../../utilities/misc";
+import { AddShiftFormFields } from "../../utilities/zod/schema";
 
 class DbShift {
   static addShift = async (shiftData: AddShiftFormFields, cmpId: string) => {
@@ -30,23 +30,25 @@ class DbShift {
 
     const newShift: IShiftsCollection = {
       ShiftId: shiftId,
-      ShiftName: shiftData.name,
-      ShiftPosition: shiftData.position,
-      ShiftDate: removeTimeFromDate(shiftData.date) as unknown as Timestamp,
-      ShiftStartTime: shiftData.start_time,
-      ShiftEndTime: shiftData.end_time,
-      ShiftDescription: shiftData.description || null,
+      ShiftName: shiftData.ShiftName,
+      ShiftPosition: shiftData.ShiftPosition,
+      ShiftDate: removeTimeFromDate(
+        shiftData.ShiftDate
+      ) as unknown as Timestamp,
+      ShiftStartTime: shiftData.ShiftStartTime,
+      ShiftEndTime: shiftData.ShiftEndTime,
+      ShiftDescription: shiftData.ShiftDescription || null,
       ShiftAssignedUserId: null,
       ShiftLocation: new GeoPoint(
-        Number(shiftData.location.lat),
-        Number(shiftData.location.lng)
+        Number(shiftData.ShiftLocation.lat),
+        Number(shiftData.ShiftLocation.lng)
       ),
       ShiftCurrentStatus: "pending",
       ShiftTask: [],
       ShiftAcknowledged: false,
       ShiftCompanyId: cmpId,
-      ShiftAddress: shiftData.address,
-      ShiftLocationName: shiftData.location_name,
+      ShiftAddress: shiftData.ShiftAddress,
+      ShiftLocationName: shiftData.ShiftLocationName,
       ShiftCreatedAt: serverTimestamp(),
       ShiftModifiedAt: serverTimestamp(),
     };
@@ -62,20 +64,22 @@ class DbShift {
     const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
 
     const newShift: Partial<IShiftsCollection> = {
-      ShiftName: shiftData.name,
-      ShiftPosition: shiftData.position,
-      ShiftDate: removeTimeFromDate(shiftData.date) as unknown as Timestamp,
-      ShiftStartTime: shiftData.start_time,
-      ShiftEndTime: shiftData.end_time,
-      ShiftDescription: shiftData.description || null,
+      ShiftName: shiftData.ShiftName,
+      ShiftPosition: shiftData.ShiftPosition,
+      ShiftDate: removeTimeFromDate(
+        shiftData.ShiftDate
+      ) as unknown as Timestamp,
+      ShiftStartTime: shiftData.ShiftStartTime,
+      ShiftEndTime: shiftData.ShiftEndTime,
+      ShiftDescription: shiftData.ShiftDescription || null,
       ShiftTask: [],
       ShiftLocation: new GeoPoint(
-        Number(shiftData.location.lat),
-        Number(shiftData.location.lng)
+        Number(shiftData.ShiftLocation.lat),
+        Number(shiftData.ShiftLocation.lng)
       ),
-      ShiftLocationName: shiftData.location_name,
+      ShiftLocationName: shiftData.ShiftLocationName,
       ShiftCompanyId: cmpId,
-      ShiftAddress: shiftData.address,
+      ShiftAddress: shiftData.ShiftAddress,
       ShiftModifiedAt: serverTimestamp(),
     };
 

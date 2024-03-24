@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AddShiftModal from "../../component/shifts/modal/AddShiftModal";
-import { DisplayCount, REACT_QUERY_KEYS } from "../../@types/enum";
+import { DisplayCount, PageRoutes, REACT_QUERY_KEYS } from "../../@types/enum";
 import DbShift from "../../firebase_configs/DB/DbShift";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DocumentData } from "firebase/firestore";
@@ -11,8 +11,9 @@ import TableShimmer from "../../common/shimmer/TableShimmer";
 import { firebaseDataToObject, formatDate } from "../../utilities/misc";
 import { useAuthState, useEditFormStore } from "../../store";
 import { Shift } from "../../store/slice/editForm.slice";
+import { useNavigate } from "react-router-dom";
 
-const Shifts = () => {
+const ShiftList = () => {
   const [createShiftModal, setCreateShiftModal] = useState(false);
 
   const { setShiftEditData } = useEditFormStore();
@@ -86,6 +87,8 @@ const Shifts = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -93,7 +96,7 @@ const Shifts = () => {
         <button
           onClick={() => {
             setShiftEditData(null);
-            setCreateShiftModal(true);
+            navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
           }}
           className="bg-primary text-surface px-4 py-2 rounded"
         >
@@ -143,7 +146,7 @@ const Shifts = () => {
                         shift as unknown as Record<string, unknown>
                       ) as unknown as Shift
                     );
-                    setCreateShiftModal(true);
+                    navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
                   }}
                   className="cursor-pointer "
                 >
@@ -179,4 +182,4 @@ const Shifts = () => {
   );
 };
 
-export default Shifts;
+export default ShiftList;

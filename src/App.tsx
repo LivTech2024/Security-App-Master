@@ -6,7 +6,6 @@ import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
-import Shifts from "./pages/shifts/Shifts";
 import Schedule from "./pages/schedule/Schedule";
 import LoaderModal from "./common/modals/LoaderModal";
 import { ContextConfirmModal } from "./common/modals/ContextConfirmModal";
@@ -26,6 +25,8 @@ import Locations from "./pages/locations/Locations";
 import CompanyBranches from "./pages/company_branches/CompanyBranches";
 import EmployeeList from "./pages/employee/EmployeeList";
 import EmployeeCreateOrEdit from "./pages/employee/EmployeeCreateOrEdit";
+import ShiftList from "./pages/shifts/ShiftList";
+import ShiftCreateOrEdit from "./pages/shifts/ShiftCreateOrEdit";
 
 function App() {
   useOnAuthStateChanged();
@@ -66,7 +67,11 @@ function App() {
           <ToastContainer />
           <Routes>
             <Route path={PageRoutes.HOME} Component={Home} />
-            <Route path={PageRoutes.SHIFTS} Component={Shifts} />
+            <Route path={PageRoutes.SHIFT_LIST} Component={ShiftList} />
+            <Route
+              path={PageRoutes.SHIFT_CREATE_OR_EDIT}
+              Component={ShiftCreateOrEdit}
+            />
             <Route path={PageRoutes.EMPLOYEE_LIST} Component={EmployeeList} />
             <Route
               path={PageRoutes.EMPLOYEE_CREATE_OR_EDIT}

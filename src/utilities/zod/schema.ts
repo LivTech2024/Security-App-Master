@@ -22,6 +22,22 @@ export const addEmployeeFormSchema = z.object({
 
 export type AddEmployeeFormField = z.infer<typeof addEmployeeFormSchema>;
 
+//*Shift create schema
+export const addShiftFormSchema = z.object({
+  ShiftName: z.string().min(2, { message: "Shift name is required" }),
+  ShiftPosition: z.string().min(1, { message: "Shift position is required" }),
+  ShiftDate: z.date().default(new Date()),
+  ShiftStartTime: z.string().min(2, { message: "Start time is required" }),
+  ShiftEndTime: z.string().min(2, { message: "End time is required" }),
+  ShiftDescription: z.string().nullable().optional(),
+  ShiftLocation: z.object({ lat: z.number(), lng: z.number() }),
+  ShiftLocationName: z.string().min(3, { message: "Location name required" }),
+  ShiftAddress: z.string().min(3, { message: "Shift address is required" }),
+  ShiftCompanyBranchId: z.string().nullable().optional(),
+});
+
+export type AddShiftFormFields = z.infer<typeof addShiftFormSchema>;
+
 //* Patrolling create Schema
 export const patrollingSchema = z.object({
   PatrolName: z.string().min(3, { message: "Patrol name is required" }),
