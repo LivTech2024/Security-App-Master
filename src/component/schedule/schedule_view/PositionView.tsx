@@ -23,6 +23,7 @@ import {
 import { errorHandler } from "../../../utilities/CustomError";
 import { sendEmail } from "../../../utilities/sendEmail";
 import { useAuthState } from "../../../store";
+import InputSelect from "../../../common/inputs/InputSelect";
 
 interface PositionViewProps {
   datesArray: Date[];
@@ -31,24 +32,32 @@ interface PositionViewProps {
 const PositionView = ({ datesArray }: PositionViewProps) => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
-  const { company } = useAuthState();
+  const { company, companyBranches } = useAuthState();
 
-  const { data } = useQuery({
-    queryKey: [REACT_QUERY_KEYS.SCHEDULES, datesArray, company!.CompanyId],
+  const [branch, setBranch] = useState("");
+
+  const { data, error } = useQuery({
+    queryKey: [
+      REACT_QUERY_KEYS.SCHEDULES,
+      datesArray,
+      branch,
+      company!.CompanyId,
+    ],
     queryFn: async () => {
       const data = await DbSchedule.getSchedules(
         datesArray[0],
         datesArray[datesArray.length - 1],
-        company!.CompanyId
+        company!.CompanyId,
+        branch
       );
       return data;
     },
   });
 
   useEffect(() => {
-    if (!data) return;
-    setSchedules(data);
-  }, [data]);
+    console.log(error);
+    setSchedules(data || []);
+  }, [data, error]);
 
   const getScheduleForDay = (date: Date, schedules?: ISchedule[]) => {
     if (!schedules) return [];
@@ -60,6 +69,8 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
   const [showEmpListByPosition, setShowEmpListByPosition] = useState<
     string | null
   >(null);
+
+  const [shiftBranchId, setShiftBranchId] = useState<string | null>(null);
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -80,6 +91,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
           currentDate: toDate(selectedDate),
           empRole: showEmpListByPosition,
           cmpId: company.CompanyId,
+          cmpBranchId: shiftBranchId,
         });
         if (data) {
           setEmpAvailableForShift(data.filter((emp) => emp.EmpIsAvailable));
@@ -92,7 +104,8 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
       }
     };
     fetchEmpSchedule();
-  }, [selectedDate, showEmpListByPosition]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate, showEmpListByPosition, shiftBranchId]);
 
   const [resultToBePublished, setResultToBePublished] = useState<
     {
@@ -199,7 +212,9 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
 
     setResultToBePublished((prev) => prev.slice(0, -1));
 
-    setEmpAvailableForShift((prev) => [...prev, emp]);
+    if (!empAvailableForShift.find((e) => e.EmpId === emp.EmpId)) {
+      setEmpAvailableForShift((prev) => [...prev, emp]);
+    }
 
     setSchedules((prev) => {
       const updatedSchedules = prev.map((schedule) => {
@@ -220,6 +235,39 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
     <>
       <DndProvider backend={HTML5Backend}>
         <div className="flex flex-col gap-4 overflow-hidden">
+          <div className="flex items-center gap-4 justify-between">
+            <InputSelect
+              data={[
+                { label: "All branch", value: "" },
+                ...companyBranches.map((branches) => {
+                  return {
+                    label: branches.CompanyBranchName,
+                    value: branches.CompanyBranchId,
+                  };
+                }),
+              ]}
+              placeholder="Select branch"
+              className="text-lg"
+              value={branch}
+              onChange={(e) => setBranch(e as string)}
+            />
+            <div className="flex items-center gap-4">
+              <button
+                disabled={resultToBePublished.length === 0}
+                className="rounded bg-gray-200 py-2 px-10 text-sm"
+                onClick={onUndo}
+              >
+                UNDO Drag/Drop
+              </button>
+              <button
+                onClick={onPublish}
+                disabled={resultToBePublished.length === 0}
+                className="bg-secondary py-2 px-[88px] rounded text-sm text-surface font-semibold hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg disabled:bg-secondaryBlueBg"
+              >
+                Publish
+              </button>
+            </div>
+          </div>
           {/* Employee list */}
           {showEmpListByPosition && selectedDate && (
             <div className="flex flex-col gap-4">
@@ -246,7 +294,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                     return (
                       <Draggable
                         draggableId={data.EmpId}
-                        type={selectedDate.toString()}
+                        type={`${selectedDate.toString()}${showEmpListByPosition}`}
                         callback={dropResult}
                       >
                         <div
@@ -293,22 +341,6 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
               </div>
             </div>
           )}
-          <div className="flex items-center gap-4 justify-end">
-            <button
-              disabled={resultToBePublished.length === 0}
-              className="rounded bg-gray-200 py-2 px-10 text-sm"
-              onClick={onUndo}
-            >
-              UNDO Drag/Drop
-            </button>
-            <button
-              onClick={onPublish}
-              disabled={resultToBePublished.length === 0}
-              className="bg-secondary py-2 px-[88px] rounded text-sm text-surface font-semibold hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg disabled:bg-secondaryBlueBg"
-            >
-              Publish
-            </button>
-          </div>
           <div className="flex flex-wrap w-full overflow-hidden">
             {datesArray.map((date, index) => {
               return (
@@ -326,13 +358,18 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                       (data, idx) => {
                         return (
                           <DropPoint
-                            accept={toDate(data.shift.ShiftDate).toString()}
+                            accept={`${toDate(
+                              data.shift.ShiftDate
+                            ).toString()}${data.shift.ShiftPosition}`}
                             className="h-full"
                             id={data.shift.ShiftId}
                             key={idx}
                           >
                             <div
                               onClick={() => {
+                                setShiftBranchId(
+                                  data.shift.ShiftCompanyBranchId || null
+                                );
                                 setSelectedDate(toDate(data.shift.ShiftDate));
                                 setShowEmpListByPosition(
                                   data.shift.ShiftPosition

@@ -1,4 +1,5 @@
 import {
+  QueryConstraint,
   collection,
   doc,
   getDoc,
@@ -32,17 +33,26 @@ class DbSchedule {
   static getSchedules = async (
     startDate: Date,
     endDate: Date,
-    cmpId: string
+    cmpId: string,
+    cmpBranchId?: string | null
   ) => {
     const schedules: ISchedule[] = [];
 
     const shiftDocRef = collection(db, CollectionName.shifts);
-    const shiftQuery = query(
-      shiftDocRef,
+    let queryParams: QueryConstraint[] = [
       where("ShiftCompanyId", "==", cmpId),
       where("ShiftDate", ">=", startDate),
-      where("ShiftDate", "<=", endDate)
-    );
+      where("ShiftDate", "<=", endDate),
+    ];
+
+    if (cmpBranchId && cmpBranchId.length > 0) {
+      console.log(cmpBranchId, "inside story");
+      queryParams = [
+        ...queryParams,
+        where("ShiftCompanyBranchId", "==", cmpBranchId),
+      ];
+    }
+    const shiftQuery = query(shiftDocRef, ...queryParams);
 
     const shiftSnapshot = await getDocs(shiftQuery);
     const shifts = shiftSnapshot.docs.map(
@@ -80,22 +90,30 @@ class DbSchedule {
     endDate,
     startDate,
     cmpId,
+    cmpBranchId,
   }: {
     startDate: Date;
     endDate: Date;
     currentDate: Date;
     empRole: string;
     cmpId: string;
+    cmpBranchId?: string | null;
   }) => {
     try {
       const employeesScheduleForWeek: IEmpScheduleForWeek[] = [];
 
       const empRef = collection(db, CollectionName.employees);
-      const empQuery = query(
-        empRef,
+      let queryParams: QueryConstraint[] = [
         where("EmployeeCompanyId", "==", cmpId),
-        where("EmployeeRole", "==", empRole)
-      );
+        where("EmployeeRole", "==", empRole),
+      ];
+      if (cmpBranchId && cmpBranchId.length > 0) {
+        queryParams = [
+          ...queryParams,
+          where("EmployeeCompanyBranchId", "==", cmpBranchId),
+        ];
+      }
+      const empQuery = query(empRef, ...queryParams);
       const empSnapshot = await getDocs(empQuery);
       const employees = empSnapshot.docs.map(
         (doc) => doc.data() as IEmployeesCollection

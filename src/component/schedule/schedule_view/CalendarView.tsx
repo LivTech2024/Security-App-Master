@@ -10,6 +10,7 @@ import { REACT_QUERY_KEYS } from "../../../@types/enum";
 import DbShift from "../../../firebase_configs/DB/DbShift";
 import AssignShiftModal from "../modal/AssignShiftModal";
 import { useAuthState } from "../../../store";
+import InputSelect from "../../../common/inputs/InputSelect";
 
 interface CalendarViewProps {
   datesArray: Date[];
@@ -27,15 +28,23 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
     null
   );
 
-  const { company } = useAuthState();
+  const { company, companyBranches } = useAuthState();
+
+  const [branch, setBranch] = useState("");
 
   const { data } = useQuery({
-    queryKey: [REACT_QUERY_KEYS.SCHEDULES, datesArray, company!.CompanyId],
+    queryKey: [
+      REACT_QUERY_KEYS.SCHEDULES,
+      datesArray,
+      company!.CompanyId,
+      branch,
+    ],
     queryFn: async () => {
       const data = await DbSchedule.getSchedules(
         datesArray[0],
         datesArray[datesArray.length - 1],
-        company!.CompanyId
+        company!.CompanyId,
+        branch
       );
       return data;
     },
@@ -66,7 +75,22 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
+      <InputSelect
+        data={[
+          { label: "All branch", value: "" },
+          ...companyBranches.map((branches) => {
+            return {
+              label: branches.CompanyBranchName,
+              value: branches.CompanyBranchId,
+            };
+          }),
+        ]}
+        placeholder="Select branch"
+        className="text-lg w-fit"
+        value={branch}
+        onChange={(e) => setBranch(e as string)}
+      />
       <DndProvider backend={HTML5Backend}>
         <div className="flex flex-wrap w-full overflow-hidden">
           {datesArray.map((date, index) => {
@@ -137,7 +161,7 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
           schedule={selectedSchedule}
         />
       </div>
-    </>
+    </div>
   );
 };
 
