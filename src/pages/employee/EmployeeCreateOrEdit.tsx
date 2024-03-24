@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   AddEmployeeFormField,
@@ -20,11 +20,11 @@ import ImageUpload from "../../component/employees/EmpOtherDetailsInput";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 import InputAutoComplete from "../../common/inputs/InputAutocomplete";
 import { AiOutlinePlus } from "react-icons/ai";
-import InputError from "../../common/inputs/InputError";
 import AddEmpRoleModal from "../../component/employees/modal/AddEmpRoleModal";
 import { IoArrowBackCircle } from "react-icons/io5";
 import Button from "../../common/button/Button";
 import { openContextModal } from "@mantine/modals";
+import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
 
 const EmployeeCreateOrEdit = () => {
   const { employeeEditData } = useEditFormStore();
@@ -47,13 +47,19 @@ const EmployeeCreateOrEdit = () => {
 
   const navigate = useNavigate();
 
-  const { company, empRoles } = useAuthState();
+  const { company, empRoles, companyBranches } = useAuthState();
 
   const [employeeRole, setEmployeeRole] = useState<string | null | undefined>(
     ""
   );
 
+  const [companyBranch, setCompanyBranch] = useState<string | null | undefined>(
+    null
+  );
+
   const [addEmpRoleModal, setAddEmpRoleModal] = useState(false);
+
+  const [addCmpBranchModal, setAddCmpBranchModal] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -63,12 +69,27 @@ const EmployeeCreateOrEdit = () => {
   }, [employeeRole]);
 
   useEffect(() => {
+    const branchId = companyBranches.find(
+      (b) => b.CompanyBranchName === companyBranch
+    )?.CompanyBranchId;
+    methods.setValue("EmployeeCompanyBranchId", branchId || null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyBranch]);
+
+  useEffect(() => {
     if (isEdit) {
       setEmployeeRole(employeeEditData.EmployeeRole);
       setEmpImageBase64(employeeEditData.EmployeeImg);
+      if (employeeEditData.EmployeeCompanyBranchId) {
+        const branchName = companyBranches.find(
+          (b) => b.CompanyBranchId === employeeEditData.EmployeeCompanyBranchId
+        )?.CompanyBranchName;
+        setCompanyBranch(branchName || null);
+      }
     } else {
       setEmployeeRole("");
       setEmpImageBase64("");
+      setCompanyBranch(null);
     }
   }, [isEdit, employeeEditData]);
 
@@ -91,7 +112,11 @@ const EmployeeCreateOrEdit = () => {
           company.CompanyId
         );
       } else {
-        await DbEmployee.addEmployee(data, empImageBase64, company.CompanyId);
+        await DbEmployee.addEmployee({
+          empData: data,
+          empImage: empImageBase64,
+          cmpId: company.CompanyId,
+        });
       }
 
       await queryClient.invalidateQueries({
@@ -139,7 +164,7 @@ const EmployeeCreateOrEdit = () => {
   };
   return (
     <div className="flex flex-col gap-4 p-6">
-      <div className="flex items-center justify-between w-full">
+      <div className="flex items-center justify-between w-full bg-surface rounded p-4 shadow">
         <div
           onClick={() => navigate(PageRoutes.EMPLOYEE_LIST)}
           className="flex items-center gap-4 cursor-pointer "
@@ -153,7 +178,7 @@ const EmployeeCreateOrEdit = () => {
           {isEdit && (
             <Button
               label="Delete"
-              type="white"
+              type="gray"
               onClick={() =>
                 openContextModal({
                   modal: "confirmModal",
@@ -234,36 +259,57 @@ const EmployeeCreateOrEdit = () => {
                 error={methods.formState.errors.EmployeePassword?.message}
                 inputType="password"
               />
-              <div className="flex flex-col gap-1">
-                <InputAutoComplete
-                  label="Role"
-                  value={employeeRole}
-                  onChange={setEmployeeRole}
-                  isFilterReq={true}
-                  data={empRoles.map((role) => {
-                    return {
-                      label: role.EmployeeRoleName,
-                      value: role.EmployeeRoleName,
-                    };
-                  })}
-                  dropDownHeader={
-                    <div
-                      onClick={() => setAddEmpRoleModal(true)}
-                      className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <AiOutlinePlus size={18} />
-                        <span>Add employee roles</span>
-                      </div>
+
+              <InputAutoComplete
+                readonly={isEdit}
+                label="Role"
+                value={employeeRole}
+                onChange={setEmployeeRole}
+                isFilterReq={true}
+                data={empRoles.map((role) => {
+                  return {
+                    label: role.EmployeeRoleName,
+                    value: role.EmployeeRoleName,
+                  };
+                })}
+                dropDownHeader={
+                  <div
+                    onClick={() => setAddEmpRoleModal(true)}
+                    className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <AiOutlinePlus size={18} />
+                      <span>Add employee roles</span>
                     </div>
-                  }
-                />
-                {methods.formState.errors.EmployeeRole?.message && (
-                  <InputError
-                    errorMessage={methods.formState.errors.EmployeeRole.message}
-                  />
-                )}
-              </div>
+                  </div>
+                }
+                error={methods.formState.errors.EmployeeRole?.message}
+              />
+
+              <InputAutoComplete
+                readonly={isEdit}
+                label="Branch (Optional)"
+                value={companyBranch}
+                onChange={setCompanyBranch}
+                isFilterReq={true}
+                data={companyBranches.map((branch) => {
+                  return {
+                    label: branch.CompanyBranchName,
+                    value: branch.CompanyBranchName,
+                  };
+                })}
+                dropDownHeader={
+                  <div
+                    onClick={() => setAddCmpBranchModal(true)}
+                    className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <AiOutlinePlus size={18} />
+                      <span>Add new branch</span>
+                    </div>
+                  </div>
+                }
+              />
             </div>
           </div>
         </form>
@@ -271,6 +317,10 @@ const EmployeeCreateOrEdit = () => {
       <AddEmpRoleModal
         opened={addEmpRoleModal}
         setOpened={setAddEmpRoleModal}
+      />
+      <AddBranchModal
+        opened={addCmpBranchModal}
+        setOpened={setAddCmpBranchModal}
       />
     </div>
   );

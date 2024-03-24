@@ -17,6 +17,7 @@ export const addEmployeeFormSchema = z.object({
     .string()
     .min(6, { message: "Min 6 character is required" }),
   EmployeeRole: z.string().min(1, { message: "Employee role is required" }),
+  EmployeeCompanyBranchId: z.string().nullable().optional(),
 });
 
 export type AddEmployeeFormField = z.infer<typeof addEmployeeFormSchema>;

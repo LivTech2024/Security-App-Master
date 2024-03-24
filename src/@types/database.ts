@@ -51,7 +51,7 @@ export interface IEmployeesCollection {
   EmployeeRole: string;
   EmployeeIsBanned: boolean;
   EmployeeCompanyId: string;
-  EmployeeCompanyBranchId?: string;
+  EmployeeCompanyBranchId?: string | null;
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;
 }

@@ -173,11 +173,15 @@ class DbEmployee {
     return snapshot.size > 0;
   };
 
-  static addEmployee = async (
-    empData: AddEmployeeFormField,
-    empImage: string,
-    cmpId: string
-  ) => {
+  static addEmployee = async ({
+    cmpId,
+    empData,
+    empImage,
+  }: {
+    empData: AddEmployeeFormField;
+    empImage: string;
+    cmpId: string;
+  }) => {
     const isEmpExist = await this.isEmpExist(
       empData.EmployeeEmail,
       empData.EmployeeRole,
@@ -221,6 +225,7 @@ class DbEmployee {
       EmployeeRole: empData.EmployeeRole,
       EmployeeIsBanned: false,
       EmployeeCompanyId: cmpId,
+      EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
       EmployeeCreatedAt: serverTimestamp(),
       EmployeeModifiedAt: serverTimestamp(),
     };

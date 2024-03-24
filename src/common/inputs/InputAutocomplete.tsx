@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import InputHeader from "./InputHeader";
 import AutocompleteDropdown from "../dropdown/AutocompleteDropdown";
+import InputError from "./InputError";
 
 export interface SuggestionItem {
   label: string;
@@ -15,7 +16,6 @@ interface InputAutocompleteProps {
   label?: string;
   placeholder?: string;
   className?: string;
-  border?: boolean;
   fontClassName?: string;
   leadingIcon?: JSX.Element;
   tailIcon?: JSX.Element;
@@ -34,12 +34,12 @@ interface InputAutocompleteProps {
   inputMaxLength?: number;
   shouldBlurAfterInput?: boolean;
   shortcutKey?: string;
+  error?: string;
 }
 
 const InputAutoComplete = ({
   data,
   bg,
-  border = true,
   className,
   fontClassName,
   label,
@@ -59,6 +59,7 @@ const InputAutoComplete = ({
   inputMaxLength,
   shouldBlurAfterInput = false,
   shortcutKey,
+  error,
 }: InputAutocompleteProps) => {
   const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
 
@@ -205,9 +206,10 @@ const InputAutoComplete = ({
         <InputHeader title={label} fontClassName={fontClassName} />
       ) : null}
       <div
-        className={`flex justify-center items-center  w-full h-11 rounded ${
-          border &&
-          "border border-inputBorderLight dark:border-inputBorderDark focus-within:ring-[2px] "
+        className={`flex justify-center items-center  w-full h-11 rounded border border-[#ccc] ${
+          error
+            ? "border-red-400"
+            : "border-inputBorder focus-within:ring-[2px]"
         } 
          dark:bg-primaryVariantDark `}
         style={{ backgroundColor: bg }}
@@ -312,6 +314,7 @@ const InputAutoComplete = ({
           </ul>
         </AutocompleteDropdown>
       </div>
+      {error && <InputError errorMessage={error} />}
     </div>
   );
 };
