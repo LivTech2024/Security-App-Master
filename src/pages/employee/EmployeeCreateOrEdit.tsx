@@ -91,6 +91,7 @@ const EmployeeCreateOrEdit = () => {
       setEmpImageBase64("");
       setCompanyBranch(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, employeeEditData]);
 
   const [empImageBase64, setEmpImageBase64] = useState<string | null>(null);

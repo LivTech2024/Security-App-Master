@@ -45,6 +45,7 @@ class DbShift {
       ),
       ShiftCurrentStatus: "pending",
       ShiftTask: [],
+      ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
       ShiftAcknowledged: false,
       ShiftCompanyId: cmpId,
       ShiftAddress: shiftData.ShiftAddress,

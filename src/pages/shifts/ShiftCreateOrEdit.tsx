@@ -28,6 +28,7 @@ import InputTime from "../../common/inputs/InputTime";
 import useFetchLocations from "../../hooks/fetch/useFetchLocations";
 import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
 import { toDate } from "../../utilities/misc";
+import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -57,11 +58,13 @@ const ShiftCreateOrEdit = () => {
       : undefined,
   });
 
-  const { company, empRoles } = useAuthState();
+  const { company, empRoles, companyBranches } = useAuthState();
 
   const queryClient = useQueryClient();
 
   const [addEmpRoleModal, setAddEmpRoleModal] = useState(false);
+
+  const [addCmpBranchModal, setAddCmpBranchModal] = useState(false);
 
   //Other form fields
   const [shiftPosition, setShiftPosition] = useState<string | null | undefined>(
@@ -76,6 +79,10 @@ const ShiftCreateOrEdit = () => {
 
   const [locationName, setLocationName] = useState<string | null | undefined>(
     ""
+  );
+
+  const [companyBranch, setCompanyBranch] = useState<string | null | undefined>(
+    null
   );
 
   const { data: locations } = useFetchLocations({
@@ -122,6 +129,14 @@ const ShiftCreateOrEdit = () => {
     }
   }, [locationName]);
 
+  useEffect(() => {
+    const branchId = companyBranches.find(
+      (b) => b.CompanyBranchName === companyBranch
+    )?.CompanyBranchId;
+    methods.setValue("ShiftCompanyBranchId", branchId || null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyBranch]);
+
   //* populate value on editing
   useEffect(() => {
     if (isEdit) {
@@ -130,6 +145,12 @@ const ShiftCreateOrEdit = () => {
       setShiftDate(new Date(shiftEditData.ShiftDate));
       setLocationName(shiftEditData.ShiftLocationName);
       setShiftPosition(shiftEditData.ShiftPosition);
+      if (shiftEditData.ShiftCompanyBranchId) {
+        const branchName = companyBranches.find(
+          (b) => b.CompanyBranchId === shiftEditData.ShiftCompanyBranchId
+        )?.CompanyBranchName;
+        setCompanyBranch(branchName || null);
+      }
       return;
     }
     setShiftDate(new Date());
@@ -137,7 +158,9 @@ const ShiftCreateOrEdit = () => {
     setEndTime("05:00 PM");
     setLocationName("");
     setShiftPosition("");
-  }, [isEdit, shiftEditData, methods]);
+    setCompanyBranch(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit, shiftEditData]);
 
   const onSubmit = async (data: AddShiftFormFields) => {
     if (!company) return;
@@ -325,6 +348,31 @@ const ShiftCreateOrEdit = () => {
               error={methods.formState.errors.ShiftAddress?.message}
             />
 
+            <InputAutoComplete
+              readonly={isEdit}
+              label="Branch (Optional)"
+              value={companyBranch}
+              onChange={setCompanyBranch}
+              isFilterReq={true}
+              data={companyBranches.map((branch) => {
+                return {
+                  label: branch.CompanyBranchName,
+                  value: branch.CompanyBranchName,
+                };
+              })}
+              dropDownHeader={
+                <div
+                  onClick={() => setAddCmpBranchModal(true)}
+                  className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <AiOutlinePlus size={18} />
+                    <span>Add new branch</span>
+                  </div>
+                </div>
+              }
+            />
+
             <div className="col-span-2">
               <TextareaWithTopHeader
                 title="Description"
@@ -337,6 +385,10 @@ const ShiftCreateOrEdit = () => {
         </form>
       </FormProvider>
 
+      <AddBranchModal
+        opened={addCmpBranchModal}
+        setOpened={setAddCmpBranchModal}
+      />
       <AddEmpRoleModal
         opened={addEmpRoleModal}
         setOpened={setAddEmpRoleModal}

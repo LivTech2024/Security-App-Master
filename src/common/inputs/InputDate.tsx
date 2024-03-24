@@ -36,7 +36,7 @@ const InputDate = ({ setValue, label, value, error, id }: InputDateProps) => {
               backgroundColor: `#FFFFFF`,
               zIndex: 300,
               boxShadow: "0 1px 2px rgba(0, 0, 0, 0.4)",
-              position: "fixed",
+              position: "absolute",
             },
           },
         }}

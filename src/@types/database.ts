@@ -78,7 +78,7 @@ export interface IShiftsCollection {
   ShiftDescription: string | null;
   ShiftAssignedUserId: string | null;
   ShiftCompanyId: string;
-  ShiftCompanyBranchId?: string;
+  ShiftCompanyBranchId?: string | null;
   ShiftAcknowledged?: boolean;
   ShiftTask: IShiftTasksChild[];
   ShiftCurrentStatus: "pending" | "started" | "completed";

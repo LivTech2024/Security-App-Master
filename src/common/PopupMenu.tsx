@@ -36,7 +36,7 @@ const PopupMenu = ({
           padding: 0,
           borderRadius: "12px",
 
-          position: "fixed",
+          position: "absolute",
           overflow: "hidden",
         },
       }}

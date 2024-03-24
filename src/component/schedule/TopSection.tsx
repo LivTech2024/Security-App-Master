@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import AddShiftModal from "../shifts/modal/AddShiftModal";
+import React from "react";
 import { Select } from "@mantine/core";
 import { FaCircleChevronLeft, FaCircleChevronRight } from "react-icons/fa6";
 import { useEditFormStore } from "../../store";
 import dayjs from "dayjs";
 import { DatePickerInput } from "@mantine/dates";
 import { MdCalendarToday } from "react-icons/md";
+import { PageRoutes } from "../../@types/enum";
+import { useNavigate } from "react-router-dom";
 
 const TopSection = ({
   selectedDate,
@@ -24,8 +25,9 @@ const TopSection = ({
     React.SetStateAction<"calendar" | "position">
   >;
 }) => {
-  const [addShiftModal, setAddShiftModal] = useState(false);
   const { setShiftEditData } = useEditFormStore();
+
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col w-full gap-4">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -34,15 +36,13 @@ const TopSection = ({
         <button
           onClick={() => {
             setShiftEditData(null);
-            setAddShiftModal(true);
+            navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
           }}
           className="bg-primary text-surface px-4 py-2 rounded"
         >
           Add new shift
         </button>
       </div>
-
-      <AddShiftModal opened={addShiftModal} setOpened={setAddShiftModal} />
 
       {/* Top section */}
       <div className="flex items-center justify-between w-full">
