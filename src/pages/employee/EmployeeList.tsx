@@ -19,6 +19,8 @@ import { Employee } from "../../store/slice/editForm.slice";
 import Button from "../../common/button/Button";
 import AddEmpRoleModal from "../../component/employees/modal/AddEmpRoleModal";
 import { useNavigate } from "react-router-dom";
+import SearchBar from "../../common/inputs/SearchBar";
+import InputSelect from "../../common/inputs/InputSelect";
 
 const EmployeeList = () => {
   const navigate = useNavigate();
@@ -27,11 +29,13 @@ const EmployeeList = () => {
 
   const { setEmployeeEditData } = useEditFormStore();
 
-  const { company } = useAuthState();
+  const { company, companyBranches } = useAuthState();
 
-  //const [query, setQuery] = useState("");
+  const [query, setQuery] = useState("");
 
-  const [debouncedQuery] = useDebouncedValue("", 200);
+  const [branch, setBranch] = useState("");
+
+  const [debouncedQuery] = useDebouncedValue(query, 200);
 
   const {
     data: snapshotData,
@@ -46,6 +50,7 @@ const EmployeeList = () => {
       REACT_QUERY_KEYS.EMPLOYEE_LIST,
       debouncedQuery,
       company!.CompanyId,
+      branch,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbEmployee.getEmployees({
@@ -53,6 +58,7 @@ const EmployeeList = () => {
         lastDoc: pageParam,
         searchQuery: debouncedQuery,
         cmpId: company!.CompanyId,
+        branch,
       });
       return snapshot.docs;
     },
@@ -132,6 +138,29 @@ const EmployeeList = () => {
             Create Employee
           </button>
         </div>
+      </div>
+
+      <div className="flex items-center bg-surface shadow p-4 rounded w-full justify-between">
+        <SearchBar
+          value={query}
+          setValue={setQuery}
+          placeholder="Search employee"
+        />
+        <InputSelect
+          data={[
+            { label: "All branch", value: "" },
+            ...companyBranches.map((branches) => {
+              return {
+                label: branches.CompanyBranchName,
+                value: branches.CompanyBranchId,
+              };
+            }),
+          ]}
+          placeholder="Select branch"
+          className="text-lg"
+          value={branch}
+          onChange={(e) => setBranch(e as string)}
+        />
       </div>
 
       <AddEmpRoleModal

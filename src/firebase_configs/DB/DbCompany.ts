@@ -27,6 +27,7 @@ import {
 } from "@firebase/firestore";
 import { fullTextSearchIndex } from "../../utilities/misc";
 import { CompanyBranchFormFields } from "../../utilities/zod/schema";
+import CustomError from "../../utilities/CustomError";
 
 class DbCompany {
   static createCompany = () => {
@@ -116,7 +117,35 @@ class DbCompany {
     return updatedCmpBranch;
   };
 
-  static deleteCompanyBranch = (cmpBranchId: string) => {
+  static deleteCompanyBranch = async (cmpBranchId: string) => {
+    //*Check if branch is used somewhere before deleting
+
+    //Check if employee exist in this branch
+    const empDocRef = collection(db, CollectionName.employees);
+    const empQuery = query(
+      empDocRef,
+      where("EmployeeCompanyBranchId", "==", cmpBranchId)
+    );
+    const empTask = getDocs(empQuery);
+
+    //Check if shifts exist in this branch
+    const shiftDocRef = collection(db, CollectionName.shifts);
+    const shiftQuery = query(
+      shiftDocRef,
+      where("ShiftCompanyBranchId", "==", cmpBranchId)
+    );
+    const shiftTask = getDocs(shiftQuery);
+
+    const querySnapshots = await Promise.all([empTask, shiftTask]);
+
+    const branchAlreadyUsed = querySnapshots.some(
+      (snapshot) => snapshot.size > 0
+    );
+
+    if (branchAlreadyUsed) {
+      throw new CustomError("This branch is already in use");
+    }
+
     const docRef = doc(db, CollectionName.companyBranch, cmpBranchId);
 
     return deleteDoc(docRef);

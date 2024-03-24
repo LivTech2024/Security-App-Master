@@ -348,12 +348,14 @@ class DbEmployee {
     searchQuery,
     cmpId,
     empRole,
+    branch,
   }: {
     lmt: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId: string;
     empRole?: string;
+    branch?: string;
   }) => {
     const empRef = collection(db, CollectionName.employees);
 
@@ -375,6 +377,13 @@ class DbEmployee {
 
     if (empRole) {
       queryParams = [...queryParams, where("EmployeeRole", "==", empRole)];
+    }
+
+    if (branch) {
+      queryParams = [
+        ...queryParams,
+        where("EmployeeCompanyBranchId", "==", branch),
+      ];
     }
 
     if (lastDoc) {
