@@ -64,14 +64,17 @@ export const DropPoint = ({
   children,
   activeClassName,
 }: DropPointProps) => {
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
-    accept,
-    drop: () => ({ id }),
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
+  const [{ canDrop, isOver }, drop] = useDrop(
+    () => ({
+      accept,
+      drop: () => ({ id }),
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
+      }),
     }),
-  }));
+    [id, children]
+  );
 
   const isActive = canDrop && isOver;
 
