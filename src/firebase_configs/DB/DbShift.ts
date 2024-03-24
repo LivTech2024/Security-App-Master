@@ -19,14 +19,32 @@ import {
 import { CollectionName } from "../../@types/enum";
 import { db } from "../config";
 import { getNewDocId } from "./utils";
-import { IShiftsCollection } from "../../@types/database";
+import { IShiftTasksChild, IShiftsCollection } from "../../@types/database";
 import { removeTimeFromDate } from "../../utilities/misc";
 import { AddShiftFormFields } from "../../utilities/zod/schema";
+import { ShiftTask } from "../../component/shifts/ShiftTaskForm";
+import { generateBarcodesAndDownloadPDF } from "../../utilities/generateBarcodesAndDownloadPdf";
 
 class DbShift {
-  static addShift = async (shiftData: AddShiftFormFields, cmpId: string) => {
+  static addShift = async (
+    shiftData: AddShiftFormFields,
+    cmpId: string,
+    tasks: ShiftTask[]
+  ) => {
     const shiftId = getNewDocId(CollectionName.shifts);
     const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
+
+    const shiftTasks: IShiftTasksChild[] = [];
+
+    tasks.map((task, idx) => {
+      if (task.TaskName && task.TaskName.length > 0) {
+        shiftTasks.push({
+          ShiftTaskId: `${shiftId}${idx}`,
+          ShiftTask: task.TaskName,
+          ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
+        });
+      }
+    });
 
     const newShift: IShiftsCollection = {
       ShiftId: shiftId,
@@ -44,7 +62,7 @@ class DbShift {
         Number(shiftData.ShiftLocation.lng)
       ),
       ShiftCurrentStatus: "pending",
-      ShiftTask: [],
+      ShiftTask: shiftTasks,
       ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
       ShiftAcknowledged: false,
       ShiftCompanyId: cmpId,
@@ -54,15 +72,40 @@ class DbShift {
       ShiftModifiedAt: serverTimestamp(),
     };
 
-    return setDoc(shiftDocRef, newShift);
+    await setDoc(shiftDocRef, newShift);
+
+    const barcodesToBeGenerated = shiftTasks.filter(
+      (t) => t.ShiftTaskQrCodeReq
+    );
+
+    if (barcodesToBeGenerated.length > 0) {
+      await generateBarcodesAndDownloadPDF(
+        barcodesToBeGenerated.map((task) => {
+          return { code: task.ShiftTaskId, label: task.ShiftTask };
+        })
+      );
+    }
   };
 
   static updateShift = async (
     shiftData: AddShiftFormFields,
     shiftId: string,
-    cmpId: string
+    cmpId: string,
+    tasks: ShiftTask[]
   ) => {
     const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
+
+    const shiftTasks: IShiftTasksChild[] = [];
+
+    tasks.map((task, idx) => {
+      if (task.TaskName && task.TaskName.length > 0) {
+        shiftTasks.push({
+          ShiftTaskId: `${shiftId}${idx}`,
+          ShiftTask: task.TaskName,
+          ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
+        });
+      }
+    });
 
     const newShift: Partial<IShiftsCollection> = {
       ShiftName: shiftData.ShiftName,
@@ -73,7 +116,7 @@ class DbShift {
       ShiftStartTime: shiftData.ShiftStartTime,
       ShiftEndTime: shiftData.ShiftEndTime,
       ShiftDescription: shiftData.ShiftDescription || null,
-      ShiftTask: [],
+      ShiftTask: shiftTasks,
       ShiftLocation: new GeoPoint(
         Number(shiftData.ShiftLocation.lat),
         Number(shiftData.ShiftLocation.lng)
@@ -84,7 +127,19 @@ class DbShift {
       ShiftModifiedAt: serverTimestamp(),
     };
 
-    return updateDoc(shiftDocRef, newShift);
+    await updateDoc(shiftDocRef, newShift);
+
+    const barcodesToBeGenerated = shiftTasks.filter(
+      (t) => t.ShiftTaskQrCodeReq
+    );
+
+    if (barcodesToBeGenerated.length > 0) {
+      await generateBarcodesAndDownloadPDF(
+        barcodesToBeGenerated.map((task) => {
+          return { code: task.ShiftTaskId, label: task.ShiftTask };
+        })
+      );
+    }
   };
 
   static deleteShift = (shiftId: string) => {

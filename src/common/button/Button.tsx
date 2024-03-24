@@ -4,14 +4,23 @@ interface ButtonProps {
   label: string;
   onClick: () => void;
   type: "blue" | "black" | "gray" | "white" | "green" | "red";
+  buttonType?: "submit" | "reset" | "button";
   className?: string;
   disabled?: boolean;
 }
 
-const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
+const Button = ({
+  label,
+  onClick,
+  type,
+  className,
+  disabled,
+  buttonType = "button",
+}: ButtonProps) => {
   if (type === "blue") {
     return (
       <button
+        type={buttonType}
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
@@ -26,6 +35,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
   if (type === "black") {
     return (
       <button
+        type={buttonType}
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
@@ -40,6 +50,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
   if (type === "gray") {
     return (
       <button
+        type={buttonType}
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
@@ -54,6 +65,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
   if (type === "white") {
     return (
       <button
+        type={buttonType}
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
@@ -68,6 +80,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
   if (type === "green") {
     return (
       <button
+        type={buttonType}
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
@@ -82,6 +95,7 @@ const Button = ({ label, onClick, type, className, disabled }: ButtonProps) => {
   if (type === "red") {
     return (
       <button
+        type={buttonType}
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(

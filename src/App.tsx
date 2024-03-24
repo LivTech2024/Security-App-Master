@@ -6,6 +6,7 @@ import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
+import "react-toastify/dist/ReactToastify.min.css";
 import Schedule from "./pages/schedule/Schedule";
 import LoaderModal from "./common/modals/LoaderModal";
 import { ContextConfirmModal } from "./common/modals/ContextConfirmModal";

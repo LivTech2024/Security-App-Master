@@ -29,6 +29,7 @@ import useFetchLocations from "../../hooks/fetch/useFetchLocations";
 import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
 import { toDate } from "../../utilities/misc";
 import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
+import ShiftTaskForm, { ShiftTask } from "../../component/shifts/ShiftTaskForm";
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -84,6 +85,10 @@ const ShiftCreateOrEdit = () => {
   const [companyBranch, setCompanyBranch] = useState<string | null | undefined>(
     null
   );
+
+  const [shiftTasks, setShiftTasks] = useState<ShiftTask[]>([
+    { TaskName: "", TaskQrCodeRequired: false },
+  ]);
 
   const { data: locations } = useFetchLocations({
     limit: 5,
@@ -151,6 +156,16 @@ const ShiftCreateOrEdit = () => {
         )?.CompanyBranchName;
         setCompanyBranch(branchName || null);
       }
+      if (shiftEditData.ShiftTask && shiftEditData.ShiftTask.length > 0) {
+        setShiftTasks(
+          shiftEditData.ShiftTask.map((task) => {
+            return {
+              TaskName: task.ShiftTask,
+              TaskQrCodeRequired: task.ShiftTaskQrCodeReq,
+            };
+          })
+        );
+      }
       return;
     }
     setShiftDate(new Date());
@@ -171,10 +186,11 @@ const ShiftCreateOrEdit = () => {
         await DbShift.updateShift(
           data,
           shiftEditData.ShiftId,
-          company.CompanyId
+          company.CompanyId,
+          shiftTasks
         );
       } else {
-        await DbShift.addShift(data, company.CompanyId);
+        await DbShift.addShift(data, company.CompanyId, shiftTasks);
       }
 
       await queryClient.invalidateQueries({
@@ -191,6 +207,7 @@ const ShiftCreateOrEdit = () => {
         type: "success",
       });
       methods.reset();
+      navigate(PageRoutes.SHIFT_LIST);
     } catch (error) {
       console.log(error);
       closeModalLoader();
@@ -216,6 +233,7 @@ const ShiftCreateOrEdit = () => {
 
       closeModalLoader();
       methods.reset();
+      navigate(PageRoutes.SHIFT_LIST);
     } catch (error) {
       console.log(error);
       closeModalLoader();
@@ -274,9 +292,16 @@ const ShiftCreateOrEdit = () => {
       <FormProvider {...methods}>
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
-          className="flex flex-col gap-4 bg-surface shadow p-4 rounded shadow"
+          className="flex w-full gap-4"
         >
-          <div className="grid grid-cols-2 gap-4">
+          <div className="w-[30%] bg-surface shadow rounded p-4 flex flex-col gap-4">
+            <div className="font-medium text-lg">Add shift task (Optional)</div>
+            <ShiftTaskForm tasks={shiftTasks} setTasks={setShiftTasks} />
+          </div>
+          <div className="grid grid-cols-2 w-[70%] gap-4 bg-surface shadow rounded p-4">
+            <div className="font-medium col-span-2 text-lg">
+              Add shift details
+            </div>
             <InputAutoComplete
               label="Shift position"
               value={shiftPosition}
@@ -348,6 +373,13 @@ const ShiftCreateOrEdit = () => {
               error={methods.formState.errors.ShiftAddress?.message}
             />
 
+            <TextareaWithTopHeader
+              title="Description (Optional)"
+              className="mx-0"
+              register={methods.register}
+              name="ShiftDescription"
+            />
+
             <InputAutoComplete
               readonly={isEdit}
               label="Branch (Optional)"
@@ -372,15 +404,6 @@ const ShiftCreateOrEdit = () => {
                 </div>
               }
             />
-
-            <div className="col-span-2">
-              <TextareaWithTopHeader
-                title="Description"
-                className="mx-0"
-                register={methods.register}
-                name="ShiftDescription"
-              />
-            </div>
           </div>
         </form>
       </FormProvider>
