@@ -1,6 +1,6 @@
 import { Popover } from "@mantine/core";
 import { FloatingPosition } from "@mantine/core";
-import React from "react";
+import React, { CSSProperties } from "react";
 
 interface PopupProps {
   opened: boolean;
@@ -10,6 +10,7 @@ interface PopupProps {
   position?: FloatingPosition | undefined;
   width?: string;
   withArrow?: boolean;
+  dropdownStyles?: CSSProperties;
 }
 
 const PopupMenu = ({
@@ -20,6 +21,13 @@ const PopupMenu = ({
   position = "bottom",
   width = "auto",
   withArrow = false,
+  dropdownStyles = {
+    zIndex: 700,
+    padding: 0,
+    borderRadius: "12px",
+    position: "absolute",
+    overflow: "hidden",
+  },
 }: PopupProps) => {
   return (
     <Popover
@@ -30,15 +38,7 @@ const PopupMenu = ({
       onChange={setOpened}
       zIndex={600}
       styles={{
-        arrow: {},
-        dropdown: {
-          zIndex: 700,
-          padding: 0,
-          borderRadius: "12px",
-
-          position: "absolute",
-          overflow: "hidden",
-        },
+        dropdown: dropdownStyles,
       }}
     >
       <Popover.Target>{target}</Popover.Target>

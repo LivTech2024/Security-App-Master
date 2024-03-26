@@ -28,17 +28,18 @@ const NavItem = ({
       <div
         onMouseEnter={() => setIsDropDownOpened(true)}
         onMouseLeave={() => setIsDropDownOpened(false)}
-        className="group"
+        //className="bg-yellow-500"
       >
         <PopupMenu
           opened={isDropDownOpened}
           setOpened={setIsDropDownOpened}
           position="bottom-start"
+          dropdownStyles={{ marginTop: "-8px", padding: 0, borderRadius: 0 }}
           target={
             <div
               className={`${
-                isDropDownOpened && "text-primaryGold"
-              } uppercase cursor-pointer p-2 duration-200 group-hover:text-primaryGold`}
+                isDropDownOpened && "bg-onHoverBg text-textPrimary"
+              } uppercase cursor-pointer p-2 duration-200 `}
             >
               {name}
             </div>
@@ -49,7 +50,7 @@ const NavItem = ({
               return (
                 <div
                   onClick={() => navigate(res.path)}
-                  className="px-4 py-2 uppercase cursor-pointer duration-200 hover:bg-onHoverBg group"
+                  className="px-6 py-2 uppercase cursor-pointer duration-200 hover:bg-onHoverBg group"
                 >
                   {res.name}
                 </div>
@@ -64,9 +65,10 @@ const NavItem = ({
     <div
       onClick={() => (path ? navigate(path) : callback && callback())}
       className={`uppercase cursor-pointer p-2 duration-200 ${
-        location.pathname === path
+        location.pathname === path ||
+        location.pathname.includes(`/${name.toLowerCase()}`)
           ? "bg-surface text-textPrimary"
-          : "hover:text-primaryGold"
+          : "hover:bg-onHoverBg hover:text-textPrimary"
       }`}
     >
       {name}
@@ -81,7 +83,7 @@ const Nav = () => {
       <NavItem path={PageRoutes.HOME} name="Home" />
       <NavItem path={PageRoutes.SCHEDULES} name="Schedules" />
       <NavItem path={PageRoutes.EMPLOYEE_LIST} name="Employees" />
-      <NavItem path={PageRoutes.SHIFT_LIST} name="Shifts" />
+      {/* <NavItem path={PageRoutes.SHIFT_LIST} name="Shifts" /> */}
       <NavItem path={PageRoutes.PATROLLING_LIST} name="Patrolling" />
       <NavItem
         name="Company"
@@ -93,7 +95,7 @@ const Nav = () => {
       />
       <NavItem path="#" name="Incident" />
       <NavItem path="#" name="Messaging" />
-      <NavItem path="#" name="Reports" />
+      <NavItem path={PageRoutes.REPORTS} name="Reports" />
       <NavItem path="#" name="Settings" />
 
       <NavItem

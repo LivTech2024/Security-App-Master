@@ -54,6 +54,7 @@ export const PageRoutes = {
   PATROLLING_VIEW: "/patrolling_view",
   LOCATIONS: "/locations",
   COMPANY_BRANCHES: "/company_branches",
+  REPORTS: "/reports",
 };
 
 export const LocalStorageKey = {

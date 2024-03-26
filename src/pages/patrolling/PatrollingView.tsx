@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import PatrolViewCard from "../../component/patrolling/PatrolViewCard";
 import { useEffect, useState } from "react";
 import DbPatrol from "../../firebase_configs/DB/DbPatrol";
@@ -11,6 +11,7 @@ import {
   showSnackbar,
 } from "../../utilities/TsxUtils";
 import { openContextModal } from "@mantine/modals";
+import { PageRoutes } from "../../@types/enum";
 
 const PatrollingView = () => {
   const [searchParam] = useSearchParams();
@@ -20,6 +21,8 @@ const PatrollingView = () => {
   const [loading, setLoading] = useState(true);
 
   const [data, setData] = useState<IPatrolsCollection | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!patrolId) return;
@@ -43,6 +46,7 @@ const PatrollingView = () => {
       await DbPatrol.deletePatrol(patrolId);
       showSnackbar({ message: "Patrol deleted successfully", type: "success" });
       closeModalLoader();
+      navigate(PageRoutes.PATROLLING_LIST);
     } catch (error) {
       console.log(error);
       errorHandler(error);
