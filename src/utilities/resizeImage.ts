@@ -43,7 +43,7 @@ export const resizeImage = async ({
             }
           };
         },
-        "image/jpeg",
+        "image/png",
         0.8
       );
     };
