@@ -174,12 +174,36 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
 
       await Promise.all(shiftAssignPromise);
 
-      const sendEmailPromise = resultToBePublished.map(async (res) => {
-        const { emp, shift } = res;
+      const aggregatedEmails: {
+        empEmail: string;
+        empName: string;
+        message: string;
+      }[] = [];
+
+      resultToBePublished.forEach((data) => {
+        const { emp, shift } = data;
+        const isExistIndex = aggregatedEmails.findIndex(
+          (d) => d.empEmail === emp.EmpEmail
+        );
+        if (isExistIndex !== -1) {
+          const prevMessage = aggregatedEmails[isExistIndex].message;
+          aggregatedEmails[
+            isExistIndex
+          ].message = `${prevMessage}\n\nShift Name: ${shift.ShiftName}\nTiming: ${shift.ShiftStartTime}-${shift.ShiftEndTime}\nAddress: ${shift.ShiftAddress}`;
+        } else {
+          aggregatedEmails.push({
+            empEmail: emp.EmpEmail,
+            empName: emp.EmpName,
+            message: `You have been assigned for the following shift.\n\n Shift Name: ${shift.ShiftName}\n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n Address: ${shift.ShiftAddress}`,
+          });
+        }
+      });
+
+      const sendEmailPromise = aggregatedEmails.map(async (res) => {
         return sendEmail({
-          to_email: emp.EmpEmail,
-          to_name: emp.EmpName,
-          message: `You have been assigned for the shift.\n Shift Name: ${shift.ShiftName}\n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n Address: ${shift.ShiftAddress}`,
+          to_email: res.empEmail,
+          to_name: res.empName,
+          message: res.message,
           subject: "Your schedule update",
         });
       });
