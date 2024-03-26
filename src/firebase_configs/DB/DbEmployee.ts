@@ -223,6 +223,7 @@ class DbEmployee {
       EmployeeEmail: empData.EmployeeEmail,
       EmployeePassword: empData.EmployeePassword,
       EmployeeRole: empData.EmployeeRole,
+      EmployeePayRate: Number(empData.EmployeePayRate),
       EmployeeIsBanned: false,
       EmployeeCompanyId: cmpId,
       EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
@@ -292,6 +293,7 @@ class DbEmployee {
           EmployeePassword: empData.EmployeePassword,
           EmployeeEmail: empData.EmployeeEmail,
           EmployeeRole: empData.EmployeeRole,
+          EmployeePayRate: Number(empData.EmployeePayRate),
           EmployeeCompanyId: cmpId,
           EmployeeModifiedAt: serverTimestamp(),
         };

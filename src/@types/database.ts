@@ -49,6 +49,7 @@ export interface IEmployeesCollection {
   EmployeeImg: string;
   EmployeeAdditionalDoc?: string;
   EmployeeRole: string;
+  EmployeePayRate: number;
   EmployeeIsBanned: boolean;
   EmployeeCompanyId: string;
   EmployeeCompanyBranchId?: string | null;

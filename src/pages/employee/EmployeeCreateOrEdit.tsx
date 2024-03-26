@@ -25,6 +25,7 @@ import { IoArrowBackCircle } from "react-icons/io5";
 import Button from "../../common/button/Button";
 import { openContextModal } from "@mantine/modals";
 import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
+import { splitName } from "../../utilities/misc";
 
 const EmployeeCreateOrEdit = () => {
   const { employeeEditData } = useEditFormStore();
@@ -36,11 +37,13 @@ const EmployeeCreateOrEdit = () => {
     defaultValues: isEdit
       ? {
           EmployeeEmail: employeeEditData.EmployeeEmail,
-          EmployeeFirstName: employeeEditData.EmployeeName.split(" ")[0],
-          EmployeeLastName: employeeEditData.EmployeeName.split(" ")[1],
+          EmployeeFirstName: splitName(employeeEditData?.EmployeeName)
+            .firstName,
+          EmployeeLastName: splitName(employeeEditData?.EmployeeName).lastName,
           EmployeePassword: employeeEditData.EmployeePassword,
           EmployeePhone: employeeEditData.EmployeePhone,
           EmployeeRole: employeeEditData.EmployeeRole,
+          EmployeePayRate: employeeEditData.EmployeePayRate,
         }
       : undefined,
   });
@@ -285,6 +288,15 @@ const EmployeeCreateOrEdit = () => {
                   </div>
                 }
                 error={methods.formState.errors.EmployeeRole?.message}
+              />
+
+              <InputWithTopHeader
+                className="mx-0"
+                label="Pay rate (hourly)"
+                register={methods.register}
+                name="EmployeePayRate"
+                error={methods.formState.errors.EmployeePayRate?.message}
+                decimalCount={2}
               />
 
               <InputAutoComplete

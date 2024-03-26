@@ -17,8 +17,10 @@ const NavItem = ({
   return (
     <div
       onClick={() => (path ? navigate(path) : callback && callback())}
-      className={`uppercase cursor-pointer p-2 ${
-        location.pathname === path && "bg-surface text-textPrimary"
+      className={`uppercase cursor-pointer p-2 duration-200 ${
+        location.pathname === path
+          ? "bg-surface text-textPrimary"
+          : "hover:text-primaryGold"
       }`}
     >
       {name}
@@ -29,17 +31,18 @@ const NavItem = ({
 const Nav = () => {
   const { userSignOut } = useAuthState();
   return (
-    <div className="flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1">
+    <div className="flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1 justify-between">
       <NavItem path={PageRoutes.HOME} name="Home" />
       <NavItem path={PageRoutes.SCHEDULES} name="Schedules" />
       <NavItem path={PageRoutes.EMPLOYEE_LIST} name="Employees" />
       <NavItem path={PageRoutes.SHIFT_LIST} name="Shifts" />
       <NavItem path={PageRoutes.PATROLLING_LIST} name="Patrolling" />
       <NavItem path={PageRoutes.LOCATIONS} name="Locations" />
-      <NavItem path={PageRoutes.COMPANY_BRANCHES} name="Company Branches" />
-      <NavItem path="/incident" name="Incident" />
-      <NavItem path="/send-message" name="Send Message" />
-      <NavItem path="/trades" name="Trades" />
+      <NavItem path={PageRoutes.COMPANY_BRANCHES} name="Branches" />
+      <NavItem path="#" name="Incident" />
+      <NavItem path="#" name="Messaging" />
+      <NavItem path="#" name="Reports" />
+      <NavItem path="#" name="Settings" />
 
       <NavItem
         name="Sign out"
