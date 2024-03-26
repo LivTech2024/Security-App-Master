@@ -2,6 +2,25 @@ import { z } from "zod";
 import { numberString } from "./helper";
 import { ConstRegex } from "../../constants/ConstRegex";
 
+//*Company branch create schema
+export const companyCreateSchema = z.object({
+  CompanyName: z
+    .string()
+    .min(3, { message: "Company name should be minimum 3 characters" }),
+  CompanyEmail: z
+    .string()
+    .min(3, { message: "Valid email is required" })
+    .regex(ConstRegex.EMAIL_OPTIONAL),
+  CompanyPhone: z
+    .string()
+    .min(10, { message: "Company phone with country code is required" }),
+  CompanyAddress: z
+    .string()
+    .min(3, { message: "Company address should be minimum 3 characters" }),
+});
+
+export type CompanyCreateFormFields = z.infer<typeof companyCreateSchema>;
+
 //*Employee create schema
 export const addEmployeeFormSchema = z.object({
   EmployeeFirstName: z.string().min(2, { message: "First name is required" }),

@@ -35,11 +35,14 @@ export const MinimumQueryCharacter = {
 export const CloudStoragePaths = {
   EMPLOYEES_IMAGES: "employees/images/",
   EMPLOYEES_DOCUMENTS: "employees/documents",
+  COMPANIES_LOGOS: "companies/logos",
 };
 
 export const ImageResolution = {
   EMP_IMAGE_WIDTH: 1200,
   EMP_IMAGE_HEIGHT: 1200,
+  COMPANY_LOGO_WIDTH: 1200,
+  COMPANY_LOGO_HEIGHT: 1200,
 };
 
 export const PageRoutes = {

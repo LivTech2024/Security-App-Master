@@ -1,5 +1,9 @@
-import { CollectionName } from "../../@types/enum";
-import { getNewDocId } from "./utils";
+import {
+  CloudStoragePaths,
+  CollectionName,
+  ImageResolution,
+} from "../../@types/enum";
+import CloudStorageImageHandler, { getNewDocId } from "./utils";
 import { db } from "../config";
 import {
   IAdminsCollection,
@@ -24,28 +28,107 @@ import {
   QueryConstraint,
   startAfter,
   DocumentData,
+  runTransaction,
 } from "@firebase/firestore";
 import { fullTextSearchIndex } from "../../utilities/misc";
-import { CompanyBranchFormFields } from "../../utilities/zod/schema";
+import {
+  CompanyBranchFormFields,
+  CompanyCreateFormFields,
+} from "../../utilities/zod/schema";
 import CustomError from "../../utilities/CustomError";
 
 class DbCompany {
-  static createCompany = () => {
+  static createCompany = async (
+    data: CompanyCreateFormFields,
+    logoBase64: string
+  ) => {
     const companyId = getNewDocId(CollectionName.companies);
     const companyRef = doc(db, CollectionName.companies, companyId);
 
+    const logoImg = [
+      {
+        base64: logoBase64,
+        path:
+          CloudStoragePaths.COMPANIES_LOGOS +
+          "/" +
+          CloudStorageImageHandler.generateImageName(companyId),
+      },
+    ];
+
+    const logoImgUrl = await CloudStorageImageHandler.getImageDownloadUrls(
+      logoImg,
+      ImageResolution.COMPANY_LOGO_HEIGHT,
+      ImageResolution.COMPANY_LOGO_WIDTH
+    );
+
     const newCompany: ICompaniesCollection = {
       CompanyId: companyId,
-      CompanyName: "Livtech",
-      CompanyLogo: "",
-      CompanyAddress: "",
-      CompanyPhone: "+912222222222",
-      CompanyEmail: "",
+      CompanyName: data.CompanyName,
+      CompanyLogo: logoImgUrl[0],
+      CompanyAddress: data.CompanyAddress,
+      CompanyPhone: data.CompanyPhone,
+      CompanyEmail: data.CompanyEmail,
       CompanyCreatedAt: serverTimestamp(),
       CompanyModifiedAt: serverTimestamp(),
     };
 
     return setDoc(companyRef, newCompany);
+  };
+
+  static updateCompany = async ({
+    cmpId,
+    data,
+    logoBase64,
+  }: {
+    data: CompanyCreateFormFields;
+    cmpId: string;
+    logoBase64: string;
+  }) => {
+    await runTransaction(db, async (transaction) => {
+      const companyRef = doc(db, CollectionName.companies, cmpId);
+      const cmpSnapshot = await transaction.get(companyRef);
+      const cmpOldData = cmpSnapshot.data() as ICompaniesCollection;
+
+      let logoImageUrl = logoBase64;
+      let cmpLogoToBeDelete: string | null = null;
+
+      if (!logoImageUrl.startsWith("https")) {
+        const imageEmployee = [
+          {
+            base64: logoBase64,
+            path:
+              CloudStoragePaths.COMPANIES_LOGOS +
+              "/" +
+              CloudStorageImageHandler.generateImageName(cmpId),
+          },
+        ];
+
+        const imageUrl = await CloudStorageImageHandler.getImageDownloadUrls(
+          imageEmployee,
+          ImageResolution.EMP_IMAGE_HEIGHT,
+          ImageResolution.EMP_IMAGE_WIDTH
+        );
+
+        logoImageUrl = imageUrl[0];
+
+        cmpLogoToBeDelete = cmpOldData.CompanyLogo;
+      }
+
+      const updatedCompany: Partial<ICompaniesCollection> = {
+        CompanyName: data.CompanyName,
+        CompanyLogo: "",
+        CompanyAddress: data.CompanyAddress,
+        CompanyPhone: data.CompanyPhone,
+        CompanyEmail: data.CompanyEmail,
+        CompanyModifiedAt: serverTimestamp(),
+      };
+
+      transaction.set(companyRef, updatedCompany);
+
+      if (cmpLogoToBeDelete) {
+        await CloudStorageImageHandler.deleteImageByUrl(cmpLogoToBeDelete);
+      }
+    });
   };
 
   static getCompanyBranches = (cmpId: string) => {

@@ -1,24 +1,27 @@
 import { Tabs } from "@mantine/core";
+import CompanyInfo from "../../component/settings/CompanyInfo";
+import AdminInfo from "../../component/settings/AdminInfo";
+import AccountSettings from "../../component/settings/AccountSettings";
 
-const Settings = () => {
+const account_settings = () => {
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
         <span className="font-semibold text-xl">Settings</span>
       </div>
-      <Tabs defaultValue="gallery">
+      <Tabs defaultValue="company_info">
         <Tabs.List justify="center">
           <Tabs.Tab
             className="text-base mx-1"
-            value="gallery"
+            value="company_info"
             bg={"#e5e7eb"}
             color="#363738af"
           >
-            Company info
+            Company Info
           </Tabs.Tab>
           <Tabs.Tab
             className="text-base mx-1 "
-            value="messages"
+            value="admin_info"
             bg={"#e5e7eb"}
             color="#363738af"
           >
@@ -26,22 +29,28 @@ const Settings = () => {
           </Tabs.Tab>
           <Tabs.Tab
             className="text-base mx-1"
-            value="settings"
+            value="account_settings"
             bg={"#e5e7eb"}
             color="#363738af"
           >
-            Account settings
+            Account Settings
           </Tabs.Tab>
         </Tabs.List>
 
-        <Tabs.Panel value="gallery">Gallery tab content</Tabs.Panel>
+        <Tabs.Panel value="company_info">
+          <CompanyInfo />
+        </Tabs.Panel>
 
-        <Tabs.Panel value="messages">Messages tab content</Tabs.Panel>
+        <Tabs.Panel value="admin_info">
+          <AdminInfo />
+        </Tabs.Panel>
 
-        <Tabs.Panel value="settings">Settings tab content</Tabs.Panel>
+        <Tabs.Panel value="account_settings">
+          <AccountSettings />
+        </Tabs.Panel>
       </Tabs>
     </div>
   );
 };
 
-export default Settings;
+export default account_settings;
