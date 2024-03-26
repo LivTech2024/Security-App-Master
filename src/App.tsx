@@ -29,6 +29,7 @@ import EmployeeCreateOrEdit from "./pages/employee/EmployeeCreateOrEdit";
 import ShiftList from "./pages/shifts/ShiftList";
 import ShiftCreateOrEdit from "./pages/shifts/ShiftCreateOrEdit";
 import Reports from "./pages/reports/Reports";
+import Settings from "./pages/settings/Settings";
 
 function App() {
   useOnAuthStateChanged();
@@ -98,6 +99,7 @@ function App() {
               Component={CompanyBranches}
             />
             <Route path={PageRoutes.REPORTS} Component={Reports} />
+            <Route path={PageRoutes.SETTINGS} Component={Settings} />
           </Routes>
         </Layout>
       </ModalsProvider>

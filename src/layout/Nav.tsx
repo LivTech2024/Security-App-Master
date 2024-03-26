@@ -96,7 +96,7 @@ const Nav = () => {
       <NavItem path="#" name="Incident" />
       <NavItem path="#" name="Messaging" />
       <NavItem path={PageRoutes.REPORTS} name="Reports" />
-      <NavItem path="#" name="Settings" />
+      <NavItem path={PageRoutes.SETTINGS} name="Settings" />
 
       <NavItem
         name="Sign out"
