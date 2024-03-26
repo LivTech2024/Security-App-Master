@@ -34,6 +34,7 @@ export const MinimumQueryCharacter = {
 
 export const CloudStoragePaths = {
   EMPLOYEES_IMAGES: "employees/images/",
+  EMPLOYEES_DOCUMENTS: "employees/documents",
 };
 
 export const ImageResolution = {
