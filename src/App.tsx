@@ -30,6 +30,7 @@ import ShiftCreateOrEdit from "./pages/shifts/ShiftCreateOrEdit";
 import Reports from "./pages/reports/Reports";
 import Settings from "./pages/settings/Settings";
 import useListenNotifications from "./hooks/listeners/useListenNotifications";
+import PaymentsAndBilling from "./pages/payments_and_billing/PaymentsAndBilling";
 
 function App() {
   useOnAuthStateChanged();
@@ -103,6 +104,10 @@ function App() {
             />
             <Route path={PageRoutes.REPORTS} Component={Reports} />
             <Route path={PageRoutes.SETTINGS} Component={Settings} />
+            <Route
+              path={PageRoutes.PAYMENTS_AND_BILLING}
+              Component={PaymentsAndBilling}
+            />
           </Routes>
         </Layout>
       </ModalsProvider>

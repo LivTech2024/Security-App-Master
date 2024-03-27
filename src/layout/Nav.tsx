@@ -95,6 +95,10 @@ const Nav = () => {
       />
       <NavItem path="#" name="Notifications" />
       <NavItem path={PageRoutes.REPORTS} name="Reports" />
+      <NavItem
+        path={PageRoutes.PAYMENTS_AND_BILLING}
+        name="Payments & Billing"
+      />
       <NavItem path={PageRoutes.SETTINGS} name="Settings" />
 
       <NavItem
