@@ -13,7 +13,6 @@ import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 import { useEffect, useState } from "react";
 import CheckpointForm from "../../component/patrolling/CheckpointForm";
 import InputAutoComplete from "../../common/inputs/InputAutocomplete";
-import useFetchGuards from "../../hooks/fetch/useFetchGuards";
 import { DateTimePicker } from "@mantine/dates";
 import { MdCalendarToday } from "react-icons/md";
 import { useAuthState } from "../../store";
@@ -29,6 +28,7 @@ import InputError from "../../common/inputs/InputError";
 import { sendEmail } from "../../utilities/sendEmail";
 import { formatDate } from "../../utilities/misc";
 import { AiOutlinePlus } from "react-icons/ai";
+import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ const PatrollingCreateOrEdit = () => {
 
   const [guard, setGuard] = useState<string | null | undefined>("");
 
-  const { data } = useFetchGuards({
+  const { data } = useFetchEmployees({
     limit: 5,
     searchQuery: guard || undefined,
     empRole: "GUARD",

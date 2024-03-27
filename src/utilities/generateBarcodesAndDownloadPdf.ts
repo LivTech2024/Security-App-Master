@@ -42,5 +42,5 @@ const qrCodesHtmlString = async (qrCodesData: QrCodeData[]) => {
 
 export async function generateBarcodesAndDownloadPDF(QrCodeData: QrCodeData[]) {
   const html = await qrCodesHtmlString(QrCodeData);
-  htmlStringToPdf("checkpoints_qrcodes.pdf", html);
+  await htmlStringToPdf("checkpoints_qrcodes.pdf", html);
 }

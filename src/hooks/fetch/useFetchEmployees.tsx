@@ -5,11 +5,11 @@ import DbEmployee from "../../firebase_configs/DB/DbEmployee";
 
 interface Props {
   limit: number;
-  empRole: string;
-  searchQuery?: string;
+  empRole?: string;
+  searchQuery?: string | null;
 }
 
-const useFetchGuards = ({ limit, searchQuery, empRole }: Props) => {
+const useFetchEmployees = ({ limit, searchQuery, empRole }: Props) => {
   const [data, setData] = useState<IEmployeesCollection[]>([]);
 
   const { company } = useAuthState();
@@ -57,4 +57,4 @@ const useFetchGuards = ({ limit, searchQuery, empRole }: Props) => {
   return { data };
 };
 
-export default useFetchGuards;
+export default useFetchEmployees;
