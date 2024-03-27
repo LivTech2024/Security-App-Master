@@ -43,7 +43,9 @@ const EmployeeCreateOrEdit = () => {
           EmployeePassword: employeeEditData.EmployeePassword,
           EmployeePhone: employeeEditData.EmployeePhone,
           EmployeeRole: employeeEditData.EmployeeRole,
-          EmployeePayRate: employeeEditData.EmployeePayRate,
+          EmployeePayRate: String(
+            employeeEditData.EmployeePayRate
+          ) as unknown as number,
         }
       : undefined,
   });

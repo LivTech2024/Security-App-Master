@@ -32,6 +32,7 @@ import {
 } from "@firebase/firestore";
 import { fullTextSearchIndex } from "../../utilities/misc";
 import {
+  AdminUpdateFormFields,
   CompanyBranchFormFields,
   CompanyCreateFormFields,
 } from "../../utilities/zod/schema";
@@ -249,6 +250,19 @@ class DbCompany {
     };
 
     return setDoc(adminRef, newAdmin);
+  };
+
+  static updateAdmin = (adminId: string, data: AdminUpdateFormFields) => {
+    const adminRef = doc(db, CollectionName.admins, adminId);
+
+    const newAdmin: Partial<IAdminsCollection> = {
+      AdminName: data.AdminName,
+      AdminEmail: data.AdminEmail,
+      AdminPhone: data.AdminPhone,
+      AdminModifiedAt: serverTimestamp(),
+    };
+
+    return updateDoc(adminRef, newAdmin);
   };
 
   static getAdminById = (adminId: string) => {

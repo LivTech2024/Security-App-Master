@@ -2,7 +2,7 @@ import { z } from "zod";
 import { numberString } from "./helper";
 import { ConstRegex } from "../../constants/ConstRegex";
 
-//*Company branch create schema
+//*Company  create schema
 export const companyCreateSchema = z.object({
   CompanyName: z
     .string()
@@ -20,6 +20,31 @@ export const companyCreateSchema = z.object({
 });
 
 export type CompanyCreateFormFields = z.infer<typeof companyCreateSchema>;
+
+//*Admin  update schema
+export const adminUpdateSchema = z.object({
+  AdminName: z
+    .string()
+    .min(3, { message: "Admin name should be minimum 3 characters" }),
+  AdminPhone: z
+    .string()
+    .min(10, { message: "Company phone with country code is required" }),
+  AdminEmail: z
+    .string()
+    .min(3, { message: "Valid email is required" })
+    .regex(ConstRegex.EMAIL_OPTIONAL),
+});
+
+export type AdminUpdateFormFields = z.infer<typeof adminUpdateSchema>;
+
+//*Admin create schema
+export const adminCreateSchema = adminUpdateSchema.extend({
+  AdminPassword: z
+    .string()
+    .min(6, { message: "Password must be minimum six characters" }),
+});
+
+export type AdminCreateFormFields = z.infer<typeof adminCreateSchema>;
 
 //*Employee create schema
 export const addEmployeeFormSchema = z.object({
