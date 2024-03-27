@@ -1,4 +1,4 @@
-import { MdPeople, MdSecurity } from "react-icons/md";
+import { MdPeople } from "react-icons/md";
 import { useAuthState } from "../../store";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineSchedule } from "react-icons/ai";
@@ -39,7 +39,8 @@ const Home = () => {
     <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center">
       <div className="flex w-full justify-center items-center">
         <div className="flex flex-col items-center gap-2">
-          <MdSecurity className="text-7xl text-primaryGold" />
+          <img src={company?.CompanyLogo} alt="" className="w-[100px]" />
+
           <div className="font-semibold text-lg">
             Welcome {company?.CompanyName}
           </div>

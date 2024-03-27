@@ -8,9 +8,17 @@ import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
 import Button from "../../common/button/Button";
 import { useAuthState } from "../../store";
+import { ChangeEvent, useState } from "react";
+import { errorHandler } from "../../utilities/CustomError";
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from "../../utilities/TsxUtils";
+import DbCompany from "../../firebase_configs/DB/DbCompany";
 
 const CompanyInfo = () => {
-  const { company } = useAuthState();
+  const { company, setCompany } = useAuthState();
 
   const methods = useForm<CompanyCreateFormFields>({
     resolver: zodResolver(companyCreateSchema),
@@ -22,8 +30,50 @@ const CompanyInfo = () => {
     },
   });
 
+  const [logoImgBase64, setLogoImgBase64] = useState(company?.CompanyLogo);
+
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoImgBase64(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const onSubmit = async (data: CompanyCreateFormFields) => {
-    console.log(data);
+    if (!company || !logoImgBase64) return;
+    try {
+      showModalLoader({});
+
+      await DbCompany.updateCompany({
+        cmpId: company?.CompanyId,
+        data,
+        logoBase64: logoImgBase64,
+      });
+
+      showSnackbar({
+        message: "Company updated successfully",
+        type: "success",
+      });
+
+      setCompany({
+        ...company,
+        CompanyAddress: data.CompanyAddress,
+        CompanyEmail: data.CompanyEmail,
+        CompanyName: data.CompanyName,
+        CompanyPhone: data.CompanyPhone,
+        CompanyLogo: logoImgBase64,
+      });
+
+      closeModalLoader();
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      closeModalLoader();
+    }
   };
   return (
     <FormProvider {...methods}>
@@ -71,6 +121,30 @@ const CompanyInfo = () => {
             name="CompanyAddress"
             error={methods.formState.errors.CompanyAddress?.message}
           />
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <div className="font-semibold text-lg">Company Logo</div>
+          <label
+            htmlFor="image"
+            className=" cursor-pointer flex items-center gap-4"
+          >
+            <img
+              src={logoImgBase64}
+              alt={logoImgBase64 ? "Uploaded" : "No Image Uploaded"}
+              className="w-32 h-32 object-cover rounded"
+            />
+            <input
+              id="image"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageUpload}
+            />
+            <div className="bg-grayButtonBg px-4 py-2 rounded font-medium ">
+              Change Logo
+            </div>
+          </label>
         </div>
       </form>
     </FormProvider>

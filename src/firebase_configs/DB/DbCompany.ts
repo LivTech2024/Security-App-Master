@@ -116,14 +116,14 @@ class DbCompany {
 
       const updatedCompany: Partial<ICompaniesCollection> = {
         CompanyName: data.CompanyName,
-        CompanyLogo: "",
+        CompanyLogo: logoImageUrl,
         CompanyAddress: data.CompanyAddress,
         CompanyPhone: data.CompanyPhone,
         CompanyEmail: data.CompanyEmail,
         CompanyModifiedAt: serverTimestamp(),
       };
 
-      transaction.set(companyRef, updatedCompany);
+      transaction.update(companyRef, updatedCompany);
 
       if (cmpLogoToBeDelete) {
         await CloudStorageImageHandler.deleteImageByUrl(cmpLogoToBeDelete);
