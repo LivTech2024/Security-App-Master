@@ -120,6 +120,8 @@ export interface IPatrolsCollection {
 
 export interface IReportsCollection {
   ReportId: string;
+  ReportCompanyId: string;
+  ReportCompanyBranchId?: string;
   ReportName: string; //* combination of location and reports name
   ReportCategory:
     | "general_concern"
@@ -133,19 +135,15 @@ export interface IReportsCollection {
   ReportCreatedAt: Timestamp | FieldValue;
 }
 
-export interface IIncidentsCollection {
-  IncidentId: string;
-  IncidentCompanyId: string;
-  IncidentCompanyBranchId?: string;
-  IncidentEmployeeId: string;
-  IncidentEmployeeName: string;
-  IncidentEmployeeRole: string;
-  IncidentFieldId: string;
-  IncidentArea: string;
-  IncidentLocation: GeoPoint;
-  IncidentNarrative: string;
-  IncidentCreatedAt: Timestamp | FieldValue;
-  IncidentUpdatedAt: Timestamp | FieldValue;
+export interface INotificationsCollection {
+  NotificationId: string;
+  NotificationCompanyId: string;
+  NotificationBranchId?: string;
+  NotificationCreatedBy: "admin" | "employee";
+  NotificationCreatorId: string;
+  NotificationTitle: string;
+  NotificationData: string;
+  NotificationCreatedAt: Timestamp | FieldValue;
 }
 
 export interface ILocationsCollection {

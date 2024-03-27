@@ -93,8 +93,7 @@ const Nav = () => {
           { name: "Manage Locations", path: PageRoutes.LOCATIONS },
         ]}
       />
-      <NavItem path="#" name="Incident" />
-      <NavItem path="#" name="Messaging" />
+      <NavItem path="#" name="Notifications" />
       <NavItem path={PageRoutes.REPORTS} name="Reports" />
       <NavItem path={PageRoutes.SETTINGS} name="Settings" />
 

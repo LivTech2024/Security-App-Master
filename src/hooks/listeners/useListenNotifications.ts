@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuthState } from "../../store";
-import { IIncidentsCollection } from "../../@types/database";
 import {
   collection,
   limit,
@@ -11,20 +10,24 @@ import {
 import { db } from "../../firebase_configs/config";
 import { CollectionName } from "../../@types/enum";
 import dayjs from "dayjs";
+import { INotificationsCollection } from "../../@types/database";
 
-const useListenIncidents = () => {
+const useListenNotifications = () => {
   const { company } = useAuthState();
 
-  const [incident, setIncident] = useState<IIncidentsCollection | null>(null);
+  const [notification, setIncident] = useState<INotificationsCollection | null>(
+    null
+  );
 
   useEffect(() => {
     if (!company) return;
-    const incidentRef = collection(db, CollectionName.incident);
+    const incidentRef = collection(db, CollectionName.notifications);
     const incidentQuery = query(
       incidentRef,
-      where("IncidentCompanyId", "==", company.CompanyId),
+      where("NotificationCompanyId", "==", company.CompanyId),
+      where("NotificationCreatedBy", "==", "employee"),
       where(
-        "IncidentUpdatedAt",
+        "NotificationCreatedAt",
         ">=",
         dayjs(new Date()).subtract(1, "hour").toDate()
       ),
@@ -33,7 +36,7 @@ const useListenIncidents = () => {
 
     const unsubscribe = onSnapshot(incidentQuery, (snapshot) => {
       if (!snapshot.empty) {
-        const data = snapshot?.docs[0]?.data() as IIncidentsCollection;
+        const data = snapshot?.docs[0]?.data() as INotificationsCollection;
         setIncident(data);
       }
     });
@@ -41,7 +44,7 @@ const useListenIncidents = () => {
     return () => unsubscribe();
   }, [company]);
 
-  return { incident };
+  return { notification };
 };
 
-export default useListenIncidents;
+export default useListenNotifications;

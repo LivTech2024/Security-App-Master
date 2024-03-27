@@ -15,7 +15,6 @@ import { PageRoutes } from "./@types/enum";
 import PatrollingList from "./pages/patrolling/PatrollingList";
 import PatrollingCreateOrEdit from "./pages/patrolling/PatrollingCreateOrEdit";
 import PatrollingView from "./pages/patrolling/PatrollingView";
-import useListenIncidents from "./hooks/listeners/useListenIncidents";
 import { useEffect } from "react";
 import { showSnackbar } from "./utilities/TsxUtils";
 import { useAuthState } from "./store";
@@ -30,20 +29,24 @@ import ShiftList from "./pages/shifts/ShiftList";
 import ShiftCreateOrEdit from "./pages/shifts/ShiftCreateOrEdit";
 import Reports from "./pages/reports/Reports";
 import Settings from "./pages/settings/Settings";
+import useListenNotifications from "./hooks/listeners/useListenNotifications";
 
 function App() {
   useOnAuthStateChanged();
 
   const { company, admin, loading } = useAuthState();
 
-  const { incident } = useListenIncidents();
+  const { notification } = useListenNotifications();
 
   useEffect(() => {
-    if (incident) {
-      const { IncidentNarrative } = incident;
-      showSnackbar({ message: IncidentNarrative, type: "info" });
+    if (notification) {
+      const { NotificationTitle } = notification;
+      showSnackbar({
+        message: `New notification received \n${NotificationTitle}`,
+        type: "info",
+      });
     }
-  }, [incident]);
+  }, [notification]);
 
   if (loading) {
     return <SplashScreen />;
