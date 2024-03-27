@@ -29,16 +29,16 @@ export const adminUpdateSchema = z.object({
   AdminPhone: z
     .string()
     .min(10, { message: "Company phone with country code is required" }),
-  AdminEmail: z
-    .string()
-    .min(3, { message: "Valid email is required" })
-    .regex(ConstRegex.EMAIL_OPTIONAL),
 });
 
 export type AdminUpdateFormFields = z.infer<typeof adminUpdateSchema>;
 
 //*Admin create schema
 export const adminCreateSchema = adminUpdateSchema.extend({
+  AdminEmail: z
+    .string()
+    .min(3, { message: "Valid email is required" })
+    .regex(ConstRegex.EMAIL_OPTIONAL),
   AdminPassword: z
     .string()
     .min(6, { message: "Password must be minimum six characters" }),

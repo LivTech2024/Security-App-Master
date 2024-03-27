@@ -257,8 +257,18 @@ class DbCompany {
 
     const newAdmin: Partial<IAdminsCollection> = {
       AdminName: data.AdminName,
-      AdminEmail: data.AdminEmail,
       AdminPhone: data.AdminPhone,
+      AdminModifiedAt: serverTimestamp(),
+    };
+
+    return updateDoc(adminRef, newAdmin);
+  };
+
+  static updateAdminEmail = (adminId: string, email: string) => {
+    const adminRef = doc(db, CollectionName.admins, adminId);
+
+    const newAdmin: Partial<IAdminsCollection> = {
+      AdminEmail: email,
       AdminModifiedAt: serverTimestamp(),
     };
 

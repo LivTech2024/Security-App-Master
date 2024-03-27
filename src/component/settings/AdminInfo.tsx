@@ -14,6 +14,8 @@ import {
   showSnackbar,
 } from "../../utilities/TsxUtils";
 import { errorHandler } from "../../utilities/CustomError";
+import { useState } from "react";
+import UpdateAdminCredModal from "./modal/UpdateAdminCredModal";
 
 const AdminInfo = () => {
   const { admin, setAdmin } = useAuthState();
@@ -22,7 +24,6 @@ const AdminInfo = () => {
     resolver: zodResolver(adminUpdateSchema),
     defaultValues: {
       AdminName: admin?.AdminName,
-      AdminEmail: admin?.AdminEmail,
       AdminPhone: admin?.AdminPhone,
     },
   });
@@ -43,7 +44,6 @@ const AdminInfo = () => {
         ...admin,
         AdminName: data.AdminName,
         AdminPhone: data.AdminPhone,
-        AdminEmail: data.AdminEmail,
       });
 
       closeModalLoader();
@@ -53,6 +53,8 @@ const AdminInfo = () => {
       closeModalLoader();
     }
   };
+
+  const [updateAdminCredModal, setUpdateAdminCredModal] = useState(false);
   return (
     <FormProvider {...methods}>
       <form
@@ -69,7 +71,7 @@ const AdminInfo = () => {
             className="px-6 py-2"
           />
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <InputWithTopHeader
             className="mx-0"
             label="Admin Name"
@@ -84,12 +86,17 @@ const AdminInfo = () => {
             name="AdminPhone"
             error={methods.formState.errors.AdminPhone?.message}
           />
-          <InputWithTopHeader
-            className="mx-0"
-            label="Admin Email"
-            register={methods.register}
-            name="AdminEmail"
-            error={methods.formState.errors.AdminEmail?.message}
+
+          <div
+            onClick={() => setUpdateAdminCredModal(true)}
+            className="text-textPrimaryBlue font-medium cursor-pointer"
+          >
+            Change Email/Password?
+          </div>
+
+          <UpdateAdminCredModal
+            opened={updateAdminCredModal}
+            setOpened={setUpdateAdminCredModal}
           />
         </div>
       </form>
