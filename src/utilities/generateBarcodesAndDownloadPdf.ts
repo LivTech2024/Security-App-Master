@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import QRCode from "qrcode";
-import html2pdf from "html2pdf.js";
+import { htmlStringToPdf } from "./htmlStringToPdf";
 
 interface QrCodeData {
   code: string;
@@ -41,37 +40,7 @@ const qrCodesHtmlString = async (qrCodesData: QrCodeData[]) => {
   return html;
 };
 
-const handleDownloadPDF = (file_name: string, htmlString: string) => {
-  const element = document.createElement("div");
-  element.innerHTML = htmlString;
-
-  html2pdf()
-    .from(element)
-    .set({
-      margin: 1,
-      filename: file_name,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    })
-    .toPdf()
-    .get("pdf")
-    .then((pdf: { output: (arg0: string) => any }) => {
-      const blob = pdf.output("blob");
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.style.display = "none";
-      a.href = url;
-      a.download = file_name;
-      document.body.appendChild(a);
-      a.click();
-
-      URL.revokeObjectURL(url);
-    });
-};
-
 export async function generateBarcodesAndDownloadPDF(QrCodeData: QrCodeData[]) {
   const html = await qrCodesHtmlString(QrCodeData);
-  handleDownloadPDF("checkpoints_qrcodes.pdf", html);
+  htmlStringToPdf("checkpoints_qrcodes.pdf", html);
 }
