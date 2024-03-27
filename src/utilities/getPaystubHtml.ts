@@ -128,7 +128,7 @@ export const getPaystubHtml = ({
     )}</p>` +
     `<p><strong>Employer:</strong> ${companyName}</p>` +
     `</body>` +
-    `</html>;`;
+    `</html>`;
 
   return html;
 };

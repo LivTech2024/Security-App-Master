@@ -10,7 +10,7 @@ export const htmlStringToPdf = async (
   const pdf = await html2pdf()
     .from(element)
     .set({
-      margin: 0,
+      margin: 0.4,
       filename: file_name,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
