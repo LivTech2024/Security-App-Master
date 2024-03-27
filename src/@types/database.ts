@@ -118,6 +118,21 @@ export interface IPatrolsCollection {
   PatrolModifiedAt: Timestamp | FieldValue;
 }
 
+export interface IReportsCollection {
+  ReportId: string;
+  ReportName: string; //* combination of location and reports name
+  ReportCategory:
+    | "general_concern"
+    | "incident"
+    | "maintenance"
+    | "security_safety"
+    | "vagrant_removal"
+    | "other";
+  ReportData: string;
+  ReportStatus: "pending" | "started" | "completed";
+  ReportCreatedAt: Timestamp | FieldValue;
+}
+
 export interface IIncidentsCollection {
   IncidentId: string;
   IncidentCompanyId: string;
