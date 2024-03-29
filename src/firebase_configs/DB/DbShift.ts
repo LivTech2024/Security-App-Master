@@ -61,6 +61,8 @@ class DbShift {
         Number(shiftData.ShiftLocation.lat),
         Number(shiftData.ShiftLocation.lng)
       ),
+      ShiftClientEmail: shiftData.ShiftClientEmail,
+      ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
       ShiftCurrentStatus: "pending",
       ShiftTask: shiftTasks,
       ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
@@ -122,6 +124,8 @@ class DbShift {
         Number(shiftData.ShiftLocation.lng)
       ),
       ShiftLocationName: shiftData.ShiftLocationName,
+      ShiftClientEmail: shiftData.ShiftClientEmail,
+      ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
       ShiftCompanyId: cmpId,
       ShiftAddress: shiftData.ShiftAddress,
       ShiftModifiedAt: serverTimestamp(),

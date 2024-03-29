@@ -7,6 +7,7 @@ import { DatePickerInput } from "@mantine/dates";
 import { MdCalendarToday } from "react-icons/md";
 import { PageRoutes } from "../../@types/enum";
 import { useNavigate } from "react-router-dom";
+import Button from "../../common/button/Button";
 
 const TopSection = ({
   selectedDate,
@@ -33,15 +34,23 @@ const TopSection = ({
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
         <span className="font-semibold text-xl">Schedule</span>
 
-        <button
-          onClick={() => {
-            setShiftEditData(null);
-            navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
-          }}
-          className="bg-primary text-surface px-4 py-2 rounded"
-        >
-          Add new shift
-        </button>
+        <div className="flex items-center gap-4">
+          <Button
+            label="View all shifts"
+            onClick={() => navigate(PageRoutes.SHIFT_LIST)}
+            type="blue"
+            className="px-4 py-2"
+          />
+          <Button
+            label="Add new shift"
+            onClick={() => {
+              setShiftEditData(null);
+              navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
+            }}
+            type="black"
+            className="px-4 py-2"
+          />
+        </div>
       </div>
 
       {/* Top section */}

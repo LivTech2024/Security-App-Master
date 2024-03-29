@@ -31,6 +31,7 @@ import Reports from "./pages/reports/Reports";
 import Settings from "./pages/settings/Settings";
 import useListenNotifications from "./hooks/listeners/useListenNotifications";
 import PaymentsAndBilling from "./pages/payments_and_billing/PaymentsAndBilling";
+import GenerateInvoice from "./pages/payments_and_billing/GenerateInvoice";
 
 function App() {
   useOnAuthStateChanged();
@@ -107,6 +108,10 @@ function App() {
             <Route
               path={PageRoutes.PAYMENTS_AND_BILLING}
               Component={PaymentsAndBilling}
+            />
+            <Route
+              path={PageRoutes.GENERATE_INVOICE}
+              Component={GenerateInvoice}
             />
           </Routes>
         </Layout>

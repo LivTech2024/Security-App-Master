@@ -55,6 +55,10 @@ const ShiftCreateOrEdit = () => {
           ShiftName: shiftEditData.ShiftName,
           ShiftPosition: shiftEditData.ShiftPosition,
           ShiftStartTime: shiftEditData.ShiftStartTime,
+          ShiftClientEmail: shiftEditData.ShiftClientEmail,
+          ShiftRestrictedRadius: String(
+            shiftEditData.ShiftRestrictedRadius
+          ) as unknown as number,
         }
       : undefined,
   });
@@ -371,6 +375,23 @@ const ShiftCreateOrEdit = () => {
                 </div>
               }
               error={methods.formState.errors.ShiftAddress?.message}
+            />
+
+            <InputWithTopHeader
+              label="Client email"
+              className="mx-0"
+              register={methods.register}
+              name="ShiftClientEmail"
+              error={methods.formState.errors.ShiftClientEmail?.message}
+            />
+
+            <InputWithTopHeader
+              label="Restricted radius (in meters)"
+              className="mx-0"
+              decimalCount={2}
+              register={methods.register}
+              name="ShiftRestrictedRadius"
+              error={methods.formState.errors.ShiftRestrictedRadius?.message}
             />
 
             <TextareaWithTopHeader

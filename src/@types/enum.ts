@@ -60,6 +60,7 @@ export const PageRoutes = {
   REPORTS: "/reports",
   SETTINGS: "/settings",
   PAYMENTS_AND_BILLING: "/payments_and_billing",
+  GENERATE_INVOICE: "/generate_invoice",
 };
 
 export const LocalStorageKey = {

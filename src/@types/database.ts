@@ -75,6 +75,8 @@ export interface IShiftsCollection {
   ShiftEndTime: string;
   ShiftLocation: GeoPoint;
   ShiftLocationName: string;
+  ShiftRestrictedRadius: number;
+  ShiftClientEmail: string;
   ShiftAddress: string;
   ShiftDescription: string | null;
   ShiftAssignedUserId: string | null;
@@ -163,4 +165,29 @@ export interface ILoggedInUsersCollection {
   LoggedInCrypt: string;
   LoggedInUserType: string;
   LoggedInCreatedAt: Timestamp | FieldValue;
+}
+
+export interface IInvoiceItems {
+  ItemName: string;
+  ItemQuantity: number;
+  ItemPrice: number;
+  ItemTotal: number;
+}
+
+export interface IInvoiceTaxList {
+  TaxName: string;
+  TaxAmount: number;
+}
+export interface IInvoicesCollection {
+  InvoiceId: string;
+  InvoiceCustomerName: string;
+  InvoiceCustomerPhone: string;
+  InvoiceCustomerAddress: string;
+  InvoiceNumber: string;
+  InvoiceDate: Timestamp | FieldValue;
+  InvoiceDueDate: Timestamp | FieldValue;
+  InvoiceItems: IInvoiceItems[];
+  InvoiceSubtotal: number;
+  InvoiceTaxList: IInvoiceTaxList[];
+  InvoiceTotalAmount: number;
 }

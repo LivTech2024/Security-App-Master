@@ -79,6 +79,10 @@ export const addShiftFormSchema = z.object({
   ShiftLocationName: z.string().min(3, { message: "Location name required" }),
   ShiftAddress: z.string().min(3, { message: "Shift address is required" }),
   ShiftCompanyBranchId: z.string().nullable().optional(),
+  ShiftRestrictedRadius: numberString({
+    message: "Restricted radius is required",
+  }),
+  ShiftClientEmail: z.string().min(2, { message: "Client email is required" }),
 });
 
 export type AddShiftFormFields = z.infer<typeof addShiftFormSchema>;
