@@ -181,6 +181,7 @@ export interface IInvoiceTaxList {
 }
 export interface IInvoicesCollection {
   InvoiceId: string;
+  InvoiceCompanyId: string;
   InvoiceCustomerName: string;
   InvoiceCustomerPhone: string;
   InvoiceCustomerAddress: string;
@@ -191,4 +192,7 @@ export interface IInvoicesCollection {
   InvoiceSubtotal: number;
   InvoiceTaxList: IInvoiceTaxList[];
   InvoiceTotalAmount: number;
+  InvoiceDescription?: string;
+  InvoiceTerms?: string;
+  InvoiceCreatedAt: Timestamp | FieldValue;
 }

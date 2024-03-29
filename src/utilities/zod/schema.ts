@@ -131,3 +131,28 @@ export const companyBranchSchema = z.object({
 });
 
 export type CompanyBranchFormFields = z.infer<typeof companyBranchSchema>;
+
+//*Invoice  create schema
+export const invoiceSchema = z.object({
+  InvoiceCustomerName: z
+    .string()
+    .min(3, { message: "Customer name should be at least 3 characters" }),
+  InvoiceCustomerPhone: z
+    .string()
+    .min(8, {
+      message: "Customer phone number should be at least 8 characters",
+    })
+    .max(16, {
+      message: "Customer phone number should be at most 16 characters",
+    }),
+  InvoiceCustomerAddress: z.string().optional().nullable(),
+  InvoiceNumber: numberString({ message: "Invoice number is required" }),
+  InvoiceDate: z.date(),
+  InvoiceDueDate: z.date(),
+  InvoiceSubtotal: numberString({ message: "Subtotal amount is required" }),
+  InvoiceTotalAmount: numberString({ message: "Total amount is required" }),
+  InvoiceDescription: z.string().optional().nullable(),
+  InvoiceTerms: z.string().optional().nullable(),
+});
+
+export type InvoiceFormFields = z.infer<typeof invoiceSchema>;
