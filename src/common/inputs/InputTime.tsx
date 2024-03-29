@@ -47,6 +47,8 @@ const InputTime = ({
   );
 
   useEffect(() => {
+    if (hrs?.length == 0 || mins?.length === 0 || (use12Hours && !hoursFormat))
+      return;
     if (!showSeconds) {
       onChange(hrs + ":" + mins + " " + hoursFormat);
     } else if (use12Hours) {
@@ -91,7 +93,7 @@ const InputTime = ({
           position="bottom"
           target={
             <input
-              value={value}
+              value={value.length > 1 ? value : "hh:mm"}
               type="text"
               className={`w-full text-lg py-2 pl-2
                outline-none  pr-2`}

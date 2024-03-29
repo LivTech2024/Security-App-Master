@@ -92,6 +92,7 @@ export interface IShiftsCollection {
 export interface IPatrolCheckPointsChild {
   CheckPointId: string;
   CheckPointName: string;
+  CheckPointTime: string;
   CheckPointStatus: "checked" | "not_checked";
   CheckPointCheckedTime?: Timestamp | FieldValue;
   CheckPointFailureReason?: string;

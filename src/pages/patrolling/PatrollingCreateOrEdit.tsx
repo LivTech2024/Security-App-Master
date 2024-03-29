@@ -38,9 +38,9 @@ const PatrollingCreateOrEdit = () => {
 
   const { company } = useAuthState();
 
-  const [checkPoints, setCheckPoints] = useState<{ checkPointName: string }[]>([
-    { checkPointName: "" },
-  ]);
+  const [checkPoints, setCheckPoints] = useState<
+    { checkPointName: string; checkPointTime: string }[]
+  >([{ checkPointName: "", checkPointTime: "" }]);
 
   const [patrolTime, setPatrolTime] = useState(new Date());
 
@@ -103,7 +103,11 @@ const PatrollingCreateOrEdit = () => {
   useEffect(() => {
     methods.setValue(
       "PatrolCheckPoints",
-      checkPoints.map((c) => c.checkPointName)
+      checkPoints
+        .filter((d) => d.checkPointName && d.checkPointTime)
+        .map((ch) => {
+          return { name: ch.checkPointName, time: ch.checkPointTime };
+        })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkPoints]);

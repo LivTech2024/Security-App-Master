@@ -104,7 +104,7 @@ export const patrollingSchema = z.object({
     .min(3, { message: "This field is required" }),
   PatrolAssignedGuardName: z.string().min(3, { message: "Guard is required" }),
   PatrolAssignedGuardEmail: z.string().min(3, { message: "Guard is required" }),
-  PatrolCheckPoints: z.array(z.string()),
+  PatrolCheckPoints: z.array(z.object({ name: z.string(), time: z.string() })),
   PatrolRestrictedRadius: numberString({
     message: "Restricted radius in meters is required",
   }),

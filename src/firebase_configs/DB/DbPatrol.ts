@@ -34,11 +34,12 @@ class DbPatrol {
 
     const PatrolCheckPoints: IPatrolCheckPointsChild[] = [];
 
-    data.PatrolCheckPoints.map((name, idx) => {
+    data.PatrolCheckPoints.map((ch, idx) => {
       const checkPointId = `${patrolId}${idx}`;
       PatrolCheckPoints.push({
         CheckPointId: checkPointId,
-        CheckPointName: name,
+        CheckPointName: ch.name,
+        CheckPointTime: ch.time,
         CheckPointStatus: "not_checked",
       });
     });
