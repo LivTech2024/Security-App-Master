@@ -411,6 +411,58 @@ class DbCompany {
 
     return getDocs(locationQuery);
   };
+
+  static getReports = ({
+    cmpId,
+    branchId,
+    lastDoc,
+    lmt,
+    endDate,
+    isLifeTime,
+    startDate,
+  }: {
+    cmpId: string;
+    branchId?: string;
+    lastDoc?: DocumentData | null;
+    lmt?: number;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+  }) => {
+    const reportRef = collection(db, CollectionName.reports);
+
+    let queryParams: QueryConstraint[] = [
+      where("ReportCompanyId", "==", cmpId),
+      orderBy("ReportCreatedAt", "desc"),
+    ];
+
+    if (branchId) {
+      queryParams = [
+        ...queryParams,
+        where("ReportCompanyBranchId", "==", branchId),
+      ];
+    }
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where("ReportCreatedAt", ">=", startDate),
+        where("ReportCreatedAt", "<=", endDate),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const empQuery = query(reportRef, ...queryParams);
+
+    return getDocs(empQuery);
+  };
 }
 
 export default DbCompany;

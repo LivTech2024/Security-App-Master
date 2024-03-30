@@ -17,6 +17,7 @@ export const DisplayCount = {
   SHIFT_LIST: 20,
   PATROL_LIST: 20,
   LOCATION_LIST: 20,
+  REPORT_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -25,6 +26,7 @@ export const REACT_QUERY_KEYS = {
   SCHEDULES: "schedules",
   PATROL_LIST: "patrolling-list",
   LOCATION_LIST: "location-list",
+  REPORT_LIST: "report-list",
 } as const;
 
 export const MinimumQueryCharacter = {
