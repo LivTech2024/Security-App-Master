@@ -198,13 +198,17 @@ const PatrollingList = () => {
                     {patrol.PatrolCheckPoints.length.toFixed(1)}
                   </td>
                   <td className="px-4 py-2 text-end align-top">
-                    <span className="line-clamp-2">
-                      {patrol.PatrolAssignedGuardsName?.map((s) => s)}
+                    <span className="line-clamp-3">
+                      {patrol.PatrolAssignedGuardsName.join(",")}
                     </span>
                   </td>
                   <td className="px-4 py-2 text-end capitalize align-top">
-                    <span className="line-clamp-2">
+                    <span className="flex items-center justify-end gap-2">
                       <PatrolStatus status={patrol.PatrolCurrentStatus} />
+                      <span>
+                        {patrol.PatrolCompletedCount}/
+                        {patrol.PatrolRequiredCount}
+                      </span>
                     </span>
                   </td>
                 </tr>

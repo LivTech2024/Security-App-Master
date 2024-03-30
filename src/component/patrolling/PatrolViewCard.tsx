@@ -11,10 +11,16 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
       </div>
       <div className="mb-4">
         <p className="text-textSecondary">
-          Assigned Guard: {patrolData.PatrolAssignedGuardName}
+          Assigned Guard: {patrolData.PatrolAssignedGuardsName.join(" , ")}
         </p>
         <p className="text-textSecondary">
           Time: {formatDate(patrolData.PatrolTime, "DD MMM-YY hh:ss A")}
+        </p>
+        <p className="text-textSecondary">
+          Required count: {patrolData.PatrolRequiredCount}
+        </p>
+        <p className="text-textSecondary">
+          Completed count: {patrolData.PatrolCompletedCount}
         </p>
       </div>
       <div className="mb-4">
@@ -25,18 +31,21 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
               {patrolData.PatrolCurrentStatus}
             </span>
             {patrolData.PatrolCurrentStatus === "pending" ? (
-              <div className="w-[12px] h-[12px] rounded-full bg-primaryGold mt-[1px]">
+              <div className="w-[12px] h-[12px] rounded-full bg-primaryGold ">
                 &nbsp;
               </div>
             ) : patrolData.PatrolCurrentStatus === "started" ? (
-              <div className="w-[12px] h-[12px] rounded-full bg-primaryRed mt-[1px]">
+              <div className="w-[12px] h-[12px] rounded-full bg-primaryRed ">
                 &nbsp;
               </div>
             ) : (
-              <div className="w-[12px] h-[12px] rounded-full bg-primaryGreen mt-[1px]">
+              <div className="w-[12px] h-[12px] rounded-full bg-primaryGreen ">
                 &nbsp;
               </div>
             )}
+            <span>
+              {patrolData.PatrolCompletedCount}/{patrolData.PatrolRequiredCount}
+            </span>
           </div>
         </div>
         {patrolData.PatrolFailureReason && (
