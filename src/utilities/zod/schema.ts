@@ -145,7 +145,10 @@ export const invoiceSchema = z.object({
       message: "Customer phone number should be at most 16 characters",
     }),
   InvoiceCustomerAddress: z.string().optional().nullable(),
-  InvoiceNumber: numberString({ message: "Invoice number is required" }),
+  InvoiceNumber: z
+    .string()
+    .min(1, { message: "Invoice number should be at least 1 character" })
+    .max(6, { message: "Invoice number should be at most 6 character" }),
   InvoiceDate: z.date(),
   InvoiceDueDate: z.date(),
   InvoiceSubtotal: numberString({ message: "Subtotal amount is required" }),

@@ -22,6 +22,9 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { generateInvoiceHTML } from "../../../utilities/generateInvoiceHtml";
 import { useAuthState } from "../../../store";
 import { htmlStringToPdf } from "../../../utilities/htmlStringToPdf";
+import DbPayment from "../../../firebase_configs/DB/DbPayment";
+import { useNavigate } from "react-router-dom";
+import { PageRoutes } from "../../../@types/enum";
 
 const numberToString = (value: number) => {
   return String(value) as unknown as number;
@@ -128,6 +131,8 @@ const InvoiceGenerate = () => {
     );
   }, [invoiceItems, invoiceTaxList]);
 
+  const navigate = useNavigate();
+
   const onSubmit = async (data: InvoiceFormFields) => {
     if (!company) return;
     console.log(data, "data", invoiceItems, invoiceTaxList);
@@ -143,6 +148,15 @@ const InvoiceGenerate = () => {
         throw new CustomError("Please add items to generate invoice");
       }
 
+      showModalLoader({});
+
+      await DbPayment.createInvoice({
+        cmpId: company.CompanyId,
+        data,
+        items: invoiceItems,
+        taxes: invoiceTaxList,
+      });
+
       const html = generateInvoiceHTML({
         invoiceData: data,
         invoiceItems,
@@ -150,9 +164,15 @@ const InvoiceGenerate = () => {
         companyDetails: company,
       });
 
-      showModalLoader({});
       await htmlStringToPdf("invoice.pdf", html);
+
+      showSnackbar({
+        message: "Invoice created successfully",
+        type: "success",
+      });
       closeModalLoader();
+
+      navigate(PageRoutes.INVOICE_LIST);
     } catch (error) {
       console.log(error);
       errorHandler(error);

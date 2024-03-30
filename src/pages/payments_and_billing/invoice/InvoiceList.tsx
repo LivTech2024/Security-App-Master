@@ -140,7 +140,7 @@ const InvoiceList = () => {
               Invoice No.
             </th>
             <th className="uppercase px-4 py-2 w-[35%] text-start">Items</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">Date</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">Date</th>
 
             <th className="uppercase px-4 py-2 w-[20%] text-end">
               Total Amount

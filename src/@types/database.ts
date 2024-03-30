@@ -189,7 +189,7 @@ export interface IInvoicesCollection {
   InvoiceCompanyId: string;
   InvoiceCustomerName: string;
   InvoiceCustomerPhone: string;
-  InvoiceCustomerAddress: string;
+  InvoiceCustomerAddress: string | null;
   InvoiceNumber: string;
   InvoiceDate: Timestamp | FieldValue;
   InvoiceDueDate: Timestamp | FieldValue;
