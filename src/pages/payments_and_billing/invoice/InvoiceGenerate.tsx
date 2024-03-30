@@ -1,30 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { IoIosCloseCircleOutline } from "react-icons/io";
-import { IInvoiceItems, IInvoiceTaxList } from "../../@types/database";
-import { InvoiceFormFields, invoiceSchema } from "../../utilities/zod/schema";
+import { IInvoiceItems, IInvoiceTaxList } from "../../../@types/database";
+import {
+  InvoiceFormFields,
+  invoiceSchema,
+} from "../../../utilities/zod/schema";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
-import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
-import InputDate from "../../common/inputs/InputDate";
-import Button from "../../common/button/Button";
-import CustomError, { errorHandler } from "../../utilities/CustomError";
+import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
+import TextareaWithTopHeader from "../../../common/inputs/TextareaWithTopHeader";
+import InputDate from "../../../common/inputs/InputDate";
+import Button from "../../../common/button/Button";
+import CustomError, { errorHandler } from "../../../utilities/CustomError";
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from "../../utilities/TsxUtils";
+} from "../../../utilities/TsxUtils";
 import { FaRegTrashAlt } from "react-icons/fa";
-import { generateInvoiceHTML } from "../../utilities/generateInvoiceHtml";
-import { useAuthState } from "../../store";
-import { htmlStringToPdf } from "../../utilities/htmlStringToPdf";
+import { generateInvoiceHTML } from "../../../utilities/generateInvoiceHtml";
+import { useAuthState } from "../../../store";
+import { htmlStringToPdf } from "../../../utilities/htmlStringToPdf";
 
 const numberToString = (value: number) => {
   return String(value) as unknown as number;
 };
 
-const GenerateInvoice = () => {
+const InvoiceGenerate = () => {
   const { company } = useAuthState();
 
   const methods = useForm<InvoiceFormFields>({
@@ -377,4 +380,4 @@ const GenerateInvoice = () => {
   );
 };
 
-export default GenerateInvoice;
+export default InvoiceGenerate;

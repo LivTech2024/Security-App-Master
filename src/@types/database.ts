@@ -138,6 +138,7 @@ export interface IReportsCollection {
     | "vagrant_removal"
     | "other";
   ReportData: string;
+  ReportImage?: string;
   ReportStatus: "pending" | "started" | "completed";
   ReportCreatedAt: Timestamp | FieldValue;
 }

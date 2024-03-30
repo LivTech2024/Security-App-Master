@@ -22,21 +22,27 @@ const PaymentsAndBilling = () => {
       />
 
       <div className="bg-surface shadow rounded p-4 grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-4 p-4 rounded bg-gray-200 items-center shadow justify-between">
+        <div
+          onClick={() => setGeneratePaystubModal(true)}
+          className="flex flex-col gap-4 p-4 rounded bg-gray-200 items-center shadow justify-between cursor-pointer"
+        >
           <img src={payStubReceiptImg} alt="" className="w-[240px]" />
           <Button
             type="black"
-            label="Generate Pay-stubs"
+            label="Pay-stubs"
             onClick={() => setGeneratePaystubModal(true)}
             className="w-full"
           />
         </div>
-        <div className="flex flex-col gap-4 p-4 rounded bg-gray-200 items-center shadow justify-between">
+        <div
+          onClick={() => navigate(PageRoutes.INVOICE_LIST)}
+          className="flex flex-col gap-4 p-4 rounded bg-gray-200 items-center shadow justify-between cursor-pointer"
+        >
           <img src={printingInvoiceImg} alt="" className="w-[340px]" />
           <Button
             type="black"
-            label="Generate Invoices"
-            onClick={() => navigate(PageRoutes.GENERATE_INVOICE)}
+            label="Invoices"
+            onClick={() => navigate(PageRoutes.INVOICE_LIST)}
             className="w-full"
           />
         </div>

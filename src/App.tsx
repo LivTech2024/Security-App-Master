@@ -31,7 +31,8 @@ import Reports from "./pages/reports/Reports";
 import Settings from "./pages/settings/Settings";
 import useListenNotifications from "./hooks/listeners/useListenNotifications";
 import PaymentsAndBilling from "./pages/payments_and_billing/PaymentsAndBilling";
-import GenerateInvoice from "./pages/payments_and_billing/GenerateInvoice";
+import InvoiceGenerate from "./pages/payments_and_billing/invoice/InvoiceGenerate";
+import InvoiceList from "./pages/payments_and_billing/invoice/InvoiceList";
 
 function App() {
   useOnAuthStateChanged();
@@ -109,9 +110,10 @@ function App() {
               path={PageRoutes.PAYMENTS_AND_BILLING}
               Component={PaymentsAndBilling}
             />
+            <Route path={PageRoutes.INVOICE_LIST} Component={InvoiceList} />
             <Route
-              path={PageRoutes.GENERATE_INVOICE}
-              Component={GenerateInvoice}
+              path={PageRoutes.INVOICE_GENERATE}
+              Component={InvoiceGenerate}
             />
           </Routes>
         </Layout>

@@ -10,6 +10,7 @@ export enum CollectionName {
   loggedInUsers = "LoggedInUsers",
   locations = "Locations",
   reports = "Reports",
+  invoices = "Invoices",
 }
 
 export const DisplayCount = {
@@ -18,6 +19,7 @@ export const DisplayCount = {
   PATROL_LIST: 20,
   LOCATION_LIST: 20,
   REPORT_LIST: 20,
+  INVOICE_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -27,6 +29,7 @@ export const REACT_QUERY_KEYS = {
   PATROL_LIST: "patrolling-list",
   LOCATION_LIST: "location-list",
   REPORT_LIST: "report-list",
+  INVOICE_LIST: "invoice-list",
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -63,7 +66,8 @@ export const PageRoutes = {
   REPORTS: "/reports",
   SETTINGS: "/settings",
   PAYMENTS_AND_BILLING: "/payments_and_billing",
-  GENERATE_INVOICE: "/generate_invoice",
+  INVOICE_LIST: "/invoice_list",
+  INVOICE_GENERATE: "/invoice_generate",
 };
 
 export const LocalStorageKey = {
