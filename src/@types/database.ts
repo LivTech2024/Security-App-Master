@@ -108,8 +108,10 @@ export interface IPatrolsCollection {
   PatrolLocation: GeoPoint;
   PatrolLocationName: string;
   PatrolTime: Timestamp | FieldValue;
-  PatrolAssignedGuardId: string;
-  PatrolAssignedGuardName: string;
+  PatrolAssignedGuardsId: string[];
+  PatrolAssignedGuardsName: string[];
+  PatrolCompletedCount: number;
+  PatrolRequiredCount: number;
   PatrolCheckPoints: IPatrolCheckPointsChild[];
   PatrolCurrentStatus: "pending" | "started" | "completed";
   PatrolGuardCurrentLocation?: GeoPoint;
@@ -125,6 +127,8 @@ export interface IReportsCollection {
   ReportId: string;
   ReportCompanyId: string;
   ReportCompanyBranchId?: string;
+  ReportEmployeeId: string;
+  ReportEmployeeName: string;
   ReportName: string; //* combination of location and reports name
   ReportCategory:
     | "general_concern"

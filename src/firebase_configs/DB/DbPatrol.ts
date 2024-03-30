@@ -28,7 +28,19 @@ import { generateBarcodesAndDownloadPDF } from "../../utilities/generateBarcodes
 import { fullTextSearchIndex } from "../../utilities/misc";
 
 class DbPatrol {
-  static createPatrol = async (cmpId: string, data: PatrollingFormFields) => {
+  static createPatrol = async ({
+    cmpId,
+    data,
+    guards,
+  }: {
+    cmpId: string;
+    data: PatrollingFormFields;
+    guards: {
+      PatrolAssignedGuardId: string;
+      PatrolAssignedGuardName: string;
+      PatrolAssignedGuardEmail: string;
+    }[];
+  }) => {
     const patrolId = getNewDocId(CollectionName.patrols);
     const patrolRef = doc(db, CollectionName.patrols, patrolId);
 
@@ -60,8 +72,10 @@ class DbPatrol {
       ),
       PatrolLocationName: data.PatrolLocationName,
       PatrolTime: data.PatrolTime as unknown as Timestamp,
-      PatrolAssignedGuardId: data.PatrolAssignedGuardId,
-      PatrolAssignedGuardName: data.PatrolAssignedGuardName,
+      PatrolAssignedGuardsId: guards.map((g) => g.PatrolAssignedGuardId),
+      PatrolAssignedGuardsName: guards.map((g) => g.PatrolAssignedGuardName),
+      PatrolRequiredCount: Number(data.PatrolRequiredCount),
+      PatrolCompletedCount: 0,
       PatrolCheckPoints,
       PatrolCurrentStatus: "pending",
       PatrolRestrictedRadius: Number(data.PatrolRestrictedRadius),

@@ -199,7 +199,7 @@ const PatrollingList = () => {
                   </td>
                   <td className="px-4 py-2 text-end align-top">
                     <span className="line-clamp-2">
-                      {patrol.PatrolAssignedGuardName}
+                      {patrol.PatrolAssignedGuardsName?.map((s) => s)}
                     </span>
                   </td>
                   <td className="px-4 py-2 text-end capitalize align-top">

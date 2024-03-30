@@ -16,7 +16,7 @@ import InputAutoComplete from "../../common/inputs/InputAutocomplete";
 import { DateTimePicker } from "@mantine/dates";
 import { MdCalendarToday } from "react-icons/md";
 import { useAuthState } from "../../store";
-import { errorHandler } from "../../utilities/CustomError";
+import CustomError, { errorHandler } from "../../utilities/CustomError";
 import {
   closeModalLoader,
   showModalLoader,
@@ -24,11 +24,12 @@ import {
 } from "../../utilities/TsxUtils";
 import DbPatrol from "../../firebase_configs/DB/DbPatrol";
 import useFetchLocations from "../../hooks/fetch/useFetchLocations";
-import InputError from "../../common/inputs/InputError";
-import { sendEmail } from "../../utilities/sendEmail";
-import { formatDate } from "../../utilities/misc";
 import { AiOutlinePlus } from "react-icons/ai";
 import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
+import { MultiSelect } from "@mantine/core";
+import InputHeader from "../../common/inputs/InputHeader";
+import { sendEmail } from "../../utilities/sendEmail";
+import { formatDate } from "../../utilities/misc";
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -44,11 +45,19 @@ const PatrollingCreateOrEdit = () => {
 
   const [patrolTime, setPatrolTime] = useState(new Date());
 
-  const [guard, setGuard] = useState<string | null | undefined>("");
+  const [guards, setGuards] = useState<string[]>([]);
+
+  const [selectedGuardsList, setSelectedGuardsList] = useState<
+    {
+      PatrolAssignedGuardId: string;
+      PatrolAssignedGuardName: string;
+      PatrolAssignedGuardEmail: string;
+    }[]
+  >([]);
 
   const { data } = useFetchEmployees({
     limit: 5,
-    searchQuery: guard || undefined,
+    searchQuery: undefined,
     empRole: "GUARD",
   });
 
@@ -57,7 +66,7 @@ const PatrollingCreateOrEdit = () => {
   );
 
   const { data: locData } = useFetchLocations({
-    limit: 5,
+    limit: 100,
     searchQuery: locationName,
   });
 
@@ -66,20 +75,36 @@ const PatrollingCreateOrEdit = () => {
   }, [methods.formState.errors]);
 
   useEffect(() => {
-    if (!guard) {
-      methods.setValue("PatrolAssignedGuardName", "");
-      methods.setValue("PatrolAssignedGuardId", "");
-      methods.setValue("PatrolAssignedGuardEmail", "");
-      return;
-    }
-    const guardData = data.find((d) => d.EmployeeName === guard);
+    if (guards.length > selectedGuardsList.length) {
+      const selectedGuardData = data.find(
+        (g) => g.EmployeeId === guards[guards.length - 1]
+      );
 
-    if (guardData) {
-      methods.setValue("PatrolAssignedGuardName", guardData.EmployeeName);
-      methods.setValue("PatrolAssignedGuardId", guardData.EmployeeId);
-      methods.setValue("PatrolAssignedGuardEmail", guardData.EmployeeEmail);
+      if (selectedGuardData) {
+        setSelectedGuardsList((prev) => [
+          ...prev,
+          {
+            PatrolAssignedGuardEmail: selectedGuardData.EmployeeEmail,
+            PatrolAssignedGuardId: selectedGuardData.EmployeeId,
+            PatrolAssignedGuardName: selectedGuardData.EmployeeName,
+          },
+        ]);
+      }
+    } else {
+      const newSelectedGuardsList = guards.map((gId) => {
+        const selectedGuardData = data.find((g) => g.EmployeeId === gId);
+        return {
+          PatrolAssignedGuardEmail: selectedGuardData?.EmployeeEmail || "",
+          PatrolAssignedGuardId: selectedGuardData?.EmployeeId || "",
+          PatrolAssignedGuardName: selectedGuardData?.EmployeeName || "",
+        };
+      });
+
+      setSelectedGuardsList(newSelectedGuardsList);
     }
-  }, [guard]);
+  }, [guards]);
+
+  console.log(selectedGuardsList, "selected guard lists");
 
   useEffect(() => {
     if (!locationName) return;
@@ -115,20 +140,31 @@ const PatrollingCreateOrEdit = () => {
   const onSubmit = async (data: PatrollingFormFields) => {
     if (!company) return;
     try {
+      if (!selectedGuardsList || selectedGuardsList.length === 0) {
+        throw new CustomError("Please assign a guard");
+      }
       showModalLoader({});
 
-      await DbPatrol.createPatrol(company.CompanyId, data);
-
-      await sendEmail({
-        message: `You have been assigned for the patrol.\n Patrol Name: ${
-          data.PatrolName
-        }\n Timing: ${formatDate(data.PatrolTime, "DD/MM/YY")}\n Address: ${
-          data.PatrolArea
-        }`,
-        subject: "Your patrol update",
-        to_email: data.PatrolAssignedGuardEmail,
-        to_name: data.PatrolAssignedGuardName,
+      await DbPatrol.createPatrol({
+        cmpId: company.CompanyId,
+        data,
+        guards: selectedGuardsList,
       });
+
+      const sendEmailPromise = selectedGuardsList.map(async (guard) => {
+        return sendEmail({
+          message: `You have been assigned for the patrol.\n Patrol Name: ${
+            data.PatrolName
+          }\n Timing: ${formatDate(data.PatrolTime, "DD/MM/YY")}\n Address: ${
+            data.PatrolArea
+          }`,
+          subject: "Your patrol update",
+          to_email: guard.PatrolAssignedGuardEmail,
+          to_name: guard.PatrolAssignedGuardName,
+        });
+      });
+
+      await Promise.all(sendEmailPromise);
 
       showSnackbar({ message: "Patrol created successfully", type: "success" });
       closeModalLoader();
@@ -172,34 +208,30 @@ const PatrollingCreateOrEdit = () => {
             name="PatrolName"
             error={methods.formState.errors.PatrolName?.message}
           />
-          <div className="flex flex-col gap-2">
-            <InputAutoComplete
-              label="Patrolling location"
-              data={locData.map((loc) => {
-                return { label: loc.LocationName, value: loc.LocationName };
-              })}
-              value={locationName}
-              onChange={setLocationName}
-              dropDownHeader={
-                <div
-                  onClick={() => {
-                    navigate(PageRoutes.LOCATIONS);
-                  }}
-                  className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <AiOutlinePlus size={18} />
-                    <span>Add location</span>
-                  </div>
+
+          <InputAutoComplete
+            label="Patrolling location"
+            data={locData.map((loc) => {
+              return { label: loc.LocationName, value: loc.LocationName };
+            })}
+            value={locationName}
+            onChange={setLocationName}
+            dropDownHeader={
+              <div
+                onClick={() => {
+                  navigate(PageRoutes.LOCATIONS);
+                }}
+                className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <AiOutlinePlus size={18} />
+                  <span>Add location</span>
                 </div>
-              }
-            />
-            {methods.formState.errors.PatrolArea?.message && (
-              <InputError
-                errorMessage={methods.formState.errors.PatrolArea.message}
-              />
-            )}
-          </div>
+              </div>
+            }
+            error={methods.formState.errors.PatrolArea?.message}
+          />
+
           {/* DateTime Input */}
           <div className="flex flex-col gap-1">
             <div className={`flex`}>
@@ -251,34 +283,29 @@ const PatrollingCreateOrEdit = () => {
               </small>
             )}
           </div>
-          <div>
-            <InputAutoComplete
-              className="mx-0"
-              label="Guard"
-              value={guard}
+          <div className="flex flex-col gap-1">
+            <InputHeader title="Assign guards" />
+            <MultiSelect
+              placeholder="Pick guards"
               data={data.map((d) => {
-                return { label: d.EmployeeName, value: d.EmployeeName };
+                return { label: d.EmployeeName, value: d.EmployeeId };
               })}
-              onChange={setGuard}
-              dropDownHeader={
-                <div
-                  onClick={() => {
-                    navigate(PageRoutes.EMPLOYEE_LIST);
-                  }}
-                  className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <AiOutlinePlus size={18} />
-                    <span>Add guard</span>
-                  </div>
-                </div>
-              }
+              value={guards}
+              onChange={setGuards}
+              searchable
+              nothingFoundMessage="No guard found..."
+              styles={{
+                input: {
+                  border: `1px solid #0000001A`,
+                  fontWeight: "normal",
+                  fontSize: "18px",
+                  borderRadius: "4px",
+                  background: "#FFFFFF",
+                  color: "#000000",
+                  padding: "8px 8px",
+                },
+              }}
             />
-            {methods.formState.errors.PatrolAssignedGuardName && (
-              <small className="text-red-600 text-xs px-1 text-start">
-                {methods.formState.errors.PatrolAssignedGuardName.message}
-              </small>
-            )}
           </div>
           <div className="md:col-span-2 flex items-end w-full gap-4">
             <InputWithTopHeader
@@ -296,6 +323,14 @@ const PatrollingCreateOrEdit = () => {
               label="Restrict guard from moving out from this radius while patrolling"
             />
           </div>
+          <InputWithTopHeader
+            className="mx-0"
+            label="Patrolling Required Count"
+            register={methods.register}
+            name="PatrolRequiredCount"
+            decimalCount={0}
+            error={methods.formState.errors.PatrolRequiredCount?.message}
+          />
           <div className="col-span-2 w-full gap-4 flex flex-col">
             <div className="font-medium text-lg ">Create checkpoints</div>
             <CheckpointForm

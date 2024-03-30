@@ -99,16 +99,15 @@ export const patrollingSchema = z.object({
     .string()
     .min(3, { message: "Location name is required" }),
   PatrolTime: z.date(),
-  PatrolAssignedGuardId: z
-    .string()
-    .min(3, { message: "This field is required" }),
-  PatrolAssignedGuardName: z.string().min(3, { message: "Guard is required" }),
-  PatrolAssignedGuardEmail: z.string().min(3, { message: "Guard is required" }),
   PatrolCheckPoints: z.array(z.object({ name: z.string(), time: z.string() })),
   PatrolRestrictedRadius: numberString({
     message: "Restricted radius in meters is required",
   }),
   PatrolKeepGuardInRadiusOfLocation: z.boolean(),
+  PatrolRequiredCount: z.coerce
+    .number()
+    .min(1, { message: "Required" })
+    .max(50, { message: "Required count cannot be more than 50" }),
 });
 
 export type PatrollingFormFields = z.infer<typeof patrollingSchema>;

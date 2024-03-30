@@ -9,6 +9,7 @@ export enum CollectionName {
   notifications = "Notifications",
   loggedInUsers = "LoggedInUsers",
   locations = "Locations",
+  reports = "Reports",
 }
 
 export const DisplayCount = {
