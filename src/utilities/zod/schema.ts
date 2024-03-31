@@ -158,3 +158,23 @@ export const invoiceSchema = z.object({
 });
 
 export type InvoiceFormFields = z.infer<typeof invoiceSchema>;
+
+//*client  create schema
+export const clientSchema = z.object({
+  ClientName: z
+    .string()
+    .min(2, { message: "Client name should be at least 2 characters" }),
+  ClientEmail: z
+    .string()
+    .min(3, { message: "Client email is required" })
+    .regex(ConstRegex.EMAIL_OPTIONAL, {
+      message: "Invalid email",
+    }),
+  ClientPhone: z
+    .string()
+    .min(8, { message: "Client phone should be at least 8 characters" }),
+  ClientAddress: z.string().nullable().optional(),
+  ClientBalance: numberString({ message: "Balance is required" }),
+});
+
+export type ClientFormFields = z.infer<typeof clientSchema>;

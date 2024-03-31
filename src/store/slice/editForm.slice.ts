@@ -1,5 +1,6 @@
 import { StateCreator } from "zustand";
 import {
+  IClientsCollection,
   IEmployeesCollection,
   ILocationsCollection,
   IShiftsCollection,
@@ -30,6 +31,12 @@ export interface Location
   LocationCreatedAt: string;
 }
 
+export interface Client
+  extends Omit<IClientsCollection, "ClientCreatedAt" | "ClientModifiedAt"> {
+  ClientCreatedAt: string;
+  ClientModifiedAt: string;
+}
+
 interface EditFormState {
   employeeEditData: Employee | null;
   setEmployeeEditData: (emp: Employee | null) => void;
@@ -41,6 +48,9 @@ interface EditFormState {
 
   companyBranchEditData: CompanyBranches | null;
   setCompanyBranchEditData: (branch: CompanyBranches | null) => void;
+
+  clientEditData: Client | null;
+  setClientEditData: (client: Client | null) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -60,8 +70,12 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
     set((state) => ({ ...state, locationEditData: loc })),
 
   //Company Branch
-  //Location
   companyBranchEditData: null,
   setCompanyBranchEditData: (branch) =>
     set((state) => ({ ...state, companyBranchEditData: branch })),
+
+  //Client
+  clientEditData: null,
+  setClientEditData: (client) =>
+    set((state) => ({ ...state, clientEditData: client })),
 });

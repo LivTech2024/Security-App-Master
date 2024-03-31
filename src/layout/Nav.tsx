@@ -91,6 +91,7 @@ const Nav = () => {
         dropdownChildren={[
           { name: "Company Branches", path: PageRoutes.COMPANY_BRANCHES },
           { name: "Manage Locations", path: PageRoutes.LOCATIONS },
+          { name: "Manage Clients", path: PageRoutes.CLIENTS },
         ]}
       />
       <NavItem path="#" name="Notifications" />

@@ -11,6 +11,7 @@ export enum CollectionName {
   locations = "Locations",
   reports = "Reports",
   invoices = "Invoices",
+  clients = "Clients",
 }
 
 export const DisplayCount = {
@@ -20,6 +21,7 @@ export const DisplayCount = {
   LOCATION_LIST: 20,
   REPORT_LIST: 20,
   INVOICE_LIST: 20,
+  CLIENT_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -30,12 +32,14 @@ export const REACT_QUERY_KEYS = {
   LOCATION_LIST: "location-list",
   REPORT_LIST: "report-list",
   INVOICE_LIST: "invoice-list",
+  CLIENT_LIST: "client-list",
 } as const;
 
 export const MinimumQueryCharacter = {
   EMPLOYEE: 1,
   PATROL: 1,
   LOCATION: 1,
+  CLIENT: 1,
 } as const;
 
 export const CloudStoragePaths = {
@@ -68,6 +72,7 @@ export const PageRoutes = {
   PAYMENTS_AND_BILLING: "/payments_and_billing",
   INVOICE_LIST: "/invoice_list",
   INVOICE_GENERATE: "/invoice_generate",
+  CLIENTS: "/clients",
 };
 
 export const LocalStorageKey = {

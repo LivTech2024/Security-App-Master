@@ -187,9 +187,10 @@ export interface IInvoiceTaxList {
 export interface IInvoicesCollection {
   InvoiceId: string;
   InvoiceCompanyId: string;
-  InvoiceCustomerName: string;
-  InvoiceCustomerPhone: string;
-  InvoiceCustomerAddress: string | null;
+  InvoiceClientId: string;
+  InvoiceClientName: string;
+  InvoiceClientPhone: string;
+  InvoiceClientAddress: string | null;
   InvoiceNumber: string;
   InvoiceDate: Timestamp | FieldValue;
   InvoiceDueDate: Timestamp | FieldValue;
@@ -201,4 +202,17 @@ export interface IInvoicesCollection {
   InvoiceTerms?: string;
   InvoiceCreatedAt: Timestamp | FieldValue;
   InvoiceModifiedAt: Timestamp | FieldValue;
+}
+
+export interface IClientsCollection {
+  ClientId: string;
+  ClientCompanyId: string;
+  ClientName: string;
+  ClientNameSearchIndex: string[];
+  ClientEmail: string;
+  ClientPhone: string;
+  ClientAddress: string | null;
+  ClientBalance: number;
+  ClientCreatedAt: Timestamp | FieldValue;
+  ClientModifiedAt: Timestamp | FieldValue;
 }
