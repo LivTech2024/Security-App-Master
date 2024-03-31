@@ -4,6 +4,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
@@ -180,6 +181,11 @@ class DbClient {
     const clientQuery = query(clientRef, ...queryParams);
 
     return getDocs(clientQuery);
+  };
+
+  static getClientById = (clientId: string) => {
+    const clientRef = doc(db, CollectionName.clients, clientId);
+    return getDoc(clientRef);
   };
 }
 

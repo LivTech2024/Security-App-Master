@@ -12,9 +12,9 @@ export const htmlStringToPdf = async (
     .set({
       margin: 0.4,
       filename: file_name,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      image: { type: "jpeg", quality: 0.95 },
+      html2canvas: { scale: 2, useCors: true },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
     })
     .toPdf()
     .get("pdf");

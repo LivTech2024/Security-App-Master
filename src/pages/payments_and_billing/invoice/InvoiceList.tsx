@@ -12,7 +12,10 @@ import Button from "../../../common/button/Button";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import DbPayment from "../../../firebase_configs/DB/DbPayment";
 import { DocumentData } from "firebase/firestore";
-import { IInvoicesCollection } from "../../../@types/database";
+import {
+  IClientsCollection,
+  IInvoicesCollection,
+} from "../../../@types/database";
 import { useInView } from "react-intersection-observer";
 import TableShimmer from "../../../common/shimmer/TableShimmer";
 import NoSearchResult from "../../../common/NoSearchResult";
@@ -23,6 +26,7 @@ import { errorHandler } from "../../../utilities/CustomError";
 import { closeModalLoader, showModalLoader } from "../../../utilities/TsxUtils";
 import { htmlStringToPdf } from "../../../utilities/htmlStringToPdf";
 import { generateInvoiceHTML } from "../../../utilities/generateInvoiceHtml";
+import DbClient from "../../../firebase_configs/DB/DbClient";
 
 const InvoiceList = () => {
   const navigate = useNavigate();
@@ -120,10 +124,18 @@ const InvoiceList = () => {
     try {
       showModalLoader({});
 
+      const clientSnapshot = await DbClient.getClientById(
+        invoiceData.InvoiceClientId
+      );
+      const clientData = clientSnapshot.data() as IClientsCollection;
+
       const html = await generateInvoiceHTML({
         companyDetails: company,
         invoiceData,
+        clientBalance: clientData.ClientBalance,
       });
+
+      console.log(html, "html");
 
       await htmlStringToPdf("invoice.pdf", html);
 

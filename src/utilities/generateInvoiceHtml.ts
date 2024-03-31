@@ -6,11 +6,13 @@ import { formatDate } from "./misc";
 interface GenerateInvoiceHTMLArgs {
   invoiceData: IInvoicesCollection;
   companyDetails: Company;
+  clientBalance: number;
 }
 
-export function generateInvoiceHTML({
+export async function generateInvoiceHTML({
   companyDetails,
   invoiceData,
+  clientBalance,
 }: GenerateInvoiceHTMLArgs) {
   const { InvoiceItems, InvoiceTaxList } = invoiceData;
 
@@ -33,8 +35,6 @@ export function generateInvoiceHTML({
     </tr>
   `
   ).join("");
-
-  console.log(companyDetails.CompanyLogo, "logo");
 
   return `
   <!DOCTYPE html>
@@ -67,7 +67,9 @@ export function generateInvoiceHTML({
       <body>
         <div style="display: flex;justify-content: space-between;margin-bottom: 20px;">
          
-        <img src="https://firebasestorage.googleapis.com/v0/b/security-app-3b156.appspot.com/o/companies%2Flogos%2FaSvLtwII6Cjs7uCISBRR5935669.jpg?alt=media&token=fcb6fc59-4a85-4aed-9753-0e92ec897ea7" style="width:100px; height:100px;" alt="Company Logo">
+        <img src="${
+          companyDetails.CompanyLogo
+        }" style="width:100px;" alt="Company Logo">
           <div>
             <p>${companyDetails.CompanyName}</p>
             <p>${companyDetails.CompanyPhone}</p>
@@ -127,7 +129,7 @@ export function generateInvoiceHTML({
             invoiceData.InvoiceReceivedAmount,
             true
           )}</p>
-          <p>Amount Due: ${numberFormatter(456, true)}</p>
+          <p>Amount Due: ${numberFormatter(clientBalance, true)}</p>
         </div>
         <div style="padding:20px 0;">
           ${
