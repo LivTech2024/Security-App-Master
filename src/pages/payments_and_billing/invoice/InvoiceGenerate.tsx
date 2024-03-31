@@ -19,12 +19,12 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import { FaRegTrashAlt } from "react-icons/fa";
-import { generateInvoiceHTML } from "../../../utilities/generateInvoiceHtml";
 import { useAuthState } from "../../../store";
-import { htmlStringToPdf } from "../../../utilities/htmlStringToPdf";
 import DbPayment from "../../../firebase_configs/DB/DbPayment";
 import { useNavigate } from "react-router-dom";
 import { PageRoutes } from "../../../@types/enum";
+import useFetchClients from "../../../hooks/fetch/useFetchClients";
+import InputAutoComplete from "../../../common/inputs/InputAutocomplete";
 
 const numberToString = (value: number) => {
   return String(value) as unknown as number;
@@ -38,7 +38,7 @@ const InvoiceGenerate = () => {
   });
 
   const [invoiceItems, setInvoiceItems] = useState<IInvoiceItems[]>([
-    { ItemName: "", ItemPrice: 0, ItemQuantity: 1, ItemTotal: 0 },
+    { ItemDescription: "", ItemPrice: 0, ItemQuantity: 1, ItemTotal: 0 },
   ]);
 
   const [invoiceTaxList, setInvoiceTaxList] = useState<IInvoiceTaxList[]>([]);
@@ -46,6 +46,37 @@ const InvoiceGenerate = () => {
   const [invoiceDate, setInvoiceDate] = useState<Date | null>(null);
 
   const [invoiceDueDate, setInvoiceDueDate] = useState<Date | null>(null);
+
+  const [clientSearchQuery, setClientSearchQuery] = useState<
+    string | null | undefined
+  >("");
+
+  const { data: clients } = useFetchClients({
+    limit: 5,
+    searchQuery: clientSearchQuery,
+  });
+
+  useEffect(() => {
+    const selectedClient = clients.find(
+      (c) => c.ClientName === clientSearchQuery
+    );
+
+    if (selectedClient) {
+      methods.setValue("InvoiceClientName", selectedClient.ClientName);
+      methods.setValue("InvoiceClientId", selectedClient.ClientId);
+      methods.setValue("InvoiceClientAddress", selectedClient.ClientAddress);
+      methods.setValue("InvoiceClientPhone", selectedClient.ClientPhone);
+    } else {
+      methods.setValue("InvoiceClientName", "");
+      methods.setValue("InvoiceClientId", "");
+      methods.setValue("InvoiceClientAddress", "");
+      methods.setValue("InvoiceClientPhone", "");
+    }
+  }, [clientSearchQuery]);
+
+  useEffect(() => {
+    console.log(methods.formState.errors);
+  }, [methods.formState.errors]);
 
   useEffect(() => {
     if (invoiceDate) {
@@ -93,7 +124,7 @@ const InvoiceGenerate = () => {
   const handleAddItem = () => {
     if (
       invoiceItems.some((item) => {
-        if (!item.ItemName || !item.ItemPrice || !item.ItemQuantity) {
+        if (!item.ItemDescription || !item.ItemPrice || !item.ItemQuantity) {
           return true;
         }
       })
@@ -106,7 +137,7 @@ const InvoiceGenerate = () => {
     }
     setInvoiceItems((prev) => [
       ...prev,
-      { ItemName: "", ItemPrice: 0, ItemQuantity: 1, ItemTotal: 0 },
+      { ItemDescription: "", ItemPrice: 0, ItemQuantity: 1, ItemTotal: 0 },
     ]);
   };
 
@@ -140,7 +171,7 @@ const InvoiceGenerate = () => {
       if (
         invoiceItems.length === 0 ||
         invoiceItems.some((item) => {
-          if (!item.ItemName || !item.ItemPrice || !item.ItemQuantity) {
+          if (!item.ItemDescription || !item.ItemPrice || !item.ItemQuantity) {
             return true;
           }
         })
@@ -156,15 +187,6 @@ const InvoiceGenerate = () => {
         items: invoiceItems,
         taxes: invoiceTaxList,
       });
-
-      const html = generateInvoiceHTML({
-        invoiceData: data,
-        invoiceItems,
-        invoiceTaxList,
-        companyDetails: company,
-      });
-
-      await htmlStringToPdf("invoice.pdf", html);
 
       showSnackbar({
         message: "Invoice created successfully",
@@ -200,28 +222,13 @@ const InvoiceGenerate = () => {
           <div className="flex gap-4 justify-between">
             <div className="flex flex-col bg-surface shadow p-4 rounded gap-4 w-[60%] max-w-2xl justify-start">
               <div className="font-semibold">Bill To.</div>
-              <InputWithTopHeader
-                className="mx-0"
-                label="Customer name"
-                register={methods.register}
-                name="InvoiceCustomerName"
-                error={methods.formState.errors?.InvoiceCustomerName?.message}
-              />
-              <InputWithTopHeader
-                className="mx-0"
-                label="Customer phone"
-                register={methods.register}
-                name="InvoiceCustomerPhone"
-                error={methods.formState.errors?.InvoiceCustomerPhone?.message}
-              />
-              <TextareaWithTopHeader
-                className="mx-0"
-                title="Customer address"
-                register={methods.register}
-                name="InvoiceCustomerAddress"
-                error={
-                  methods.formState.errors?.InvoiceCustomerAddress?.message
-                }
+              <InputAutoComplete
+                label="Client"
+                value={clientSearchQuery}
+                onChange={setClientSearchQuery}
+                data={clients.map((data) => {
+                  return { label: data.ClientName, value: data.ClientName };
+                })}
               />
             </div>
             <div className="flex flex-col bg-surface shadow p-4 rounded gap-4 w-[40%] max-w-xl justify-start">
@@ -276,9 +283,9 @@ const InvoiceGenerate = () => {
                   <InputWithTopHeader
                     className="mx-0 w-full"
                     placeholder="Item Name"
-                    value={item.ItemName}
+                    value={item.ItemDescription}
                     onChange={(e) =>
-                      handleItemChange(index, "ItemName", e.target.value)
+                      handleItemChange(index, "ItemDescription", e.target.value)
                     }
                   />
                 </div>
@@ -298,6 +305,7 @@ const InvoiceGenerate = () => {
                   placeholder="Price"
                   value={item.ItemPrice}
                   decimalCount={2}
+                  leadingIcon={<div>$</div>}
                   onChange={(e) =>
                     handleItemChange(index, "ItemPrice", e.target.value)
                   }
@@ -306,6 +314,7 @@ const InvoiceGenerate = () => {
                 <InputWithTopHeader
                   className="mx-0"
                   placeholder="Price"
+                  leadingIcon={<div>$</div>}
                   value={item.ItemTotal}
                   decimalCount={2}
                   disabled
@@ -348,6 +357,7 @@ const InvoiceGenerate = () => {
                 register={methods.register}
                 name="InvoiceSubtotal"
                 error={methods.formState.errors.InvoiceSubtotal?.message}
+                leadingIcon={<div>$</div>}
               />
 
               {/* Tax details */}
@@ -370,6 +380,7 @@ const InvoiceGenerate = () => {
                       onChange={(e) =>
                         handleTaxChange(index, "TaxAmount", e.target.value)
                       }
+                      leadingIcon={<div>$</div>}
                     />
                     <IoIosCloseCircleOutline
                       onClick={() =>
@@ -391,6 +402,16 @@ const InvoiceGenerate = () => {
                 register={methods.register}
                 name="InvoiceTotalAmount"
                 error={methods.formState.errors.InvoiceTotalAmount?.message}
+                leadingIcon={<div>$</div>}
+              />
+
+              <InputWithTopHeader
+                className="mx-0"
+                label="Received Amount"
+                register={methods.register}
+                name="InvoiceReceivedAmount"
+                error={methods.formState.errors.InvoiceReceivedAmount?.message}
+                leadingIcon={<div>$</div>}
               />
             </div>
           </div>

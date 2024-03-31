@@ -1,8 +1,11 @@
 export const numberFormatter = (
-  num: number,
+  num: number | null,
   showCurrency = false,
   decimalCounts?: number
 ) => {
+  if (num === null) {
+    num = 0;
+  }
   if (decimalCounts === undefined) {
     decimalCounts = 2;
   }

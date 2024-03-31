@@ -8,8 +8,8 @@ import {
   limit,
   orderBy,
   query,
+  runTransaction,
   serverTimestamp,
-  setDoc,
   startAfter,
   where,
 } from "firebase/firestore";
@@ -17,6 +17,7 @@ import { db } from "../config";
 import { CollectionName } from "../../@types/enum";
 import { InvoiceFormFields } from "../../utilities/zod/schema";
 import {
+  IClientsCollection,
   IInvoiceItems,
   IInvoiceTaxList,
   IInvoicesCollection,
@@ -61,30 +62,48 @@ class DbPayment {
       throw new CustomError("This invoice number already exist");
     }
 
-    const invoiceId = getNewDocId(CollectionName.invoices);
+    await runTransaction(db, async (transaction) => {
+      const invoiceId = getNewDocId(CollectionName.invoices);
 
-    const invoiceRef = doc(db, CollectionName.invoices, invoiceId);
+      const invoiceRef = doc(db, CollectionName.invoices, invoiceId);
 
-    const newInvoice: IInvoicesCollection = {
-      InvoiceId: invoiceId,
-      InvoiceCompanyId: cmpId,
-      InvoiceCustomerName: data.InvoiceCustomerName,
-      InvoiceCustomerPhone: data.InvoiceCustomerPhone,
-      InvoiceCustomerAddress: data.InvoiceCustomerAddress || null,
-      InvoiceNumber: data.InvoiceNumber,
-      InvoiceDate: removeTimeFromDate(data.InvoiceDate) as unknown as Timestamp,
-      InvoiceDueDate: removeTimeFromDate(
-        data.InvoiceDueDate
-      ) as unknown as Timestamp,
-      InvoiceItems: items,
-      InvoiceSubtotal: data.InvoiceSubtotal ?? 0,
-      InvoiceTaxList: taxes,
-      InvoiceTotalAmount: data.InvoiceTotalAmount ?? 0,
-      InvoiceCreatedAt: serverTimestamp(),
-      InvoiceModifiedAt: serverTimestamp(),
-    };
+      const newInvoice: IInvoicesCollection = {
+        InvoiceId: invoiceId,
+        InvoiceCompanyId: cmpId,
+        InvoiceClientId: data.InvoiceClientId,
+        InvoiceClientName: data.InvoiceClientName,
+        InvoiceClientPhone: data.InvoiceClientPhone,
+        InvoiceClientAddress: data.InvoiceClientAddress || null,
+        InvoiceNumber: data.InvoiceNumber,
+        InvoiceDate: removeTimeFromDate(
+          data.InvoiceDate
+        ) as unknown as Timestamp,
+        InvoiceDueDate: removeTimeFromDate(
+          data.InvoiceDueDate
+        ) as unknown as Timestamp,
+        InvoiceItems: items,
+        InvoiceSubtotal: data.InvoiceSubtotal ?? 0,
+        InvoiceTaxList: taxes,
+        InvoiceTotalAmount: data.InvoiceTotalAmount ?? 0,
+        InvoiceDescription: data.InvoiceDescription || null,
+        InvoiceReceivedAmount: data.InvoiceReceivedAmount ?? 0,
+        InvoiceTerms: data.InvoiceTerms || null,
+        InvoiceCreatedAt: serverTimestamp(),
+        InvoiceModifiedAt: serverTimestamp(),
+      };
 
-    return setDoc(invoiceRef, newInvoice);
+      const balanceAmount =
+        (data.InvoiceTotalAmount || 0) - (data.InvoiceReceivedAmount || 0);
+
+      const clientRef = doc(db, CollectionName.clients, data.InvoiceClientId);
+      const snapshot = await transaction.get(clientRef);
+      const client = snapshot.data() as IClientsCollection;
+
+      transaction.update(clientRef, {
+        ClientBalance: client.ClientBalance + balanceAmount,
+      });
+      transaction.set(invoiceRef, newInvoice);
+    });
   };
 
   static getInvoices = ({
@@ -128,6 +147,29 @@ class DbPayment {
     const invoiceQuery = query(invoiceRef, ...queryParams);
 
     return getDocs(invoiceQuery);
+  };
+
+  static deleteInvoice = async (invoiceId: string) => {
+    await runTransaction(db, async (transaction) => {
+      const invoiceRef = doc(db, CollectionName.invoices, invoiceId);
+      const invoiceSnapshot = await transaction.get(invoiceRef);
+      const invoiceData = invoiceSnapshot.data() as IInvoicesCollection;
+
+      const { InvoiceTotalAmount, InvoiceReceivedAmount, InvoiceClientId } =
+        invoiceData;
+
+      const clientRef = doc(db, CollectionName.clients, InvoiceClientId);
+      const clientSnapshot = await transaction.get(clientRef);
+      const clientData = clientSnapshot.data() as IClientsCollection;
+
+      const balanceAmount = InvoiceTotalAmount - InvoiceReceivedAmount;
+
+      transaction.delete(invoiceRef);
+
+      transaction.update(clientRef, {
+        ClientBalance: clientData.ClientBalance - balanceAmount,
+      });
+    });
   };
 }
 

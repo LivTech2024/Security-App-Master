@@ -17,6 +17,12 @@ import { useInView } from "react-intersection-observer";
 import TableShimmer from "../../../common/shimmer/TableShimmer";
 import NoSearchResult from "../../../common/NoSearchResult";
 import { formatDate } from "../../../utilities/misc";
+import { numberFormatter } from "../../../utilities/NumberFormater";
+import { MdOutlinePrint } from "react-icons/md";
+import { errorHandler } from "../../../utilities/CustomError";
+import { closeModalLoader, showModalLoader } from "../../../utilities/TsxUtils";
+import { htmlStringToPdf } from "../../../utilities/htmlStringToPdf";
+import { generateInvoiceHTML } from "../../../utilities/generateInvoiceHtml";
 
 const InvoiceList = () => {
   const navigate = useNavigate();
@@ -108,6 +114,27 @@ const InvoiceList = () => {
       fetchNextPage();
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
+
+  const downloadInvoice = async (invoiceData: IInvoicesCollection) => {
+    if (!company) return;
+    try {
+      showModalLoader({});
+
+      const html = await generateInvoiceHTML({
+        companyDetails: company,
+        invoiceData,
+      });
+
+      await htmlStringToPdf("invoice.pdf", html);
+
+      closeModalLoader();
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      closeModalLoader();
+    }
+  };
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -140,11 +167,12 @@ const InvoiceList = () => {
               Invoice No.
             </th>
             <th className="uppercase px-4 py-2 w-[35%] text-start">Items</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-end">Date</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">Date</th>
 
-            <th className="uppercase px-4 py-2 w-[20%] text-end">
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
               Total Amount
             </th>
+            <th className="uppercase px-4 py-2 w-[5%] text-end"></th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -160,7 +188,7 @@ const InvoiceList = () => {
                 <tr key={invoice.InvoiceId}>
                   <td className="align-top px-4 py-2 text-start">
                     <span className="line-clamp-3">
-                      {invoice.InvoiceCustomerName}
+                      {invoice.InvoiceClientName}
                     </span>
                   </td>
                   <td className="align-top px-4 py-2 text-start">
@@ -169,16 +197,22 @@ const InvoiceList = () => {
 
                   <td className="align-top px-4 py-2 text-start">
                     <span className="line-clamp-2">
-                      {invoice.InvoiceItems.map((item) => item.ItemName).join(
-                        ","
-                      )}
+                      {invoice.InvoiceItems.map(
+                        (item) => item.ItemDescription
+                      ).join(",")}
                     </span>
                   </td>
-                  <td className="align-top px-4 py-2 text-end">
+                  <td className="align-top px-4 py-2 text-start">
                     {formatDate(invoice.InvoiceDate)}
                   </td>
-                  <td className="align-top px-4 py-2 text-end ">
-                    {invoice.InvoiceTotalAmount}
+                  <td className="align-top px-4 py-2 text-start ">
+                    {numberFormatter(invoice.InvoiceTotalAmount, true)}
+                  </td>
+                  <td
+                    onClick={() => downloadInvoice(invoice)}
+                    className="align-top px-4 py-2 text-end cursor-pointer text-xl text-textPrimaryBlue "
+                  >
+                    <MdOutlinePrint />
                   </td>
                 </tr>
               );

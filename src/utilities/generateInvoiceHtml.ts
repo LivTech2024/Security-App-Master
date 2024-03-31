@@ -1,67 +1,58 @@
-import dayjs from "dayjs";
-import { IInvoiceItems, IInvoiceTaxList } from "../@types/database";
+import { IInvoicesCollection } from "../@types/database";
 import { Company } from "../store/slice/auth.slice";
-import { InvoiceFormFields } from "./zod/schema";
+import { numberFormatter } from "./NumberFormater";
+import { formatDate } from "./misc";
 
 interface GenerateInvoiceHTMLArgs {
-  invoiceData: InvoiceFormFields;
-  invoiceItems: IInvoiceItems[];
-  invoiceTaxList: IInvoiceTaxList[];
+  invoiceData: IInvoicesCollection;
   companyDetails: Company;
 }
 
 export function generateInvoiceHTML({
   companyDetails,
   invoiceData,
-  invoiceItems,
-  invoiceTaxList,
 }: GenerateInvoiceHTMLArgs) {
-  const itemsHTML = invoiceItems
-    .map(
-      (item) => `
+  const { InvoiceItems, InvoiceTaxList } = invoiceData;
+
+  const itemsHTML = InvoiceItems.map(
+    (item) => `
     <tr>
-      <td>${item.ItemName}</td>
+      <td>${item.ItemDescription}</td>
       <td>${item.ItemQuantity}</td>
-      <td>${item.ItemPrice}</td>
-      <td>${item.ItemTotal}</td>
+      <td>${numberFormatter(item.ItemPrice, true)}</td>
+      <td>${numberFormatter(item.ItemTotal, true)}</td>
     </tr>
   `
-    )
-    .join("");
+  ).join("");
 
-  const taxesHTML = invoiceTaxList
-    .map(
-      (tax) => `
+  const taxesHTML = InvoiceTaxList.map(
+    (tax) => `
     <tr>
       <td>${tax.TaxName}</td>
-      <td>${tax.TaxAmount}</td>
+      <td>${numberFormatter(tax.TaxAmount, true)}</td>
     </tr>
   `
-    )
-    .join("");
+  ).join("");
+
+  console.log(companyDetails.CompanyLogo, "logo");
 
   return `
+  <!DOCTYPE html>
     <html>
       <head>
+      <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
         <style>
-          /* Add your custom styles here */
           body {
             font-family: Arial, sans-serif;
           }
-          .invoice-header {
-            text-align: center;
-            margin-bottom: 20px;
-          }
-          .invoice-header h1 {
-            margin: 0;
-          }
           .invoice-details {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 20px;
           }
           table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
           }
           th, td {
             border: 1px solid #ddd;
@@ -74,44 +65,47 @@ export function generateInvoiceHTML({
         </style>
       </head>
       <body>
-        <div class="invoice-header">
-          <h1 style="font-weight:600; font-size:24px;">Invoice</h1>
-          <p>${companyDetails.CompanyName}</p>
-          <p>${companyDetails.CompanyPhone}</p>
-          <p>${companyDetails.CompanyEmail}</p>
+        <div style="display: flex;justify-content: space-between;margin-bottom: 20px;">
+         
+        <img src="https://firebasestorage.googleapis.com/v0/b/security-app-3b156.appspot.com/o/companies%2Flogos%2FaSvLtwII6Cjs7uCISBRR5935669.jpg?alt=media&token=fcb6fc59-4a85-4aed-9753-0e92ec897ea7" style="width:100px; height:100px;" alt="Company Logo">
+          <div>
+            <p>${companyDetails.CompanyName}</p>
+            <p>${companyDetails.CompanyPhone}</p>
+            <p>${companyDetails.CompanyEmail}</p>
+            <p>${companyDetails.CompanyAddress}</p>
+          </div>
         </div>
         <div class="invoice-details">
-          <p>Customer Name: ${invoiceData.InvoiceCustomerName}</p>
-          <p>Customer Phone: ${invoiceData.InvoiceCustomerPhone}</p>
-          ${
-            invoiceData.InvoiceCustomerAddress &&
-            `<p>Customer Address: ${invoiceData.InvoiceCustomerAddress}</p>`
-          }
-          <p>Invoice Number: ${invoiceData.InvoiceNumber}</p>
-          <p>Invoice Date: ${dayjs(invoiceData.InvoiceDate).format(
-            "DD/MM/YYYY"
-          )}</p>
-          <p>Invoice Due Date: ${dayjs(invoiceData.InvoiceDueDate).format(
-            "DD/MM/YYYY"
-          )}</p>
+          <div>
+            <p>Customer Name: ${invoiceData.InvoiceClientName}</p>
+            <p>Customer Phone: ${invoiceData.InvoiceClientPhone}</p>
+            <p>Customer Address: ${invoiceData.InvoiceClientAddress}</p>
+          </div>
+          <div>
+            <p>Invoice Number: ${invoiceData.InvoiceNumber}</p>
+            <p>Invoice Date: ${formatDate(invoiceData.InvoiceDate)}</p>
+            <p>Invoice Due Date: ${formatDate(invoiceData.InvoiceDueDate)}</p>
+          </div>
         </div>
         <table>
           <thead>
             <tr>
-              <th>Item Name</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th>Total</th>
+              <th style="width:40%;">Description</th>
+              <th style="width:20%;">Quantity</th>
+              <th style="width:20%;">Rate</th>
+              <th style="width:20%;">Total</th>
             </tr>
           </thead>
           <tbody>
             ${itemsHTML}
           </tbody>
         </table>
-        <div>
-          <p>Subtotal: ${invoiceData.InvoiceSubtotal}</p>
+        <div style="padding:20px 0;">
+          <p>Subtotal: ${numberFormatter(invoiceData.InvoiceSubtotal, true)}</p>
         </div>
-        <table style="margin-top:20px;">
+        ${
+          invoiceData.InvoiceTaxList.length > 0
+            ? `<table>
           <thead>
             <tr>
               <th>Tax Name</th>
@@ -121,24 +115,32 @@ export function generateInvoiceHTML({
           <tbody>
             ${taxesHTML}
           </tbody>
-        </table>
-        <div style="margin-bottom:4px;">
-          <p style="font-weight:600; font-size:20px;">Total Amount: ${
-            invoiceData.InvoiceTotalAmount
-          }</p>
-        </div>
-        ${
-          invoiceData.InvoiceDescription &&
-          `<div style="margin-bottom:4px;">
-          <p>Description: ${invoiceData.InvoiceDescription}</p>
-        </div>`
+        </table>`
+            : "<div></div>"
         }
-       ${
-         invoiceData.InvoiceTerms &&
-         `<div style="margin-bottom:4px;">
-          <p>Terms & Conditions: ${invoiceData.InvoiceTerms}</p>
-        </div>`
-       }
+        <div style="padding-bottom:20px">
+          <p>Total Amount: ${numberFormatter(
+            invoiceData.InvoiceTotalAmount,
+            true
+          )}</p>
+          <p>Amount Paid: ${numberFormatter(
+            invoiceData.InvoiceReceivedAmount,
+            true
+          )}</p>
+          <p>Amount Due: ${numberFormatter(456, true)}</p>
+        </div>
+        <div style="padding:20px 0;">
+          ${
+            invoiceData.InvoiceDescription
+              ? `<p>Description: ${invoiceData.InvoiceDescription || "-"}</p>`
+              : ""
+          }
+          ${
+            invoiceData.InvoiceTerms
+              ? `<p>Terms & Conditions: ${invoiceData.InvoiceTerms || "-"}</p>`
+              : ""
+          }
+        </div>
       </body>
     </html>
   `;

@@ -174,7 +174,7 @@ export interface ILoggedInUsersCollection {
 }
 
 export interface IInvoiceItems {
-  ItemName: string;
+  ItemDescription: string;
   ItemQuantity: number;
   ItemPrice: number;
   ItemTotal: number;
@@ -197,9 +197,10 @@ export interface IInvoicesCollection {
   InvoiceItems: IInvoiceItems[];
   InvoiceSubtotal: number;
   InvoiceTaxList: IInvoiceTaxList[];
+  InvoiceReceivedAmount: number;
   InvoiceTotalAmount: number;
-  InvoiceDescription?: string;
-  InvoiceTerms?: string;
+  InvoiceDescription?: string | null;
+  InvoiceTerms?: string | null;
   InvoiceCreatedAt: Timestamp | FieldValue;
   InvoiceModifiedAt: Timestamp | FieldValue;
 }

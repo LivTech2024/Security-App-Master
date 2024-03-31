@@ -132,30 +132,44 @@ export const companyBranchSchema = z.object({
 export type CompanyBranchFormFields = z.infer<typeof companyBranchSchema>;
 
 //*Invoice  create schema
-export const invoiceSchema = z.object({
-  InvoiceCustomerName: z
-    .string()
-    .min(3, { message: "Customer name should be at least 3 characters" }),
-  InvoiceCustomerPhone: z
-    .string()
-    .min(8, {
-      message: "Customer phone number should be at least 8 characters",
-    })
-    .max(16, {
-      message: "Customer phone number should be at most 16 characters",
+export const invoiceSchema = z
+  .object({
+    InvoiceClientId: z.string().min(3, { message: "Client id is required" }),
+    InvoiceClientName: z
+      .string()
+      .min(2, { message: "Client name should be at least 3 characters" }),
+    InvoiceClientPhone: z
+      .string()
+      .min(8, {
+        message: "Client phone number should be at least 8 characters",
+      })
+      .max(16, {
+        message: "Client phone number should be at most 16 characters",
+      }),
+    InvoiceClientAddress: z.string().optional().nullable(),
+    InvoiceNumber: z
+      .string()
+      .min(1, { message: "Invoice number should be at least 1 character" })
+      .max(6, { message: "Invoice number should be at most 6 character" }),
+    InvoiceDate: z.date(),
+    InvoiceDueDate: z.date(),
+    InvoiceSubtotal: numberString({ message: "Subtotal amount is required" }),
+    InvoiceTotalAmount: numberString({ message: "Total amount is required" }),
+    InvoiceReceivedAmount: numberString({
+      message: "Received amount amount is required",
     }),
-  InvoiceCustomerAddress: z.string().optional().nullable(),
-  InvoiceNumber: z
-    .string()
-    .min(1, { message: "Invoice number should be at least 1 character" })
-    .max(6, { message: "Invoice number should be at most 6 character" }),
-  InvoiceDate: z.date(),
-  InvoiceDueDate: z.date(),
-  InvoiceSubtotal: numberString({ message: "Subtotal amount is required" }),
-  InvoiceTotalAmount: numberString({ message: "Total amount is required" }),
-  InvoiceDescription: z.string().optional().nullable(),
-  InvoiceTerms: z.string().optional().nullable(),
-});
+    InvoiceDescription: z.string().optional().nullable(),
+    InvoiceTerms: z.string().optional().nullable(),
+  })
+  .superRefine(({ InvoiceReceivedAmount, InvoiceTotalAmount }, ctx) => {
+    if (Number(InvoiceReceivedAmount) > Number(InvoiceTotalAmount)) {
+      ctx.addIssue({
+        path: ["InvoiceReceivedAmount"],
+        message: `Received amount cannot be greater than total amount`,
+        code: "custom",
+      });
+    }
+  });
 
 export type InvoiceFormFields = z.infer<typeof invoiceSchema>;
 
