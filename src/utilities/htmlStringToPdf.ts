@@ -7,17 +7,15 @@ export const htmlStringToPdf = async (
   const element = document.createElement("div");
   element.innerHTML = htmlString;
 
-  const pdf = await html2pdf()
-    .from(element)
-    .set({
-      margin: 0.4,
-      filename: file_name,
-      image: { type: "jpeg", quality: 0.95 },
-      html2canvas: { scale: 2, useCors: true },
-      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-    })
-    .toPdf()
-    .get("pdf");
+  const opt = {
+    margin: 0.4,
+    filename: file_name,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+  };
+
+  const pdf = await html2pdf().set(opt).from(element).toPdf().get("pdf");
 
   const blob = pdf.output("blob");
   const url = URL.createObjectURL(blob);

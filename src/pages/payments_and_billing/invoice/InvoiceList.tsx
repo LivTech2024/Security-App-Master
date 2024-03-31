@@ -135,8 +135,6 @@ const InvoiceList = () => {
         clientBalance: clientData.ClientBalance,
       });
 
-      console.log(html, "html");
-
       await htmlStringToPdf("invoice.pdf", html);
 
       closeModalLoader();
