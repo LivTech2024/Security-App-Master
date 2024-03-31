@@ -200,4 +200,5 @@ export interface IInvoicesCollection {
   InvoiceDescription?: string;
   InvoiceTerms?: string;
   InvoiceCreatedAt: Timestamp | FieldValue;
+  InvoiceModifiedAt: Timestamp | FieldValue;
 }
