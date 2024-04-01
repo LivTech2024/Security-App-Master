@@ -28,12 +28,10 @@ const AssignShiftModal = ({
 }: {
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedDate: Date;
+  selectedDate: Date | null;
   schedule: ISchedule | null;
 }) => {
-  const [selectedEmp, setSelectedEmp] = useState<IEmployeesCollection | null>(
-    null
-  );
+  const [selectedEmps, setSelectedEmps] = useState<IEmployeesCollection[]>([]);
 
   const queryClient = useQueryClient();
 
@@ -44,7 +42,6 @@ const AssignShiftModal = ({
   const { company } = useAuthState();
 
   useEffect(() => {
-    setSelectedEmp(schedule?.employee ? schedule.employee : null);
     const fetchEmpSchedule = async () => {
       if (!schedule || !company) return;
       try {
@@ -64,14 +61,19 @@ const AssignShiftModal = ({
       }
     };
     fetchEmpSchedule();
-  }, [selectedDate, opened, schedule]);
+  }, [selectedDate, opened, schedule, company]);
 
   const onSubmit = async () => {
-    if (
-      !schedule ||
-      !selectedEmp ||
-      selectedEmp.EmployeeId === schedule?.employee?.EmployeeId
-    ) {
+    if (!schedule || selectedEmps.length === 0) {
+      return;
+    }
+    if (schedule.shift.ShiftRequiredEmp !== selectedEmps.length) {
+      showSnackbar({
+        message: `This shift requires ${
+          schedule?.shift.ShiftRequiredEmp
+        } ${schedule?.shift.ShiftPosition.toUpperCase()}s`,
+        type: "error",
+      });
       return;
     }
     try {
@@ -79,14 +81,20 @@ const AssignShiftModal = ({
 
       await DbSchedule.assignShiftToEmp(
         schedule.shift.ShiftId,
-        selectedEmp.EmployeeId
+        selectedEmps.map((emp) => emp.EmployeeId)
       );
-      sendEmail({
-        to_email: selectedEmp.EmployeeEmail,
-        to_name: selectedEmp.EmployeeName,
-        message: `You have been assigned for the shift.\n Shift Name: ${schedule.shift.ShiftName}\n Timing: ${schedule.shift.ShiftStartTime}-${schedule.shift.ShiftEndTime} \n Address: ${schedule.shift.ShiftAddress}`,
-        subject: "Your schedule update",
+
+      const sendEmailPromise = selectedEmps.map(async (emp) => {
+        return sendEmail({
+          to_email: emp.EmployeeEmail,
+          to_name: emp.EmployeeName,
+          message: `You have been assigned for the shift.\n Shift Name: ${schedule.shift.ShiftName}\n Timing: ${schedule.shift.ShiftStartTime}-${schedule.shift.ShiftEndTime} \n Address: ${schedule.shift.ShiftAddress}`,
+          subject: "Your schedule update",
+        });
       });
+
+      await Promise.all(sendEmailPromise);
+
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.SCHEDULES],
       });
@@ -100,23 +108,46 @@ const AssignShiftModal = ({
     }
   };
 
+  const handleRowClicked = (data: IEmpScheduleForWeek) => {
+    if (!data.EmpIsAvailable) return;
+    const emp: Partial<IEmployeesCollection> = {
+      EmployeeId: data.EmpId,
+      EmployeeEmail: data.EmpEmail,
+      EmployeeName: data.EmpName,
+    };
+
+    setSelectedEmps((prev) => {
+      if (prev.find((e) => e.EmployeeId === emp.EmployeeId)) {
+        return prev.filter((e) => e.EmployeeId !== emp.EmployeeId);
+      } else {
+        if (selectedEmps.length === schedule?.shift.ShiftRequiredEmp) {
+          showSnackbar({
+            message: `This shift requires only ${
+              schedule?.shift.ShiftRequiredEmp
+            } ${schedule?.shift.ShiftPosition.toUpperCase()}s`,
+            type: "error",
+          });
+          return prev;
+        }
+        return [...prev, emp as IEmployeesCollection];
+      }
+    });
+  };
+
   return (
     <Dialog
       opened={opened}
       setOpened={setOpened}
-      title="Assign shift"
+      title="Assign shift to multiple employees"
       size="auto"
       isFormModal
       positiveCallback={onSubmit}
-      disableSubmit={
-        !selectedEmp ||
-        selectedEmp.EmployeeId === schedule?.employee?.EmployeeId
-      }
+      disableSubmit={selectedEmps.length === 0}
     >
       <div className="flex flex-col bg-gray-100 rounded-md p-4">
         <div className="font-semibold text-lg">
-          Assign shift to available{" "}
-          {schedule?.shift.ShiftPosition.toUpperCase()}
+          Assign shift to {schedule?.shift.ShiftRequiredEmp} available{" "}
+          {schedule?.shift.ShiftPosition.toUpperCase()}s
           <span className="ml-2 font-medium text-sm">
             {schedule?.shift.ShiftName} (
             {dayjs(selectedDate).format("dddd MMM-DD")})
@@ -144,17 +175,9 @@ const AssignShiftModal = ({
                 const { firstName, lastName } = splitName(data.EmpName);
                 return (
                   <tr
-                    onClick={() => {
-                      if (!data.EmpIsAvailable) return;
-                      const emp: Partial<IEmployeesCollection> = {
-                        EmployeeId: data.EmpId,
-                        EmployeeEmail: data.EmpEmail,
-                        EmployeeName: data.EmpName,
-                      };
-                      setSelectedEmp(emp as IEmployeesCollection);
-                    }}
+                    onClick={() => handleRowClicked(data)}
                     className={`${
-                      selectedEmp?.EmployeeId === data.EmpId
+                      selectedEmps?.find((emp) => emp.EmployeeId === data.EmpId)
                         ? "bg-blue-500 text-surface"
                         : "bg-surface"
                     } cursor-pointer`}
@@ -170,7 +193,9 @@ const AssignShiftModal = ({
                     </td>
                     <td className="text-center px-4 py-2">
                       {schedule?.employee &&
-                      schedule.employee.EmployeeId === data.EmpId ? (
+                      schedule.employee.find(
+                        (emp) => emp.EmployeeId === data.EmpId
+                      ) ? (
                         <span className="font-semibold">
                           Currently assigned{" "}
                         </span>

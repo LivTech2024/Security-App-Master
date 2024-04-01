@@ -24,6 +24,7 @@ import { errorHandler } from "../../../utilities/CustomError";
 import { sendEmail } from "../../../utilities/sendEmail";
 import { useAuthState } from "../../../store";
 import InputSelect from "../../../common/inputs/InputSelect";
+import AssignShiftModal from "../modal/AssignShiftModal";
 
 interface PositionViewProps {
   datesArray: Date[];
@@ -69,6 +70,10 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
   const [showEmpListByPosition, setShowEmpListByPosition] = useState<
     string | null
   >(null);
+
+  const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(
+    null
+  );
 
   const [shiftBranchId, setShiftBranchId] = useState<string | null>(null);
 
@@ -122,7 +127,16 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
       (s) => s.shift.ShiftId === dropPointId
     );
 
-    if (selectedShift?.employee) {
+    if (selectedShift?.shift && selectedShift.shift.ShiftRequiredEmp > 1) {
+      showSnackbar({
+        message:
+          "This shift requires more than 1 employee, click on the shift to assign multiple employees to it",
+        type: "error",
+      });
+      return;
+    }
+
+    if (selectedShift?.employee && selectedShift.employee.length > 0) {
       showSnackbar({
         message: "This shift already have assigned employees",
         type: "error",
@@ -151,7 +165,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
           };
           return {
             ...schedule,
-            employee: updatedEmp,
+            employee: [updatedEmp],
           };
         }
         return schedule;
@@ -166,10 +180,9 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
       showModalLoader({});
 
       const shiftAssignPromise = resultToBePublished.map(async (result) => {
-        return DbSchedule.assignShiftToEmp(
-          result.shift.ShiftId,
-          result.emp.EmpId
-        );
+        return DbSchedule.assignShiftToEmp(result.shift.ShiftId, [
+          result.emp.EmpId,
+        ]);
       });
 
       await Promise.all(shiftAssignPromise);
@@ -245,7 +258,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
         if (schedule.shift.ShiftId === shift.ShiftId) {
           return {
             ...schedule,
-            employee: null,
+            employee: [],
           };
         }
         return schedule;
@@ -254,6 +267,10 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
       return updatedSchedules as ISchedule[];
     });
   };
+
+  /****************For multiple employee assignation to single shift****************/
+
+  const [assignMultipleEmpModal, setAssignMultipleEmpModal] = useState(false);
 
   return (
     <>
@@ -293,7 +310,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
             </div>
           </div>
           {/* Employee list */}
-          {showEmpListByPosition && selectedDate && (
+          {showEmpListByPosition && selectedDate && !assignMultipleEmpModal && (
             <div className="flex flex-col gap-4">
               <div className="font-medium flex items-center gap-2">
                 Available
@@ -391,10 +408,17 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                           >
                             <div
                               onClick={() => {
+                                setSelectedDate(toDate(data.shift.ShiftDate));
+                                setSelectedSchedule(data);
                                 setShiftBranchId(
                                   data.shift.ShiftCompanyBranchId || null
                                 );
-                                setSelectedDate(toDate(data.shift.ShiftDate));
+                                if (data.shift.ShiftRequiredEmp > 1) {
+                                  setShowEmpListByPosition(null);
+                                  setAssignMultipleEmpModal(true);
+                                  return;
+                                }
+
                                 setShowEmpListByPosition(
                                   data.shift.ShiftPosition
                                 );
@@ -414,9 +438,11 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                                   {data.shift.ShiftStartTime}-
                                   {data.shift.ShiftEndTime}
                                 </div>
-                                {data.employee ? (
+                                {data.employee.length > 0 ? (
                                   <div className=" py-[2px] rounded w-full text-center">
-                                    {data.employee.EmployeeName}
+                                    {data.employee
+                                      .map((emp) => emp.EmployeeName)
+                                      .join(",")}
                                   </div>
                                 ) : (
                                   <div className="bg-[#ffff64] py-[2px] rounded w-full text-center">
@@ -438,6 +464,13 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
               );
             })}
           </div>
+
+          <AssignShiftModal
+            schedule={selectedSchedule}
+            selectedDate={selectedDate}
+            opened={assignMultipleEmpModal}
+            setOpened={setAssignMultipleEmpModal}
+          />
         </div>
       </DndProvider>
     </>

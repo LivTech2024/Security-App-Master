@@ -16,7 +16,7 @@ import { toDate } from "../../utilities/misc";
 
 export interface ISchedule {
   shift: IShiftsCollection;
-  employee: IEmployeesCollection | null;
+  employee: IEmployeesCollection[];
 }
 
 export interface IEmpScheduleForWeek {
@@ -46,7 +46,6 @@ class DbSchedule {
     ];
 
     if (cmpBranchId && cmpBranchId.length > 0) {
-      console.log(cmpBranchId, "inside story");
       queryParams = [
         ...queryParams,
         where("ShiftCompanyBranchId", "==", cmpBranchId),
@@ -63,17 +62,21 @@ class DbSchedule {
       let schedule: ISchedule | null = null;
       const { ShiftAssignedUserId } = shift;
 
-      schedule = { shift, employee: null };
+      schedule = { shift, employee: [] };
 
-      if (ShiftAssignedUserId) {
-        const empDocRef = doc(
-          db,
-          CollectionName.employees,
-          ShiftAssignedUserId
-        );
-        const empSnapshot = await getDoc(empDocRef);
-        const empData = empSnapshot.data() as IEmployeesCollection;
-        schedule = { ...schedule, employee: empData };
+      const assignedEmps: IEmployeesCollection[] = [];
+
+      if (ShiftAssignedUserId.length > 0) {
+        const empPromise = ShiftAssignedUserId.map(async (id) => {
+          const empDocRef = doc(db, CollectionName.employees, id);
+          const empSnapshot = await getDoc(empDocRef);
+          const empData = empSnapshot.data() as IEmployeesCollection;
+          assignedEmps.push(empData);
+        });
+
+        await Promise.all(empPromise);
+
+        schedule = { ...schedule, employee: assignedEmps };
       }
 
       schedules.push({ shift: schedule.shift, employee: schedule.employee });
@@ -125,7 +128,7 @@ class DbSchedule {
           shiftRef,
           where("ShiftDate", ">=", startDate),
           where("ShiftDate", "<=", endDate),
-          where("ShiftAssignedUserId", "==", emp.EmployeeId)
+          where("ShiftAssignedUserId", "array-contains", emp.EmployeeId)
         );
         const shiftSnapshot = await getDocs(shiftQuery);
         const shifts = shiftSnapshot.docs.map(
@@ -187,7 +190,7 @@ class DbSchedule {
     }
   };
 
-  static assignShiftToEmp = async (shiftId: string, empId: string) => {
+  static assignShiftToEmp = async (shiftId: string, empId: string[]) => {
     const shiftRef = doc(db, CollectionName.shifts, shiftId);
 
     return updateDoc(shiftRef, { ShiftAssignedUserId: empId });

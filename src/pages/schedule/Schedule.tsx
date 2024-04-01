@@ -13,7 +13,7 @@ const Schedule = () => {
     "weekly"
   );
   const [selectedView, setSelectedView] = useState<"calendar" | "position">(
-    "position"
+    "calendar"
   );
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const Schedule = () => {
         selectedView={selectedView}
         setSelectedView={setSelectedView}
       />
-      {selectedView === "calendar" ? (
+      {selectedView === "position" ? (
         <CalendarView datesArray={datesArray} selectedDate={selectedDate} />
       ) : (
         <PositionView datesArray={datesArray} />

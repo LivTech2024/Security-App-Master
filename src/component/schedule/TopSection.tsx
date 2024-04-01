@@ -63,6 +63,7 @@ const TopSection = ({
             { label: "Calendar view", value: "calendar" },
             { label: "Position view", value: "position" },
           ]}
+          disabled
           className="text-lg"
           styles={{
             input: {
