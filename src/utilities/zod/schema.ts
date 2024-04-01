@@ -62,6 +62,9 @@ export const addEmployeeFormSchema = z.object({
     .min(6, { message: "Min 6 character is required" }),
   EmployeeRole: z.string().min(1, { message: "Employee role is required" }),
   EmployeePayRate: numberString({ message: "Employee pay rate is required" }),
+  EmployeeMaxHrsPerWeek: numberString({
+    message: "Employee max week hours is required",
+  }),
   EmployeeCompanyBranchId: z.string().nullable().optional(),
 });
 

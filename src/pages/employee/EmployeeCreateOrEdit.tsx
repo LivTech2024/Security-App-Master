@@ -46,8 +46,11 @@ const EmployeeCreateOrEdit = () => {
           EmployeePayRate: String(
             employeeEditData.EmployeePayRate
           ) as unknown as number,
+          EmployeeMaxHrsPerWeek: String(
+            employeeEditData.EmployeeMaxHrsPerWeek || 45
+          ) as unknown as number,
         }
-      : undefined,
+      : { EmployeeMaxHrsPerWeek: 45 },
   });
 
   const navigate = useNavigate();
@@ -298,6 +301,15 @@ const EmployeeCreateOrEdit = () => {
                 register={methods.register}
                 name="EmployeePayRate"
                 error={methods.formState.errors.EmployeePayRate?.message}
+                decimalCount={2}
+              />
+
+              <InputWithTopHeader
+                className="mx-0"
+                label="Maximum week hours"
+                register={methods.register}
+                name="EmployeeMaxHrsPerWeek"
+                error={methods.formState.errors.EmployeeMaxHrsPerWeek?.message}
                 decimalCount={2}
               />
 

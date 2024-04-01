@@ -51,6 +51,7 @@ export interface IEmployeesCollection {
   EmployeeAdditionalDoc?: string;
   EmployeeRole: string;
   EmployeePayRate: number;
+  EmployeeMaxHrsPerWeek: number;
   EmployeeIsBanned: boolean;
   EmployeeCompanyId: string;
   EmployeeCompanyBranchId?: string | null;

@@ -225,6 +225,7 @@ class DbEmployee {
       EmployeePassword: empData.EmployeePassword,
       EmployeeRole: empData.EmployeeRole,
       EmployeePayRate: Number(empData.EmployeePayRate),
+      EmployeeMaxHrsPerWeek: Number(empData.EmployeeMaxHrsPerWeek),
       EmployeeIsBanned: false,
       EmployeeCompanyId: cmpId,
       EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
@@ -290,6 +291,7 @@ class DbEmployee {
           EmployeeNameSearchIndex: fullTextSearchIndex(
             `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
           ),
+          EmployeeMaxHrsPerWeek: Number(empData.EmployeeMaxHrsPerWeek),
           EmployeePhone: empData.EmployeePhone,
           EmployeePassword: empData.EmployeePassword,
           EmployeeEmail: empData.EmployeeEmail,
