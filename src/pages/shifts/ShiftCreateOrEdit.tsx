@@ -401,6 +401,19 @@ const ShiftCreateOrEdit = () => {
               searchValue={clientSearchValue}
               onSearchChange={setClientSearchValue}
               error={methods.formState.errors.ShiftClientId?.message}
+              nothingFoundMessage={
+                <div
+                  onClick={() => {
+                    navigate(PageRoutes.CLIENTS);
+                  }}
+                  className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <AiOutlinePlus size={18} />
+                    <span>Add Client</span>
+                  </div>
+                </div>
+              }
             />
 
             <InputWithTopHeader
