@@ -67,6 +67,7 @@ class DbEmployee {
     const newEmpRole: IEmployeeRolesCollection = {
       EmployeeRoleId: empRoleId,
       EmployeeRoleCompanyId: cmpId,
+      EmployeeRoleIsDeletable: true,
       EmployeeRoleName: empRole.trim().toUpperCase(),
       EmployeeRoleCreatedAt: serverTimestamp(),
     };

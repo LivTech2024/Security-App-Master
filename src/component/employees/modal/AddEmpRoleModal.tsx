@@ -96,36 +96,39 @@ const AddEmpRoleModal = ({
                 return (
                   <tr key={role.EmployeeRoleId} className="">
                     <td className="py-2 px-2">{role.EmployeeRoleName}</td>
-                    <td className="text-end flex justify-end py-2 px-2">
-                      <FaRegTrashAlt
-                        onClick={() =>
-                          openContextModal({
-                            modal: "confirmModal",
-                            withCloseButton: false,
-                            centered: true,
-                            closeOnClickOutside: true,
-                            innerProps: {
-                              title: "Confirm",
-                              body: "Are you sure to delete this role",
-                              onConfirm: () => {
-                                onDelete(
-                                  role.EmployeeRoleId,
-                                  role.EmployeeRoleName
-                                );
+                    {role.EmployeeRoleIsDeletable && (
+                      <td className="text-end flex justify-end py-2 px-2">
+                        <FaRegTrashAlt
+                          onClick={() =>
+                            openContextModal({
+                              modal: "confirmModal",
+                              withCloseButton: false,
+                              centered: true,
+                              closeOnClickOutside: true,
+                              innerProps: {
+                                title: "Confirm",
+                                body: "Are you sure to delete this role",
+                                onConfirm: () => {
+                                  if (!role.EmployeeRoleIsDeletable) return;
+                                  onDelete(
+                                    role.EmployeeRoleId,
+                                    role.EmployeeRoleName
+                                  );
+                                },
+                                onCancel: () => {
+                                  setOpened(true);
+                                },
                               },
-                              onCancel: () => {
-                                setOpened(true);
+                              size: "30%",
+                              styles: {
+                                body: { padding: "0px" },
                               },
-                            },
-                            size: "30%",
-                            styles: {
-                              body: { padding: "0px" },
-                            },
-                          })
-                        }
-                        className="cursor-pointer text-lg text-textPrimaryRed hover:scale-[1.1]"
-                      />
-                    </td>
+                            })
+                          }
+                          className="cursor-pointer text-lg text-textPrimaryRed hover:scale-[1.1]"
+                        />
+                      </td>
+                    )}
                   </tr>
                 );
               })

@@ -26,6 +26,7 @@ export interface IEmployeeRolesCollection {
   EmployeeRoleId: string;
   EmployeeRoleCompanyId: string;
   EmployeeRoleName: string;
+  EmployeeRoleIsDeletable: boolean;
   EmployeeRoleCreatedAt: Timestamp | FieldValue;
 }
 
