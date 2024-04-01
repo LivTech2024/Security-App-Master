@@ -109,7 +109,12 @@ const AssignShiftModal = ({
   };
 
   const handleRowClicked = (data: IEmpScheduleForWeek) => {
-    if (!data.EmpIsAvailable) return;
+    if (
+      !data.EmpIsAvailable ||
+      (schedule?.shift?.ShiftAssignedUserId &&
+        schedule?.shift?.ShiftAssignedUserId.length > 0)
+    )
+      return;
     const emp: Partial<IEmployeesCollection> = {
       EmployeeId: data.EmpId,
       EmployeeEmail: data.EmpEmail,
@@ -139,10 +144,16 @@ const AssignShiftModal = ({
       opened={opened}
       setOpened={setOpened}
       title="Assign shift to multiple employees"
-      size="auto"
+      size="80%"
       isFormModal
       positiveCallback={onSubmit}
       disableSubmit={selectedEmps.length === 0}
+      showBottomTool={
+        schedule?.shift?.ShiftAssignedUserId &&
+        schedule?.shift?.ShiftAssignedUserId.length > 0
+          ? false
+          : true
+      }
     >
       <div className="flex flex-col bg-gray-100 rounded-md p-4">
         <div className="font-semibold text-lg">
@@ -161,12 +172,13 @@ const AssignShiftModal = ({
         <table className="mt-4 text-sm">
           <thead className="">
             <tr>
-              <th className="py-2 px-4 text-start">First Name</th>
-              <th className="py-2 px-4 text-start">Last Name</th>
-              <th className="py-2 px-4 text-start">Phone</th>
-              <th className="py-2 px-4 text-start">Week Shifts</th>
-              <th className="py-2 px-4 text-start">Week Hours</th>
-              <th className="py-2 px-4 text-end">Available</th>
+              <th className="py-2 px-4 text-start w-[5%]">Image</th>
+              <th className="py-2 px-4 text-start w-[15%]">First Name</th>
+              <th className="py-2 px-4 text-start w-[15%]">Last Name</th>
+              <th className="py-2 px-4 text-start w-[15%]">Phone</th>
+              <th className="py-2 px-4 text-center w-[15%]">Week Shifts</th>
+              <th className="py-2 px-4 text-center w-[15%]">Week Hours</th>
+              <th className="py-2 px-4 text-end w-[20%]">Available</th>
             </tr>
           </thead>
           <tbody>
@@ -182,28 +194,37 @@ const AssignShiftModal = ({
                         : "bg-surface"
                     } cursor-pointer`}
                   >
+                    <td className="text-start px-4 py-2">
+                      <img
+                        src={data.EmpImg}
+                        alt=""
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    </td>
                     <td className="text-start px-4 py-2">{firstName}</td>
                     <td className="text-start px-4 py-2">{lastName}</td>
                     <td className="text-start px-4 py-2">{data.EmpPhone}</td>
-                    <td className="text-start px-4 py-2">
+                    <td className="text-center px-4 py-2">
                       {data.EmpWeekShifts}
                     </td>
-                    <td className="text-start px-4 py-2">
+                    <td className="text-center px-4 py-2">
                       {data.EmpWeekHours.toFixed(1)}
                     </td>
-                    <td className="text-center px-4 py-2">
-                      {schedule?.employee &&
-                      schedule.employee.find(
-                        (emp) => emp.EmployeeId === data.EmpId
-                      ) ? (
-                        <span className="font-semibold">
-                          Currently assigned{" "}
-                        </span>
-                      ) : data.EmpIsAvailable ? (
-                        <TiTick className="text-textPrimaryGreen text-xl text-center" />
-                      ) : (
-                        <RxCross1 className="text-textPrimaryRed text-xl text-center" />
-                      )}
+                    <td className="text-end px-4 py-2">
+                      <div className="flex justify-end">
+                        {schedule?.employee &&
+                        schedule.employee.find(
+                          (emp) => emp.EmployeeId === data.EmpId
+                        ) ? (
+                          <span className="font-semibold">
+                            Currently assigned{" "}
+                          </span>
+                        ) : data.EmpIsAvailable ? (
+                          <TiTick className="text-textPrimaryGreen text-xl" />
+                        ) : (
+                          <RxCross1 className="text-textPrimaryRed text-xl" />
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

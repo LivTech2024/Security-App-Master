@@ -329,7 +329,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                   className="text-textPrimaryRed text-xl ml-4 cursor-pointer mb-[1px]"
                 />
               </div>
-              <div className="flex items-center gap-4 flex-wrap cursor-move">
+              <div className="flex items-center gap-4 flex-wrap">
                 {empAvailableForShift.length > 0 && !isEmpLoading ? (
                   empAvailableForShift.map((data) => {
                     return (
@@ -338,27 +338,31 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                         type={`${selectedDate.toString()}${showEmpListByPosition}`}
                         callback={dropResult}
                       >
-                        <div
-                          key={data.EmpId}
-                          className="flex flex-col bg-primaryGold p-2 rounded text-sm text-surface"
-                        >
-                          <div className="flex items-center gap-2">
-                            Name:{" "}
-                            <span className="font-semibold">
-                              {data.EmpName}
-                            </span>{" "}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            Week shifts:{" "}
-                            <span className="font-semibold">
-                              {data.EmpWeekShifts}
-                            </span>{" "}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            Week hours:{" "}
-                            <span className="font-semibold">
-                              {data.EmpWeekHours}
-                            </span>{" "}
+                        <div className="flex items-center gap-2 bg-primaryGold p-2 rounded text-sm text-surface">
+                          <img
+                            src={data.EmpImg}
+                            alt=""
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                          <div key={data.EmpId} className="flex flex-col ">
+                            <div className="flex items-center gap-2">
+                              Name:{" "}
+                              <span className="font-semibold">
+                                {data.EmpName}
+                              </span>{" "}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              Week shifts:{" "}
+                              <span className="font-semibold">
+                                {data.EmpWeekShifts}
+                              </span>{" "}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              Week hours:{" "}
+                              <span className="font-semibold">
+                                {data.EmpWeekHours.toFixed(1)}
+                              </span>{" "}
+                            </div>
                           </div>
                         </div>
                       </Draggable>
@@ -439,7 +443,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                                   {data.shift.ShiftEndTime}
                                 </div>
                                 {data.employee.length > 0 ? (
-                                  <div className=" py-[2px] rounded w-full text-center">
+                                  <div className=" py-[2px] rounded w-full text-center line-clamp-1">
                                     {data.employee
                                       .map((emp) => emp.EmployeeName)
                                       .join(",")}

@@ -22,6 +22,7 @@ export interface ISchedule {
 export interface IEmpScheduleForWeek {
   EmpId: string;
   EmpName: string;
+  EmpImg: string;
   EmpPhone: string;
   EmpEmail: string;
   EmpWeekShifts: number;
@@ -170,6 +171,7 @@ class DbSchedule {
         employeesScheduleForWeek.push({
           EmpId: emp.EmployeeId,
           EmpName: emp.EmployeeName,
+          EmpImg: emp.EmployeeImg,
           EmpPhone: emp.EmployeePhone,
           EmpEmail: emp.EmployeeEmail,
           EmpWeekShifts: shifts.length,
