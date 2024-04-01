@@ -30,6 +30,8 @@ import { MultiSelect } from "@mantine/core";
 import InputHeader from "../../common/inputs/InputHeader";
 import { sendEmail } from "../../utilities/sendEmail";
 import { formatDate } from "../../utilities/misc";
+import InputSelect from "../../common/inputs/InputSelect";
+import useFetchClients from "../../hooks/fetch/useFetchClients";
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -70,6 +72,13 @@ const PatrollingCreateOrEdit = () => {
     searchQuery: locationName,
   });
 
+  const [clientSearchValue, setClientSearchValue] = useState("");
+
+  const { data: clients } = useFetchClients({
+    limit: 5,
+    searchQuery: clientSearchValue,
+  });
+
   useEffect(() => {
     console.log(methods.formState.errors);
   }, [methods.formState.errors]);
@@ -103,8 +112,6 @@ const PatrollingCreateOrEdit = () => {
       setSelectedGuardsList(newSelectedGuardsList);
     }
   }, [guards]);
-
-  console.log(selectedGuardsList, "selected guard lists");
 
   useEffect(() => {
     if (!locationName) return;
@@ -330,6 +337,17 @@ const PatrollingCreateOrEdit = () => {
             name="PatrolRequiredCount"
             decimalCount={0}
             error={methods.formState.errors.PatrolRequiredCount?.message}
+          />
+          <InputSelect
+            label="Client"
+            value={methods.watch("PatrolClientId")}
+            onChange={(e) => methods.setValue("PatrolClientId", e || "")}
+            data={clients.map((client) => {
+              return { label: client.ClientName, value: client.ClientId };
+            })}
+            searchValue={clientSearchValue}
+            onSearchChange={setClientSearchValue}
+            error={methods.formState.errors.PatrolClientId?.message}
           />
           <div className="col-span-2 w-full gap-4 flex flex-col">
             <div className="font-medium text-lg ">Create checkpoints</div>

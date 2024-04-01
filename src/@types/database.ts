@@ -120,6 +120,7 @@ export interface IPatrolsCollection {
   PatrolFailureReason?: string;
   PatrolRestrictedRadius: number;
   PatrolKeepGuardInRadiusOfLocation: boolean;
+  PatrolClientId: string;
   PatrolAcknowledged?: boolean;
   PatrolCreatedAt: Timestamp | FieldValue;
   PatrolModifiedAt: Timestamp | FieldValue;

@@ -61,6 +61,9 @@ const ShiftCreateOrEdit = () => {
           ShiftRestrictedRadius: String(
             shiftEditData.ShiftRestrictedRadius
           ) as unknown as number,
+          ShiftRequiredEmp: String(
+            shiftEditData.ShiftRequiredEmp
+          ) as unknown as number,
         }
       : { ShiftRequiredEmp: String(1) as unknown as number },
   });

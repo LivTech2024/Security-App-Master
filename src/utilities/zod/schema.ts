@@ -122,6 +122,7 @@ export const patrollingSchema = z.object({
     .number()
     .min(1, { message: "Required" })
     .max(50, { message: "Required count cannot be more than 50" }),
+  PatrolClientId: z.string().min(3, { message: "Client is required" }),
 });
 
 export type PatrollingFormFields = z.infer<typeof patrollingSchema>;

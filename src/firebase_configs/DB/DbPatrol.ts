@@ -77,6 +77,7 @@ class DbPatrol {
       PatrolRequiredCount: Number(data.PatrolRequiredCount),
       PatrolCompletedCount: 0,
       PatrolCheckPoints,
+      PatrolClientId: data.PatrolClientId,
       PatrolCurrentStatus: "pending",
       PatrolRestrictedRadius: Number(data.PatrolRestrictedRadius),
       PatrolKeepGuardInRadiusOfLocation: data.PatrolKeepGuardInRadiusOfLocation,
