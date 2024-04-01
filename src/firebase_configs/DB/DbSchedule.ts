@@ -12,7 +12,7 @@ import { CollectionName } from "../../@types/enum";
 import { db } from "../config";
 import { IEmployeesCollection, IShiftsCollection } from "../../@types/database";
 import dayjs from "dayjs";
-import { toDate } from "../../utilities/misc";
+import { getHoursDiffInTwoTimeString, toDate } from "../../utilities/misc";
 
 export interface ISchedule {
   shift: IShiftsCollection;
@@ -138,33 +138,10 @@ class DbSchedule {
 
         // Calculate total work hours for the week
         const totalWorkHours = shifts.reduce((totalHours, shift) => {
-          const [startHourStr, startMinuteStr] =
-            shift.ShiftStartTime.split(":");
-          const [endHourStr, endMinuteStr] = shift.ShiftEndTime.split(":");
-
-          // Parse start and end times to integers
-          let startHour = parseInt(startHourStr, 10);
-          const startMinute = parseInt(startMinuteStr, 10);
-          let endHour = parseInt(endHourStr, 10);
-          const endMinute = parseInt(endMinuteStr, 10);
-
-          // Adjust hours for PM times
-          if (shift.ShiftStartTime.includes("PM") && startHour !== 12) {
-            startHour += 12;
-          }
-          if (shift.ShiftEndTime.includes("PM") && endHour !== 12) {
-            endHour += 12;
-          }
-
-          // Calculate shift duration in hours
-          const startDateTime = dayjs(toDate(shift.ShiftDate))
-            .hour(startHour)
-            .minute(startMinute);
-          const endDateTime = dayjs(toDate(shift.ShiftDate))
-            .hour(endHour)
-            .minute(endMinute);
-          const shiftHours = endDateTime.diff(startDateTime, "hour", true);
-
+          const shiftHours = getHoursDiffInTwoTimeString(
+            shift.ShiftStartTime,
+            shift.ShiftEndTime
+          );
           return totalHours + shiftHours;
         }, 0);
 

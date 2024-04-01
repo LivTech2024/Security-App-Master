@@ -6,6 +6,7 @@ import { SiAdguard } from "react-icons/si";
 import { FaExclamationTriangle, FaToolbox } from "react-icons/fa";
 import { PageRoutes } from "../../@types/enum";
 import { RiBillLine } from "react-icons/ri";
+import { getHoursDiffInTwoTimeString } from "../../utilities/misc";
 
 const HomeItem = ({
   name,
@@ -46,6 +47,13 @@ const Home = () => {
           </div>
         </div>
       </div>
+      <button
+        onClick={() => {
+          console.log(getHoursDiffInTwoTimeString("9:00AM", "8:30AM"));
+        }}
+      >
+        Test hours diff
+      </button>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 w-full">
         <HomeItem
           path={PageRoutes.EMPLOYEE_LIST}

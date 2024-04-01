@@ -345,6 +345,8 @@ const PatrollingCreateOrEdit = () => {
             data={clients.map((client) => {
               return { label: client.ClientName, value: client.ClientId };
             })}
+            searchable
+            clearable
             searchValue={clientSearchValue}
             onSearchChange={setClientSearchValue}
             error={methods.formState.errors.PatrolClientId?.message}

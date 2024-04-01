@@ -41,7 +41,7 @@ const AddClientModal = ({
       ClientName: "",
       ClientEmail: "",
       ClientPhone: "",
-      ClientBalance: 0,
+      ClientBalance: String(0) as unknown as number,
       ClientAddress: null,
     };
     if (isEdit) {

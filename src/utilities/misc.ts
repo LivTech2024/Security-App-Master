@@ -154,3 +154,34 @@ export const splitName = (fullName: string) => {
     return { firstName: fullName, lastName: "" };
   }
 };
+
+export const getHoursDiffInTwoTimeString = (
+  startTime: string,
+  endTime: string
+) => {
+  const parseTime = (time: string) => {
+    const [hourStr, minuteStr] = time.split(":");
+    let hour = parseInt(hourStr, 10);
+    const minute = parseInt(minuteStr, 10);
+    if (time.includes("PM") && hour !== 12) {
+      hour += 12;
+    } else if (time.includes("AM") && hour === 12) {
+      hour = 0;
+    }
+    return { hour, minute };
+  };
+
+  const { hour: startHour, minute: startMinute } = parseTime(startTime);
+  const { hour: endHour, minute: endMinute } = parseTime(endTime);
+
+  const startDateTime = dayjs().hour(startHour).minute(startMinute);
+  const endDateTime = dayjs().hour(endHour).minute(endMinute);
+
+  let diff = endDateTime.diff(startDateTime, "hours", true);
+
+  if (diff < 0) {
+    diff += 24;
+  }
+
+  return Number(diff.toFixed(2));
+};

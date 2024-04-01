@@ -13,6 +13,8 @@ interface InputSelectProps {
   error?: string | null;
   searchValue?: string;
   onSearchChange?: React.Dispatch<React.SetStateAction<string>>;
+  searchable?: boolean;
+  clearable?: boolean;
 }
 
 const InputSelect = ({
@@ -26,6 +28,8 @@ const InputSelect = ({
   error,
   onSearchChange,
   searchValue,
+  clearable,
+  searchable,
 }: InputSelectProps) => {
   return (
     <div className={` gap-1 flex flex-col `}>
@@ -51,8 +55,8 @@ const InputSelect = ({
             padding: "22px 12px",
           },
         }}
-        clearable
-        searchable
+        clearable={clearable}
+        searchable={searchable}
         searchValue={searchValue}
         onSearchChange={onSearchChange}
       />
