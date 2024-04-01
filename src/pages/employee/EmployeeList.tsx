@@ -171,10 +171,11 @@ const EmployeeList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[20%] text-center">
+            <th className="uppercase px-4 py-2 w-[10%] text-start">Image</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-center">
               First Name
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-center">
+            <th className="uppercase px-4 py-2 w-[15%] text-center">
               Last Name
             </th>
             <th className="uppercase px-4 py-2 w-[20%] text-center">Email</th>
@@ -207,6 +208,13 @@ const EmployeeList = () => {
                   }}
                   className="cursor-pointer"
                 >
+                  <td className="px-4 py-2 text-start">
+                    <img
+                      src={emp.EmployeeImg}
+                      alt=""
+                      className="rounded-full object-cover w-14 h-14"
+                    />
+                  </td>
                   <td className="px-4 py-2 text-center">{firstName}</td>
                   <td className="px-4 py-2 text-center">{lastName}</td>
                   <td className="px-4 py-2 text-center">{emp.EmployeeEmail}</td>

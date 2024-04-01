@@ -77,11 +77,12 @@ export interface IShiftsCollection {
   ShiftLocation: GeoPoint;
   ShiftLocationName: string;
   ShiftRestrictedRadius: number;
-  ShiftClientEmail: string;
   ShiftAddress: string;
   ShiftDescription: string | null;
-  ShiftAssignedUserId: string | null;
+  ShiftAssignedUserId: string[];
+  ShiftClientId: string;
   ShiftCompanyId: string;
+  ShiftRequiredEmp: number; //* By default 1
   ShiftCompanyBranchId?: string | null;
   ShiftAcknowledged?: boolean;
   ShiftTask: IShiftTasksChild[];

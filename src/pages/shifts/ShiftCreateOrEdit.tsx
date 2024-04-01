@@ -30,6 +30,8 @@ import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
 import { toDate } from "../../utilities/misc";
 import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
 import ShiftTaskForm, { ShiftTask } from "../../component/shifts/ShiftTaskForm";
+import useFetchClients from "../../hooks/fetch/useFetchClients";
+import InputSelect from "../../common/inputs/InputSelect";
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -55,12 +57,12 @@ const ShiftCreateOrEdit = () => {
           ShiftName: shiftEditData.ShiftName,
           ShiftPosition: shiftEditData.ShiftPosition,
           ShiftStartTime: shiftEditData.ShiftStartTime,
-          ShiftClientEmail: shiftEditData.ShiftClientEmail,
+          ShiftClientId: shiftEditData.ShiftClientId,
           ShiftRestrictedRadius: String(
             shiftEditData.ShiftRestrictedRadius
           ) as unknown as number,
         }
-      : undefined,
+      : { ShiftRequiredEmp: String(1) as unknown as number },
   });
 
   const { company, empRoles, companyBranches } = useAuthState();
@@ -97,6 +99,13 @@ const ShiftCreateOrEdit = () => {
   const { data: locations } = useFetchLocations({
     limit: 5,
     searchQuery: locationName,
+  });
+
+  const [clientSearchValue, setClientSearchValue] = useState("");
+
+  const { data: clients } = useFetchClients({
+    limit: 5,
+    searchQuery: clientSearchValue,
   });
 
   useEffect(() => {
@@ -377,12 +386,25 @@ const ShiftCreateOrEdit = () => {
               error={methods.formState.errors.ShiftAddress?.message}
             />
 
+            <InputSelect
+              label="Client"
+              value={methods.watch("ShiftClientId")}
+              onChange={(e) => methods.setValue("ShiftClientId", e || "")}
+              data={clients.map((client) => {
+                return { label: client.ClientName, value: client.ClientId };
+              })}
+              searchValue={clientSearchValue}
+              onSearchChange={setClientSearchValue}
+              error={methods.formState.errors.ShiftClientId?.message}
+            />
+
             <InputWithTopHeader
-              label="Client email"
+              label="Required no. of employees"
               className="mx-0"
+              decimalCount={0}
               register={methods.register}
-              name="ShiftClientEmail"
-              error={methods.formState.errors.ShiftClientEmail?.message}
+              name="ShiftRequiredEmp"
+              error={methods.formState.errors.ShiftRequiredEmp?.message}
             />
 
             <InputWithTopHeader
@@ -392,13 +414,6 @@ const ShiftCreateOrEdit = () => {
               register={methods.register}
               name="ShiftRestrictedRadius"
               error={methods.formState.errors.ShiftRestrictedRadius?.message}
-            />
-
-            <TextareaWithTopHeader
-              title="Description (Optional)"
-              className="mx-0"
-              register={methods.register}
-              name="ShiftDescription"
             />
 
             <InputAutoComplete
@@ -424,6 +439,12 @@ const ShiftCreateOrEdit = () => {
                   </div>
                 </div>
               }
+            />
+            <TextareaWithTopHeader
+              title="Description (Optional)"
+              className="mx-0"
+              register={methods.register}
+              name="ShiftDescription"
             />
           </div>
         </form>

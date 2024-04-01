@@ -56,12 +56,13 @@ class DbShift {
       ShiftStartTime: shiftData.ShiftStartTime,
       ShiftEndTime: shiftData.ShiftEndTime,
       ShiftDescription: shiftData.ShiftDescription || null,
-      ShiftAssignedUserId: null,
+      ShiftAssignedUserId: [],
+      ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
       ShiftLocation: new GeoPoint(
         Number(shiftData.ShiftLocation.lat),
         Number(shiftData.ShiftLocation.lng)
       ),
-      ShiftClientEmail: shiftData.ShiftClientEmail,
+      ShiftClientId: shiftData.ShiftClientId,
       ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
       ShiftCurrentStatus: "pending",
       ShiftTask: shiftTasks,
@@ -124,10 +125,11 @@ class DbShift {
         Number(shiftData.ShiftLocation.lng)
       ),
       ShiftLocationName: shiftData.ShiftLocationName,
-      ShiftClientEmail: shiftData.ShiftClientEmail,
+      ShiftClientId: shiftData.ShiftClientId,
       ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
       ShiftCompanyId: cmpId,
       ShiftAddress: shiftData.ShiftAddress,
+      ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
       ShiftModifiedAt: serverTimestamp(),
     };
 

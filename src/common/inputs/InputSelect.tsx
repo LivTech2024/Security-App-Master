@@ -11,6 +11,8 @@ interface InputSelectProps {
   fontClassName?: string;
   data: ComboboxData;
   error?: string | null;
+  searchValue?: string;
+  onSearchChange?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const InputSelect = ({
@@ -22,6 +24,8 @@ const InputSelect = ({
   fontClassName,
   data,
   error,
+  onSearchChange,
+  searchValue,
 }: InputSelectProps) => {
   return (
     <div className={` gap-1 flex flex-col `}>
@@ -44,9 +48,13 @@ const InputSelect = ({
             borderRadius: "4px",
             background: "#FFFFFF",
             color: "#000000",
-            padding: "12px 12px",
+            padding: "22px 12px",
           },
         }}
+        clearable
+        searchable
+        searchValue={searchValue}
+        onSearchChange={onSearchChange}
       />
       {error && <InputError errorMessage={error} />}
     </div>

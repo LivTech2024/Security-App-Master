@@ -68,22 +68,36 @@ export const addEmployeeFormSchema = z.object({
 export type AddEmployeeFormField = z.infer<typeof addEmployeeFormSchema>;
 
 //*Shift create schema
-export const addShiftFormSchema = z.object({
-  ShiftName: z.string().min(2, { message: "Shift name is required" }),
-  ShiftPosition: z.string().min(1, { message: "Shift position is required" }),
-  ShiftDate: z.date().default(new Date()),
-  ShiftStartTime: z.string().min(2, { message: "Start time is required" }),
-  ShiftEndTime: z.string().min(2, { message: "End time is required" }),
-  ShiftDescription: z.string().nullable().optional(),
-  ShiftLocation: z.object({ lat: z.number(), lng: z.number() }),
-  ShiftLocationName: z.string().min(3, { message: "Location name required" }),
-  ShiftAddress: z.string().min(3, { message: "Shift address is required" }),
-  ShiftCompanyBranchId: z.string().nullable().optional(),
-  ShiftRestrictedRadius: numberString({
-    message: "Restricted radius is required",
-  }),
-  ShiftClientEmail: z.string().min(2, { message: "Client email is required" }),
-});
+export const addShiftFormSchema = z
+  .object({
+    ShiftName: z.string().min(2, { message: "Shift name is required" }),
+    ShiftPosition: z.string().min(1, { message: "Shift position is required" }),
+    ShiftDate: z.date().default(new Date()),
+    ShiftStartTime: z.string().min(2, { message: "Start time is required" }),
+    ShiftEndTime: z.string().min(2, { message: "End time is required" }),
+    ShiftDescription: z.string().nullable().optional(),
+    ShiftLocation: z.object({ lat: z.number(), lng: z.number() }),
+    ShiftLocationName: z.string().min(3, { message: "Location name required" }),
+    ShiftAddress: z.string().min(3, { message: "Shift address is required" }),
+    ShiftCompanyBranchId: z.string().nullable().optional(),
+    ShiftRestrictedRadius: numberString({
+      message: "Restricted radius is required",
+    }),
+    ShiftClientId: z.string().min(2, { message: "Client is required" }),
+    ShiftRequiredEmp: numberString({
+      message: "Please enter the required no. of employees",
+      defaultValue: 1,
+    }),
+  })
+  .superRefine(({ ShiftRequiredEmp }, ctx) => {
+    if (!Number(ShiftRequiredEmp)) {
+      ctx.addIssue({
+        path: ["ShiftRequiredEmp"],
+        message: `Required no. of employees must be at least 1`,
+        code: "custom",
+      });
+    }
+  });
 
 export type AddShiftFormFields = z.infer<typeof addShiftFormSchema>;
 
