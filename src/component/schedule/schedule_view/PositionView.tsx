@@ -8,7 +8,7 @@ import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
 } from "../../../firebase_configs/DB/DbSchedule";
-import { toDate } from "../../../utilities/misc";
+import { getHoursDiffInTwoTimeString, toDate } from "../../../utilities/misc";
 import { Draggable, DropPoint } from "../../../utilities/DragAndDropHelper";
 import {
   IEmployeesCollection,
@@ -145,6 +145,21 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
     }
 
     if (!selectedEmp || !selectedShift) return;
+
+    const shiftHours = getHoursDiffInTwoTimeString(
+      selectedShift.shift.ShiftStartTime,
+      selectedShift.shift.ShiftEndTime
+    );
+
+    const totalEmpWeekHoursAfterAssignation =
+      shiftHours + selectedEmp.EmpWeekHours;
+
+    if (totalEmpWeekHoursAfterAssignation > selectedEmp.EmpMaxWeekHours) {
+      showSnackbar({
+        message: "Employee maximum hours per week exceeded",
+        type: "info",
+      });
+    }
 
     setResultToBePublished((prev) => [
       ...prev,
