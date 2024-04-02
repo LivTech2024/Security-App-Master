@@ -228,6 +228,8 @@ class DbEmployee {
       EmployeeMaxHrsPerWeek: Number(empData.EmployeeMaxHrsPerWeek),
       EmployeeIsBanned: false,
       EmployeeCompanyId: cmpId,
+      EmployeeIsAvailable: true,
+      EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
       EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
       EmployeeCreatedAt: serverTimestamp(),
       EmployeeModifiedAt: serverTimestamp(),
@@ -297,6 +299,7 @@ class DbEmployee {
           EmployeeEmail: empData.EmployeeEmail,
           EmployeeRole: empData.EmployeeRole,
           EmployeePayRate: Number(empData.EmployeePayRate),
+          EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
           EmployeeCompanyId: cmpId,
           EmployeeModifiedAt: serverTimestamp(),
         };

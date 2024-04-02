@@ -26,6 +26,8 @@ import Button from "../../common/button/Button";
 import { openContextModal } from "@mantine/modals";
 import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
 import { splitName } from "../../utilities/misc";
+import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
+import InputSelect from "../../common/inputs/InputSelect";
 
 const EmployeeCreateOrEdit = () => {
   const { employeeEditData } = useEditFormStore();
@@ -49,8 +51,10 @@ const EmployeeCreateOrEdit = () => {
           EmployeeMaxHrsPerWeek: String(
             employeeEditData.EmployeeMaxHrsPerWeek || 45
           ) as unknown as number,
+          EmployeeSupervisorId: employeeEditData.EmployeeSupervisorId,
+          EmployeeCompanyBranchId: employeeEditData.EmployeeCompanyBranchId,
         }
-      : { EmployeeMaxHrsPerWeek: 45 },
+      : { EmployeeMaxHrsPerWeek: String(45) as unknown as number },
   });
 
   const navigate = useNavigate();
@@ -101,6 +105,11 @@ const EmployeeCreateOrEdit = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, employeeEditData]);
+
+  const { data: supervisors } = useFetchEmployees({
+    limit: 100,
+    empRole: "SUPERVISOR",
+  });
 
   const [empImageBase64, setEmpImageBase64] = useState<string | null>(null);
 
@@ -312,6 +321,40 @@ const EmployeeCreateOrEdit = () => {
                 error={methods.formState.errors.EmployeeMaxHrsPerWeek?.message}
                 decimalCount={2}
               />
+
+              {employeeRole === "GUARD" && (
+                <InputSelect
+                  label="Supervisor"
+                  value={methods.watch("EmployeeSupervisorId") || ""}
+                  onChange={(e) =>
+                    methods.setValue("EmployeeSupervisorId", e as string)
+                  }
+                  data={supervisors.map((branch) => {
+                    return {
+                      label: branch.EmployeeName,
+                      value: branch.EmployeeId,
+                    };
+                  })}
+                  searchable
+                  nothingFoundMessage={
+                    <div
+                      onClick={() => {
+                        navigate(PageRoutes.EMPLOYEE_LIST);
+                        setTimeout(
+                          () => navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT),
+                          50
+                        );
+                      }}
+                      className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <AiOutlinePlus size={18} />
+                        <span>Add new supervisor</span>
+                      </div>
+                    </div>
+                  }
+                />
+              )}
 
               <InputAutoComplete
                 readonly={isEdit}
