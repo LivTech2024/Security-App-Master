@@ -129,7 +129,7 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
                             </div>
                             {data.employee ? (
                               <div className=" py-[2px] rounded w-full text-center">
-                                {data.employee.EmployeeName}
+                                {data.employee[0].EmployeeName}
                               </div>
                             ) : (
                               <div className="bg-[#ffff64] py-[2px] rounded w-full text-center">
