@@ -30,6 +30,100 @@ interface PositionViewProps {
   datesArray: Date[];
 }
 
+interface AvailableEmpListProps {
+  selectedSchedule: ISchedule;
+  setSelectedSchedule: React.Dispatch<React.SetStateAction<ISchedule | null>>;
+  empAvailableForShift: IEmpScheduleForWeek[];
+  isEmpLoading: boolean;
+  dropResult: (draggableId: string, dropPointId: string) => void;
+}
+
+const AvailableEmpList = ({
+  selectedSchedule,
+  setSelectedSchedule,
+  empAvailableForShift,
+  isEmpLoading,
+  dropResult,
+}: AvailableEmpListProps) => {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="font-medium flex items-center gap-2">
+        Available
+        <span className="capitalize font-semibold">
+          {selectedSchedule.shift.ShiftPosition}
+        </span>
+        for{" "}
+        <span className="font-semibold">
+          {dayjs(toDate(selectedSchedule.shift.ShiftDate)).format("ddd MMM-DD")}
+        </span>
+        <MdOutlineClose
+          onClick={() => {
+            setSelectedSchedule(null);
+          }}
+          className="text-textPrimaryRed text-xl ml-4 cursor-pointer mb-[1px]"
+        />
+      </div>
+      <div className="flex items-center gap-4 flex-wrap">
+        {empAvailableForShift.length > 0 && !isEmpLoading ? (
+          empAvailableForShift.map((data) => {
+            return (
+              <Draggable
+                draggableId={data.EmpId}
+                type={`${toDate(selectedSchedule.shift.ShiftDate).toString()}${
+                  selectedSchedule.shift.ShiftPosition
+                }`}
+                callback={dropResult}
+              >
+                <div className="flex items-center gap-2 bg-primaryGold p-2 rounded text-sm text-surface">
+                  <img
+                    src={data.EmpImg}
+                    alt=""
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div key={data.EmpId} className="flex flex-col ">
+                    <div className="flex items-center gap-2">
+                      Name:{" "}
+                      <span className="font-semibold">{data.EmpName}</span>{" "}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      Week shifts:{" "}
+                      <span className="font-semibold">
+                        {data.EmpWeekShifts}
+                      </span>{" "}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      Week hours:{" "}
+                      <span className="font-semibold">
+                        {data.EmpWeekHours.toFixed(1)}
+                      </span>{" "}
+                    </div>
+                  </div>
+                </div>
+              </Draggable>
+            );
+          })
+        ) : isEmpLoading ? (
+          Array.from({ length: 5 }).map((_, idx) => {
+            return (
+              <div
+                key={idx}
+                className="bg-shimmerColor animate-pulse w-[150px] h-[80px]"
+              ></div>
+            );
+          })
+        ) : (
+          <div className="bg-primaryGold font-bold py-1 px-2 rounded">
+            No {selectedSchedule.shift.ShiftPosition} available for{" "}
+            {dayjs(toDate(selectedSchedule.shift.ShiftDate)).format(
+              "ddd MMM-DD"
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const PositionView = ({ datesArray }: PositionViewProps) => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
@@ -67,17 +161,9 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
     );
   };
 
-  const [showEmpListByPosition, setShowEmpListByPosition] = useState<
-    string | null
-  >(null);
-
   const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(
     null
   );
-
-  const [shiftBranchId, setShiftBranchId] = useState<string | null>(null);
-
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const [empAvailableForShift, setEmpAvailableForShift] = useState<
     IEmpScheduleForWeek[]
@@ -87,16 +173,20 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
 
   useEffect(() => {
     const fetchEmpSchedule = async () => {
-      if (!showEmpListByPosition || !selectedDate || !company) return;
+      if (!selectedSchedule || !company) return;
       try {
         setIsEmpLoading(true);
         const data = await DbSchedule.getEmployeesSchedule({
-          startDate: dayjs(selectedDate).startOf("week").toDate(),
-          endDate: dayjs(selectedDate).endOf("week").toDate(),
-          currentDate: toDate(selectedDate),
-          empRole: showEmpListByPosition,
+          startDate: dayjs(toDate(selectedSchedule.shift.ShiftDate))
+            .startOf("week")
+            .toDate(),
+          endDate: dayjs(toDate(selectedSchedule.shift.ShiftDate))
+            .endOf("week")
+            .toDate(),
+          currentDate: toDate(toDate(selectedSchedule.shift.ShiftDate)),
+          empRole: selectedSchedule.shift.ShiftPosition,
           cmpId: company.CompanyId,
-          cmpBranchId: shiftBranchId,
+          cmpBranchId: selectedSchedule.shift.ShiftCompanyBranchId,
         });
         if (data) {
           setEmpAvailableForShift(data.filter((emp) => emp.EmpIsAvailable));
@@ -110,7 +200,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
     };
     fetchEmpSchedule();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDate, showEmpListByPosition, shiftBranchId]);
+  }, [selectedSchedule]);
 
   const [resultToBePublished, setResultToBePublished] = useState<
     {
@@ -325,81 +415,14 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
             </div>
           </div>
           {/* Employee list */}
-          {showEmpListByPosition && selectedDate && !assignMultipleEmpModal && (
-            <div className="flex flex-col gap-4">
-              <div className="font-medium flex items-center gap-2">
-                Available
-                <span className="capitalize font-semibold">
-                  {showEmpListByPosition}
-                </span>
-                for{" "}
-                <span className="font-semibold">
-                  {dayjs(selectedDate).format("ddd MMM-DD")}
-                </span>
-                <MdOutlineClose
-                  onClick={() => {
-                    setShowEmpListByPosition(null);
-                    setSelectedDate(null);
-                  }}
-                  className="text-textPrimaryRed text-xl ml-4 cursor-pointer mb-[1px]"
-                />
-              </div>
-              <div className="flex items-center gap-4 flex-wrap">
-                {empAvailableForShift.length > 0 && !isEmpLoading ? (
-                  empAvailableForShift.map((data) => {
-                    return (
-                      <Draggable
-                        draggableId={data.EmpId}
-                        type={`${selectedDate.toString()}${showEmpListByPosition}`}
-                        callback={dropResult}
-                      >
-                        <div className="flex items-center gap-2 bg-primaryGold p-2 rounded text-sm text-surface">
-                          <img
-                            src={data.EmpImg}
-                            alt=""
-                            className="w-12 h-12 rounded-full object-cover"
-                          />
-                          <div key={data.EmpId} className="flex flex-col ">
-                            <div className="flex items-center gap-2">
-                              Name:{" "}
-                              <span className="font-semibold">
-                                {data.EmpName}
-                              </span>{" "}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              Week shifts:{" "}
-                              <span className="font-semibold">
-                                {data.EmpWeekShifts}
-                              </span>{" "}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              Week hours:{" "}
-                              <span className="font-semibold">
-                                {data.EmpWeekHours.toFixed(1)}
-                              </span>{" "}
-                            </div>
-                          </div>
-                        </div>
-                      </Draggable>
-                    );
-                  })
-                ) : isEmpLoading ? (
-                  Array.from({ length: 5 }).map((_, idx) => {
-                    return (
-                      <div
-                        key={idx}
-                        className="bg-shimmerColor animate-pulse w-[150px] h-[80px]"
-                      ></div>
-                    );
-                  })
-                ) : (
-                  <div className="bg-primaryGold font-bold py-1 px-2 rounded">
-                    No {showEmpListByPosition} available for{" "}
-                    {dayjs(selectedDate).format("ddd MMM-DD")}
-                  </div>
-                )}
-              </div>
-            </div>
+          {selectedSchedule && !assignMultipleEmpModal && (
+            <AvailableEmpList
+              dropResult={dropResult}
+              empAvailableForShift={empAvailableForShift}
+              isEmpLoading={isEmpLoading}
+              selectedSchedule={selectedSchedule}
+              setSelectedSchedule={setSelectedSchedule}
+            />
           )}
           <div className="flex flex-wrap w-full overflow-hidden">
             {datesArray.map((date, index) => {
@@ -427,20 +450,10 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                           >
                             <div
                               onClick={() => {
-                                setSelectedDate(toDate(data.shift.ShiftDate));
                                 setSelectedSchedule(data);
-                                setShiftBranchId(
-                                  data.shift.ShiftCompanyBranchId || null
-                                );
                                 if (data.shift.ShiftRequiredEmp > 1) {
-                                  setShowEmpListByPosition(null);
                                   setAssignMultipleEmpModal(true);
-                                  return;
                                 }
-
-                                setShowEmpListByPosition(
-                                  data.shift.ShiftPosition
-                                );
                               }}
                               key={data.shift.ShiftId + idx}
                               className={`flex flex-col p-2 cursor-pointer`}
@@ -486,9 +499,9 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
 
           <AssignShiftModal
             schedule={selectedSchedule}
-            selectedDate={selectedDate}
             opened={assignMultipleEmpModal}
             setOpened={setAssignMultipleEmpModal}
+            setSelectedSchedule={setSelectedSchedule}
           />
         </div>
       </DndProvider>

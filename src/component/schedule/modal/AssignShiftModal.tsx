@@ -23,13 +23,13 @@ import { useAuthState } from "../../../store";
 const AssignShiftModal = ({
   opened,
   setOpened,
-  selectedDate,
   schedule,
+  setSelectedSchedule,
 }: {
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedDate: Date | null;
   schedule: ISchedule | null;
+  setSelectedSchedule: React.Dispatch<React.SetStateAction<ISchedule | null>>;
 }) => {
   const [selectedEmps, setSelectedEmps] = useState<IEmployeesCollection[]>([]);
 
@@ -46,8 +46,12 @@ const AssignShiftModal = ({
       if (!schedule || !company) return;
       try {
         const data = await DbSchedule.getEmployeesSchedule({
-          startDate: dayjs(selectedDate).startOf("week").toDate(),
-          endDate: dayjs(selectedDate).endOf("week").toDate(),
+          startDate: dayjs(toDate(schedule.shift.ShiftDate))
+            .startOf("week")
+            .toDate(),
+          endDate: dayjs(toDate(schedule.shift.ShiftDate))
+            .endOf("week")
+            .toDate(),
           currentDate: toDate(schedule?.shift.ShiftDate),
           empRole: schedule.shift.ShiftPosition,
           cmpId: company.CompanyId,
@@ -61,7 +65,7 @@ const AssignShiftModal = ({
       }
     };
     fetchEmpSchedule();
-  }, [selectedDate, opened, schedule, company]);
+  }, [opened, schedule, company]);
 
   const onSubmit = async () => {
     if (!schedule || selectedEmps.length === 0) {
@@ -154,6 +158,7 @@ const AssignShiftModal = ({
           ? false
           : true
       }
+      onClose={() => setSelectedSchedule(null)}
     >
       <div className="flex flex-col bg-gray-100 rounded-md p-4">
         <div className="font-semibold text-lg">
@@ -161,7 +166,9 @@ const AssignShiftModal = ({
           {schedule?.shift.ShiftPosition.toUpperCase()}s
           <span className="ml-2 font-medium text-sm">
             {schedule?.shift.ShiftName} (
-            {dayjs(selectedDate).format("dddd MMM-DD")})
+            {schedule?.shift.ShiftDate &&
+              dayjs(toDate(schedule?.shift.ShiftDate)).format("dddd MMM-DD")}
+            )
           </span>
         </div>
         <div className="bg-blue-500 py-1 px-2 text-xs text-surface w-fit mt-2 rounded">
