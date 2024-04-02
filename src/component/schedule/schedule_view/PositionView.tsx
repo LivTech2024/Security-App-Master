@@ -25,7 +25,7 @@ import { sendEmail } from "../../../utilities/sendEmail";
 import { useAuthState } from "../../../store";
 import InputSelect from "../../../common/inputs/InputSelect";
 import AssignShiftModal from "../modal/AssignShiftModal";
-import { Accordion } from "@mantine/core";
+//import { Accordion } from "@mantine/core";
 
 interface PositionViewProps {
   datesArray: Date[];
@@ -426,12 +426,12 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
             />
           )}
           <div className="flex items-start gap-6 w-full justify-between">
-            <div className="flex flex-wrap w-[80%] overflow-hidden">
+            <div className="flex w-full flex-wrap overflow-hidden">
               {datesArray.map((date, index) => {
                 return (
                   <div
                     key={index}
-                    className="flex flex-col w-[180px] text-center"
+                    className="flex flex-col w-[14.23%] text-center"
                   >
                     <div className="font-semibold">
                       {dayjs(date).format("ddd MMM-DD")}
@@ -498,7 +498,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                 );
               })}
             </div>
-            <div className="flex flex-col gap-4 p-4 bg-onHoverBg rounded shadow w-[20%]">
+            {/* <div className="flex flex-col gap-4 p-4 bg-onHoverBg rounded shadow w-[20%]">
               <div className="font-semibold">Available Employees</div>
               <Accordion variant="contained">
                 <Accordion.Item value="photos">
@@ -526,7 +526,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                   <Accordion.Panel>Content</Accordion.Panel>
                 </Accordion.Item>
               </Accordion>
-            </div>
+            </div> */}
           </div>
 
           {/* Modal */}
