@@ -67,7 +67,7 @@ class DbSchedule {
 
       const assignedEmps: IEmployeesCollection[] = [];
 
-      if (ShiftAssignedUserId.length > 0) {
+      if (ShiftAssignedUserId && ShiftAssignedUserId?.length > 0) {
         const empPromise = ShiftAssignedUserId.map(async (id) => {
           const empDocRef = doc(db, CollectionName.employees, id);
           const empSnapshot = await getDoc(empDocRef);
