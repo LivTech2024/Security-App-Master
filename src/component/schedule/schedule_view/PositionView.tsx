@@ -25,6 +25,7 @@ import { sendEmail } from "../../../utilities/sendEmail";
 import { useAuthState } from "../../../store";
 import InputSelect from "../../../common/inputs/InputSelect";
 import AssignShiftModal from "../modal/AssignShiftModal";
+import { Accordion } from "@mantine/core";
 
 interface PositionViewProps {
   datesArray: Date[];
@@ -424,79 +425,111 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
               setSelectedSchedule={setSelectedSchedule}
             />
           )}
-          <div className="flex flex-wrap w-full overflow-hidden">
-            {datesArray.map((date, index) => {
-              return (
-                <div
-                  key={index}
-                  className="flex flex-col w-[14.28%] text-center"
-                >
-                  <div className="font-semibold">
-                    {dayjs(date).format("ddd MMM-DD")}
-                  </div>
-
-                  {getScheduleForDay(datesArray[index], schedules).length >
-                  0 ? (
-                    getScheduleForDay(datesArray[index], schedules).map(
-                      (data, idx) => {
-                        return (
-                          <DropPoint
-                            accept={`${toDate(
-                              data.shift.ShiftDate
-                            ).toString()}${data.shift.ShiftPosition}`}
-                            className="h-full"
-                            id={data.shift.ShiftId}
-                            key={idx}
-                          >
-                            <div
-                              onClick={() => {
-                                setSelectedSchedule(data);
-                                if (data.shift.ShiftRequiredEmp > 1) {
-                                  setAssignMultipleEmpModal(true);
-                                }
-                              }}
-                              key={data.shift.ShiftId + idx}
-                              className={`flex flex-col p-2 cursor-pointer`}
-                            >
-                              <div className="h-[30px] bg-gray-200 py-1 text-sm font-semibold  text-textPrimaryBlue capitalize">
-                                {data.shift.ShiftPosition}
-                              </div>
-
-                              <div className="bg-[#5e5c5c23] p-2 rounded  min-w-full items-center text-sm">
-                                <div className="text-base font-medium">
-                                  {data.shift.ShiftName}
-                                </div>
-                                <div className="font-semibold">
-                                  {data.shift.ShiftStartTime}-
-                                  {data.shift.ShiftEndTime}
-                                </div>
-                                {data.employee.length > 0 ? (
-                                  <div className=" py-[2px] rounded w-full text-center line-clamp-1">
-                                    {data.employee
-                                      .map((emp) => emp.EmployeeName)
-                                      .join(",")}
-                                  </div>
-                                ) : (
-                                  <div className="bg-[#ffff64] py-[2px] rounded w-full text-center">
-                                    (Unassigned)
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </DropPoint>
-                        );
-                      }
-                    )
-                  ) : (
-                    <div className="flex flex-col">
-                      <div className="h-[40px] "></div>
+          <div className="flex items-start gap-6 w-full justify-between">
+            <div className="flex flex-wrap w-[80%] overflow-hidden">
+              {datesArray.map((date, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col w-[180px] text-center"
+                  >
+                    <div className="font-semibold">
+                      {dayjs(date).format("ddd MMM-DD")}
                     </div>
-                  )}
-                </div>
-              );
-            })}
+
+                    {getScheduleForDay(datesArray[index], schedules).length >
+                    0 ? (
+                      getScheduleForDay(datesArray[index], schedules).map(
+                        (data, idx) => {
+                          return (
+                            <DropPoint
+                              accept={`${toDate(
+                                data.shift.ShiftDate
+                              ).toString()}${data.shift.ShiftPosition}`}
+                              className="h-full"
+                              id={data.shift.ShiftId}
+                              key={idx}
+                            >
+                              <div
+                                onClick={() => {
+                                  setSelectedSchedule(data);
+                                  if (data.shift.ShiftRequiredEmp > 1) {
+                                    setAssignMultipleEmpModal(true);
+                                  }
+                                }}
+                                key={data.shift.ShiftId + idx}
+                                className={`flex flex-col p-2 cursor-pointer`}
+                              >
+                                <div className="h-[30px] bg-gray-200 py-1 text-sm font-semibold  text-textPrimaryBlue capitalize">
+                                  {data.shift.ShiftPosition}
+                                </div>
+
+                                <div className="bg-[#5e5c5c23] p-2 rounded  min-w-full items-center text-sm">
+                                  <div className="text-base font-medium">
+                                    {data.shift.ShiftName}
+                                  </div>
+                                  <div className="font-semibold">
+                                    {data.shift.ShiftStartTime}-
+                                    {data.shift.ShiftEndTime}
+                                  </div>
+                                  {data.employee.length > 0 ? (
+                                    <div className=" py-[2px] rounded w-full text-center line-clamp-1">
+                                      {data.employee
+                                        .map((emp) => emp.EmployeeName)
+                                        .join(",")}
+                                    </div>
+                                  ) : (
+                                    <div className="bg-[#ffff64] py-[2px] rounded w-full text-center">
+                                      (Unassigned)
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </DropPoint>
+                          );
+                        }
+                      )
+                    ) : (
+                      <div className="flex flex-col">
+                        <div className="h-[40px] "></div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex flex-col gap-4 p-4 bg-onHoverBg rounded shadow w-[20%]">
+              <div className="font-semibold">Available Employees</div>
+              <Accordion variant="contained">
+                <Accordion.Item value="photos">
+                  <Accordion.Control>GUARDS</Accordion.Control>
+                  <Accordion.Panel>
+                    {selectedSchedule && !assignMultipleEmpModal && (
+                      <AvailableEmpList
+                        dropResult={dropResult}
+                        empAvailableForShift={empAvailableForShift}
+                        isEmpLoading={isEmpLoading}
+                        selectedSchedule={selectedSchedule}
+                        setSelectedSchedule={setSelectedSchedule}
+                      />
+                    )}
+                  </Accordion.Panel>
+                </Accordion.Item>
+
+                <Accordion.Item value="print">
+                  <Accordion.Control>SUPERVISORS</Accordion.Control>
+                  <Accordion.Panel>Content</Accordion.Panel>
+                </Accordion.Item>
+
+                <Accordion.Item value="camera">
+                  <Accordion.Control>OTHERS</Accordion.Control>
+                  <Accordion.Panel>Content</Accordion.Panel>
+                </Accordion.Item>
+              </Accordion>
+            </div>
           </div>
 
+          {/* Modal */}
           <AssignShiftModal
             schedule={selectedSchedule}
             opened={assignMultipleEmpModal}
