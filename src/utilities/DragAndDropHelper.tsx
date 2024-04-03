@@ -36,16 +36,15 @@ export const Draggable = ({
   );
 
   return (
-    <tr
+    <div
       ref={drag}
-      className=" pb-1 text-sm"
       style={{
         opacity: isDragging ? 0.5 : 1,
         cursor: "move",
       }}
     >
       {children}
-    </tr>
+    </div>
   );
 };
 

@@ -188,7 +188,7 @@ const EmployeeList = () => {
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={5}>
+              <td colSpan={6}>
                 <NoSearchResult text="No employee" />
               </td>
             </tr>
@@ -227,7 +227,7 @@ const EmployeeList = () => {
             })
           )}
           <tr ref={ref}>
-            <td colSpan={5}>
+            <td colSpan={6}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />

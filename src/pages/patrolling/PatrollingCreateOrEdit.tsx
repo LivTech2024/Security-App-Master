@@ -345,6 +345,19 @@ const PatrollingCreateOrEdit = () => {
             data={clients.map((client) => {
               return { label: client.ClientName, value: client.ClientId };
             })}
+            nothingFoundMessage={
+              <div
+                onClick={() => {
+                  navigate(PageRoutes.CLIENTS);
+                }}
+                className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <AiOutlinePlus size={18} />
+                  <span>Add Client</span>
+                </div>
+              </div>
+            }
             searchable
             clearable
             searchValue={clientSearchValue}

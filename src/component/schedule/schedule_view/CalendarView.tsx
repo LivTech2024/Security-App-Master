@@ -8,7 +8,6 @@ import { Draggable, DropPoint } from "../../../utilities/DragAndDropHelper";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { REACT_QUERY_KEYS } from "../../../@types/enum";
 import DbShift from "../../../firebase_configs/DB/DbShift";
-import AssignShiftModal from "../modal/AssignShiftModal";
 import { useAuthState } from "../../../store";
 import InputSelect from "../../../common/inputs/InputSelect";
 
@@ -18,6 +17,7 @@ interface CalendarViewProps {
 }
 
 const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
+  console.log(selectedDate, "here");
   const queryClient = useQueryClient();
 
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
@@ -27,6 +27,8 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
   const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(
     null
   );
+
+  console.log(assignShiftModal, selectedSchedule);
 
   const { company, companyBranches } = useAuthState();
 
@@ -153,14 +155,6 @@ const CalendarView = ({ datesArray, selectedDate }: CalendarViewProps) => {
           })}
         </div>
       </DndProvider>
-      <div className="hidden">
-        <AssignShiftModal
-          opened={assignShiftModal}
-          setOpened={setAssignShiftModal}
-          selectedDate={selectedDate}
-          schedule={selectedSchedule}
-        />
-      </div>
     </div>
   );
 };

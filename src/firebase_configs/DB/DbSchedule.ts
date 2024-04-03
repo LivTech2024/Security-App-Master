@@ -27,6 +27,7 @@ export interface IEmpScheduleForWeek {
   EmpEmail: string;
   EmpWeekShifts: number;
   EmpWeekHours: number;
+  EmpMaxWeekHours: number;
   EmpIsAvailable: boolean;
 }
 
@@ -158,6 +159,7 @@ class DbSchedule {
             ? false
             : true,
           EmpWeekHours: totalWorkHours,
+          EmpMaxWeekHours: emp.EmployeeMaxHrsPerWeek,
         });
       });
 

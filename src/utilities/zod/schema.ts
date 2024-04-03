@@ -47,26 +47,40 @@ export const adminCreateSchema = adminUpdateSchema.extend({
 export type AdminCreateFormFields = z.infer<typeof adminCreateSchema>;
 
 //*Employee create schema
-export const addEmployeeFormSchema = z.object({
-  EmployeeFirstName: z.string().min(2, { message: "First name is required" }),
-  EmployeeLastName: z.string().min(2, { message: "Last name is required" }),
-  EmployeePhone: z.string().min(10, { message: "Phone number is required" }),
-  EmployeeEmail: z
-    .string()
-    .min(3, { message: "Email is required" })
-    .regex(ConstRegex.EMAIL_OPTIONAL, {
-      message: "Invalid email",
+export const addEmployeeFormSchema = z
+  .object({
+    EmployeeFirstName: z.string().min(2, { message: "First name is required" }),
+    EmployeeLastName: z.string().min(2, { message: "Last name is required" }),
+    EmployeePhone: z.string().min(10, { message: "Phone number is required" }),
+    EmployeeEmail: z
+      .string()
+      .min(3, { message: "Email is required" })
+      .regex(ConstRegex.EMAIL_OPTIONAL, {
+        message: "Invalid email",
+      }),
+    EmployeePassword: z
+      .string()
+      .min(6, { message: "Min 6 character is required" }),
+    EmployeeRole: z.string().min(1, { message: "Employee role is required" }),
+    EmployeePayRate: numberString({ message: "Employee pay rate is required" }),
+    EmployeeMaxHrsPerWeek: numberString({
+      message: "Employee max week hours is required",
     }),
-  EmployeePassword: z
-    .string()
-    .min(6, { message: "Min 6 character is required" }),
-  EmployeeRole: z.string().min(1, { message: "Employee role is required" }),
-  EmployeePayRate: numberString({ message: "Employee pay rate is required" }),
-  EmployeeMaxHrsPerWeek: numberString({
-    message: "Employee max week hours is required",
-  }),
-  EmployeeCompanyBranchId: z.string().nullable().optional(),
-});
+    EmployeeSupervisorId: z.string().nullable().optional(),
+    EmployeeCompanyBranchId: z.string().nullable().optional(),
+  })
+  .superRefine(({ EmployeeRole, EmployeeSupervisorId }, ctx) => {
+    if (
+      EmployeeRole === "GUARD" &&
+      (!EmployeeSupervisorId || EmployeeSupervisorId.length < 3)
+    ) {
+      ctx.addIssue({
+        path: ["EmployeeSupervisorId"],
+        message: `Please select supervisor for this guard`,
+        code: "custom",
+      });
+    }
+  });
 
 export type AddEmployeeFormField = z.infer<typeof addEmployeeFormSchema>;
 
