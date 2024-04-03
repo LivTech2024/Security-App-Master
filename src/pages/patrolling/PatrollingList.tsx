@@ -15,7 +15,6 @@ import { IPatrolsCollection } from "../../@types/database";
 import { useInView } from "react-intersection-observer";
 import TableShimmer from "../../common/shimmer/TableShimmer";
 import NoSearchResult from "../../common/NoSearchResult";
-import { formatDate, toDate } from "../../utilities/misc";
 
 export const PatrolStatus = ({
   status,
@@ -150,15 +149,18 @@ const PatrollingList = () => {
             <th className="uppercase px-4 py-2 w-[15%] text-start">
               Patrol Name
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-start">Area</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">Location</th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">Time</th>
             <th className="uppercase px-4 py-2 w-[10%] text-center">
-              checkpoints
+              Checkpoints
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-end">
-              Assigned to
+            <th className="uppercase px-4 py-2 w-[15%] text-end">
+              Required Times
             </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-end">status</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">
+              Completed Times
+            </th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">Status</th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -184,23 +186,21 @@ const PatrollingList = () => {
                     <span className="line-clamp-2">{patrol.PatrolName}</span>
                   </td>
                   <td className="px-4 py-2 text-start align-top ">
-                    <span className="line-clamp-3">{patrol.PatrolArea}</span>
+                    <span className="line-clamp-3">
+                      {patrol.PatrolLocationName}
+                    </span>
                   </td>
                   <td className="px-4 py-2 text-start align-top">
-                    <span className="line-clamp-2">
-                      {formatDate(
-                        toDate(patrol.PatrolTime),
-                        "DD MMM-YY hh:mm A"
-                      )}
-                    </span>
+                    <span className="line-clamp-2">{patrol.PatrolTime}</span>
                   </td>
                   <td className="px-4 py-2 text-center align-top">
                     {patrol.PatrolCheckPoints.length.toFixed(1)}
                   </td>
-                  <td className="px-4 py-2 text-end align-top">
-                    <span className="line-clamp-3">
-                      {patrol.PatrolAssignedGuardsName.join(",")}
-                    </span>
+                  <td className="px-4 py-2 text-center align-top">
+                    {patrol.PatrolRequiredCount}
+                  </td>
+                  <td className="px-4 py-2 text-center align-top">
+                    {patrol.PatrolCompletedCount}
                   </td>
                   <td className="px-4 py-2 text-end capitalize align-top">
                     <span className="flex items-center justify-end gap-2">

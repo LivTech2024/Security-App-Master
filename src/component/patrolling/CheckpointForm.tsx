@@ -1,12 +1,9 @@
 import Button from "../../common/button/Button";
-import InputTime from "../../common/inputs/InputTime";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 
 interface CheckPointInputProps {
-  checkpoints: { checkPointName: string; checkPointTime: string }[];
-  setCheckpoints: (
-    checkpoints: { checkPointName: string; checkPointTime: string }[]
-  ) => void;
+  checkpoints: { checkPointName: string }[];
+  setCheckpoints: (checkpoints: { checkPointName: string }[]) => void;
 }
 
 const CheckpointForm = ({
@@ -18,7 +15,6 @@ const CheckpointForm = ({
       ...checkpoints,
       {
         checkPointName: "",
-        checkPointTime: "",
       },
     ]);
   };
@@ -30,7 +26,7 @@ const CheckpointForm = ({
 
   const handleChange = (
     index: number,
-    key: "checkPointName" | "checkPointTime",
+    key: "checkPointName",
     value: string
   ) => {
     const updatedCheckpoints = [...checkpoints];
@@ -61,14 +57,6 @@ const CheckpointForm = ({
                   handleChange(index, "checkPointName", e.target.value)
                 }
               />
-
-              <InputTime
-                value={checkpoint.checkPointTime}
-                onChange={(e) =>
-                  handleChange(index, "checkPointTime", e as string)
-                }
-                use12Hours
-              />
             </div>
           </div>
         ))}
@@ -77,10 +65,7 @@ const CheckpointForm = ({
         type="green"
         className="px-6 py-[6px] text-base w-fit"
         onClick={handleAddCheckpoint}
-        disabled={checkpoints.some(
-          (checkpoint) =>
-            !checkpoint.checkPointName || checkpoint.checkPointTime === ""
-        )}
+        disabled={checkpoints.some((checkpoint) => !checkpoint.checkPointName)}
         label="Add new"
       />
     </div>

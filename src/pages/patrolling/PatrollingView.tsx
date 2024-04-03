@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import PatrolViewCard from "../../component/patrolling/PatrolViewCard";
 import { useEffect, useState } from "react";
 import DbPatrol from "../../firebase_configs/DB/DbPatrol";
-import { IPatrolsCollection } from "../../@types/database";
+import { IPatrolsCollection, IShiftsCollection } from "../../@types/database";
 import NoSearchResult from "../../common/NoSearchResult";
 import { errorHandler } from "../../utilities/CustomError";
 import {
@@ -12,6 +12,7 @@ import {
 } from "../../utilities/TsxUtils";
 import { openContextModal } from "@mantine/modals";
 import { PageRoutes } from "../../@types/enum";
+import DbEmployee from "../../firebase_configs/DB/DbEmployee";
 
 const PatrollingView = () => {
   const [searchParam] = useSearchParams();
@@ -22,20 +23,42 @@ const PatrollingView = () => {
 
   const [data, setData] = useState<IPatrolsCollection | null>(null);
 
+  const [assignedGuards, setAssignedGuards] = useState<string[]>([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!patrolId) return;
-    DbPatrol.getPatrolById(patrolId)
-      .then((snapshot) => {
-        const patrolData = snapshot.data() as IPatrolsCollection;
-        setData(patrolData);
+    const fetchPatrolData = async () => {
+      if (!patrolId) return;
+      try {
+        const patrolSnapshot = await DbPatrol.getPatrolById(patrolId);
+        const patrolData = patrolSnapshot.data() as IPatrolsCollection;
+
+        if (patrolData) {
+          setData(patrolData);
+          const { PatrolLocationId } = patrolData;
+
+          const shiftSnapshot = await DbPatrol.getAssignedGuardOfPatrol(
+            PatrolLocationId
+          );
+          const shiftData = shiftSnapshot?.docs[0]?.data() as IShiftsCollection;
+          if (shiftData) {
+            const { ShiftAssignedUserId } = shiftData;
+            ShiftAssignedUserId.map(async (empId) => {
+              const emp = await DbEmployee.getEmpById(empId);
+              setAssignedGuards((prev) => [...prev, emp.EmployeeName]);
+            });
+          }
+        }
+
         setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.log(error);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchPatrolData();
   }, [patrolId]);
 
   const deletePatrol = async () => {
@@ -104,7 +127,7 @@ const PatrollingView = () => {
             Delete
           </button>
         </div>
-        <PatrolViewCard patrolData={data} />
+        <PatrolViewCard patrolData={data} assignedGuards={assignedGuards} />
       </div>
     );
   }

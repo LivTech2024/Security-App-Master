@@ -2,20 +2,29 @@ import { IPatrolsCollection } from "../../@types/database";
 import TimelineVertical from "../../common/TimelineVertical";
 import { formatDate } from "../../utilities/misc";
 
-const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
+const PatrolViewCard = ({
+  patrolData,
+  assignedGuards,
+}: {
+  patrolData: IPatrolsCollection;
+  assignedGuards: string[];
+}) => {
   return (
     <div className="bg-surface border border-gray-300 shadow-md rounded-lg px-4 pt-4 mb-4">
       <div className="mb-2">
         <div className="text-xl font-semibold">{patrolData.PatrolName}</div>
-        <span className="text-textTertiary">{patrolData.PatrolArea}</span>
+        <span className="text-textTertiary">
+          {patrolData.PatrolLocationName}
+        </span>
       </div>
       <div className="mb-4">
         <p className="text-textSecondary">
-          Assigned Guard: {patrolData.PatrolAssignedGuardsName.join(" , ")}
+          Assigned Guard:{" "}
+          {assignedGuards.length > 0
+            ? assignedGuards.join(" , ")
+            : "No guards assigned"}
         </p>
-        <p className="text-textSecondary">
-          Time: {formatDate(patrolData.PatrolTime, "DD MMM-YY hh:ss A")}
-        </p>
+        <p className="text-textSecondary">Time: {patrolData.PatrolTime}</p>
         <p className="text-textSecondary">
           Required count: {patrolData.PatrolRequiredCount}
         </p>

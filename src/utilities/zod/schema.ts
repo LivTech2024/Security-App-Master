@@ -121,25 +121,29 @@ export type AddShiftFormFields = z.infer<typeof addShiftFormSchema>;
 //* Patrolling create Schema
 export const patrollingSchema = z.object({
   PatrolName: z.string().min(3, { message: "Patrol name is required" }),
-  PatrolArea: z.string().min(3, { message: "Patrol area is required" }),
   PatrolLocation: z.object({
     latitude: z.string(),
     longitude: z.string(),
   }),
-  PatrolLocationName: z
-    .string()
-    .min(3, { message: "Location name is required" }),
-  PatrolTime: z.date(),
-  PatrolCheckPoints: z.array(z.object({ name: z.string(), time: z.string() })),
-  PatrolRestrictedRadius: numberString({
-    message: "Restricted radius in meters is required",
-  }),
+  PatrolLocationId: z.string().min(3, { message: "Location id is required" }),
+  PatrolLocationName: z.string().min(3, { message: "Location is required" }),
+  PatrolTime: z.string().min(1, { message: "Patrol time is required" }),
+  PatrolCheckPoints: z.array(z.object({ name: z.string() })),
+  PatrolRestrictedRadius: z.coerce
+    .number()
+    .min(100, { message: "Restricted radius must be at least 100 meters" })
+    .max(10000, { message: "Restricted radius must be at most 10000 meters" }),
   PatrolKeepGuardInRadiusOfLocation: z.boolean(),
   PatrolRequiredCount: z.coerce
     .number()
-    .min(1, { message: "Required" })
+    .min(1, { message: "Required count is required" })
     .max(50, { message: "Required count cannot be more than 50" }),
-  PatrolClientId: z.string().min(3, { message: "Client is required" }),
+  PatrolReminderInMinutes: z.coerce
+    .number()
+    .min(1, { message: "Patrol reminder in minutes is required" })
+    .max(720, {
+      message: "Patrol reminder in minutes cannot be more than 720",
+    }),
 });
 
 export type PatrollingFormFields = z.infer<typeof patrollingSchema>;

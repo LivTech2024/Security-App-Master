@@ -4,6 +4,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
@@ -405,6 +406,13 @@ class DbEmployee {
     const empQuery = query(empRef, ...queryParams);
 
     return getDocs(empQuery);
+  };
+
+  static getEmpById = async (empId: string) => {
+    const empRef = doc(db, CollectionName.employees, empId);
+    const snapshot = await getDoc(empRef);
+
+    return snapshot.data() as IEmployeesCollection;
   };
 }
 

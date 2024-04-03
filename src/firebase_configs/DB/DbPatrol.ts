@@ -2,7 +2,6 @@ import {
   DocumentData,
   GeoPoint,
   QueryConstraint,
-  Timestamp,
   collection,
   deleteDoc,
   doc,
@@ -25,21 +24,15 @@ import {
 } from "../../@types/database";
 import { PatrollingFormFields } from "../../utilities/zod/schema";
 import { generateBarcodesAndDownloadPDF } from "../../utilities/generateBarcodesAndDownloadPdf";
-import { fullTextSearchIndex } from "../../utilities/misc";
+import { fullTextSearchIndex, removeTimeFromDate } from "../../utilities/misc";
 
 class DbPatrol {
   static createPatrol = async ({
     cmpId,
     data,
-    guards,
   }: {
     cmpId: string;
     data: PatrollingFormFields;
-    guards: {
-      PatrolAssignedGuardId: string;
-      PatrolAssignedGuardName: string;
-      PatrolAssignedGuardEmail: string;
-    }[];
   }) => {
     const patrolId = getNewDocId(CollectionName.patrols);
     const patrolRef = doc(db, CollectionName.patrols, patrolId);
@@ -51,7 +44,6 @@ class DbPatrol {
       PatrolCheckPoints.push({
         CheckPointId: checkPointId,
         CheckPointName: ch.name,
-        CheckPointTime: ch.time,
         CheckPointStatus: "not_checked",
       });
     });
@@ -65,19 +57,17 @@ class DbPatrol {
       PatrolCompanyId: cmpId,
       PatrolName: data.PatrolName,
       PatrolNameSearchIndex,
-      PatrolArea: data.PatrolArea,
       PatrolLocation: new GeoPoint(
         Number(data.PatrolLocation.latitude),
         Number(data.PatrolLocation.longitude)
       ),
+      PatrolReminderInMinutes: data.PatrolReminderInMinutes,
+      PatrolLocationId: data.PatrolLocationId,
       PatrolLocationName: data.PatrolLocationName,
-      PatrolTime: data.PatrolTime as unknown as Timestamp,
-      PatrolAssignedGuardsId: guards.map((g) => g.PatrolAssignedGuardId),
-      PatrolAssignedGuardsName: guards.map((g) => g.PatrolAssignedGuardName),
+      PatrolTime: data.PatrolTime,
       PatrolRequiredCount: Number(data.PatrolRequiredCount),
       PatrolCompletedCount: 0,
       PatrolCheckPoints,
-      PatrolClientId: data.PatrolClientId,
       PatrolCurrentStatus: "pending",
       PatrolRestrictedRadius: Number(data.PatrolRestrictedRadius),
       PatrolKeepGuardInRadiusOfLocation: data.PatrolKeepGuardInRadiusOfLocation,
@@ -88,6 +78,7 @@ class DbPatrol {
     await setDoc(patrolRef, newPatrol);
 
     await generateBarcodesAndDownloadPDF(
+      data.PatrolLocationName,
       PatrolCheckPoints.map((ch) => {
         return { code: ch.CheckPointId, label: ch.CheckPointName };
       })
@@ -145,6 +136,18 @@ class DbPatrol {
   static deletePatrol = (patrolId: string) => {
     const patrolRef = doc(db, CollectionName.patrols, patrolId);
     return deleteDoc(patrolRef);
+  };
+
+  static getAssignedGuardOfPatrol = (locationId: string) => {
+    const shiftRef = collection(db, CollectionName.shifts);
+    const shiftQuery = query(
+      shiftRef,
+      where("ShiftLocationId", "==", locationId),
+      where("ShitDate", "==", removeTimeFromDate(new Date())),
+      limit(1)
+    );
+
+    return getDocs(shiftQuery);
   };
 }
 

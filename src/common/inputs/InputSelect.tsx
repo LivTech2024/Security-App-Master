@@ -1,12 +1,11 @@
 import InputHeader from "./InputHeader";
-import InputError from "./InputError";
 import { ComboboxData, ComboboxItem, Select } from "@mantine/core";
 
 interface InputSelectProps {
   label?: string;
   placeholder?: string;
-  value: string;
-  onChange: ((value: string | null, option: ComboboxItem) => void) | undefined;
+  value?: string;
+  onChange?: ((value: string | null, option: ComboboxItem) => void) | undefined;
   className?: string;
   fontClassName?: string;
   data: ComboboxData;
@@ -40,6 +39,7 @@ const InputSelect = ({
       ) : null}
 
       <Select
+        error={error}
         placeholder={placeholder}
         allowDeselect={false}
         value={value}
@@ -64,7 +64,6 @@ const InputSelect = ({
         onSearchChange={onSearchChange}
         nothingFoundMessage={nothingFoundMessage}
       />
-      {error && <InputError errorMessage={error} />}
     </div>
   );
 };
