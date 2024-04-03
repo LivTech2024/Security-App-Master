@@ -16,7 +16,6 @@ import DbEmployee from "../../firebase_configs/DB/DbEmployee";
 import { PageRoutes, REACT_QUERY_KEYS } from "../../@types/enum";
 import { useNavigate } from "react-router-dom";
 import { errorHandler } from "../../utilities/CustomError";
-import ImageUpload from "../../component/employees/EmpOtherDetailsInput";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 import InputAutoComplete from "../../common/inputs/InputAutocomplete";
 import { AiOutlinePlus } from "react-icons/ai";
@@ -28,6 +27,7 @@ import AddBranchModal from "../../component/company_branches/modal/AddBranchModa
 import { splitName } from "../../utilities/misc";
 import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
 import InputSelect from "../../common/inputs/InputSelect";
+import EmpUploadImgCard from "../../component/employees/EmpUploadImgCard";
 
 const EmployeeCreateOrEdit = () => {
   const { employeeEditData } = useEditFormStore();
@@ -234,7 +234,7 @@ const EmployeeCreateOrEdit = () => {
         >
           <div className="flex  gap-4 w-full">
             <div className="flex flex-col gap-4 w-[40%] bg-surface shadow p-4 rounded">
-              <ImageUpload
+              <EmpUploadImgCard
                 empImageBase64={empImageBase64}
                 setEmpImageBase64={setEmpImageBase64}
               />
