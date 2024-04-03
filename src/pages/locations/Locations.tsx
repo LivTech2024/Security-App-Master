@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AddLocationModal from "../../component/locations/modal/AddLocationModal";
 import { useAuthState, useEditFormStore } from "../../store";
 import { useDebouncedValue } from "@mantine/hooks";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DisplayCount,
   MinimumQueryCharacter,
@@ -14,8 +14,14 @@ import { ILocationsCollection } from "../../@types/database";
 import { useInView } from "react-intersection-observer";
 import NoSearchResult from "../../common/NoSearchResult";
 import TableShimmer from "../../common/shimmer/TableShimmer";
-import { firebaseDataToObject } from "../../utilities/misc";
-import { Location } from "../../store/slice/editForm.slice";
+import { FaRegTrashAlt } from "react-icons/fa";
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from "../../utilities/TsxUtils";
+import { errorHandler } from "../../utilities/CustomError";
+import { openContextModal } from "@mantine/modals";
 
 const Locations = () => {
   const [locationAddModal, setLocationAddModal] = useState(false);
@@ -105,6 +111,32 @@ const Locations = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const queryClient = useQueryClient();
+
+  //* For deleting location
+  const onDelete = async (locId: string) => {
+    if (!company) return;
+    try {
+      showModalLoader({});
+
+      await DbCompany.deleteLocation(locId);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.LOCATION_LIST],
+      });
+
+      closeModalLoader();
+      showSnackbar({
+        message: "Location deleted successfully",
+        type: "success",
+      });
+    } catch (error) {
+      errorHandler(error);
+      closeModalLoader();
+      console.log(error);
+    }
+  };
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -133,9 +165,10 @@ const Locations = () => {
             <th className="uppercase px-4 py-2 w-[25%] text-start">
               Location Name
             </th>
-            <th className="uppercase px-4 py-2 w-[35%] text-start">Address</th>
+            <th className="uppercase px-4 py-2 w-[30%] text-start">Address</th>
             <th className="uppercase px-4 py-2 w-[20%] text-end">Latitude</th>
             <th className="uppercase px-4 py-2 w-[20%] text-end">Longitude</th>
+            <th className="uppercase px-4 py-2 w-[5%] text-end"></th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -148,18 +181,7 @@ const Locations = () => {
           ) : (
             data.map((loc) => {
               return (
-                <tr
-                  onClick={() => {
-                    setLocationEditData(
-                      firebaseDataToObject(
-                        loc as unknown as Record<string, unknown>
-                      ) as unknown as Location
-                    );
-                    setLocationAddModal(true);
-                  }}
-                  key={loc.LocationId}
-                  className="cursor-pointer"
-                >
+                <tr key={loc.LocationId} className="">
                   <td className="px-4 py-2 align-top text-start">
                     {loc.LocationName}
                   </td>
@@ -171,6 +193,30 @@ const Locations = () => {
                   </td>
                   <td className="px-4 py-2 align-top text-end">
                     {loc.LocationCoordinates.longitude}
+                  </td>
+                  <td className="px-4 py-2 align-top text-end justify-end flex">
+                    <FaRegTrashAlt
+                      onClick={() => {
+                        openContextModal({
+                          modal: "confirmModal",
+                          withCloseButton: false,
+                          centered: true,
+                          closeOnClickOutside: true,
+                          innerProps: {
+                            title: "Confirm",
+                            body: "Are you sure to delete this location",
+                            onConfirm: () => {
+                              onDelete(loc.LocationId);
+                            },
+                          },
+                          size: "30%",
+                          styles: {
+                            body: { padding: "0px" },
+                          },
+                        });
+                      }}
+                      className="cursor-pointer text-lg hover:scale-105 text-textPrimaryRed"
+                    />
                   </td>
                 </tr>
               );

@@ -365,7 +365,33 @@ class DbCompany {
     return updateDoc(locationRef, newLocation);
   };
 
-  static deleteLocation = (locationId: string) => {
+  static deleteLocation = async (locationId: string) => {
+    //*Check if shift exist with this location
+    const shiftDocRef = collection(db, CollectionName.shifts);
+    const shiftQuery = query(
+      shiftDocRef,
+      where("ShiftLocationId", "==", locationId),
+      limit(1)
+    );
+    const shiftTask = getDocs(shiftQuery);
+
+    //*Check if patrol exist with this location
+    const patrolDocRef = collection(db, CollectionName.patrols);
+    const patrolQuery = query(
+      patrolDocRef,
+      where("ShiftLocationPatrolLocationIdId", "==", locationId),
+      limit(1)
+    );
+    const patrolTask = getDocs(patrolQuery);
+
+    const querySnapshots = await Promise.all([shiftTask, patrolTask]);
+
+    const isLocationUsed = querySnapshots.some((snapshot) => snapshot.size > 0);
+
+    if (isLocationUsed) {
+      throw new CustomError("This location is already used");
+    }
+
     const locationRef = doc(db, CollectionName.locations, locationId);
     return deleteDoc(locationRef);
   };
