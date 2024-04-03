@@ -68,6 +68,7 @@ export const addEmployeeFormSchema = z
     }),
     EmployeeSupervisorId: z.string().nullable().optional(),
     EmployeeCompanyBranchId: z.string().nullable().optional(),
+    EmployeeIsBanned: z.boolean(),
   })
   .superRefine(({ EmployeeRole, EmployeeSupervisorId }, ctx) => {
     if (

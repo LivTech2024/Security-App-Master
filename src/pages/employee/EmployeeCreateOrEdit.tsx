@@ -28,6 +28,8 @@ import { splitName } from "../../utilities/misc";
 import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
 import InputSelect from "../../common/inputs/InputSelect";
 import EmpUploadImgCard from "../../component/employees/EmpUploadImgCard";
+import EmployeeOtherDetails from "../../component/employees/EmployeeOtherDetails";
+import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 
 const EmployeeCreateOrEdit = () => {
   const { employeeEditData } = useEditFormStore();
@@ -53,6 +55,7 @@ const EmployeeCreateOrEdit = () => {
           ) as unknown as number,
           EmployeeSupervisorId: employeeEditData.EmployeeSupervisorId,
           EmployeeCompanyBranchId: employeeEditData.EmployeeCompanyBranchId,
+          EmployeeIsBanned: employeeEditData.EmployeeIsBanned,
         }
       : { EmployeeMaxHrsPerWeek: String(45) as unknown as number },
   });
@@ -233,13 +236,14 @@ const EmployeeCreateOrEdit = () => {
           className="flex flex-col gap-4"
         >
           <div className="flex  gap-4 w-full">
-            <div className="flex flex-col gap-4 w-[40%] bg-surface shadow p-4 rounded">
+            <div className="flex flex-col gap-4 w-[50%] bg-surface shadow p-4 rounded">
               <EmpUploadImgCard
                 empImageBase64={empImageBase64}
                 setEmpImageBase64={setEmpImageBase64}
               />
+              <EmployeeOtherDetails />
             </div>
-            <div className="grid grid-cols-2 gap-4 w-[60%] bg-surface shadow rounded p-4 place-content-start">
+            <div className="grid grid-cols-2 gap-4 w-[50%] bg-surface shadow rounded p-4 place-content-start flex-grow">
               <InputWithTopHeader
                 className="mx-0"
                 label="First Name"
@@ -357,30 +361,39 @@ const EmployeeCreateOrEdit = () => {
                 />
               )}
 
-              <InputAutoComplete
-                readonly={isEdit}
-                label="Branch (Optional)"
-                value={companyBranch}
-                onChange={setCompanyBranch}
-                isFilterReq={true}
-                data={companyBranches.map((branch) => {
-                  return {
-                    label: branch.CompanyBranchName,
-                    value: branch.CompanyBranchName,
-                  };
-                })}
-                dropDownHeader={
-                  <div
-                    onClick={() => setAddCmpBranchModal(true)}
-                    className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2">
-                      <AiOutlinePlus size={18} />
-                      <span>Add new branch</span>
+              <div className="col-span-2 flex items-end justify-end w-full gap-4">
+                <InputAutoComplete
+                  readonly={isEdit}
+                  label="Branch (Optional)"
+                  value={companyBranch}
+                  onChange={setCompanyBranch}
+                  isFilterReq={true}
+                  data={companyBranches.map((branch) => {
+                    return {
+                      label: branch.CompanyBranchName,
+                      value: branch.CompanyBranchName,
+                    };
+                  })}
+                  dropDownHeader={
+                    <div
+                      onClick={() => setAddCmpBranchModal(true)}
+                      className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <AiOutlinePlus size={18} />
+                        <span>Add new branch</span>
+                      </div>
                     </div>
-                  </div>
-                }
-              />
+                  }
+                  className="w-full"
+                />
+                <SwitchWithSideHeader
+                  register={methods.register}
+                  name="EmployeeIsBanned"
+                  className="w-full mb-2 font-medium"
+                  label="Ban this employee"
+                />
+              </div>
             </div>
           </div>
         </form>

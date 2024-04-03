@@ -40,6 +40,24 @@ export interface IAdminsCollection {
   AdminModifiedAt: Timestamp | FieldValue;
 }
 
+export interface IEmpLicenseDetails {
+  LicenseType: "driving" | "security";
+  LicenseNumber: number;
+  LicenseExpDate: Timestamp | FieldValue;
+}
+export interface IEmpBankDetails {
+  BankName: string;
+  BankAccName: string;
+  BankAccNumber: string;
+  BankIfscCode: string;
+  BankVoidCheckImg: string | null;
+}
+
+export interface IEmpCertificatesDetails {
+  CertificateName: string;
+  CertificateDoc: string;
+}
+
 export interface IEmployeesCollection {
   EmployeeId: string;
   EmployeeName: string;
@@ -48,7 +66,6 @@ export interface IEmployeesCollection {
   EmployeeEmail: string;
   EmployeePassword: string;
   EmployeeImg: string;
-  EmployeeAdditionalDoc?: string;
   EmployeeRole: string;
   EmployeePayRate: number;
   EmployeeMaxHrsPerWeek: number;
@@ -57,6 +74,9 @@ export interface IEmployeesCollection {
   EmployeeIsBanned: boolean;
   EmployeeCompanyId: string;
   EmployeeCompanyBranchId?: string | null;
+  EmployeeLicenses: IEmpLicenseDetails[];
+  EmployeeBankDetails: IEmpBankDetails | null;
+  EmployeeCertificates: IEmpCertificatesDetails[];
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;
 }

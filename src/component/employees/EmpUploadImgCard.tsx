@@ -21,7 +21,7 @@ const EmpUploadImgCard = ({
 
   return (
     <div className="p-4 bg-gray-100 rounded-lg shadow-md">
-      <h2 className="text-lg font-medium mb-4">Upload Employee Image</h2>
+      <h2 className=" font-semibold mb-4">Upload Employee Image</h2>
       <div className="flex items-center">
         <label htmlFor="image" className="mr-4 cursor-pointer">
           <img

@@ -227,11 +227,14 @@ class DbEmployee {
       EmployeeRole: empData.EmployeeRole,
       EmployeePayRate: Number(empData.EmployeePayRate),
       EmployeeMaxHrsPerWeek: Number(empData.EmployeeMaxHrsPerWeek),
-      EmployeeIsBanned: false,
+      EmployeeIsBanned: empData.EmployeeIsBanned,
       EmployeeCompanyId: cmpId,
       EmployeeIsAvailable: true,
       EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
       EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
+      EmployeeBankDetails: null,
+      EmployeeCertificates: [],
+      EmployeeLicenses: [],
       EmployeeCreatedAt: serverTimestamp(),
       EmployeeModifiedAt: serverTimestamp(),
     };
@@ -302,6 +305,7 @@ class DbEmployee {
           EmployeePayRate: Number(empData.EmployeePayRate),
           EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
           EmployeeCompanyId: cmpId,
+          EmployeeIsBanned: empData.EmployeeIsBanned,
           EmployeeModifiedAt: serverTimestamp(),
         };
 
