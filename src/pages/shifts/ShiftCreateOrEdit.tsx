@@ -67,6 +67,7 @@ const ShiftCreateOrEdit = () => {
           ShiftRequiredEmp: String(
             shiftEditData.ShiftRequiredEmp
           ) as unknown as number,
+          ShiftLocationId: shiftEditData.ShiftLocationId,
         }
       : { ShiftRequiredEmp: String(1) as unknown as number },
   });

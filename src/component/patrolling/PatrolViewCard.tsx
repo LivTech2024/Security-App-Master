@@ -20,9 +20,11 @@ const PatrolViewCard = ({
       <div className="mb-4">
         <p className="text-textSecondary">
           Assigned Guard:{" "}
-          {assignedGuards.length > 0
-            ? assignedGuards.join(" , ")
-            : "No guards assigned"}
+          <span className="font-medium text-textPrimary">
+            {assignedGuards.length > 0
+              ? assignedGuards.join(" , ")
+              : "No guards assigned"}
+          </span>
         </p>
         <p className="text-textSecondary">Time: {patrolData.PatrolTime}</p>
         <p className="text-textSecondary">

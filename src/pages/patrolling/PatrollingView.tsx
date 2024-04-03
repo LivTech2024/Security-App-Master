@@ -42,12 +42,20 @@ const PatrollingView = () => {
             PatrolLocationId
           );
           const shiftData = shiftSnapshot?.docs[0]?.data() as IShiftsCollection;
+
           if (shiftData) {
             const { ShiftAssignedUserId } = shiftData;
-            ShiftAssignedUserId.map(async (empId) => {
+            const promise = ShiftAssignedUserId.map(async (empId) => {
               const emp = await DbEmployee.getEmpById(empId);
-              setAssignedGuards((prev) => [...prev, emp.EmployeeName]);
+              setAssignedGuards((prev) => {
+                if (prev.find((p) => p === emp.EmployeeName)) {
+                  return prev;
+                }
+                return [...prev, emp.EmployeeName];
+              });
             });
+
+            await Promise.all(promise);
           }
         }
 
