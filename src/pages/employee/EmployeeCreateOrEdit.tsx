@@ -353,6 +353,7 @@ const EmployeeCreateOrEdit = () => {
                       </div>
                     </div>
                   }
+                  error={methods.formState.errors.EmployeeSupervisorId?.message}
                 />
               )}
 
