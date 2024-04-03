@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useJsApiLoader } from "@react-google-maps/api";
 import AddLocationModal from "../../component/locations/modal/AddLocationModal";
 import { useAuthState, useEditFormStore } from "../../store";
 import { useDebouncedValue } from "@mantine/hooks";
@@ -22,6 +23,9 @@ import {
 } from "../../utilities/TsxUtils";
 import { errorHandler } from "../../utilities/CustomError";
 import { openContextModal } from "@mantine/modals";
+import { Library } from "@googlemaps/js-api-loader";
+
+const libraries: Library[] = ["places"];
 
 const Locations = () => {
   const [locationAddModal, setLocationAddModal] = useState(false);
@@ -137,103 +141,116 @@ const Locations = () => {
     }
   };
 
-  return (
-    <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Locations</span>
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_JAVASCRIPT_API,
+    libraries,
+  });
 
-        <button
-          onClick={() => {
-            setLocationAddModal(true);
-            setLocationEditData(null);
-          }}
-          className="bg-primary text-surface px-4 py-2 rounded"
-        >
-          Add Location
-        </button>
-      </div>
-      <div className="hidden">
-        <AddLocationModal
-          opened={locationAddModal}
-          setOpened={setLocationAddModal}
-        />
-      </div>
+  if (isLoaded)
+    return (
+      <div className="flex flex-col w-full h-full p-6 gap-6">
+        <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
+          <span className="font-semibold text-xl">Locations</span>
 
-      <table className="rounded overflow-hidden w-full">
-        <thead className="bg-primary text-surface text-sm">
-          <tr>
-            <th className="uppercase px-4 py-2 w-[25%] text-start">
-              Location Name
-            </th>
-            <th className="uppercase px-4 py-2 w-[30%] text-start">Address</th>
-            <th className="uppercase px-4 py-2 w-[20%] text-end">Latitude</th>
-            <th className="uppercase px-4 py-2 w-[20%] text-end">Longitude</th>
-            <th className="uppercase px-4 py-2 w-[5%] text-end"></th>
-          </tr>
-        </thead>
-        <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
-          {data.length === 0 && !isLoading ? (
+          <button
+            onClick={() => {
+              setLocationAddModal(true);
+              setLocationEditData(null);
+            }}
+            className="bg-primary text-surface px-4 py-2 rounded"
+          >
+            Add Location
+          </button>
+        </div>
+        <div className="hidden">
+          <AddLocationModal
+            opened={locationAddModal}
+            setOpened={setLocationAddModal}
+          />
+        </div>
+
+        <table className="rounded overflow-hidden w-full">
+          <thead className="bg-primary text-surface text-sm">
             <tr>
+              <th className="uppercase px-4 py-2 w-[25%] text-start">
+                Location Name
+              </th>
+              <th className="uppercase px-4 py-2 w-[30%] text-start">
+                Address
+              </th>
+              <th className="uppercase px-4 py-2 w-[20%] text-end">Latitude</th>
+              <th className="uppercase px-4 py-2 w-[20%] text-end">
+                Longitude
+              </th>
+              <th className="uppercase px-4 py-2 w-[5%] text-end"></th>
+            </tr>
+          </thead>
+          <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
+            {data.length === 0 && !isLoading ? (
+              <tr>
+                <td colSpan={4}>
+                  <NoSearchResult text="No location" />
+                </td>
+              </tr>
+            ) : (
+              data.map((loc) => {
+                return (
+                  <tr key={loc.LocationId} className="">
+                    <td className="px-4 py-2 align-top text-start">
+                      {loc.LocationName}
+                    </td>
+                    <td className="px-4 py-2 align-top text-start">
+                      <span className="line-clamp-3">
+                        {loc.LocationAddress}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 align-top text-end">
+                      {loc.LocationCoordinates.latitude}
+                    </td>
+                    <td className="px-4 py-2 align-top text-end">
+                      {loc.LocationCoordinates.longitude}
+                    </td>
+                    <td className="px-4 py-2 align-top text-end justify-end flex">
+                      <FaRegTrashAlt
+                        onClick={() => {
+                          openContextModal({
+                            modal: "confirmModal",
+                            withCloseButton: false,
+                            centered: true,
+                            closeOnClickOutside: true,
+                            innerProps: {
+                              title: "Confirm",
+                              body: "Are you sure to delete this location",
+                              onConfirm: () => {
+                                onDelete(loc.LocationId);
+                              },
+                            },
+                            size: "30%",
+                            styles: {
+                              body: { padding: "0px" },
+                            },
+                          });
+                        }}
+                        className="cursor-pointer text-lg hover:scale-105 text-textPrimaryRed"
+                      />
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+            <tr ref={ref}>
               <td colSpan={4}>
-                <NoSearchResult text="No location" />
+                {(isLoading || isFetchingNextPage) &&
+                  Array.from({ length: 10 }).map((_, idx) => (
+                    <TableShimmer key={idx} />
+                  ))}
               </td>
             </tr>
-          ) : (
-            data.map((loc) => {
-              return (
-                <tr key={loc.LocationId} className="">
-                  <td className="px-4 py-2 align-top text-start">
-                    {loc.LocationName}
-                  </td>
-                  <td className="px-4 py-2 align-top text-start">
-                    <span className="line-clamp-3">{loc.LocationAddress}</span>
-                  </td>
-                  <td className="px-4 py-2 align-top text-end">
-                    {loc.LocationCoordinates.latitude}
-                  </td>
-                  <td className="px-4 py-2 align-top text-end">
-                    {loc.LocationCoordinates.longitude}
-                  </td>
-                  <td className="px-4 py-2 align-top text-end justify-end flex">
-                    <FaRegTrashAlt
-                      onClick={() => {
-                        openContextModal({
-                          modal: "confirmModal",
-                          withCloseButton: false,
-                          centered: true,
-                          closeOnClickOutside: true,
-                          innerProps: {
-                            title: "Confirm",
-                            body: "Are you sure to delete this location",
-                            onConfirm: () => {
-                              onDelete(loc.LocationId);
-                            },
-                          },
-                          size: "30%",
-                          styles: {
-                            body: { padding: "0px" },
-                          },
-                        });
-                      }}
-                      className="cursor-pointer text-lg hover:scale-105 text-textPrimaryRed"
-                    />
-                  </td>
-                </tr>
-              );
-            })
-          )}
-          <tr ref={ref}>
-            <td colSpan={4}>
-              {(isLoading || isFetchingNextPage) &&
-                Array.from({ length: 10 }).map((_, idx) => (
-                  <TableShimmer key={idx} />
-                ))}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
+          </tbody>
+        </table>
+      </div>
+    );
 };
 
 export default Locations;
