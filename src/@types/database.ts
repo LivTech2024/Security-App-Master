@@ -78,9 +78,11 @@ export interface IShiftsCollection {
   ShiftStartTime: string;
   ShiftEndTime: string;
   ShiftLocation: GeoPoint;
+  ShiftLocationId: string;
   ShiftLocationName: string;
+  ShiftLocationAddress: string;
   ShiftRestrictedRadius: number;
-  ShiftAddress: string;
+  ShiftEnableRestrictedRadius: boolean;
   ShiftDescription: string | null;
   ShiftAssignedUserId: string[];
   ShiftClientId: string;

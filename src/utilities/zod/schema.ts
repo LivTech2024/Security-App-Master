@@ -93,13 +93,17 @@ export const addShiftFormSchema = z
     ShiftStartTime: z.string().min(2, { message: "Start time is required" }),
     ShiftEndTime: z.string().min(2, { message: "End time is required" }),
     ShiftDescription: z.string().nullable().optional(),
-    ShiftLocation: z.object({ lat: z.number(), lng: z.number() }),
+    ShiftLocation: z.object({ latitude: z.string(), longitude: z.string() }),
+    ShiftLocationId: z.string().min(3, { message: "Location id required" }),
     ShiftLocationName: z.string().min(3, { message: "Location name required" }),
-    ShiftAddress: z.string().min(3, { message: "Shift address is required" }),
+    ShiftLocationAddress: z
+      .string()
+      .min(3, { message: "Shift address is required" }),
     ShiftCompanyBranchId: z.string().nullable().optional(),
     ShiftRestrictedRadius: numberString({
       message: "Restricted radius is required",
     }),
+    ShiftEnableRestrictedRadius: z.boolean(),
     ShiftClientId: z.string().min(2, { message: "Client is required" }),
     ShiftRequiredEmp: numberString({
       message: "Please enter the required no. of employees",

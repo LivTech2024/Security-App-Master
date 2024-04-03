@@ -59,8 +59,8 @@ class DbShift {
       ShiftAssignedUserId: [],
       ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
       ShiftLocation: new GeoPoint(
-        Number(shiftData.ShiftLocation.lat),
-        Number(shiftData.ShiftLocation.lng)
+        Number(shiftData.ShiftLocation.latitude),
+        Number(shiftData.ShiftLocation.longitude)
       ),
       ShiftClientId: shiftData.ShiftClientId,
       ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
@@ -69,8 +69,10 @@ class DbShift {
       ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
       ShiftAcknowledged: false,
       ShiftCompanyId: cmpId,
-      ShiftAddress: shiftData.ShiftAddress,
+      ShiftLocationId: shiftData.ShiftLocationId,
+      ShiftLocationAddress: shiftData.ShiftLocationAddress,
       ShiftLocationName: shiftData.ShiftLocationName,
+      ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
       ShiftCreatedAt: serverTimestamp(),
       ShiftModifiedAt: serverTimestamp(),
     };
@@ -83,6 +85,7 @@ class DbShift {
 
     if (barcodesToBeGenerated.length > 0) {
       await generateBarcodesAndDownloadPDF(
+        shiftData.ShiftName,
         barcodesToBeGenerated.map((task) => {
           return { code: task.ShiftTaskId, label: task.ShiftTask };
         })
@@ -121,14 +124,15 @@ class DbShift {
       ShiftDescription: shiftData.ShiftDescription || null,
       ShiftTask: shiftTasks,
       ShiftLocation: new GeoPoint(
-        Number(shiftData.ShiftLocation.lat),
-        Number(shiftData.ShiftLocation.lng)
+        Number(shiftData.ShiftLocation.latitude),
+        Number(shiftData.ShiftLocation.longitude)
       ),
       ShiftLocationName: shiftData.ShiftLocationName,
       ShiftClientId: shiftData.ShiftClientId,
       ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
       ShiftCompanyId: cmpId,
-      ShiftAddress: shiftData.ShiftAddress,
+      ShiftLocationId: shiftData.ShiftLocationId,
+      ShiftLocationAddress: shiftData.ShiftLocationAddress,
       ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
       ShiftModifiedAt: serverTimestamp(),
     };
@@ -141,6 +145,7 @@ class DbShift {
 
     if (barcodesToBeGenerated.length > 0) {
       await generateBarcodesAndDownloadPDF(
+        shiftData.ShiftName,
         barcodesToBeGenerated.map((task) => {
           return { code: task.ShiftTaskId, label: task.ShiftTask };
         })
