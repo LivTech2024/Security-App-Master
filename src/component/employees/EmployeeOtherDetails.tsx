@@ -2,6 +2,7 @@ import { Accordion } from "@mantine/core";
 import EmpCertificateDetails from "./EmpCertificateDetails";
 import EmpLicenses from "./EmpLicenses";
 import EmpBankDetails from "./EmpBankDetails";
+import { IEmpBankDetails } from "../../@types/database";
 
 export interface EmpLicenseDetails {
   LicenseType: "driving" | "security";
@@ -14,11 +15,17 @@ interface EmployeeOtherDetailsProps {
   setEmpLicenseDetails: React.Dispatch<
     React.SetStateAction<EmpLicenseDetails[]>
   >;
+  empBankDetails: IEmpBankDetails | null;
+  setEmpBankDetails: React.Dispatch<
+    React.SetStateAction<IEmpBankDetails | null>
+  >;
 }
 
 const EmployeeOtherDetails = ({
   empLicenseDetails,
   setEmpLicenseDetails,
+  empBankDetails,
+  setEmpBankDetails,
 }: EmployeeOtherDetailsProps) => {
   return (
     <div className="flex flex-col gap-4 p-4 bg-gray-100 rounded-lg shadow-md w-full">
@@ -41,7 +48,10 @@ const EmployeeOtherDetails = ({
             <span className="font-semibold">Add Bank Details</span>
           </Accordion.Control>
           <Accordion.Panel>
-            <EmpBankDetails />
+            <EmpBankDetails
+              empBankDetails={empBankDetails}
+              setEmpBankDetails={setEmpBankDetails}
+            />
           </Accordion.Panel>
         </Accordion.Item>
 

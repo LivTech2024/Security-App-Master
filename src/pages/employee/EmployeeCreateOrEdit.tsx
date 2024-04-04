@@ -32,6 +32,7 @@ import EmployeeOtherDetails, {
   EmpLicenseDetails,
 } from "../../component/employees/EmployeeOtherDetails";
 import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
+import { IEmpBankDetails } from "../../@types/database";
 
 const EmployeeCreateOrEdit = () => {
   const { employeeEditData } = useEditFormStore();
@@ -129,6 +130,10 @@ const EmployeeCreateOrEdit = () => {
   const [empLicenseDetails, setEmpLicenseDetails] = useState<
     EmpLicenseDetails[]
   >([]);
+
+  const [empBankDetails, setEmpBankDetails] = useState<IEmpBankDetails | null>(
+    null
+  );
 
   const onSubmit = async (data: AddEmployeeFormField) => {
     if (!empImageBase64) {
@@ -260,6 +265,8 @@ const EmployeeCreateOrEdit = () => {
               <EmployeeOtherDetails
                 empLicenseDetails={empLicenseDetails}
                 setEmpLicenseDetails={setEmpLicenseDetails}
+                empBankDetails={empBankDetails}
+                setEmpBankDetails={setEmpBankDetails}
               />
             </div>
             <div className="grid grid-cols-2 gap-4 w-[50%] bg-surface shadow rounded p-4 place-content-start flex-grow">
