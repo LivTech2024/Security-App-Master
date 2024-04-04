@@ -66,12 +66,24 @@ const EmpCertificateDetails = ({
           key={index}
           className="flex items-center space-x-4 justify-between"
         >
-          <InputWithTopHeader
-            placeholder="Certificate Name"
-            className="mx-0"
-            value={certificate.CertificateName}
-            onChange={(e) => handleNameChange(index, e.target.value)}
-          />
+          <div className="flex flex-col">
+            <InputWithTopHeader
+              placeholder="Certificate Name"
+              className="mx-0"
+              value={certificate.CertificateName}
+              onChange={(e) => handleNameChange(index, e.target.value)}
+            />
+            {typeof certificate.CertificateDoc === "string" &&
+              certificate.CertificateDoc.startsWith("https") && (
+                <a
+                  href={certificate.CertificateDoc}
+                  target="_blank"
+                  className=" text-textPrimaryBlue cursor-pointer mt-1"
+                >
+                  Click here to view certificate
+                </a>
+              )}
+          </div>
           <input
             id="fileUpload"
             type="file"
