@@ -130,8 +130,6 @@ const EmployeeCreateOrEdit = () => {
     EmpLicenseDetails[]
   >([]);
 
-  console.log(empLicenseDetails, "empLicenseDetails");
-
   const onSubmit = async (data: AddEmployeeFormField) => {
     if (!empImageBase64) {
       showSnackbar({ message: "Please add employee image", type: "error" });
