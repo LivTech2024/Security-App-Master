@@ -33,6 +33,7 @@ import EmployeeOtherDetails, {
 } from "../../component/employees/EmployeeOtherDetails";
 import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 import { IEmpBankDetails } from "../../@types/database";
+import { EmpCertificates } from "../../component/employees/EmpCertificateDetails";
 
 const EmployeeCreateOrEdit = () => {
   const { employeeEditData } = useEditFormStore();
@@ -114,6 +115,9 @@ const EmployeeCreateOrEdit = () => {
       if (employeeEditData.EmployeeBankDetails) {
         setEmpBankDetails(employeeEditData.EmployeeBankDetails);
       }
+      if (employeeEditData.EmployeeCertificates) {
+        setEmpCertificates(employeeEditData.EmployeeCertificates);
+      }
     } else {
       setEmployeeRole("");
       setEmpImageBase64("");
@@ -149,6 +153,8 @@ const EmployeeCreateOrEdit = () => {
     BankVoidCheckImg: "",
   });
 
+  const [empCertificates, setEmpCertificates] = useState<EmpCertificates[]>([]);
+
   const onSubmit = async (data: AddEmployeeFormField) => {
     if (!empImageBase64) {
       showSnackbar({ message: "Please add employee image", type: "error" });
@@ -181,6 +187,9 @@ const EmployeeCreateOrEdit = () => {
           cmpId: company.CompanyId,
           licenseDetails: empLicenseDetails,
           bankDetails: empBankDetails,
+          certificates: empCertificates.filter(
+            (c) => c.CertificateName && c.CertificateDoc
+          ),
         });
       } else {
         await DbEmployee.addEmployee({
@@ -189,6 +198,9 @@ const EmployeeCreateOrEdit = () => {
           cmpId: company.CompanyId,
           licenseDetails: empLicenseDetails,
           bankDetails: empBankDetails,
+          certificates: empCertificates.filter(
+            (c) => c.CertificateName && c.CertificateDoc
+          ),
         });
       }
 
@@ -298,6 +310,8 @@ const EmployeeCreateOrEdit = () => {
                 setEmpLicenseDetails={setEmpLicenseDetails}
                 empBankDetails={empBankDetails}
                 setEmpBankDetails={setEmpBankDetails}
+                certificates={empCertificates}
+                setCertificates={setEmpCertificates}
               />
             </div>
             <div className="grid grid-cols-2 gap-4 w-[50%] bg-surface shadow rounded p-4 place-content-start flex-grow">

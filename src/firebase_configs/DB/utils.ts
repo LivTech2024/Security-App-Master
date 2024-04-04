@@ -151,13 +151,22 @@ class CloudStorageImageHandler {
 }
 
 export class CloudStorageFileHandler {
-  static uploadFile = async (data: string, path: string) => {
-    // Create a storage reference with a unique name
-    const logRef = ref(storage, path);
+  static generateFileNameWithRandom = (id: string, index: number) => {
+    const random = Math.floor(Math.random() * (9999 - 1111 + 1)) + 1111;
+    const ms = new Date().getMilliseconds();
+    return id + index + random + ms + ".pdf";
+  };
 
-    // Upload the log data as a blob
-    const blob = new Blob([data], { type: "text/plain" });
-    await uploadBytes(logRef, blob);
+  static uploadFile = async (file: File, path: string) => {
+    const storageRef = ref(storage, path);
+    const { ref: snapRef } = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapRef);
+    return downloadURL;
+  };
+
+  static deleteFileByUrl = (url: string) => {
+    const fileRef = ref(storage, url);
+    return deleteObject(fileRef);
   };
 }
 

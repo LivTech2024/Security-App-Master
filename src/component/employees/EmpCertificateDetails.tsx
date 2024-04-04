@@ -1,12 +1,21 @@
-import { useState } from "react";
+import React from "react";
 import { IEmpCertificatesDetails } from "../../@types/database";
 import { MdClose } from "react-icons/md";
+import { showSnackbar } from "../../utilities/TsxUtils";
+import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 
-const EmpCertificateDetails = () => {
-  const [certificates, setCertificates] = useState<IEmpCertificatesDetails[]>([
-    { CertificateName: "", CertificateDoc: "" },
-  ]);
+export interface EmpCertificates
+  extends Omit<IEmpCertificatesDetails, "CertificateDoc"> {
+  CertificateDoc: File | string;
+}
 
+const EmpCertificateDetails = ({
+  certificates,
+  setCertificates,
+}: {
+  certificates: EmpCertificates[];
+  setCertificates: React.Dispatch<React.SetStateAction<EmpCertificates[]>>;
+}) => {
   const handleNameChange = (index: number, value: string) => {
     const updatedCertificates = [...certificates];
     updatedCertificates[index].CertificateName = value;
@@ -14,12 +23,32 @@ const EmpCertificateDetails = () => {
   };
 
   const handlePdfChange = (index: number, file: File) => {
+    if (file.size > 200000) {
+      showSnackbar({
+        message: "File size must be less than 200kb",
+        type: "error",
+      });
+      return;
+    }
     const updatedCertificates = [...certificates];
-    updatedCertificates[index].CertificateDoc = file.name;
+    updatedCertificates[index].CertificateDoc = file;
     setCertificates(updatedCertificates);
   };
 
   const handleAddMore = () => {
+    // Check if any of the existing certificates are incomplete
+    if (
+      certificates.some(
+        (certificate) =>
+          !certificate.CertificateName || !certificate.CertificateDoc
+      )
+    ) {
+      showSnackbar({
+        message: "Please complete all certificates before adding more",
+        type: "error",
+      });
+      return;
+    }
     setCertificates([
       ...certificates,
       { CertificateName: "", CertificateDoc: "" },
@@ -33,22 +62,38 @@ const EmpCertificateDetails = () => {
   return (
     <div className="space-y-4">
       {certificates.map((certificate, index) => (
-        <div key={index} className="flex items-center space-x-4">
-          <input
-            type="text"
+        <div
+          key={index}
+          className="flex items-center space-x-4 justify-between"
+        >
+          <InputWithTopHeader
             placeholder="Certificate Name"
-            className="border border-gray-300 p-2 rounded"
+            className="mx-0"
             value={certificate.CertificateName}
             onChange={(e) => handleNameChange(index, e.target.value)}
           />
           <input
+            id="fileUpload"
             type="file"
             accept="application/pdf"
-            className="border border-gray-300 p-2 rounded"
+            className={`border border-gray-300 p-2 rounded ${
+              typeof certificate.CertificateDoc === "string" &&
+              certificate.CertificateDoc.startsWith("https") &&
+              "hidden"
+            }`}
             onChange={(e) =>
               handlePdfChange(index, e.target.files?.[0] as File)
             }
           />
+          {typeof certificate.CertificateDoc === "string" &&
+            certificate.CertificateDoc.startsWith("https") && (
+              <label
+                htmlFor="fileUpload"
+                className="flex justify-end text-textPrimaryBlue cursor-pointer"
+              >
+                Click here to upload new pdf
+              </label>
+            )}
           {certificates.length > 1 && (
             <MdClose
               className="text-textPrimaryRed text-xl cursor-pointer"
@@ -63,7 +108,7 @@ const EmpCertificateDetails = () => {
         className="bg-blue-500 text-white px-4 py-2 rounded"
         onClick={handleAddMore}
       >
-        Add More
+        Add {certificates.length > 0 ? "More" : "New"}
       </button>
     </div>
   );

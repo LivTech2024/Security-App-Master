@@ -23,9 +23,13 @@ import {
   ImageResolution,
 } from "../../@types/enum";
 import { db } from "../config";
-import CloudStorageImageHandler, { getNewDocId } from "./utils";
+import CloudStorageImageHandler, {
+  CloudStorageFileHandler,
+  getNewDocId,
+} from "./utils";
 import {
   IEmpBankDetails,
+  IEmpCertificatesDetails,
   IEmployeeRolesCollection,
   IEmployeesCollection,
 } from "../../@types/database";
@@ -33,6 +37,7 @@ import CustomError from "../../utilities/CustomError";
 import { fullTextSearchIndex } from "../../utilities/misc";
 import { AddEmployeeFormField } from "../../utilities/zod/schema";
 import { EmpLicenseDetails } from "../../component/employees/EmployeeOtherDetails";
+import { EmpCertificates } from "../../component/employees/EmpCertificateDetails";
 
 class DbEmployee {
   static isEmpRoleExist = async (empRole: string, empRoleId: string | null) => {
@@ -184,12 +189,14 @@ class DbEmployee {
     empImage,
     licenseDetails,
     bankDetails,
+    certificates,
   }: {
     empData: AddEmployeeFormField;
     empImage: string;
     cmpId: string;
     licenseDetails: EmpLicenseDetails[];
     bankDetails: IEmpBankDetails;
+    certificates: EmpCertificates[];
   }) => {
     const isEmpExist = await this.isEmpExist(
       empData.EmployeeEmail,
@@ -251,6 +258,24 @@ class DbEmployee {
         };
       });
 
+    const EmployeeCertificates: IEmpCertificatesDetails[] = await Promise.all(
+      certificates?.map(async (certificate, idx) => {
+        const fileName = CloudStorageFileHandler.generateFileNameWithRandom(
+          empId,
+          idx
+        );
+        const fileUrl = await CloudStorageFileHandler.uploadFile(
+          certificate.CertificateDoc as File,
+          CloudStoragePaths.EMPLOYEES_DOCUMENTS + "/" + fileName
+        );
+
+        return {
+          CertificateName: certificate.CertificateName,
+          CertificateDoc: fileUrl,
+        };
+      })
+    );
+
     const newEmployee: IEmployeesCollection = {
       EmployeeId: empId,
       EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
@@ -270,7 +295,7 @@ class DbEmployee {
       EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
       EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
       EmployeeBankDetails: bankDetails,
-      EmployeeCertificates: [],
+      EmployeeCertificates,
       EmployeeLicenses,
       EmployeeCreatedAt: serverTimestamp(),
       EmployeeModifiedAt: serverTimestamp(),
@@ -286,6 +311,7 @@ class DbEmployee {
     empImage,
     licenseDetails,
     bankDetails,
+    certificates,
   }: {
     empData: AddEmployeeFormField;
     empImage: string;
@@ -293,6 +319,7 @@ class DbEmployee {
     cmpId: string;
     licenseDetails: EmpLicenseDetails[];
     bankDetails: IEmpBankDetails;
+    certificates: EmpCertificates[];
   }) => {
     try {
       const isEmpExist = await this.isEmpExist(
@@ -308,6 +335,9 @@ class DbEmployee {
 
       await runTransaction(db, async (transaction) => {
         const empDocRef = doc(db, CollectionName.employees, empId);
+        const empSnapshot = await transaction.get(empDocRef);
+        const oldEmpData = empSnapshot.data() as IEmployeesCollection;
+        const oldCertificates = oldEmpData?.EmployeeCertificates || [];
 
         let empImageUrl = empImage;
 
@@ -366,6 +396,48 @@ class DbEmployee {
               };
             }) || [];
 
+        //*This is for emp certificates
+        const EmployeeCertificates: IEmpCertificatesDetails[] =
+          await Promise.all(
+            certificates?.map(async (certificate, idx) => {
+              if (
+                typeof certificate.CertificateDoc === "string" &&
+                certificate.CertificateDoc.startsWith("https:")
+              ) {
+                return {
+                  CertificateName: certificate.CertificateName,
+                  CertificateDoc: certificate.CertificateDoc,
+                };
+              } else {
+                const fileName =
+                  CloudStorageFileHandler.generateFileNameWithRandom(
+                    empId,
+                    idx
+                  );
+                const fileUrl = await CloudStorageFileHandler.uploadFile(
+                  certificate.CertificateDoc as File,
+                  CloudStoragePaths.EMPLOYEES_DOCUMENTS + "/" + fileName
+                );
+
+                return {
+                  CertificateName: certificate.CertificateName,
+                  CertificateDoc: fileUrl,
+                };
+              }
+            })
+          );
+
+        // Identify deleted certificates
+        const deletedCertificates = oldCertificates.map((oldCertificate) => {
+          if (
+            !EmployeeCertificates.find(
+              (c) => c.CertificateDoc === oldCertificate.CertificateDoc
+            )
+          ) {
+            return oldCertificate.CertificateDoc;
+          }
+        });
+
         const newEmployee: Partial<IEmployeesCollection> = {
           EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
           EmployeeImg: empImageUrl,
@@ -382,11 +454,23 @@ class DbEmployee {
           EmployeeCompanyId: cmpId,
           EmployeeIsBanned: empData.EmployeeIsBanned,
           EmployeeLicenses,
+          EmployeeCertificates,
           EmployeeBankDetails: bankDetails,
           EmployeeModifiedAt: serverTimestamp(),
         };
 
         transaction.update(empDocRef, newEmployee);
+
+        console.log(deletedCertificates, "deletedCertificates");
+
+        const fileDeletePromises = deletedCertificates.map((fileUrl) => {
+          if (fileUrl) {
+            return CloudStorageFileHandler.deleteFileByUrl(fileUrl);
+          }
+        });
+        Promise.allSettled(fileDeletePromises).catch((error_) => {
+          console.log(error_);
+        });
       });
     } catch (error) {
       console.log(error);
