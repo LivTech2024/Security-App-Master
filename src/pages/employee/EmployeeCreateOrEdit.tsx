@@ -24,11 +24,13 @@ import { IoArrowBackCircle } from "react-icons/io5";
 import Button from "../../common/button/Button";
 import { openContextModal } from "@mantine/modals";
 import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
-import { splitName } from "../../utilities/misc";
+import { splitName, toDate } from "../../utilities/misc";
 import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
 import InputSelect from "../../common/inputs/InputSelect";
 import EmpUploadImgCard from "../../component/employees/EmpUploadImgCard";
-import EmployeeOtherDetails from "../../component/employees/EmployeeOtherDetails";
+import EmployeeOtherDetails, {
+  EmpLicenseDetails,
+} from "../../component/employees/EmployeeOtherDetails";
 import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 
 const EmployeeCreateOrEdit = () => {
@@ -101,10 +103,18 @@ const EmployeeCreateOrEdit = () => {
         )?.CompanyBranchName;
         setCompanyBranch(branchName || null);
       }
+      if (employeeEditData.EmployeeLicenses) {
+        setEmpLicenseDetails(
+          employeeEditData?.EmployeeLicenses?.map((l) => {
+            return { ...l, LicenseExpDate: toDate(l.LicenseExpDate) };
+          })
+        );
+      }
     } else {
       setEmployeeRole("");
       setEmpImageBase64("");
       setCompanyBranch(null);
+      setEmpLicenseDetails([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, employeeEditData]);
@@ -116,6 +126,12 @@ const EmployeeCreateOrEdit = () => {
 
   const [empImageBase64, setEmpImageBase64] = useState<string | null>(null);
 
+  const [empLicenseDetails, setEmpLicenseDetails] = useState<
+    EmpLicenseDetails[]
+  >([]);
+
+  console.log(empLicenseDetails, "empLicenseDetails");
+
   const onSubmit = async (data: AddEmployeeFormField) => {
     if (!empImageBase64) {
       showSnackbar({ message: "Please add employee image", type: "error" });
@@ -126,17 +142,19 @@ const EmployeeCreateOrEdit = () => {
       showModalLoader({});
 
       if (isEdit) {
-        await DbEmployee.updateEmployee(
-          data,
-          empImageBase64,
-          employeeEditData.EmployeeId,
-          company.CompanyId
-        );
+        await DbEmployee.updateEmployee({
+          empData: data,
+          empImage: empImageBase64,
+          empId: employeeEditData.EmployeeId,
+          cmpId: company.CompanyId,
+          licenseDetails: empLicenseDetails,
+        });
       } else {
         await DbEmployee.addEmployee({
           empData: data,
           empImage: empImageBase64,
           cmpId: company.CompanyId,
+          licenseDetails: empLicenseDetails,
         });
       }
 
@@ -241,7 +259,10 @@ const EmployeeCreateOrEdit = () => {
                 empImageBase64={empImageBase64}
                 setEmpImageBase64={setEmpImageBase64}
               />
-              <EmployeeOtherDetails />
+              <EmployeeOtherDetails
+                empLicenseDetails={empLicenseDetails}
+                setEmpLicenseDetails={setEmpLicenseDetails}
+              />
             </div>
             <div className="grid grid-cols-2 gap-4 w-[50%] bg-surface shadow rounded p-4 place-content-start flex-grow">
               <InputWithTopHeader

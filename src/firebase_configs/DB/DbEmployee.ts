@@ -1,6 +1,7 @@
 import {
   DocumentData,
   QueryConstraint,
+  Timestamp,
   collection,
   deleteDoc,
   doc,
@@ -30,6 +31,7 @@ import {
 import CustomError from "../../utilities/CustomError";
 import { fullTextSearchIndex } from "../../utilities/misc";
 import { AddEmployeeFormField } from "../../utilities/zod/schema";
+import { EmpLicenseDetails } from "../../component/employees/EmployeeOtherDetails";
 
 class DbEmployee {
   static isEmpRoleExist = async (empRole: string, empRoleId: string | null) => {
@@ -179,10 +181,12 @@ class DbEmployee {
     cmpId,
     empData,
     empImage,
+    licenseDetails,
   }: {
     empData: AddEmployeeFormField;
     empImage: string;
     cmpId: string;
+    licenseDetails: EmpLicenseDetails[];
   }) => {
     const isEmpExist = await this.isEmpExist(
       empData.EmployeeEmail,
@@ -214,6 +218,15 @@ class DbEmployee {
       ImageResolution.EMP_IMAGE_WIDTH
     );
 
+    const EmployeeLicenses = licenseDetails
+      .filter((l) => l.LicenseNumber && l.LicenseExpDate)
+      .map((l) => {
+        return {
+          ...l,
+          LicenseExpDate: l.LicenseExpDate as unknown as Timestamp,
+        };
+      });
+
     const newEmployee: IEmployeesCollection = {
       EmployeeId: empId,
       EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
@@ -234,7 +247,7 @@ class DbEmployee {
       EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
       EmployeeBankDetails: null,
       EmployeeCertificates: [],
-      EmployeeLicenses: [],
+      EmployeeLicenses,
       EmployeeCreatedAt: serverTimestamp(),
       EmployeeModifiedAt: serverTimestamp(),
     };
@@ -242,12 +255,19 @@ class DbEmployee {
     return setDoc(docRef, newEmployee);
   };
 
-  static updateEmployee = async (
-    empData: AddEmployeeFormField,
-    empImage: string,
-    empId: string,
-    cmpId: string
-  ) => {
+  static updateEmployee = async ({
+    cmpId,
+    empData,
+    empId,
+    empImage,
+    licenseDetails,
+  }: {
+    empData: AddEmployeeFormField;
+    empImage: string;
+    empId: string;
+    cmpId: string;
+    licenseDetails: EmpLicenseDetails[];
+  }) => {
     try {
       const isEmpExist = await this.isEmpExist(
         empData.EmployeeEmail,
@@ -291,6 +311,16 @@ class DbEmployee {
           empImageToBeDelete = oldEmpData.EmployeeImg;
         }
 
+        const EmployeeLicenses =
+          licenseDetails
+            ?.filter((l) => l.LicenseNumber && l.LicenseExpDate)
+            ?.map((l) => {
+              return {
+                ...l,
+                LicenseExpDate: l.LicenseExpDate as unknown as Timestamp,
+              };
+            }) || [];
+
         const newEmployee: Partial<IEmployeesCollection> = {
           EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
           EmployeeImg: empImageUrl,
@@ -306,6 +336,7 @@ class DbEmployee {
           EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
           EmployeeCompanyId: cmpId,
           EmployeeIsBanned: empData.EmployeeIsBanned,
+          EmployeeLicenses,
           EmployeeModifiedAt: serverTimestamp(),
         };
 

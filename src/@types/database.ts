@@ -42,7 +42,7 @@ export interface IAdminsCollection {
 
 export interface IEmpLicenseDetails {
   LicenseType: "driving" | "security";
-  LicenseNumber: number;
+  LicenseNumber: string;
   LicenseExpDate: Timestamp | FieldValue;
 }
 export interface IEmpBankDetails {
