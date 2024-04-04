@@ -25,10 +25,8 @@ export const getNewDocId = (collectionName: string) => {
 };
 
 class CloudStorageImageHandler {
-  static generateImageName = (id: string) => {
-    const random = Math.floor(Math.random() * (9999 - 1111 + 1)) + 1111;
-    const ms = new Date().getMilliseconds();
-    return id + random + ms + ".jpg";
+  static generateImageName = (id: string, name: string) => {
+    return `${id}_${name}.jpg`;
   };
 
   static deleteImageByUrl = (url: string) => {

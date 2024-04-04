@@ -15,7 +15,7 @@ import {
 import DbEmployee from "../../firebase_configs/DB/DbEmployee";
 import { PageRoutes, REACT_QUERY_KEYS } from "../../@types/enum";
 import { useNavigate } from "react-router-dom";
-import { errorHandler } from "../../utilities/CustomError";
+import CustomError, { errorHandler } from "../../utilities/CustomError";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 import InputAutoComplete from "../../common/inputs/InputAutocomplete";
 import { AiOutlinePlus } from "react-icons/ai";
@@ -111,11 +111,21 @@ const EmployeeCreateOrEdit = () => {
           })
         );
       }
+      if (employeeEditData.EmployeeBankDetails) {
+        setEmpBankDetails(employeeEditData.EmployeeBankDetails);
+      }
     } else {
       setEmployeeRole("");
       setEmpImageBase64("");
       setCompanyBranch(null);
       setEmpLicenseDetails([]);
+      setEmpBankDetails({
+        BankAccName: "",
+        BankAccNumber: "",
+        BankIfscCode: "",
+        BankName: "",
+        BankVoidCheckImg: "",
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, employeeEditData]);
@@ -131,9 +141,13 @@ const EmployeeCreateOrEdit = () => {
     EmpLicenseDetails[]
   >([]);
 
-  const [empBankDetails, setEmpBankDetails] = useState<IEmpBankDetails | null>(
-    null
-  );
+  const [empBankDetails, setEmpBankDetails] = useState<IEmpBankDetails>({
+    BankAccName: "",
+    BankAccNumber: "",
+    BankIfscCode: "",
+    BankName: "",
+    BankVoidCheckImg: "",
+  });
 
   const onSubmit = async (data: AddEmployeeFormField) => {
     if (!empImageBase64) {
@@ -142,6 +156,21 @@ const EmployeeCreateOrEdit = () => {
     }
     if (!company) return;
     try {
+      const requiredFields = [
+        "BankAccName",
+        "BankAccNumber",
+        "BankIfscCode",
+        "BankName",
+        "BankVoidCheckImg",
+      ];
+
+      if (
+        !requiredFields.every(
+          (field) => empBankDetails[field as keyof IEmpBankDetails]
+        )
+      ) {
+        throw new CustomError("Please add complete bank details");
+      }
       showModalLoader({});
 
       if (isEdit) {
@@ -151,6 +180,7 @@ const EmployeeCreateOrEdit = () => {
           empId: employeeEditData.EmployeeId,
           cmpId: company.CompanyId,
           licenseDetails: empLicenseDetails,
+          bankDetails: empBankDetails,
         });
       } else {
         await DbEmployee.addEmployee({
@@ -158,6 +188,7 @@ const EmployeeCreateOrEdit = () => {
           empImage: empImageBase64,
           cmpId: company.CompanyId,
           licenseDetails: empLicenseDetails,
+          bankDetails: empBankDetails,
         });
       }
 

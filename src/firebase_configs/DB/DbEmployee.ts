@@ -25,6 +25,7 @@ import {
 import { db } from "../config";
 import CloudStorageImageHandler, { getNewDocId } from "./utils";
 import {
+  IEmpBankDetails,
   IEmployeeRolesCollection,
   IEmployeesCollection,
 } from "../../@types/database";
@@ -182,11 +183,13 @@ class DbEmployee {
     empData,
     empImage,
     licenseDetails,
+    bankDetails,
   }: {
     empData: AddEmployeeFormField;
     empImage: string;
     cmpId: string;
     licenseDetails: EmpLicenseDetails[];
+    bankDetails: IEmpBankDetails;
   }) => {
     const isEmpExist = await this.isEmpExist(
       empData.EmployeeEmail,
@@ -208,7 +211,7 @@ class DbEmployee {
         path:
           CloudStoragePaths.EMPLOYEES_IMAGES +
           "/" +
-          CloudStorageImageHandler.generateImageName(empId),
+          CloudStorageImageHandler.generateImageName(empId, "profile"),
       },
     ];
 
@@ -217,6 +220,27 @@ class DbEmployee {
       ImageResolution.EMP_IMAGE_HEIGHT,
       ImageResolution.EMP_IMAGE_WIDTH
     );
+
+    if (bankDetails && bankDetails.BankVoidCheckImg) {
+      const imageVoidCheck = [
+        {
+          base64: bankDetails.BankVoidCheckImg,
+          path:
+            CloudStoragePaths.EMPLOYEES_IMAGES +
+            "/" +
+            CloudStorageImageHandler.generateImageName(empId, "void_check"),
+        },
+      ];
+
+      const imageVoidCheckUrl =
+        await CloudStorageImageHandler.getImageDownloadUrls(
+          imageVoidCheck,
+          ImageResolution.EMP_VOID_CHECK_HEIGHT,
+          ImageResolution.EMP_VOID_CHECK_WIDTH
+        );
+
+      bankDetails = { ...bankDetails, BankVoidCheckImg: imageVoidCheckUrl[0] };
+    }
 
     const EmployeeLicenses = licenseDetails
       .filter((l) => l.LicenseNumber && l.LicenseExpDate)
@@ -245,7 +269,7 @@ class DbEmployee {
       EmployeeIsAvailable: true,
       EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
       EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
-      EmployeeBankDetails: null,
+      EmployeeBankDetails: bankDetails,
       EmployeeCertificates: [],
       EmployeeLicenses,
       EmployeeCreatedAt: serverTimestamp(),
@@ -261,12 +285,14 @@ class DbEmployee {
     empId,
     empImage,
     licenseDetails,
+    bankDetails,
   }: {
     empData: AddEmployeeFormField;
     empImage: string;
     empId: string;
     cmpId: string;
     licenseDetails: EmpLicenseDetails[];
+    bankDetails: IEmpBankDetails;
   }) => {
     try {
       const isEmpExist = await this.isEmpExist(
@@ -282,11 +308,8 @@ class DbEmployee {
 
       await runTransaction(db, async (transaction) => {
         const empDocRef = doc(db, CollectionName.employees, empId);
-        const empSnapshot = await transaction.get(empDocRef);
-        const oldEmpData = empSnapshot.data() as IEmployeesCollection;
 
         let empImageUrl = empImage;
-        let empImageToBeDelete: string | null = null;
 
         if (!empImageUrl.startsWith("https")) {
           const imageEmployee = [
@@ -295,7 +318,7 @@ class DbEmployee {
               path:
                 CloudStoragePaths.EMPLOYEES_IMAGES +
                 "/" +
-                CloudStorageImageHandler.generateImageName(empId),
+                CloudStorageImageHandler.generateImageName(empId, "profile"),
             },
           ];
 
@@ -307,8 +330,30 @@ class DbEmployee {
             );
 
           empImageUrl = imageEmpUrl[0];
+        }
 
-          empImageToBeDelete = oldEmpData.EmployeeImg;
+        if (bankDetails && !bankDetails.BankVoidCheckImg.startsWith("https")) {
+          const imageVoidCheck = [
+            {
+              base64: bankDetails.BankVoidCheckImg,
+              path:
+                CloudStoragePaths.EMPLOYEES_IMAGES +
+                "/" +
+                CloudStorageImageHandler.generateImageName(empId, "void_check"),
+            },
+          ];
+
+          const imageVoidCheckUrl =
+            await CloudStorageImageHandler.getImageDownloadUrls(
+              imageVoidCheck,
+              ImageResolution.EMP_VOID_CHECK_HEIGHT,
+              ImageResolution.EMP_VOID_CHECK_WIDTH
+            );
+
+          bankDetails = {
+            ...bankDetails,
+            BankVoidCheckImg: imageVoidCheckUrl[0],
+          };
         }
 
         const EmployeeLicenses =
@@ -337,14 +382,11 @@ class DbEmployee {
           EmployeeCompanyId: cmpId,
           EmployeeIsBanned: empData.EmployeeIsBanned,
           EmployeeLicenses,
+          EmployeeBankDetails: bankDetails,
           EmployeeModifiedAt: serverTimestamp(),
         };
 
         transaction.update(empDocRef, newEmployee);
-
-        if (empImageToBeDelete) {
-          await CloudStorageImageHandler.deleteImageByUrl(empImageToBeDelete);
-        }
       });
     } catch (error) {
       console.log(error);

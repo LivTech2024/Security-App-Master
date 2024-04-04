@@ -50,7 +50,7 @@ export interface IEmpBankDetails {
   BankAccName: string;
   BankAccNumber: string;
   BankIfscCode: string;
-  BankVoidCheckImg: string | null;
+  BankVoidCheckImg: string;
 }
 
 export interface IEmpCertificatesDetails {
@@ -75,7 +75,7 @@ export interface IEmployeesCollection {
   EmployeeCompanyId: string;
   EmployeeCompanyBranchId?: string | null;
   EmployeeLicenses: IEmpLicenseDetails[];
-  EmployeeBankDetails: IEmpBankDetails | null;
+  EmployeeBankDetails: IEmpBankDetails;
   EmployeeCertificates: IEmpCertificatesDetails[];
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;

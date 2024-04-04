@@ -15,10 +15,8 @@ interface EmployeeOtherDetailsProps {
   setEmpLicenseDetails: React.Dispatch<
     React.SetStateAction<EmpLicenseDetails[]>
   >;
-  empBankDetails: IEmpBankDetails | null;
-  setEmpBankDetails: React.Dispatch<
-    React.SetStateAction<IEmpBankDetails | null>
-  >;
+  empBankDetails: IEmpBankDetails;
+  setEmpBankDetails: React.Dispatch<React.SetStateAction<IEmpBankDetails>>;
 }
 
 const EmployeeOtherDetails = ({

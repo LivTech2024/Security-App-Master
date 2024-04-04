@@ -44,12 +44,13 @@ export const resizeImage = async ({
           };
         },
         "image/png",
-        0.6
+        0.8
       );
     };
 
     img.onerror = (err) => {
       reject(err);
+      throw err;
     };
   });
 };

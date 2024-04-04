@@ -7,10 +7,8 @@ const EmpBankDetails = ({
   empBankDetails,
   setEmpBankDetails,
 }: {
-  empBankDetails: IEmpBankDetails | null;
-  setEmpBankDetails: React.Dispatch<
-    React.SetStateAction<IEmpBankDetails | null>
-  >;
+  empBankDetails: IEmpBankDetails;
+  setEmpBankDetails: React.Dispatch<React.SetStateAction<IEmpBankDetails>>;
 }) => {
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

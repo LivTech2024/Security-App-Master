@@ -52,7 +52,7 @@ class DbCompany {
         path:
           CloudStoragePaths.COMPANIES_LOGOS +
           "/" +
-          CloudStorageImageHandler.generateImageName(companyId),
+          CloudStorageImageHandler.generateImageName(companyId, "logo"),
       },
     ];
 
@@ -87,11 +87,8 @@ class DbCompany {
   }) => {
     await runTransaction(db, async (transaction) => {
       const companyRef = doc(db, CollectionName.companies, cmpId);
-      const cmpSnapshot = await transaction.get(companyRef);
-      const cmpOldData = cmpSnapshot.data() as ICompaniesCollection;
 
       let logoImageUrl = logoBase64;
-      let cmpLogoToBeDelete: string | null = null;
 
       if (!logoImageUrl.startsWith("https")) {
         const imageEmployee = [
@@ -100,7 +97,7 @@ class DbCompany {
             path:
               CloudStoragePaths.COMPANIES_LOGOS +
               "/" +
-              CloudStorageImageHandler.generateImageName(cmpId),
+              CloudStorageImageHandler.generateImageName(cmpId, "logo"),
           },
         ];
 
@@ -111,8 +108,6 @@ class DbCompany {
         );
 
         logoImageUrl = imageUrl[0];
-
-        cmpLogoToBeDelete = cmpOldData.CompanyLogo;
       }
 
       const updatedCompany: Partial<ICompaniesCollection> = {
@@ -125,10 +120,6 @@ class DbCompany {
       };
 
       transaction.update(companyRef, updatedCompany);
-
-      if (cmpLogoToBeDelete) {
-        await CloudStorageImageHandler.deleteImageByUrl(cmpLogoToBeDelete);
-      }
     });
   };
 
