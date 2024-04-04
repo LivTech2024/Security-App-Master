@@ -475,7 +475,7 @@ const PositionView = ({ datesArray }: PositionViewProps) => {
                                   {data.employee.length > 0 ? (
                                     <div className=" py-[2px] rounded w-full text-center line-clamp-1">
                                       {data.employee
-                                        .map((emp) => emp.EmployeeName)
+                                        .map((emp) => emp?.EmployeeName)
                                         .join(",")}
                                     </div>
                                   ) : (

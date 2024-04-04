@@ -486,7 +486,7 @@ class DbEmployee {
       const shiftRef = collection(db, CollectionName.shifts);
       const shiftQuery = query(
         shiftRef,
-        where("ShiftAssignedUserId", "==", empId),
+        where("ShiftAssignedUserId", "array-contains", empId),
         limit(1)
       );
 
