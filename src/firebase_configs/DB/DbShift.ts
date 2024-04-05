@@ -10,6 +10,7 @@ import {
   limit,
   orderBy,
   query,
+  runTransaction,
   serverTimestamp,
   setDoc,
   startAfter,
@@ -24,6 +25,7 @@ import { removeTimeFromDate } from "../../utilities/misc";
 import { AddShiftFormFields } from "../../utilities/zod/schema";
 import { ShiftTask } from "../../component/shifts/ShiftTaskForm";
 import { generateBarcodesAndDownloadPDF } from "../../utilities/generateBarcodesAndDownloadPdf";
+import CustomError from "../../utilities/CustomError";
 
 class DbShift {
   static addShift = async (
@@ -42,6 +44,8 @@ class DbShift {
           ShiftTaskId: `${shiftId}${idx}`,
           ShiftTask: task.TaskName,
           ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
+          ShiftTaskStatus: [],
+          ShiftTaskPhotos: [],
         });
       }
     });
@@ -64,10 +68,10 @@ class DbShift {
       ),
       ShiftClientId: shiftData.ShiftClientId,
       ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
-      ShiftCurrentStatus: "pending",
+      ShiftCurrentStatus: [],
       ShiftTask: shiftTasks,
       ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
-      ShiftAcknowledged: false,
+      ShiftAcknowledgedByEmpId: [],
       ShiftCompanyId: cmpId,
       ShiftLocationId: shiftData.ShiftLocationId,
       ShiftLocationAddress: shiftData.ShiftLocationAddress,
@@ -99,58 +103,71 @@ class DbShift {
     cmpId: string,
     tasks: ShiftTask[]
   ) => {
-    const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
+    await runTransaction(db, async (transaction) => {
+      const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
+      const shiftSnapshot = await transaction.get(shiftDocRef);
+      const oldShiftData = shiftSnapshot.data() as IShiftsCollection;
 
-    const shiftTasks: IShiftTasksChild[] = [];
+      if (oldShiftData.ShiftAssignedUserId?.length > 0) {
+        throw new CustomError(
+          "Cannot edit this shift as it already have assigned employees"
+        );
+      }
 
-    tasks.map((task, idx) => {
-      if (task.TaskName && task.TaskName.length > 0) {
-        shiftTasks.push({
-          ShiftTaskId: `${shiftId}${idx}`,
-          ShiftTask: task.TaskName,
-          ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
-        });
+      const shiftTasks: IShiftTasksChild[] = [];
+
+      tasks.map((task, idx) => {
+        if (task.TaskName && task.TaskName.length > 0) {
+          shiftTasks.push({
+            ShiftTaskId: `${shiftId}${idx}`,
+            ShiftTask: task.TaskName,
+            ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
+            ShiftTaskStatus: [],
+            ShiftTaskPhotos: [],
+          });
+        }
+      });
+
+      const newShift: Partial<IShiftsCollection> = {
+        ShiftName: shiftData.ShiftName,
+        ShiftPosition: shiftData.ShiftPosition,
+        ShiftDate: removeTimeFromDate(
+          shiftData.ShiftDate
+        ) as unknown as Timestamp,
+        ShiftStartTime: shiftData.ShiftStartTime,
+        ShiftEndTime: shiftData.ShiftEndTime,
+        ShiftDescription: shiftData.ShiftDescription || null,
+        ShiftTask: shiftTasks,
+        ShiftLocation: new GeoPoint(
+          Number(shiftData.ShiftLocation.latitude),
+          Number(shiftData.ShiftLocation.longitude)
+        ),
+        ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
+        ShiftLocationName: shiftData.ShiftLocationName,
+        ShiftClientId: shiftData.ShiftClientId,
+        ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
+        ShiftCompanyId: cmpId,
+        ShiftLocationId: shiftData.ShiftLocationId,
+        ShiftLocationAddress: shiftData.ShiftLocationAddress,
+        ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
+        ShiftModifiedAt: serverTimestamp(),
+      };
+
+      await updateDoc(shiftDocRef, newShift);
+
+      const barcodesToBeGenerated = shiftTasks.filter(
+        (t) => t.ShiftTaskQrCodeReq
+      );
+
+      if (barcodesToBeGenerated.length > 0) {
+        await generateBarcodesAndDownloadPDF(
+          shiftData.ShiftName,
+          barcodesToBeGenerated.map((task) => {
+            return { code: task.ShiftTaskId, label: task.ShiftTask };
+          })
+        );
       }
     });
-
-    const newShift: Partial<IShiftsCollection> = {
-      ShiftName: shiftData.ShiftName,
-      ShiftPosition: shiftData.ShiftPosition,
-      ShiftDate: removeTimeFromDate(
-        shiftData.ShiftDate
-      ) as unknown as Timestamp,
-      ShiftStartTime: shiftData.ShiftStartTime,
-      ShiftEndTime: shiftData.ShiftEndTime,
-      ShiftDescription: shiftData.ShiftDescription || null,
-      ShiftTask: shiftTasks,
-      ShiftLocation: new GeoPoint(
-        Number(shiftData.ShiftLocation.latitude),
-        Number(shiftData.ShiftLocation.longitude)
-      ),
-      ShiftLocationName: shiftData.ShiftLocationName,
-      ShiftClientId: shiftData.ShiftClientId,
-      ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
-      ShiftCompanyId: cmpId,
-      ShiftLocationId: shiftData.ShiftLocationId,
-      ShiftLocationAddress: shiftData.ShiftLocationAddress,
-      ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
-      ShiftModifiedAt: serverTimestamp(),
-    };
-
-    await updateDoc(shiftDocRef, newShift);
-
-    const barcodesToBeGenerated = shiftTasks.filter(
-      (t) => t.ShiftTaskQrCodeReq
-    );
-
-    if (barcodesToBeGenerated.length > 0) {
-      await generateBarcodesAndDownloadPDF(
-        shiftData.ShiftName,
-        barcodesToBeGenerated.map((task) => {
-          return { code: task.ShiftTaskId, label: task.ShiftTask };
-        })
-      );
-    }
   };
 
   static deleteShift = (shiftId: string) => {

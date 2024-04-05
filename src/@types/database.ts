@@ -85,9 +85,14 @@ export interface IShiftTasksChild {
   ShiftTaskId: string;
   ShiftTask: string;
   ShiftTaskQrCodeReq: boolean;
-  ShiftTaskCompleted?: boolean;
-  ShiftTaskCompletionTime?: Timestamp | FieldValue;
-  ShiftTaskFailureReason?: string;
+  ShiftTaskStatus: {
+    TaskStatus: "pending" | "completed";
+    TaskCompletedById?: string;
+    TaskCompletedByName?: string;
+    TaskCompletionTime?: Timestamp | FieldValue;
+    TaskFailureReason?: string;
+  }[];
+  ShiftTaskPhotos?: string[];
 }
 
 export interface IShiftsCollection {
@@ -109,9 +114,14 @@ export interface IShiftsCollection {
   ShiftCompanyId: string;
   ShiftRequiredEmp: number; //* By default 1
   ShiftCompanyBranchId?: string | null;
-  ShiftAcknowledged?: boolean;
+  ShiftAcknowledgedByEmpId: string[];
   ShiftTask: IShiftTasksChild[];
-  ShiftCurrentStatus: "pending" | "started" | "completed";
+  ShiftCurrentStatus: {
+    Status: "pending" | "started" | "completed";
+    StatusReportedById?: string;
+    StatusReportedByName?: string;
+    StatusReportedTime?: Timestamp | FieldValue;
+  }[];
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;
 }

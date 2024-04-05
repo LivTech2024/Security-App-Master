@@ -45,7 +45,7 @@ class DbPatrol {
       PatrolCheckPoints.push({
         CheckPointId: checkPointId,
         CheckPointName: ch.name,
-        CheckPointStatus: [{ Status: "not_checked" }],
+        CheckPointStatus: [],
         CheckPointCategory: ch.category || null,
       });
     });
@@ -69,7 +69,7 @@ class DbPatrol {
       PatrolTime: data.PatrolTime,
       PatrolRequiredCount: Number(data.PatrolRequiredCount),
       PatrolCheckPoints,
-      PatrolCurrentStatus: [{ Status: "pending", StatusCompletedCount: 0 }],
+      PatrolCurrentStatus: [],
       PatrolRestrictedRadius: Number(data.PatrolRestrictedRadius),
       PatrolKeepGuardInRadiusOfLocation: data.PatrolKeepGuardInRadiusOfLocation,
       PatrolCreatedAt: serverTimestamp(),
