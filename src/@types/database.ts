@@ -116,6 +116,12 @@ export interface IShiftsCollection {
   ShiftCompanyBranchId?: string | null;
   ShiftAcknowledgedByEmpId: string[];
   ShiftTask: IShiftTasksChild[];
+  ShiftGuardWellnessReport: {
+    WellnessLastReported: Timestamp | FieldValue;
+    WellnessReportedById: string; //*Emp id
+  }[];
+  ShiftPhotos?: string[];
+  ShiftPhotoUploadIntervalInMinutes?: number | null;
   ShiftCurrentStatus: {
     Status: "pending" | "started" | "completed";
     StatusReportedById?: string;

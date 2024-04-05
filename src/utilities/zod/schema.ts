@@ -110,6 +110,7 @@ export const addShiftFormSchema = z
       message: "Please enter the required no. of employees",
       defaultValue: 1,
     }),
+    ShiftPhotoUploadIntervalInMinutes: z.coerce.number().nullable().optional(),
   })
   .superRefine(({ ShiftRequiredEmp }, ctx) => {
     if (!Number(ShiftRequiredEmp)) {

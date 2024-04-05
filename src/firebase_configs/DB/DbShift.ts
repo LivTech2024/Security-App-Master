@@ -45,7 +45,6 @@ class DbShift {
           ShiftTask: task.TaskName,
           ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
           ShiftTaskStatus: [],
-          ShiftTaskPhotos: [],
         });
       }
     });
@@ -66,6 +65,9 @@ class DbShift {
         Number(shiftData.ShiftLocation.latitude),
         Number(shiftData.ShiftLocation.longitude)
       ),
+      ShiftGuardWellnessReport: [],
+      ShiftPhotoUploadIntervalInMinutes:
+        shiftData.ShiftPhotoUploadIntervalInMinutes,
       ShiftClientId: shiftData.ShiftClientId,
       ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
       ShiftCurrentStatus: [],
@@ -123,7 +125,6 @@ class DbShift {
             ShiftTask: task.TaskName,
             ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
             ShiftTaskStatus: [],
-            ShiftTaskPhotos: [],
           });
         }
       });
@@ -142,6 +143,8 @@ class DbShift {
           Number(shiftData.ShiftLocation.latitude),
           Number(shiftData.ShiftLocation.longitude)
         ),
+        ShiftPhotoUploadIntervalInMinutes:
+          shiftData.ShiftPhotoUploadIntervalInMinutes,
         ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
         ShiftLocationName: shiftData.ShiftLocationName,
         ShiftClientId: shiftData.ShiftClientId,

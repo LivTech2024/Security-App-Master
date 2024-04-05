@@ -489,6 +489,16 @@ const ShiftCreateOrEdit = () => {
                 </div>
               }
             />
+            <InputWithTopHeader
+              label="Photo upload interval in minutes (Optional)"
+              className="mx-0"
+              register={methods.register}
+              name="ShiftPhotoUploadIntervalInMinutes"
+              error={
+                methods.formState.errors.ShiftPhotoUploadIntervalInMinutes
+                  ?.message
+              }
+            />
             <TextareaWithTopHeader
               title="Description (Optional)"
               className="mx-0"
