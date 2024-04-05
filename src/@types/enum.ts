@@ -87,3 +87,8 @@ export interface LocalStorageLoggedInUserData {
   LoggedInCrypt: string;
   LoggedInAuthUserType: "admin" | "guard" | "supervisor";
 }
+
+export enum ScheduleView {
+  CALENDAR_VIEW = "calendar_view",
+  BY_EMPLOYEE_VIEW = "by_employee_view",
+}

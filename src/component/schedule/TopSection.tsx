@@ -5,7 +5,7 @@ import { useEditFormStore } from "../../store";
 import dayjs from "dayjs";
 import { DatePickerInput } from "@mantine/dates";
 import { MdCalendarToday } from "react-icons/md";
-import { PageRoutes } from "../../@types/enum";
+import { PageRoutes, ScheduleView } from "../../@types/enum";
 import { useNavigate } from "react-router-dom";
 import Button from "../../common/button/Button";
 
@@ -21,10 +21,8 @@ const TopSection = ({
   setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
   selectedTenure: "weekly" | "monthly";
   setSelectedTenure: React.Dispatch<React.SetStateAction<"weekly" | "monthly">>;
-  selectedView: "calendar" | "position";
-  setSelectedView: React.Dispatch<
-    React.SetStateAction<"calendar" | "position">
-  >;
+  selectedView: ScheduleView;
+  setSelectedView: React.Dispatch<React.SetStateAction<ScheduleView>>;
 }) => {
   const { setShiftEditData } = useEditFormStore();
 
@@ -58,12 +56,14 @@ const TopSection = ({
         <Select
           allowDeselect={false}
           value={selectedView}
-          onChange={(e) => setSelectedView(e as "calendar" | "position")}
+          onChange={(e) => {
+            console.log(e);
+            setSelectedView(e as ScheduleView);
+          }}
           data={[
-            { label: "Calendar view", value: "calendar" },
-            { label: "Position view", value: "position" },
+            { label: "Calendar view", value: ScheduleView.CALENDAR_VIEW },
+            { label: "By Employee view", value: ScheduleView.BY_EMPLOYEE_VIEW },
           ]}
-          disabled
           className="text-lg"
           styles={{
             input: {
