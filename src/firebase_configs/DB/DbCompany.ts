@@ -10,6 +10,7 @@ import {
   ICompaniesCollection,
   ICompanyBranchesCollection,
   ILocationsCollection,
+  ISettingsCollection,
 } from "../../@types/database";
 import {
   doc,
@@ -479,6 +480,19 @@ class DbCompany {
     const empQuery = query(reportRef, ...queryParams);
 
     return getDocs(empQuery);
+  };
+
+  static createSettings = (cmpId: string) => {
+    const settingId = getNewDocId(CollectionName.settings);
+    const settingRef = doc(db, CollectionName.settings, settingId);
+
+    const newSetting: ISettingsCollection = {
+      SettingId: settingId,
+      SettingCompanyId: cmpId,
+      SettingEmpWellnessIntervalInMins: 60,
+    };
+
+    return setDoc(settingRef, newSetting);
   };
 }
 

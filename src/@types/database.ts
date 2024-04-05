@@ -265,3 +265,9 @@ export interface IClientsCollection {
   ClientCreatedAt: Timestamp | FieldValue;
   ClientModifiedAt: Timestamp | FieldValue;
 }
+
+export interface ISettingsCollection {
+  SettingId: string;
+  SettingCompanyId: string;
+  SettingEmpWellnessIntervalInMins: number;
+}

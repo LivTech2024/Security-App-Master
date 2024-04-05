@@ -12,6 +12,7 @@ export enum CollectionName {
   reports = "Reports",
   invoices = "Invoices",
   clients = "Clients",
+  settings = "Settings",
 }
 
 export const DisplayCount = {
