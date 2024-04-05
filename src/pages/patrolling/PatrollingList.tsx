@@ -146,21 +146,19 @@ const PatrollingList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">
+            <th className="uppercase px-4 py-2 w-[20%] text-start">
               Patrol Name
             </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">Location</th>
+            <th className="uppercase px-4 py-2 w-[20%] text-start">Location</th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">Time</th>
             <th className="uppercase px-4 py-2 w-[10%] text-center">
               Checkpoints
             </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-end">
+            <th className="uppercase px-4 py-2 w-[15%] text-center">
               Required Times
             </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-end">
-              Completed Times
-            </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-end">Status</th>
+
+            <th className="uppercase px-4 py-2 w-[20%] text-end">Status</th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -199,17 +197,14 @@ const PatrollingList = () => {
                   <td className="px-4 py-2 text-center align-top">
                     {patrol.PatrolRequiredCount}
                   </td>
-                  <td className="px-4 py-2 text-center align-top">
-                    {patrol.PatrolCompletedCount}
-                  </td>
                   <td className="px-4 py-2 text-end capitalize align-top">
-                    <span className="flex items-center justify-end gap-2">
-                      <PatrolStatus status={patrol.PatrolCurrentStatus} />
-                      <span>
-                        {patrol.PatrolCompletedCount}/
-                        {patrol.PatrolRequiredCount}
-                      </span>
-                    </span>
+                    <PatrolStatus
+                      status={
+                        patrol.PatrolCurrentStatus[
+                          patrol.PatrolCurrentStatus?.length - 1
+                        ].Status
+                      }
+                    />
                   </td>
                 </tr>
               );

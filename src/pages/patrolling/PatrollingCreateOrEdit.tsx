@@ -13,7 +13,7 @@ import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 import { useEffect, useState } from "react";
 import CheckpointForm from "../../component/patrolling/CheckpointForm";
 import { useAuthState } from "../../store";
-import { errorHandler } from "../../utilities/CustomError";
+import CustomError, { errorHandler } from "../../utilities/CustomError";
 import {
   closeModalLoader,
   showModalLoader,
@@ -37,9 +37,9 @@ const PatrollingCreateOrEdit = () => {
 
   const { company } = useAuthState();
 
-  const [checkPoints, setCheckPoints] = useState<{ checkPointName: string }[]>([
-    { checkPointName: "" },
-  ]);
+  const [checkPoints, setCheckPoints] = useState<
+    { checkPointName: string; checkPointCategory: string | null }[]
+  >([{ checkPointName: "", checkPointCategory: null }]);
 
   const [patrolTime, setPatrolTime] = useState("");
 
@@ -82,7 +82,7 @@ const PatrollingCreateOrEdit = () => {
       checkPoints
         .filter((d) => d.checkPointName)
         .map((ch) => {
-          return { name: ch.checkPointName };
+          return { name: ch.checkPointName, category: ch.checkPointCategory };
         })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,9 +92,22 @@ const PatrollingCreateOrEdit = () => {
     methods.setValue("PatrolTime", patrolTime);
   }, [patrolTime]);
 
+  const [checkpointsCategories, setCheckpointsCategories] = useState<string[]>(
+    []
+  );
+
   const onSubmit = async (data: PatrollingFormFields) => {
     if (!company) return;
     try {
+      if (
+        checkpointsCategories.length > 0 &&
+        checkPoints.some((ch) => !ch.checkPointCategory)
+      ) {
+        throw new CustomError(
+          "Either remove the checkpoints categories or add categories to all checkpoints"
+        );
+      }
+
       showModalLoader({});
 
       await DbPatrol.createPatrol({
@@ -219,6 +232,8 @@ const PatrollingCreateOrEdit = () => {
             <CheckpointForm
               checkpoints={checkPoints}
               setCheckpoints={setCheckPoints}
+              checkpointCategories={checkpointsCategories}
+              setCheckpointCategories={setCheckpointsCategories}
             />
           </div>
         </div>

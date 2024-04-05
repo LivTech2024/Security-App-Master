@@ -2,13 +2,7 @@ import { IPatrolsCollection } from "../../@types/database";
 import TimelineVertical from "../../common/TimelineVertical";
 import { formatDate } from "../../utilities/misc";
 
-const PatrolViewCard = ({
-  patrolData,
-  assignedGuards,
-}: {
-  patrolData: IPatrolsCollection;
-  assignedGuards: string[];
-}) => {
+const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
   return (
     <div className="bg-surface border border-gray-300 shadow-md rounded-lg px-4 pt-4 mb-4">
       <div className="mb-2">
@@ -18,46 +12,44 @@ const PatrolViewCard = ({
         </span>
       </div>
       <div className="mb-4">
-        <p className="text-textSecondary">
-          Assigned Guard:{" "}
-          <span className="font-medium text-textPrimary">
-            {assignedGuards.length > 0
-              ? assignedGuards.join(" , ")
-              : "No guards assigned"}
-          </span>
-        </p>
         <p className="text-textSecondary">Time: {patrolData.PatrolTime}</p>
         <p className="text-textSecondary">
           Required count: {patrolData.PatrolRequiredCount}
         </p>
-        <p className="text-textSecondary">
-          Completed count: {patrolData.PatrolCompletedCount}
-        </p>
       </div>
       <div className="mb-4">
-        <div className="flex items-end">
-          <span className="text-textSecondary capitalize">Status:</span>
-          <div className="flex items-center gap-2 ml-2">
-            <span className="capitalize font-medium text-textSecondary">
-              {patrolData.PatrolCurrentStatus}
-            </span>
-            {patrolData.PatrolCurrentStatus === "pending" ? (
-              <div className="w-[12px] h-[12px] rounded-full bg-primaryGold ">
-                &nbsp;
+        <div className="flex flex-col">
+          <div className="text-textSecondary capitalize">Status:</div>
+          {patrolData?.PatrolCurrentStatus?.map((data, idx) => {
+            return (
+              <div
+                key={data.StatusReportedById}
+                className="flex items-center gap-2"
+              >
+                <span>{idx + 1}.</span>
+                <div
+                  className={`w-[12px] h-[12px] rounded-full ${
+                    data.Status === "pending"
+                      ? "bg-primaryGold"
+                      : data.Status === "started"
+                      ? "bg-primaryRed"
+                      : "bg-primaryGreen"
+                  } `}
+                >
+                  &nbsp;
+                </div>
+                <div className="capitalize">
+                  {data.Status} {data.StatusCompletedCount}/
+                  {patrolData.PatrolRequiredCount} .
+                </div>
+
+                <span className="mt-[2px]">Guard: </span>
+                <div className="font-semibold mt-[2px]">
+                  {data?.StatusReportedByName ?? "No guards assigned"}
+                </div>
               </div>
-            ) : patrolData.PatrolCurrentStatus === "started" ? (
-              <div className="w-[12px] h-[12px] rounded-full bg-primaryRed ">
-                &nbsp;
-              </div>
-            ) : (
-              <div className="w-[12px] h-[12px] rounded-full bg-primaryGreen ">
-                &nbsp;
-              </div>
-            )}
-            <span>
-              {patrolData.PatrolCompletedCount}/{patrolData.PatrolRequiredCount}
-            </span>
-          </div>
+            );
+          })}
         </div>
         {patrolData.PatrolFailureReason && (
           <div className="text-textSecondary">
@@ -67,39 +59,83 @@ const PatrolViewCard = ({
       </div>
       <div className="mb-4">
         <div className="font-semibold">Checkpoints:</div>
-        <div className="flex flex-col mt-4">
-          <TimelineVertical
-            timelineItems={patrolData.PatrolCheckPoints.sort((a, b) =>
-              a.CheckPointStatus.localeCompare(b.CheckPointStatus)
-            ).map((ch) => {
-              return {
-                icon: "",
-                text: ch.CheckPointName,
-                isActive: ch.CheckPointStatus === "checked",
-                description: (
-                  <div className="flex flex-col">
-                    <span>
-                      Status:{" "}
-                      <span className="capitalize font-medium">
-                        {ch.CheckPointStatus === "checked"
-                          ? "Checked"
-                          : "Not checked"}
-                      </span>{" "}
-                    </span>
-                    {ch.CheckPointFailureReason && (
-                      <span>Failure reason: {ch.CheckPointFailureReason}</span>
-                    )}
-                    {ch.CheckPointCheckedTime && (
-                      <span className="text-textTertiary">
-                        {formatDate(ch.CheckPointCheckedTime, "hh:mm A")}
-                      </span>
-                    )}
-                  </div>
-                ),
-              };
-            })}
-          />
-        </div>
+
+        {patrolData.PatrolCurrentStatus?.map((data, idx) => {
+          return (
+            <div key={idx} className="flex gap-4 flex-wrap">
+              <div className="flex flex-col gap-2 mt-2">
+                <div>
+                  {idx + 1}. Guard:{" "}
+                  <span className="font-semibold">
+                    {" "}
+                    {data.StatusReportedByName || "No guard assigned"}
+                  </span>
+                </div>
+                <TimelineVertical
+                  timelineItems={patrolData.PatrolCheckPoints.map((ch) => {
+                    return {
+                      icon: "",
+                      text: ch.CheckPointName,
+                      isActive:
+                        ch.CheckPointStatus?.find(
+                          (s) =>
+                            s?.StatusReportedById === data?.StatusReportedById
+                        )?.Status === "checked"
+                          ? true
+                          : false,
+                      description: (
+                        <div className="flex flex-col">
+                          <span>
+                            Status:{" "}
+                            <span className="capitalize font-medium">
+                              {ch.CheckPointStatus?.find(
+                                (s) =>
+                                  s?.StatusReportedById ===
+                                  data?.StatusReportedById
+                              )?.Status === "checked"
+                                ? "Checked"
+                                : "Not checked"}
+                            </span>{" "}
+                          </span>
+                          {ch.CheckPointStatus?.find(
+                            (s) =>
+                              s?.StatusReportedById === data?.StatusReportedById
+                          )?.StatusFailureReason && (
+                            <span>
+                              Failure reason:{" "}
+                              {
+                                ch.CheckPointStatus?.find(
+                                  (s) =>
+                                    s?.StatusReportedById ===
+                                    data?.StatusReportedById
+                                )?.StatusFailureReason
+                              }
+                            </span>
+                          )}
+                          {ch.CheckPointStatus?.find(
+                            (s) =>
+                              s?.StatusReportedById === data?.StatusReportedById
+                          )?.StatusReportedTime && (
+                            <span className="text-textTertiary">
+                              {formatDate(
+                                ch.CheckPointStatus?.find(
+                                  (s) =>
+                                    s?.StatusReportedById ===
+                                    data?.StatusReportedById
+                                )?.StatusReportedTime,
+                                "hh:mm A"
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      ),
+                    };
+                  })}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <div className="mb-4 text-textTertiary">

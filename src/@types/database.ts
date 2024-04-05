@@ -119,9 +119,14 @@ export interface IShiftsCollection {
 export interface IPatrolCheckPointsChild {
   CheckPointId: string;
   CheckPointName: string;
-  CheckPointStatus: "checked" | "not_checked";
-  CheckPointCheckedTime?: Timestamp | FieldValue;
-  CheckPointFailureReason?: string;
+  CheckPointCategory: string | null;
+  CheckPointStatus: {
+    Status: "checked" | "not_checked";
+    StatusReportedById?: string;
+    StatusReportedByName?: string;
+    StatusReportedTime?: Timestamp | FieldValue;
+    StatusFailureReason?: string;
+  }[];
 }
 
 export interface IPatrolsCollection {
@@ -133,10 +138,15 @@ export interface IPatrolsCollection {
   PatrolLocationId: string;
   PatrolLocationName: string;
   PatrolTime: string;
-  PatrolCompletedCount: number;
   PatrolRequiredCount: number;
   PatrolCheckPoints: IPatrolCheckPointsChild[];
-  PatrolCurrentStatus: "pending" | "started" | "completed";
+  PatrolCurrentStatus: {
+    Status: "pending" | "started" | "completed";
+    StatusCompletedCount: number;
+    StatusReportedById?: string;
+    StatusReportedByName?: string;
+    StatusReportedTime?: Timestamp | FieldValue;
+  }[];
   PatrolFailureReason?: string;
   PatrolRestrictedRadius: number;
   PatrolKeepGuardInRadiusOfLocation: boolean;

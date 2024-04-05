@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import PatrolViewCard from "../../component/patrolling/PatrolViewCard";
 import { useEffect, useState } from "react";
 import DbPatrol from "../../firebase_configs/DB/DbPatrol";
-import { IPatrolsCollection, IShiftsCollection } from "../../@types/database";
+import { IPatrolsCollection } from "../../@types/database";
 import NoSearchResult from "../../common/NoSearchResult";
 import { errorHandler } from "../../utilities/CustomError";
 import {
@@ -12,7 +12,6 @@ import {
 } from "../../utilities/TsxUtils";
 import { openContextModal } from "@mantine/modals";
 import { PageRoutes } from "../../@types/enum";
-import DbEmployee from "../../firebase_configs/DB/DbEmployee";
 
 const PatrollingView = () => {
   const [searchParam] = useSearchParams();
@@ -23,8 +22,6 @@ const PatrollingView = () => {
 
   const [data, setData] = useState<IPatrolsCollection | null>(null);
 
-  const [assignedGuards, setAssignedGuards] = useState<string[]>([]);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,30 +31,7 @@ const PatrollingView = () => {
         const patrolSnapshot = await DbPatrol.getPatrolById(patrolId);
         const patrolData = patrolSnapshot.data() as IPatrolsCollection;
 
-        if (patrolData) {
-          setData(patrolData);
-          const { PatrolLocationId } = patrolData;
-
-          const shiftSnapshot = await DbPatrol.getAssignedGuardOfPatrol(
-            PatrolLocationId
-          );
-          const shiftData = shiftSnapshot?.docs[0]?.data() as IShiftsCollection;
-
-          if (shiftData) {
-            const { ShiftAssignedUserId } = shiftData;
-            const promise = ShiftAssignedUserId.map(async (empId) => {
-              const emp = await DbEmployee.getEmpById(empId);
-              setAssignedGuards((prev) => {
-                if (prev.find((p) => p === emp.EmployeeName)) {
-                  return prev;
-                }
-                return [...prev, emp.EmployeeName];
-              });
-            });
-
-            await Promise.all(promise);
-          }
-        }
+        setData(patrolData);
 
         setLoading(false);
       } catch (error) {
@@ -135,7 +109,7 @@ const PatrollingView = () => {
             Delete
           </button>
         </div>
-        <PatrolViewCard patrolData={data} assignedGuards={assignedGuards} />
+        <PatrolViewCard patrolData={data} />
       </div>
     );
   }

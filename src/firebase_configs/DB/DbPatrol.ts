@@ -41,10 +41,12 @@ class DbPatrol {
 
     data.PatrolCheckPoints.map((ch, idx) => {
       const checkPointId = `${patrolId}${idx}`;
+
       PatrolCheckPoints.push({
         CheckPointId: checkPointId,
         CheckPointName: ch.name,
-        CheckPointStatus: "not_checked",
+        CheckPointStatus: [{ Status: "not_checked" }],
+        CheckPointCategory: ch.category || null,
       });
     });
 
@@ -66,9 +68,8 @@ class DbPatrol {
       PatrolLocationName: data.PatrolLocationName,
       PatrolTime: data.PatrolTime,
       PatrolRequiredCount: Number(data.PatrolRequiredCount),
-      PatrolCompletedCount: 0,
       PatrolCheckPoints,
-      PatrolCurrentStatus: "pending",
+      PatrolCurrentStatus: [{ Status: "pending", StatusCompletedCount: 0 }],
       PatrolRestrictedRadius: Number(data.PatrolRestrictedRadius),
       PatrolKeepGuardInRadiusOfLocation: data.PatrolKeepGuardInRadiusOfLocation,
       PatrolCreatedAt: serverTimestamp(),
