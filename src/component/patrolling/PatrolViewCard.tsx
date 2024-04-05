@@ -20,36 +20,40 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
       <div className="mb-4">
         <div className="flex flex-col">
           <div className="text-textSecondary capitalize">Status:</div>
-          {patrolData?.PatrolCurrentStatus?.map((data, idx) => {
-            return (
-              <div
-                key={data.StatusReportedById}
-                className="flex items-center gap-2"
-              >
-                <span>{idx + 1}.</span>
+          {patrolData?.PatrolCurrentStatus.length > 0 ? (
+            patrolData?.PatrolCurrentStatus?.map((data, idx) => {
+              return (
                 <div
-                  className={`w-[12px] h-[12px] rounded-full ${
-                    data.Status === "pending"
-                      ? "bg-primaryGold"
-                      : data.Status === "started"
-                      ? "bg-primaryRed"
-                      : "bg-primaryGreen"
-                  } `}
+                  key={data.StatusReportedById}
+                  className="flex items-center gap-2"
                 >
-                  &nbsp;
-                </div>
-                <div className="capitalize">
-                  {data.Status} {data.StatusCompletedCount}/
-                  {patrolData.PatrolRequiredCount} .
-                </div>
+                  <span>{idx + 1}.</span>
+                  <div
+                    className={`w-[12px] h-[12px] rounded-full ${
+                      data.Status === "pending"
+                        ? "bg-primaryGold"
+                        : data.Status === "started"
+                        ? "bg-primaryRed"
+                        : "bg-primaryGreen"
+                    } `}
+                  >
+                    &nbsp;
+                  </div>
+                  <div className="capitalize">
+                    {data.Status} {data.StatusCompletedCount}/
+                    {patrolData.PatrolRequiredCount} .
+                  </div>
 
-                <span className="mt-[2px]">Guard: </span>
-                <div className="font-semibold mt-[2px]">
-                  {data?.StatusReportedByName ?? "No guards assigned"}
+                  <span className="mt-[2px]">Guard: </span>
+                  <div className="font-semibold mt-[2px]">
+                    {data?.StatusReportedByName ?? "No guards assigned"}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            <div>No assigned guards</div>
+          )}
         </div>
         {patrolData.PatrolFailureReason && (
           <div className="text-textSecondary">

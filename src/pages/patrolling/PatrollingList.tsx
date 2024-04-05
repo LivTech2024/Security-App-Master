@@ -202,7 +202,7 @@ const PatrollingList = () => {
                       status={
                         patrol.PatrolCurrentStatus[
                           patrol.PatrolCurrentStatus?.length - 1
-                        ].Status
+                        ]?.Status || "pending"
                       }
                     />
                   </td>
