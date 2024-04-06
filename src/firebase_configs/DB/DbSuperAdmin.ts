@@ -11,6 +11,7 @@ import {
   IAdminsCollection,
   ICompaniesCollection,
   IEmployeeRolesCollection,
+  ISettingsCollection,
 } from "../../@types/database";
 import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
 
@@ -40,7 +41,7 @@ class DbSuperAdmin {
 
         const newCompany: ICompaniesCollection = {
           CompanyId: companyId,
-          CompanyName: "Tactick Protection Solution Ltd.",
+          CompanyName: "Tactical Protection Solutions Ltd.",
           CompanyEmail: emailId,
           CompanyPhone: "+1234567",
           CompanyAddress: "Alberta, Canada",
@@ -55,8 +56,8 @@ class DbSuperAdmin {
         const adminDocRef = doc(db, CollectionName.admins, uid);
         const newAdmin: IAdminsCollection = {
           AdminId: uid,
-          AdminName: "Jhon",
-          AdminEmail: "Doe",
+          AdminName: "Jhon Doe",
+          AdminEmail: emailId,
           AdminPhone: "+1234567",
           AdminCompanyId: companyId,
           AdminCreatedAt: serverTimestamp(),
@@ -86,6 +87,17 @@ class DbSuperAdmin {
 
           transaction.set(empRoleDocRef, newEmpRole);
         });
+
+        //*Create default settings;
+        const settingId = getNewDocId(CollectionName.settings);
+        const settingRef = doc(db, CollectionName.settings, settingId);
+        const newSetting: ISettingsCollection = {
+          SettingId: settingId,
+          SettingCompanyId: companyId,
+          SettingEmpWellnessIntervalInMins: 60,
+        };
+
+        transaction.set(settingRef, newSetting);
       });
     } catch (error) {
       console.log(error);
