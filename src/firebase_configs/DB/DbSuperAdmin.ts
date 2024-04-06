@@ -60,7 +60,11 @@ class DbSuperAdmin {
 
         defaultEmpRoles.forEach(async (role) => {
           const empRoleId = getNewDocId(CollectionName.employeeRoles);
-          const empRoleDocRef = doc(db, CollectionName.employeeRoles);
+          const empRoleDocRef = doc(
+            db,
+            CollectionName.employeeRoles,
+            empRoleId
+          );
 
           const newEmpRole: IEmployeeRolesCollection = {
             EmployeeRoleId: empRoleId,
