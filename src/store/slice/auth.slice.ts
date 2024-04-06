@@ -5,6 +5,7 @@ import {
   ICompanyBranchesCollection,
   IEmployeeRolesCollection,
   ILoggedInUsersCollection,
+  ISuperAdminCollection,
 } from "../../@types/database";
 import * as storage from "../../utilities/Storage";
 import { LocalStorageKey } from "../../@types/enum";
@@ -37,6 +38,8 @@ export interface CompanyBranches
 }
 
 interface AuthState {
+  superAdmin: ISuperAdminCollection | null;
+  setSuperAdmin: (superAdmin: ISuperAdminCollection | null) => void;
   company: Company | null;
   setCompany: (cmp: Company | null) => void;
   admin: Admin | null;
@@ -51,6 +54,8 @@ interface AuthState {
 }
 
 export const createAuthSlice: StateCreator<AuthState> = (set) => ({
+  superAdmin: null,
+  setSuperAdmin: (superAdmin) => set((state) => ({ ...state, superAdmin })),
   company: null,
   setCompany: (cmp) => set((state) => ({ ...state, company: cmp })),
   admin: null,

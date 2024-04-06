@@ -1,4 +1,9 @@
-import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  runTransaction,
+  serverTimestamp,
+} from "firebase/firestore";
 import { CollectionName } from "../../@types/enum";
 import { getNewDocId } from "./utils";
 import { auth, db } from "../config";
@@ -13,6 +18,11 @@ const emailId = "tpssolution@gmail.com";
 const password = "tps12345";
 
 class DbSuperAdmin {
+  static getSuperAdminById = (id: string) => {
+    const superAdminRef = doc(db, CollectionName.superAdmin, id);
+    return getDoc(superAdminRef);
+  };
+
   static createNewCompany = async () => {
     //*Create a new auth user
     const userCred = await createUserWithEmailAndPassword(

@@ -1,4 +1,5 @@
 import type { FieldValue, GeoPoint, Timestamp } from "firebase/firestore";
+import { IUserType } from "./enum";
 
 export interface ICompaniesCollection {
   CompanyId: string;
@@ -217,7 +218,7 @@ export interface ILoggedInUsersCollection {
   LoggedInUserId: string;
   IsLoggedIn: boolean;
   LoggedInCrypt: string;
-  LoggedInUserType: string;
+  LoggedInUserType: IUserType;
   LoggedInCreatedAt: Timestamp | FieldValue;
 }
 
@@ -270,4 +271,12 @@ export interface ISettingsCollection {
   SettingId: string;
   SettingCompanyId: string;
   SettingEmpWellnessIntervalInMins: number;
+}
+
+//*SuperAdmin
+export interface ISuperAdminCollection {
+  SuperAdminId: string;
+  SuperAdminEmail: string;
+  SuperAdminName: string;
+  SuperAdminPhone: string;
 }

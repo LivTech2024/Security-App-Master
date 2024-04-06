@@ -13,6 +13,7 @@ export enum CollectionName {
   invoices = "Invoices",
   clients = "Clients",
   settings = "Settings",
+  superAdmin = "SuperAdmin",
 }
 
 export const DisplayCount = {
@@ -83,10 +84,15 @@ export const LocalStorageKey = {
   LOGGEDIN_USER: "loggedInUser",
 };
 
+export enum IUserType {
+  ADMIN = "admin",
+  SUPER_ADMIN = "super_admin",
+}
+
 export interface LocalStorageLoggedInUserData {
   LoggedInId: string;
   LoggedInCrypt: string;
-  LoggedInAuthUserType: "admin" | "guard" | "supervisor";
+  LoggedInAuthUserType: IUserType;
 }
 
 export enum ScheduleView {

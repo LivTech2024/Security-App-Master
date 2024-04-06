@@ -1,6 +1,10 @@
 import { useEffect } from "react";
 import * as storage from "../utilities/Storage";
-import { LocalStorageKey, LocalStorageLoggedInUserData } from "../@types/enum";
+import {
+  IUserType,
+  LocalStorageKey,
+  LocalStorageLoggedInUserData,
+} from "../@types/enum";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase_configs/config";
 import DbCompany from "../firebase_configs/DB/DbCompany";
@@ -11,6 +15,7 @@ import {
   ICompanyBranchesCollection,
   IEmployeeRolesCollection,
   ILoggedInUsersCollection,
+  ISuperAdminCollection,
 } from "../@types/database";
 import { useAuthState } from "../store";
 import {
@@ -20,10 +25,17 @@ import {
   EmployeeRoles,
 } from "../store/slice/auth.slice";
 import DbEmployee from "../firebase_configs/DB/DbEmployee";
+import DbSuperAdmin from "../firebase_configs/DB/DbSuperAdmin";
 
 const useOnAuthStateChanged = () => {
-  const { setAdmin, setCompany, setLoading, setEmpRoles, setCompanyBranches } =
-    useAuthState();
+  const {
+    setAdmin,
+    setCompany,
+    setLoading,
+    setEmpRoles,
+    setCompanyBranches,
+    setSuperAdmin,
+  } = useAuthState();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
@@ -70,46 +82,55 @@ const useOnAuthStateChanged = () => {
           loggedInUserData
         ) as unknown as ILoggedInUsersCollection;
 
-        //* Fetch admin and store in zustand
-        const adminSnapshot = await DbCompany.getAdminById(
-          _loggedInUser.LoggedInUserId
-        );
-        const admin = adminSnapshot.data() as IAdminsCollection;
-        const _admin = firebaseDataToObject(
-          admin as unknown as Record<string, unknown>
-        ) as unknown as Admin;
-        setAdmin(_admin);
-
-        if (_admin.AdminCompanyId) {
-          //*Fetch company and store in zustand;
-          const cmpSnapshot = await DbCompany.getCompanyById(
-            _admin.AdminCompanyId
+        if (_loggedInUser.LoggedInUserType === IUserType.ADMIN) {
+          //* Fetch admin and store in zustand
+          const adminSnapshot = await DbCompany.getAdminById(
+            _loggedInUser.LoggedInUserId
           );
-          const company = cmpSnapshot.data() as ICompaniesCollection;
-          const _company = firebaseDataToObject(
-            company as unknown as Record<string, unknown>
-          ) as unknown as Company;
-          setCompany(_company);
+          const admin = adminSnapshot.data() as IAdminsCollection;
+          const _admin = firebaseDataToObject(
+            admin as unknown as Record<string, unknown>
+          ) as unknown as Admin;
+          setAdmin(_admin);
 
-          //*Fetch employee roles
-          const empRolesSnapshot = await DbEmployee.getEmpRoles({
-            cmpId: _admin.AdminCompanyId,
-          });
-          const empRoles = empRolesSnapshot.docs.map(
-            (doc) => doc.data() as IEmployeeRolesCollection
+          if (_admin.AdminCompanyId) {
+            //*Fetch company and store in zustand;
+            const cmpSnapshot = await DbCompany.getCompanyById(
+              _admin.AdminCompanyId
+            );
+            const company = cmpSnapshot.data() as ICompaniesCollection;
+            const _company = firebaseDataToObject(
+              company as unknown as Record<string, unknown>
+            ) as unknown as Company;
+            setCompany(_company);
+
+            //*Fetch employee roles
+            const empRolesSnapshot = await DbEmployee.getEmpRoles({
+              cmpId: _admin.AdminCompanyId,
+            });
+            const empRoles = empRolesSnapshot.docs.map(
+              (doc) => doc.data() as IEmployeeRolesCollection
+            );
+
+            setEmpRoles(empRoles as unknown as EmployeeRoles[]);
+
+            //*Fetch company branches
+            const cmpBranchSnapshot = await DbCompany.getCompanyBranches(
+              admin.AdminCompanyId
+            );
+            const cmpBranches = cmpBranchSnapshot.docs.map(
+              (doc) => doc.data() as ICompanyBranchesCollection
+            );
+
+            setCompanyBranches(cmpBranches as unknown as CompanyBranches[]);
+          }
+        } else {
+          //* Fetch super admin and store in zustand
+          const superAdminSnapshot = await DbSuperAdmin.getSuperAdminById(
+            _loggedInUser.LoggedInUserId
           );
-
-          setEmpRoles(empRoles as unknown as EmployeeRoles[]);
-
-          //*Fetch company branches
-          const cmpBranchSnapshot = await DbCompany.getCompanyBranches(
-            admin.AdminCompanyId
-          );
-          const cmpBranches = cmpBranchSnapshot.docs.map(
-            (doc) => doc.data() as ICompanyBranchesCollection
-          );
-
-          setCompanyBranches(cmpBranches as unknown as CompanyBranches[]);
+          const superAdmin = superAdminSnapshot.data() as ISuperAdminCollection;
+          setSuperAdmin(superAdmin);
         }
 
         setLoading(false);

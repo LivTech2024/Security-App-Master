@@ -39,7 +39,7 @@ import CreateNewCompany from "./pages/super_admin/CreateNewCompany";
 function App() {
   useOnAuthStateChanged();
 
-  const { company, admin, loading } = useAuthState();
+  const { company, admin, loading, superAdmin } = useAuthState();
 
   const { notification } = useListenNotifications();
 
@@ -59,28 +59,30 @@ function App() {
     return <SplashScreen />;
   }
 
-  if (location.pathname.includes("/super_admin")) {
+  if (location.pathname.includes("/super_admin") && superAdmin) {
     return (
       <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
         <ModalsProvider
           modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
         >
-          <Layout>
-            <ToastContainer />
-            <Routes>
-              {" "}
-              <Route
-                path={PageRoutes.SUPER_ADMIN_CREATE_NEW_COMPANY}
-                Component={CreateNewCompany}
-              />
-            </Routes>
-          </Layout>
+          <ToastContainer />
+          <Routes>
+            {" "}
+            <Route
+              path={PageRoutes.SUPER_ADMIN_CREATE_NEW_COMPANY}
+              Component={CreateNewCompany}
+            />
+          </Routes>
         </ModalsProvider>
       </MantineProvider>
     );
   }
 
-  if (!admin || !company) {
+  if (
+    !admin ||
+    !company ||
+    (location.pathname.includes("/super_admin") && !superAdmin)
+  ) {
     return (
       <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
         <ModalsProvider
