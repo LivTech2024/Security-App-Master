@@ -5,8 +5,6 @@ import {
   LocalStorageKey,
   LocalStorageLoggedInUserData,
 } from "../@types/enum";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase_configs/config";
 import DbCompany from "../firebase_configs/DB/DbCompany";
 import { firebaseDataToObject } from "../utilities/misc";
 import {
@@ -38,14 +36,14 @@ const useOnAuthStateChanged = () => {
   } = useAuthState();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
+    const unsubscribe = async () => {
       try {
         setLoading(true);
-        if (!userAuth) {
+        /* if (!userAuth) {
           console.log("userAuth not found -> signing out");
           setLoading(false);
           return;
-        }
+        } */
         const loggedInUser = storage.getJson<LocalStorageLoggedInUserData>(
           LocalStorageKey.LOGGEDIN_USER
         );
@@ -54,7 +52,7 @@ const useOnAuthStateChanged = () => {
           return;
         }
 
-        const { LoggedInId, LoggedInCrypt } = loggedInUser;
+        const { LoggedInId, LoggedInCrypt, LoggedInUserId } = loggedInUser;
 
         if (!LoggedInId || !LoggedInCrypt) {
           console.log("LoggedInId, LoggedInCrypt not found -> signing out");
@@ -64,7 +62,7 @@ const useOnAuthStateChanged = () => {
 
         // query loggedin user
         const loggedInUserDoc = await DbCompany.getUserLoggedInData(
-          userAuth.uid,
+          LoggedInUserId,
           LoggedInId,
           LoggedInCrypt,
           true
@@ -138,9 +136,9 @@ const useOnAuthStateChanged = () => {
         setLoading(false);
         console.log(error);
       }
-    });
+    };
 
-    return () => unsubscribe();
+    unsubscribe();
   }, []);
 };
 

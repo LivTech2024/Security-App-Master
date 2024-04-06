@@ -91,6 +91,7 @@ export enum IUserType {
 
 export interface LocalStorageLoggedInUserData {
   LoggedInId: string;
+  LoggedInUserId: string;
   LoggedInCrypt: string;
   LoggedInAuthUserType: IUserType;
 }

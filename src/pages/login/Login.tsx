@@ -101,6 +101,7 @@ const Login = () => {
       const lsLoggedInUser: LocalStorageLoggedInUserData = {
         LoggedInId: loggedInId,
         LoggedInCrypt: loggedInCrypt,
+        LoggedInUserId: uId,
         LoggedInAuthUserType: userType as IUserType,
       };
 
