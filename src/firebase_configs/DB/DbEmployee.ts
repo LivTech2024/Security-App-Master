@@ -520,7 +520,7 @@ class DbEmployee {
     empRole,
     branch,
   }: {
-    lmt: number;
+    lmt?: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId: string;

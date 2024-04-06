@@ -16,9 +16,11 @@ const TopSection = ({
   setSelectedTenure,
   selectedView,
   setSelectedView,
+  isSelectTenureDisabled = false,
 }: {
   selectedDate: Date;
   setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
+  isSelectTenureDisabled?: boolean;
   selectedTenure: "weekly" | "monthly";
   setSelectedTenure: React.Dispatch<React.SetStateAction<"weekly" | "monthly">>;
   selectedView: ScheduleView;
@@ -116,27 +118,31 @@ const TopSection = ({
           />
         </div>
         <div>
-          <Select
-            allowDeselect={false}
-            value={selectedTenure}
-            onChange={(e) => setSelectedTenure(e as "monthly" | "weekly")}
-            data={[
-              { label: "Weekly", value: "weekly" },
-              { label: "Monthly", value: "monthly" },
-            ]}
-            className="text-lg"
-            styles={{
-              input: {
-                border: `1px solid #0000001A`,
-                fontWeight: "normal",
-                fontSize: "18px",
-                borderRadius: "4px",
-                background: "#FFFFFF",
-                color: "#000000",
-                padding: "12px 12px",
-              },
-            }}
-          />
+          {!isSelectTenureDisabled ? (
+            <Select
+              allowDeselect={false}
+              value={selectedTenure}
+              onChange={(e) => setSelectedTenure(e as "monthly" | "weekly")}
+              data={[
+                { label: "Weekly", value: "weekly" },
+                { label: "Monthly", value: "monthly" },
+              ]}
+              className="text-lg"
+              styles={{
+                input: {
+                  border: `1px solid #0000001A`,
+                  fontWeight: "normal",
+                  fontSize: "18px",
+                  borderRadius: "4px",
+                  background: "#FFFFFF",
+                  color: "#000000",
+                  padding: "12px 12px",
+                },
+              }}
+            />
+          ) : (
+            <span>&nbsp;</span>
+          )}
         </div>
       </div>
     </div>
