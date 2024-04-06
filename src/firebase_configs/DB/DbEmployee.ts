@@ -502,12 +502,26 @@ class DbEmployee {
 
       const empData = snapshot.data() as IEmployeesCollection;
 
-      const { EmployeeImg } = empData;
+      const { EmployeeImg, EmployeeBankDetails, EmployeeCertificates } =
+        empData;
 
       transaction.delete(empRef);
 
       if (EmployeeImg) {
         await CloudStorageImageHandler.deleteImageByUrl(EmployeeImg);
+      }
+      if (EmployeeBankDetails.BankVoidCheckImg) {
+        await CloudStorageImageHandler.deleteImageByUrl(
+          EmployeeBankDetails.BankVoidCheckImg
+        );
+      }
+
+      if (EmployeeCertificates.length > 0) {
+        const certificateDeletePromise = EmployeeCertificates.map((c) =>
+          CloudStorageFileHandler.deleteFileByUrl(c.CertificateDoc)
+        );
+
+        await Promise.all(certificateDeletePromise);
       }
     });
   };
