@@ -1,10 +1,6 @@
 import { useEffect } from "react";
 import * as storage from "../utilities/Storage";
-import {
-  LocalStorageKey,
-  LocalStorageLoggedInUserData,
-  PageRoutes,
-} from "../@types/enum";
+import { LocalStorageKey, LocalStorageLoggedInUserData } from "../@types/enum";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase_configs/config";
 import DbCompany from "../firebase_configs/DB/DbCompany";
@@ -23,14 +19,11 @@ import {
   CompanyBranches,
   EmployeeRoles,
 } from "../store/slice/auth.slice";
-import { useNavigate } from "react-router-dom";
 import DbEmployee from "../firebase_configs/DB/DbEmployee";
 
 const useOnAuthStateChanged = () => {
   const { setAdmin, setCompany, setLoading, setEmpRoles, setCompanyBranches } =
     useAuthState();
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
@@ -120,7 +113,6 @@ const useOnAuthStateChanged = () => {
         }
 
         setLoading(false);
-        navigate(PageRoutes.HOME);
       } catch (error) {
         setLoading(false);
         console.log(error);

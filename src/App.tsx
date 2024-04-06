@@ -1,6 +1,6 @@
 import "./App.css";
 import Layout from "./layout";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/home/Home";
 import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
@@ -34,6 +34,7 @@ import PaymentsAndBilling from "./pages/payments_and_billing/PaymentsAndBilling"
 import InvoiceGenerate from "./pages/payments_and_billing/invoice/InvoiceGenerate";
 import InvoiceList from "./pages/payments_and_billing/invoice/InvoiceList";
 import Clients from "./pages/client/Clients";
+import CreateNewCompany from "./pages/super_admin/CreateNewCompany";
 
 function App() {
   useOnAuthStateChanged();
@@ -41,6 +42,8 @@ function App() {
   const { company, admin, loading } = useAuthState();
 
   const { notification } = useListenNotifications();
+
+  const location = useLocation();
 
   useEffect(() => {
     if (notification) {
@@ -54,6 +57,27 @@ function App() {
 
   if (loading) {
     return <SplashScreen />;
+  }
+
+  if (location.pathname.includes("/super_admin")) {
+    return (
+      <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
+        <ModalsProvider
+          modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
+        >
+          <Layout>
+            <ToastContainer />
+            <Routes>
+              {" "}
+              <Route
+                path={PageRoutes.SUPER_ADMIN_CREATE_NEW_COMPANY}
+                Component={CreateNewCompany}
+              />
+            </Routes>
+          </Layout>
+        </ModalsProvider>
+      </MantineProvider>
+    );
   }
 
   if (!admin || !company) {

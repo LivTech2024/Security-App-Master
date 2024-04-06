@@ -76,6 +76,7 @@ export const PageRoutes = {
   INVOICE_LIST: "/invoice_list",
   INVOICE_GENERATE: "/invoice_generate",
   CLIENTS: "/clients",
+  SUPER_ADMIN_CREATE_NEW_COMPANY: "/super_admin/create_new_company",
 };
 
 export const LocalStorageKey = {
