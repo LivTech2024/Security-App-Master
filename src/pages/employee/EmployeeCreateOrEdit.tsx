@@ -342,6 +342,7 @@ const EmployeeCreateOrEdit = () => {
                 register={methods.register}
                 name="EmployeeEmail"
                 error={methods.formState.errors.EmployeeEmail?.message}
+                disabled={isEdit}
               />
 
               <InputWithTopHeader
