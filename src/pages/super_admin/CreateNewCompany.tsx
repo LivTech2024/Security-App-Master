@@ -1,4 +1,3 @@
-import React from "react";
 import { errorHandler } from "../../utilities/CustomError";
 import { closeModalLoader, showModalLoader } from "../../utilities/TsxUtils";
 import DbSuperAdmin from "../../firebase_configs/DB/DbSuperAdmin";
