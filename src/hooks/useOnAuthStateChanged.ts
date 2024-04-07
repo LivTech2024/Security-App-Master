@@ -24,6 +24,8 @@ import {
 } from "../store/slice/auth.slice";
 import DbEmployee from "../firebase_configs/DB/DbEmployee";
 import DbSuperAdmin from "../firebase_configs/DB/DbSuperAdmin";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase_configs/config";
 
 const useOnAuthStateChanged = () => {
   const {
@@ -36,14 +38,14 @@ const useOnAuthStateChanged = () => {
   } = useAuthState();
 
   useEffect(() => {
-    const unsubscribe = async () => {
+    const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
       try {
         setLoading(true);
-        /* if (!userAuth) {
+        if (!userAuth) {
           console.log("userAuth not found -> signing out");
           setLoading(false);
           return;
-        } */
+        }
         const loggedInUser = storage.getJson<LocalStorageLoggedInUserData>(
           LocalStorageKey.LOGGEDIN_USER
         );
@@ -136,9 +138,11 @@ const useOnAuthStateChanged = () => {
         setLoading(false);
         console.log(error);
       }
-    };
+    });
 
-    unsubscribe();
+    return () => {
+      unsubscribe();
+    };
   }, []);
 };
 

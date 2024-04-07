@@ -6,7 +6,6 @@ import { SiAdguard } from "react-icons/si";
 import { FaExclamationTriangle, FaToolbox } from "react-icons/fa";
 import { PageRoutes } from "../../@types/enum";
 import { RiBillLine } from "react-icons/ri";
-import { createAuthUser } from "../../API/AuthUser";
 
 const HomeItem = ({
   name,
@@ -37,19 +36,8 @@ const HomeItem = ({
 const Home = () => {
   const { company } = useAuthState();
 
-  const test = async () => {
-    const res = await createAuthUser({
-      email: "test@gmail.com",
-      password: "test123",
-      role: "employee",
-      userId: "12345678",
-    });
-
-    console.log(res, "here res");
-  };
   return (
     <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center">
-      <button onClick={test}>test</button>
       <div className="flex w-full justify-center items-center">
         <div className="flex flex-col items-center gap-2">
           <img
