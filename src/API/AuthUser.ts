@@ -2,6 +2,8 @@ import axios from "axios";
 
 const baseUrl = import.meta.env.VITE_SERVER_BASE_URL;
 
+//const baseUrl = "http://localhost:3000";
+
 export const createAuthUser = ({
   email,
   password,
@@ -29,19 +31,15 @@ export const createAuthUser = ({
 export const updateAuthUser = ({
   email,
   userId,
-  password,
 }: {
   email: string;
-  password: string;
   userId: string;
 }) => {
   return axios.put<{
     email: string;
     user_id: string;
-    password: string;
   }>(`${baseUrl}/api/auth_user`, {
     email,
-    password,
     user_id: userId,
   });
 };

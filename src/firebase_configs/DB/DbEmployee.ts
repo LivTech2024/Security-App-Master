@@ -487,6 +487,7 @@ class DbEmployee {
           ),
           EmployeeMaxHrsPerWeek: Number(empData.EmployeeMaxHrsPerWeek),
           EmployeePhone: empData.EmployeePhone,
+          EmployeeEmail: empData.EmployeeEmail,
           EmployeePassword: empData.EmployeePassword,
           EmployeeRole: empData.EmployeeRole,
           EmployeePayRate: Number(empData.EmployeePayRate),
@@ -502,9 +503,8 @@ class DbEmployee {
         transaction.update(empDocRef, newEmployee);
 
         await updateAuthUser({
-          email: empData.EmployeeEmail,
           userId: empId,
-          password: empData.EmployeePassword,
+          email: empData.EmployeeEmail,
         });
 
         if (oldEmpData.EmployeePassword !== empData.EmployeePassword) {
@@ -517,14 +517,16 @@ class DbEmployee {
           await updatePassword(userCred.user, empData.EmployeePassword);
         }
 
-        const fileDeletePromises = deletedCertificates.map((fileUrl) => {
+        const fileDeletePromises = deletedCertificates?.map((fileUrl) => {
           if (fileUrl) {
             return CloudStorageFileHandler.deleteFileByUrl(fileUrl);
           }
         });
-        Promise.allSettled(fileDeletePromises).catch((error_) => {
-          console.log(error_);
-        });
+        if (fileDeletePromises.length > 0) {
+          Promise.allSettled(fileDeletePromises).catch((error_) => {
+            console.log(error_);
+          });
+        }
       });
     } catch (error) {
       console.log(error);
