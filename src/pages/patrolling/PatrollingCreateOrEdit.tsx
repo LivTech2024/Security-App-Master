@@ -12,9 +12,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 import { useEffect, useState } from "react";
 import CheckpointForm from "../../component/patrolling/CheckpointForm";
-import InputAutoComplete from "../../common/inputs/InputAutocomplete";
-import { DateTimePicker } from "@mantine/dates";
-import { MdCalendarToday } from "react-icons/md";
 import { useAuthState } from "../../store";
 import CustomError, { errorHandler } from "../../utilities/CustomError";
 import {
@@ -25,153 +22,98 @@ import {
 import DbPatrol from "../../firebase_configs/DB/DbPatrol";
 import useFetchLocations from "../../hooks/fetch/useFetchLocations";
 import { AiOutlinePlus } from "react-icons/ai";
-import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
-import { MultiSelect } from "@mantine/core";
-import InputHeader from "../../common/inputs/InputHeader";
-import { sendEmail } from "../../utilities/sendEmail";
-import { formatDate } from "../../utilities/misc";
 import InputSelect from "../../common/inputs/InputSelect";
-import useFetchClients from "../../hooks/fetch/useFetchClients";
+import InputTime from "../../common/inputs/InputTime";
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
   const methods = useForm<PatrollingFormFields>({
     resolver: zodResolver(patrollingSchema),
+    defaultValues: {
+      PatrolReminderInMinutes: 60,
+      PatrolRestrictedRadius: 100,
+    },
   });
 
   const { company } = useAuthState();
 
   const [checkPoints, setCheckPoints] = useState<
-    { checkPointName: string; checkPointTime: string }[]
-  >([{ checkPointName: "", checkPointTime: "" }]);
+    { checkPointName: string; checkPointCategory: string | null }[]
+  >([{ checkPointName: "", checkPointCategory: null }]);
 
-  const [patrolTime, setPatrolTime] = useState(new Date());
+  const [patrolTime, setPatrolTime] = useState("");
 
-  const [guards, setGuards] = useState<string[]>([]);
-
-  const [selectedGuardsList, setSelectedGuardsList] = useState<
-    {
-      PatrolAssignedGuardId: string;
-      PatrolAssignedGuardName: string;
-      PatrolAssignedGuardEmail: string;
-    }[]
-  >([]);
-
-  const { data } = useFetchEmployees({
-    limit: 5,
-    searchQuery: undefined,
-    empRole: "GUARD",
-  });
-
-  const [locationName, setLocationName] = useState<string | null | undefined>(
-    ""
-  );
+  const [locationSearchQuery, setLocationSearchQuery] = useState("");
 
   const { data: locData } = useFetchLocations({
     limit: 100,
-    searchQuery: locationName,
-  });
-
-  const [clientSearchValue, setClientSearchValue] = useState("");
-
-  const { data: clients } = useFetchClients({
-    limit: 5,
-    searchQuery: clientSearchValue,
+    searchQuery: locationSearchQuery,
   });
 
   useEffect(() => {
     console.log(methods.formState.errors);
   }, [methods.formState.errors]);
 
-  useEffect(() => {
-    if (guards.length > selectedGuardsList.length) {
-      const selectedGuardData = data.find(
-        (g) => g.EmployeeId === guards[guards.length - 1]
-      );
+  const locationId = methods.watch("PatrolLocationId");
 
-      if (selectedGuardData) {
-        setSelectedGuardsList((prev) => [
-          ...prev,
-          {
-            PatrolAssignedGuardEmail: selectedGuardData.EmployeeEmail,
-            PatrolAssignedGuardId: selectedGuardData.EmployeeId,
-            PatrolAssignedGuardName: selectedGuardData.EmployeeName,
-          },
-        ]);
+  useEffect(() => {
+    console.log(locationId, "id");
+    if (locationId) {
+      const selectedLocation = locData.find(
+        (loc) => loc.LocationId === locationId
+      );
+      if (selectedLocation) {
+        methods.setValue("PatrolLocationName", selectedLocation?.LocationName);
+        methods.setValue("PatrolLocationId", selectedLocation?.LocationId);
+        methods.setValue("PatrolLocation", {
+          latitude: String(selectedLocation.LocationCoordinates.latitude),
+          longitude: String(selectedLocation.LocationCoordinates.longitude),
+        });
       }
     } else {
-      const newSelectedGuardsList = guards.map((gId) => {
-        const selectedGuardData = data.find((g) => g.EmployeeId === gId);
-        return {
-          PatrolAssignedGuardEmail: selectedGuardData?.EmployeeEmail || "",
-          PatrolAssignedGuardId: selectedGuardData?.EmployeeId || "",
-          PatrolAssignedGuardName: selectedGuardData?.EmployeeName || "",
-        };
-      });
-
-      setSelectedGuardsList(newSelectedGuardsList);
+      methods.setValue("PatrolLocationId", "");
+      methods.setValue("PatrolLocationName", "");
     }
-  }, [guards]);
-
-  useEffect(() => {
-    if (!locationName) return;
-    const location = locData.find((loc) => loc.LocationName === locationName);
-    if (location) {
-      methods.setValue("PatrolLocationName", locationName);
-      methods.setValue("PatrolArea", location?.LocationAddress);
-      methods.setValue("PatrolLocation", {
-        latitude: String(location.LocationCoordinates.latitude),
-        longitude: String(location.LocationCoordinates.longitude),
-      });
-    }
-  }, [locationName]);
-
-  useEffect(() => {
-    if (!patrolTime) return;
-
-    methods.setValue("PatrolTime", patrolTime);
-  }, [patrolTime]);
+  }, [locationId]);
 
   useEffect(() => {
     methods.setValue(
       "PatrolCheckPoints",
       checkPoints
-        .filter((d) => d.checkPointName && d.checkPointTime)
+        .filter((d) => d.checkPointName)
         .map((ch) => {
-          return { name: ch.checkPointName, time: ch.checkPointTime };
+          return { name: ch.checkPointName, category: ch.checkPointCategory };
         })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkPoints]);
 
+  useEffect(() => {
+    methods.setValue("PatrolTime", patrolTime);
+  }, [patrolTime]);
+
+  const [checkpointsCategories, setCheckpointsCategories] = useState<string[]>(
+    []
+  );
+
   const onSubmit = async (data: PatrollingFormFields) => {
     if (!company) return;
     try {
-      if (!selectedGuardsList || selectedGuardsList.length === 0) {
-        throw new CustomError("Please assign a guard");
+      if (
+        checkpointsCategories.length > 0 &&
+        checkPoints.some((ch) => !ch.checkPointCategory)
+      ) {
+        throw new CustomError(
+          "Either remove the checkpoints categories or add categories to all checkpoints"
+        );
       }
+
       showModalLoader({});
 
       await DbPatrol.createPatrol({
         cmpId: company.CompanyId,
         data,
-        guards: selectedGuardsList,
       });
-
-      const sendEmailPromise = selectedGuardsList.map(async (guard) => {
-        return sendEmail({
-          message: `You have been assigned for the patrol.\n Patrol Name: ${
-            data.PatrolName
-          }\n Timing: ${formatDate(data.PatrolTime, "DD/MM/YY")}\n Address: ${
-            data.PatrolArea
-          }`,
-          subject: "Your patrol update",
-          to_email: guard.PatrolAssignedGuardEmail,
-          to_name: guard.PatrolAssignedGuardName,
-        });
-      });
-
-      await Promise.all(sendEmailPromise);
 
       showSnackbar({ message: "Patrol created successfully", type: "success" });
       closeModalLoader();
@@ -216,14 +158,13 @@ const PatrollingCreateOrEdit = () => {
             error={methods.formState.errors.PatrolName?.message}
           />
 
-          <InputAutoComplete
+          <InputSelect
             label="Patrolling location"
             data={locData.map((loc) => {
-              return { label: loc.LocationName, value: loc.LocationName };
+              return { label: loc.LocationName, value: loc.LocationId };
             })}
-            value={locationName}
-            onChange={setLocationName}
-            dropDownHeader={
+            onChange={(e) => methods.setValue("PatrolLocationId", e as string)}
+            nothingFoundMessage={
               <div
                 onClick={() => {
                   navigate(PageRoutes.LOCATIONS);
@@ -236,84 +177,30 @@ const PatrollingCreateOrEdit = () => {
                 </div>
               </div>
             }
-            error={methods.formState.errors.PatrolArea?.message}
+            searchable
+            searchValue={locationSearchQuery}
+            onSearchChange={setLocationSearchQuery}
+            clearable
+            error={methods.formState.errors.PatrolLocationName?.message}
           />
 
-          {/* DateTime Input */}
-          <div className="flex flex-col gap-1">
-            <div className={`flex`}>
-              <span className={`text-xs line-clamp-1`}>Time</span>
-            </div>
+          <InputTime
+            use12Hours
+            value={patrolTime}
+            onChange={setPatrolTime}
+            label="Patrolling Time"
+            error={methods.formState.errors.PatrolTime?.message}
+          />
 
-            <DateTimePicker
-              dropdownType="modal"
-              valueFormat="DD/MM/YY hh:mm A"
-              rightSection={
-                <label>
-                  <MdCalendarToday size={16} className="cursor-pointer" />
-                </label>
-              }
-              value={patrolTime}
-              onChange={(e) => setPatrolTime(e as Date)}
-              className="focus-within:ring-[2px] rounded "
-              popoverProps={{
-                styles: {
-                  dropdown: {
-                    backgroundColor: `#FFFFFF`,
-                    zIndex: 300,
-                    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.4)",
-                    position: "fixed",
-                  },
-                },
-              }}
-              styles={{
-                input: {
-                  border: `1px solid #0000001A`,
-                  fontWeight: "normal",
-                  fontSize: "18px",
-                  borderRadius: "4px",
-                  background: "#FFFFFF",
-                  color: "#000000",
-                  padding: "8px 8px",
-                },
-                day: {
-                  color: `#000000`,
-                  ":hover": {
-                    color: "#000000",
-                  },
-                },
-              }}
-            />
-            {methods.formState.errors.PatrolTime && (
-              <small className="text-red-600 text-xs px-1 text-start">
-                {methods.formState.errors.PatrolTime.message}
-              </small>
-            )}
-          </div>
-          <div className="flex flex-col gap-1">
-            <InputHeader title="Assign guards" />
-            <MultiSelect
-              placeholder="Pick guards"
-              data={data.map((d) => {
-                return { label: d.EmployeeName, value: d.EmployeeId };
-              })}
-              value={guards}
-              onChange={setGuards}
-              searchable
-              nothingFoundMessage="No guard found..."
-              styles={{
-                input: {
-                  border: `1px solid #0000001A`,
-                  fontWeight: "normal",
-                  fontSize: "18px",
-                  borderRadius: "4px",
-                  background: "#FFFFFF",
-                  color: "#000000",
-                  padding: "8px 8px",
-                },
-              }}
-            />
-          </div>
+          <InputWithTopHeader
+            className="mx-0"
+            label="Patrolling Required Count"
+            register={methods.register}
+            name="PatrolRequiredCount"
+            decimalCount={0}
+            error={methods.formState.errors.PatrolRequiredCount?.message}
+          />
+
           <div className="md:col-span-2 flex items-end w-full gap-4">
             <InputWithTopHeader
               className="mx-0 w-full"
@@ -330,45 +217,23 @@ const PatrollingCreateOrEdit = () => {
               label="Restrict guard from moving out from this radius while patrolling"
             />
           </div>
+
           <InputWithTopHeader
             className="mx-0"
-            label="Patrolling Required Count"
+            label="Patrolling reminder to guard in minutes"
             register={methods.register}
-            name="PatrolRequiredCount"
+            name="PatrolReminderInMinutes"
             decimalCount={0}
-            error={methods.formState.errors.PatrolRequiredCount?.message}
+            error={methods.formState.errors.PatrolReminderInMinutes?.message}
           />
-          <InputSelect
-            label="Client"
-            value={methods.watch("PatrolClientId")}
-            onChange={(e) => methods.setValue("PatrolClientId", e || "")}
-            data={clients.map((client) => {
-              return { label: client.ClientName, value: client.ClientId };
-            })}
-            nothingFoundMessage={
-              <div
-                onClick={() => {
-                  navigate(PageRoutes.CLIENTS);
-                }}
-                className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <AiOutlinePlus size={18} />
-                  <span>Add Client</span>
-                </div>
-              </div>
-            }
-            searchable
-            clearable
-            searchValue={clientSearchValue}
-            onSearchChange={setClientSearchValue}
-            error={methods.formState.errors.PatrolClientId?.message}
-          />
+
           <div className="col-span-2 w-full gap-4 flex flex-col">
             <div className="font-medium text-lg ">Create checkpoints</div>
             <CheckpointForm
               checkpoints={checkPoints}
               setCheckpoints={setCheckPoints}
+              checkpointCategories={checkpointsCategories}
+              setCheckpointCategories={setCheckpointsCategories}
             />
           </div>
         </div>

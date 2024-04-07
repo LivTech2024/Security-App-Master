@@ -1,4 +1,5 @@
 import type { FieldValue, GeoPoint, Timestamp } from "firebase/firestore";
+import { IUserType } from "./enum";
 
 export interface ICompaniesCollection {
   CompanyId: string;
@@ -40,6 +41,24 @@ export interface IAdminsCollection {
   AdminModifiedAt: Timestamp | FieldValue;
 }
 
+export interface IEmpLicenseDetails {
+  LicenseType: "driving" | "security";
+  LicenseNumber: string;
+  LicenseExpDate: Timestamp | FieldValue;
+}
+export interface IEmpBankDetails {
+  BankName: string;
+  BankAccName: string;
+  BankAccNumber: string;
+  BankIfscCode: string;
+  BankVoidCheckImg: string;
+}
+
+export interface IEmpCertificatesDetails {
+  CertificateName: string;
+  CertificateDoc: string;
+}
+
 export interface IEmployeesCollection {
   EmployeeId: string;
   EmployeeName: string;
@@ -48,7 +67,6 @@ export interface IEmployeesCollection {
   EmployeeEmail: string;
   EmployeePassword: string;
   EmployeeImg: string;
-  EmployeeAdditionalDoc?: string;
   EmployeeRole: string;
   EmployeePayRate: number;
   EmployeeMaxHrsPerWeek: number;
@@ -57,6 +75,9 @@ export interface IEmployeesCollection {
   EmployeeIsBanned: boolean;
   EmployeeCompanyId: string;
   EmployeeCompanyBranchId?: string | null;
+  EmployeeLicenses: IEmpLicenseDetails[];
+  EmployeeBankDetails: IEmpBankDetails;
+  EmployeeCertificates: IEmpCertificatesDetails[];
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;
 }
@@ -65,9 +86,14 @@ export interface IShiftTasksChild {
   ShiftTaskId: string;
   ShiftTask: string;
   ShiftTaskQrCodeReq: boolean;
-  ShiftTaskCompleted?: boolean;
-  ShiftTaskCompletionTime?: Timestamp | FieldValue;
-  ShiftTaskFailureReason?: string;
+  ShiftTaskStatus: {
+    TaskStatus: "pending" | "completed";
+    TaskCompletedById?: string;
+    TaskCompletedByName?: string;
+    TaskCompletionTime?: Timestamp | FieldValue;
+    TaskFailureReason?: string;
+  }[];
+  ShiftTaskPhotos?: string[];
 }
 
 export interface IShiftsCollection {
@@ -78,18 +104,31 @@ export interface IShiftsCollection {
   ShiftStartTime: string;
   ShiftEndTime: string;
   ShiftLocation: GeoPoint;
+  ShiftLocationId: string;
   ShiftLocationName: string;
+  ShiftLocationAddress: string;
   ShiftRestrictedRadius: number;
-  ShiftAddress: string;
+  ShiftEnableRestrictedRadius: boolean;
   ShiftDescription: string | null;
   ShiftAssignedUserId: string[];
   ShiftClientId: string;
   ShiftCompanyId: string;
   ShiftRequiredEmp: number; //* By default 1
   ShiftCompanyBranchId?: string | null;
-  ShiftAcknowledged?: boolean;
+  ShiftAcknowledgedByEmpId: string[];
   ShiftTask: IShiftTasksChild[];
-  ShiftCurrentStatus: "pending" | "started" | "completed";
+  ShiftGuardWellnessReport: {
+    WellnessLastReported: Timestamp | FieldValue;
+    WellnessReportedById: string; //*Emp id
+  }[];
+  ShiftPhotos?: string[];
+  ShiftPhotoUploadIntervalInMinutes?: number | null;
+  ShiftCurrentStatus: {
+    Status: "pending" | "started" | "completed";
+    StatusReportedById?: string;
+    StatusReportedByName?: string;
+    StatusReportedTime?: Timestamp | FieldValue;
+  }[];
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;
 }
@@ -97,34 +136,38 @@ export interface IShiftsCollection {
 export interface IPatrolCheckPointsChild {
   CheckPointId: string;
   CheckPointName: string;
-  CheckPointTime: string;
-  CheckPointStatus: "checked" | "not_checked";
-  CheckPointCheckedTime?: Timestamp | FieldValue;
-  CheckPointFailureReason?: string;
+  CheckPointCategory: string | null;
+  CheckPointStatus: {
+    Status: "checked" | "not_checked";
+    StatusReportedById?: string;
+    StatusReportedByName?: string;
+    StatusReportedTime?: Timestamp | FieldValue;
+    StatusFailureReason?: string;
+  }[];
 }
 
 export interface IPatrolsCollection {
   PatrolId: string;
   PatrolCompanyId: string;
-  PatrolCompanyBranchId?: string;
   PatrolName: string;
   PatrolNameSearchIndex: string[];
-  PatrolArea: string;
   PatrolLocation: GeoPoint;
+  PatrolLocationId: string;
   PatrolLocationName: string;
-  PatrolTime: Timestamp | FieldValue;
-  PatrolAssignedGuardsId: string[];
-  PatrolAssignedGuardsName: string[];
-  PatrolCompletedCount: number;
+  PatrolTime: string;
   PatrolRequiredCount: number;
   PatrolCheckPoints: IPatrolCheckPointsChild[];
-  PatrolCurrentStatus: "pending" | "started" | "completed";
-  PatrolGuardCurrentLocation?: GeoPoint;
+  PatrolCurrentStatus: {
+    Status: "pending" | "started" | "completed";
+    StatusCompletedCount: number;
+    StatusReportedById?: string;
+    StatusReportedByName?: string;
+    StatusReportedTime?: Timestamp | FieldValue;
+  }[];
   PatrolFailureReason?: string;
   PatrolRestrictedRadius: number;
   PatrolKeepGuardInRadiusOfLocation: boolean;
-  PatrolClientId: string;
-  PatrolAcknowledged?: boolean;
+  PatrolReminderInMinutes: number;
   PatrolCreatedAt: Timestamp | FieldValue;
   PatrolModifiedAt: Timestamp | FieldValue;
 }
@@ -175,7 +218,7 @@ export interface ILoggedInUsersCollection {
   LoggedInUserId: string;
   IsLoggedIn: boolean;
   LoggedInCrypt: string;
-  LoggedInUserType: string;
+  LoggedInUserType: IUserType;
   LoggedInCreatedAt: Timestamp | FieldValue;
 }
 
@@ -222,4 +265,18 @@ export interface IClientsCollection {
   ClientBalance: number;
   ClientCreatedAt: Timestamp | FieldValue;
   ClientModifiedAt: Timestamp | FieldValue;
+}
+
+export interface ISettingsCollection {
+  SettingId: string;
+  SettingCompanyId: string;
+  SettingEmpWellnessIntervalInMins: number;
+}
+
+//*SuperAdmin
+export interface ISuperAdminCollection {
+  SuperAdminId: string;
+  SuperAdminEmail: string;
+  SuperAdminName: string;
+  SuperAdminPhone: string;
 }

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import TopSection from "../../component/schedule/TopSection";
+import { ScheduleView } from "../../@types/enum";
+import ByEmployeeView from "../../component/schedule/schedule_view/ByEmployeeView";
 import CalendarView from "../../component/schedule/schedule_view/CalendarView";
-import PositionView from "../../component/schedule/schedule_view/PositionView";
 
 const Schedule = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -12,8 +13,8 @@ const Schedule = () => {
   const [selectedTenure, setSelectedTenure] = useState<"weekly" | "monthly">(
     "weekly"
   );
-  const [selectedView, setSelectedView] = useState<"calendar" | "position">(
-    "calendar"
+  const [selectedView, setSelectedView] = useState<ScheduleView>(
+    ScheduleView.CALENDAR_VIEW
   );
 
   useEffect(() => {
@@ -49,11 +50,12 @@ const Schedule = () => {
         setSelectedTenure={setSelectedTenure}
         selectedView={selectedView}
         setSelectedView={setSelectedView}
+        isSelectTenureDisabled={selectedView !== ScheduleView.CALENDAR_VIEW}
       />
-      {selectedView === "position" ? (
-        <CalendarView datesArray={datesArray} selectedDate={selectedDate} />
+      {selectedView === ScheduleView.CALENDAR_VIEW ? (
+        <CalendarView datesArray={datesArray} />
       ) : (
-        <PositionView datesArray={datesArray} />
+        <ByEmployeeView datesArray={datesArray} />
       )}
     </div>
   );

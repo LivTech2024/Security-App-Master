@@ -6,10 +6,11 @@ import {
   showModalLoader,
   showSnackbar,
 } from "../../utilities/TsxUtils";
-import { errorHandler } from "../../utilities/CustomError";
+import CustomError, { errorHandler } from "../../utilities/CustomError";
 import { useNavigate } from "react-router-dom";
 import {
   CollectionName,
+  IUserType,
   LocalStorageKey,
   LocalStorageLoggedInUserData,
   PageRoutes,
@@ -22,6 +23,7 @@ import {
   IAdminsCollection,
   ICompaniesCollection,
   ILoggedInUsersCollection,
+  ISuperAdminCollection,
 } from "../../@types/database";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "../../firebase_configs/config";
@@ -29,6 +31,8 @@ import DbCompany from "../../firebase_configs/DB/DbCompany";
 import { useAuthState } from "../../store";
 import { firebaseDataToObject } from "../../utilities/misc";
 import { Admin, Company } from "../../store/slice/auth.slice";
+import DbSuperAdmin from "../../firebase_configs/DB/DbSuperAdmin";
+import { FirebaseError } from "firebase/app";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -38,7 +42,7 @@ const Login = () => {
 
   const auth = getAuth();
 
-  const { setAdmin, setCompany } = useAuthState();
+  const { setAdmin, setCompany, setSuperAdmin } = useAuthState();
 
   const signInSuccess = async (dbUser: User) => {
     try {
@@ -47,15 +51,48 @@ const Login = () => {
       const randomChar = v4();
       const loggedInCrypt = randNum + randomChar + uId;
 
+      let userType = IUserType.ADMIN;
+
+      //* Fetch admin and store in zustand
+      const adminSnapshot = await DbCompany.getAdminById(uId);
+      const superAdminSnapshot = await DbSuperAdmin.getSuperAdminById(uId);
+
+      if (adminSnapshot.exists()) {
+        const admin = adminSnapshot.data() as IAdminsCollection;
+        const _admin = firebaseDataToObject(
+          admin as unknown as Record<string, unknown>
+        ) as unknown as Admin;
+        setAdmin(_admin);
+
+        //*Fetch company and store in zustand;
+        const cmpSnapshot = await DbCompany.getCompanyById(
+          admin.AdminCompanyId
+        );
+        const company = cmpSnapshot.data() as ICompaniesCollection;
+        const _company = firebaseDataToObject(
+          company as unknown as Record<string, unknown>
+        ) as unknown as Company;
+        setCompany(_company);
+      } else if (superAdminSnapshot.exists()) {
+        const superAdmin = superAdminSnapshot.data() as ISuperAdminCollection;
+        setSuperAdmin(superAdmin);
+        userType = IUserType.SUPER_ADMIN;
+      }
+
+      if (!adminSnapshot.exists() && !superAdminSnapshot.exists()) {
+        throw new CustomError("Invalid credentials");
+      }
+
       //* Create a new loggedInUser doc
       const loggedInId = getNewDocId(CollectionName.loggedInUsers);
+
       const newLoggedInDoc: ILoggedInUsersCollection = {
         LoggedInId: loggedInId,
         LoggedInUserId: uId,
         IsLoggedIn: true,
         LoggedInCreatedAt: serverTimestamp(),
         LoggedInCrypt: loggedInCrypt,
-        LoggedInUserType: "admin",
+        LoggedInUserType: userType,
       };
       const loggedInDocRef = doc(db, CollectionName.loggedInUsers, loggedInId);
 
@@ -64,24 +101,9 @@ const Login = () => {
       const lsLoggedInUser: LocalStorageLoggedInUserData = {
         LoggedInId: loggedInId,
         LoggedInCrypt: loggedInCrypt,
-        LoggedInAuthUserType: "admin",
+        LoggedInUserId: uId,
+        LoggedInAuthUserType: userType as IUserType,
       };
-
-      //* Fetch admin and store in zustand
-      const adminSnapshot = await DbCompany.getAdminById(uId);
-      const admin = adminSnapshot.data() as IAdminsCollection;
-      const _admin = firebaseDataToObject(
-        admin as unknown as Record<string, unknown>
-      ) as unknown as Admin;
-      setAdmin(_admin);
-
-      //*Fetch company and store in zustand;
-      const cmpSnapshot = await DbCompany.getCompanyById(admin.AdminCompanyId);
-      const company = cmpSnapshot.data() as ICompaniesCollection;
-      const _company = firebaseDataToObject(
-        company as unknown as Record<string, unknown>
-      ) as unknown as Company;
-      setCompany(_company);
 
       storage.setJson(LocalStorageKey.LOGGEDIN_USER, lsLoggedInUser);
     } catch (error) {
@@ -111,8 +133,12 @@ const Login = () => {
       closeModalLoader();
     } catch (error) {
       closeModalLoader();
-      errorHandler(error);
       console.log(error);
+      if (error instanceof FirebaseError) {
+        showSnackbar({ message: "Invalid credential", type: "error" });
+        return;
+      }
+      errorHandler(error);
     }
   };
 

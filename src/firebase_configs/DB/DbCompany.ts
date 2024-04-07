@@ -10,6 +10,7 @@ import {
   ICompaniesCollection,
   ICompanyBranchesCollection,
   ILocationsCollection,
+  ISettingsCollection,
 } from "../../@types/database";
 import {
   doc,
@@ -52,7 +53,7 @@ class DbCompany {
         path:
           CloudStoragePaths.COMPANIES_LOGOS +
           "/" +
-          CloudStorageImageHandler.generateImageName(companyId),
+          CloudStorageImageHandler.generateImageName(companyId, "logo"),
       },
     ];
 
@@ -87,11 +88,8 @@ class DbCompany {
   }) => {
     await runTransaction(db, async (transaction) => {
       const companyRef = doc(db, CollectionName.companies, cmpId);
-      const cmpSnapshot = await transaction.get(companyRef);
-      const cmpOldData = cmpSnapshot.data() as ICompaniesCollection;
 
       let logoImageUrl = logoBase64;
-      let cmpLogoToBeDelete: string | null = null;
 
       if (!logoImageUrl.startsWith("https")) {
         const imageEmployee = [
@@ -100,7 +98,7 @@ class DbCompany {
             path:
               CloudStoragePaths.COMPANIES_LOGOS +
               "/" +
-              CloudStorageImageHandler.generateImageName(cmpId),
+              CloudStorageImageHandler.generateImageName(cmpId, "logo"),
           },
         ];
 
@@ -111,8 +109,6 @@ class DbCompany {
         );
 
         logoImageUrl = imageUrl[0];
-
-        cmpLogoToBeDelete = cmpOldData.CompanyLogo;
       }
 
       const updatedCompany: Partial<ICompaniesCollection> = {
@@ -125,10 +121,6 @@ class DbCompany {
       };
 
       transaction.update(companyRef, updatedCompany);
-
-      if (cmpLogoToBeDelete) {
-        await CloudStorageImageHandler.deleteImageByUrl(cmpLogoToBeDelete);
-      }
     });
   };
 
@@ -365,7 +357,33 @@ class DbCompany {
     return updateDoc(locationRef, newLocation);
   };
 
-  static deleteLocation = (locationId: string) => {
+  static deleteLocation = async (locationId: string) => {
+    //*Check if shift exist with this location
+    const shiftDocRef = collection(db, CollectionName.shifts);
+    const shiftQuery = query(
+      shiftDocRef,
+      where("ShiftLocationId", "==", locationId),
+      limit(1)
+    );
+    const shiftTask = getDocs(shiftQuery);
+
+    //*Check if patrol exist with this location
+    const patrolDocRef = collection(db, CollectionName.patrols);
+    const patrolQuery = query(
+      patrolDocRef,
+      where("ShiftLocationPatrolLocationIdId", "==", locationId),
+      limit(1)
+    );
+    const patrolTask = getDocs(patrolQuery);
+
+    const querySnapshots = await Promise.all([shiftTask, patrolTask]);
+
+    const isLocationUsed = querySnapshots.some((snapshot) => snapshot.size > 0);
+
+    if (isLocationUsed) {
+      throw new CustomError("This location is already used");
+    }
+
     const locationRef = doc(db, CollectionName.locations, locationId);
     return deleteDoc(locationRef);
   };
@@ -462,6 +480,19 @@ class DbCompany {
     const empQuery = query(reportRef, ...queryParams);
 
     return getDocs(empQuery);
+  };
+
+  static createSettings = (cmpId: string) => {
+    const settingId = getNewDocId(CollectionName.settings);
+    const settingRef = doc(db, CollectionName.settings, settingId);
+
+    const newSetting: ISettingsCollection = {
+      SettingId: settingId,
+      SettingCompanyId: cmpId,
+      SettingEmpWellnessIntervalInMins: 60,
+    };
+
+    return setDoc(settingRef, newSetting);
   };
 }
 

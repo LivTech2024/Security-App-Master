@@ -12,6 +12,8 @@ export enum CollectionName {
   reports = "Reports",
   invoices = "Invoices",
   clients = "Clients",
+  settings = "Settings",
+  superAdmin = "SuperAdmin",
 }
 
 export const DisplayCount = {
@@ -49,8 +51,10 @@ export const CloudStoragePaths = {
 };
 
 export const ImageResolution = {
-  EMP_IMAGE_WIDTH: 1200,
-  EMP_IMAGE_HEIGHT: 1200,
+  EMP_IMAGE_WIDTH: 720,
+  EMP_IMAGE_HEIGHT: 720,
+  EMP_VOID_CHECK_WIDTH: 720,
+  EMP_VOID_CHECK_HEIGHT: 480,
   COMPANY_LOGO_WIDTH: 1200,
   COMPANY_LOGO_HEIGHT: 1200,
 };
@@ -73,14 +77,26 @@ export const PageRoutes = {
   INVOICE_LIST: "/invoice_list",
   INVOICE_GENERATE: "/invoice_generate",
   CLIENTS: "/clients",
+  SUPER_ADMIN_CREATE_NEW_COMPANY: "/super_admin/create_new_company",
 };
 
 export const LocalStorageKey = {
   LOGGEDIN_USER: "loggedInUser",
 };
 
+export enum IUserType {
+  ADMIN = "admin",
+  SUPER_ADMIN = "super_admin",
+}
+
 export interface LocalStorageLoggedInUserData {
   LoggedInId: string;
+  LoggedInUserId: string;
   LoggedInCrypt: string;
-  LoggedInAuthUserType: "admin" | "guard" | "supervisor";
+  LoggedInAuthUserType: IUserType;
+}
+
+export enum ScheduleView {
+  CALENDAR_VIEW = "calendar_view",
+  BY_EMPLOYEE_VIEW = "by_employee_view",
 }

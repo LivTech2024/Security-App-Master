@@ -50,6 +50,7 @@ export const resizeImage = async ({
 
     img.onerror = (err) => {
       reject(err);
+      throw err;
     };
   });
 };

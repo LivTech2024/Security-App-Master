@@ -46,9 +46,10 @@ const NavItem = ({
           }
         >
           <div className="flex flex-col group">
-            {dropdownChildren?.map((res) => {
+            {dropdownChildren?.map((res, idx) => {
               return (
                 <div
+                  key={idx}
                   onClick={() => navigate(res.path)}
                   className="px-6 py-2 uppercase cursor-pointer duration-200 hover:bg-onHoverBg group"
                 >

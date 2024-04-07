@@ -35,11 +35,16 @@ const HomeItem = ({
 
 const Home = () => {
   const { company } = useAuthState();
+
   return (
     <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center">
       <div className="flex w-full justify-center items-center">
         <div className="flex flex-col items-center gap-2">
-          <img src={company?.CompanyLogo} alt="" className="w-[100px]" />
+          <img
+            src={company?.CompanyLogo}
+            alt=""
+            className="w-[120px] object-cover"
+          />
 
           <div className="font-semibold text-lg">
             Welcome {company?.CompanyName}

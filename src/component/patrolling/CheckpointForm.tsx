@@ -1,24 +1,30 @@
+import { TagsInput } from "@mantine/core";
 import Button from "../../common/button/Button";
-import InputTime from "../../common/inputs/InputTime";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 
+import InputSelect from "../../common/inputs/InputSelect";
+
 interface CheckPointInputProps {
-  checkpoints: { checkPointName: string; checkPointTime: string }[];
+  checkpoints: { checkPointName: string; checkPointCategory: string | null }[];
   setCheckpoints: (
-    checkpoints: { checkPointName: string; checkPointTime: string }[]
+    checkpoints: { checkPointName: string; checkPointCategory: string | null }[]
   ) => void;
+  checkpointCategories: string[];
+  setCheckpointCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const CheckpointForm = ({
   checkpoints,
   setCheckpoints,
+  checkpointCategories,
+  setCheckpointCategories,
 }: CheckPointInputProps) => {
   const handleAddCheckpoint = () => {
     setCheckpoints([
       ...checkpoints,
       {
         checkPointName: "",
-        checkPointTime: "",
+        checkPointCategory: null,
       },
     ]);
   };
@@ -30,7 +36,7 @@ const CheckpointForm = ({
 
   const handleChange = (
     index: number,
-    key: "checkPointName" | "checkPointTime",
+    key: "checkPointName" | "checkPointCategory",
     value: string
   ) => {
     const updatedCheckpoints = [...checkpoints];
@@ -40,6 +46,23 @@ const CheckpointForm = ({
 
   return (
     <div className="flex flex-col gap-4">
+      <TagsInput
+        label="Create checkpoints category"
+        placeholder="Enter category and press enter"
+        value={checkpointCategories}
+        onChange={setCheckpointCategories}
+        styles={{
+          input: {
+            border: `1px solid #0000001A`,
+            fontWeight: "normal",
+            fontSize: "18px",
+            borderRadius: "4px",
+            background: "#FFFFFF",
+            color: "#000000",
+            padding: "8px 8px",
+          },
+        }}
+      />
       <div className="grid grid-cols-2 gap-4">
         {checkpoints.map((checkpoint, index) => (
           <div key={index} className="flex items-center space-x-4">
@@ -54,21 +77,25 @@ const CheckpointForm = ({
             )}
             <div className="flex items-center gap-4">
               <InputWithTopHeader
-                className="mx-0 w-full"
+                className={`mx-0 ${
+                  checkpointCategories.length === 0 && "w-full"
+                }`}
                 placeholder="Checkpoint Name"
                 value={checkpoint.checkPointName}
                 onChange={(e) =>
                   handleChange(index, "checkPointName", e.target.value)
                 }
               />
-
-              <InputTime
-                value={checkpoint.checkPointTime}
-                onChange={(e) =>
-                  handleChange(index, "checkPointTime", e as string)
-                }
-                use12Hours
-              />
+              {checkpointCategories.length > 0 && (
+                <InputSelect
+                  placeholder="Select category"
+                  data={checkpointCategories}
+                  className="w-full"
+                  onChange={(e) =>
+                    handleChange(index, "checkPointCategory", e as string)
+                  }
+                />
+              )}
             </div>
           </div>
         ))}
@@ -79,7 +106,8 @@ const CheckpointForm = ({
         onClick={handleAddCheckpoint}
         disabled={checkpoints.some(
           (checkpoint) =>
-            !checkpoint.checkPointName || checkpoint.checkPointTime === ""
+            !checkpoint.checkPointName ||
+            (checkpointCategories.length > 0 && !checkpoint.checkPointCategory)
         )}
         label="Add new"
       />

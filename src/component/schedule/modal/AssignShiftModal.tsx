@@ -92,7 +92,7 @@ const AssignShiftModal = ({
         return sendEmail({
           to_email: emp.EmployeeEmail,
           to_name: emp.EmployeeName,
-          message: `You have been assigned for the shift.\n Shift Name: ${schedule.shift.ShiftName}\n Timing: ${schedule.shift.ShiftStartTime}-${schedule.shift.ShiftEndTime} \n Address: ${schedule.shift.ShiftAddress}`,
+          message: `You have been assigned for the shift.\n Shift Name: ${schedule.shift.ShiftName}\n Timing: ${schedule.shift.ShiftStartTime}-${schedule.shift.ShiftEndTime} \n Address: ${schedule.shift.ShiftLocationAddress}`,
           subject: "Your schedule update",
         });
       });

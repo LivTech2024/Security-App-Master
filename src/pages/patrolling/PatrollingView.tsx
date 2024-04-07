@@ -25,17 +25,22 @@ const PatrollingView = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!patrolId) return;
-    DbPatrol.getPatrolById(patrolId)
-      .then((snapshot) => {
-        const patrolData = snapshot.data() as IPatrolsCollection;
+    const fetchPatrolData = async () => {
+      if (!patrolId) return;
+      try {
+        const patrolSnapshot = await DbPatrol.getPatrolById(patrolId);
+        const patrolData = patrolSnapshot.data() as IPatrolsCollection;
+
         setData(patrolData);
+
         setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.log(error);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchPatrolData();
   }, [patrolId]);
 
   const deletePatrol = async () => {

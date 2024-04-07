@@ -32,6 +32,7 @@ import AddBranchModal from "../../component/company_branches/modal/AddBranchModa
 import ShiftTaskForm, { ShiftTask } from "../../component/shifts/ShiftTaskForm";
 import useFetchClients from "../../hooks/fetch/useFetchClients";
 import InputSelect from "../../common/inputs/InputSelect";
+import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -44,14 +45,16 @@ const ShiftCreateOrEdit = () => {
     resolver: zodResolver(addShiftFormSchema),
     defaultValues: isEdit
       ? {
-          ShiftAddress: shiftEditData.ShiftAddress,
+          ShiftLocationAddress: shiftEditData.ShiftLocationAddress,
+          ShiftEnableRestrictedRadius:
+            shiftEditData.ShiftEnableRestrictedRadius,
           ShiftCompanyBranchId: shiftEditData.ShiftCompanyBranchId,
           ShiftDate: toDate(shiftEditData.ShiftDate),
           ShiftDescription: shiftEditData.ShiftDescription,
           ShiftEndTime: shiftEditData.ShiftEndTime,
           ShiftLocation: {
-            lat: shiftEditData.ShiftLocation.latitude,
-            lng: shiftEditData.ShiftLocation.longitude,
+            latitude: String(shiftEditData.ShiftLocation.latitude),
+            longitude: String(shiftEditData.ShiftLocation.longitude),
           },
           ShiftLocationName: shiftEditData.ShiftLocationName,
           ShiftName: shiftEditData.ShiftName,
@@ -64,6 +67,7 @@ const ShiftCreateOrEdit = () => {
           ShiftRequiredEmp: String(
             shiftEditData.ShiftRequiredEmp
           ) as unknown as number,
+          ShiftLocationId: shiftEditData.ShiftLocationId,
         }
       : { ShiftRequiredEmp: String(1) as unknown as number },
   });
@@ -87,9 +91,7 @@ const ShiftCreateOrEdit = () => {
 
   const [endTime, setEndTime] = useState("05:00 PM");
 
-  const [locationName, setLocationName] = useState<string | null | undefined>(
-    ""
-  );
+  const [locationSearchQuery, setLocationSearchQuery] = useState("");
 
   const [companyBranch, setCompanyBranch] = useState<string | null | undefined>(
     null
@@ -101,7 +103,7 @@ const ShiftCreateOrEdit = () => {
 
   const { data: locations } = useFetchLocations({
     limit: 5,
-    searchQuery: locationName,
+    searchQuery: locationSearchQuery,
   });
 
   const [clientSearchValue, setClientSearchValue] = useState("");
@@ -110,6 +112,10 @@ const ShiftCreateOrEdit = () => {
     limit: 5,
     searchQuery: clientSearchValue,
   });
+
+  useEffect(() => {
+    console.log(methods.formState.errors);
+  }, [methods.formState.errors]);
 
   useEffect(() => {
     if (shiftDate) {
@@ -137,18 +143,32 @@ const ShiftCreateOrEdit = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shiftPosition]);
 
+  const locationId = methods.watch("ShiftLocationId");
+
   useEffect(() => {
-    if (!locationName) return;
-    const location = locations.find((loc) => loc.LocationName === locationName);
-    if (location) {
-      methods.setValue("ShiftLocationName", locationName);
-      methods.setValue("ShiftAddress", location?.LocationAddress);
-      methods.setValue("ShiftLocation", {
-        lat: location.LocationCoordinates.latitude,
-        lng: location.LocationCoordinates.longitude,
-      });
+    console.log(locationId, "id");
+    if (locationId) {
+      const selectedLocation = locations.find(
+        (loc) => loc.LocationId === locationId
+      );
+      if (selectedLocation) {
+        methods.setValue("ShiftLocationName", selectedLocation?.LocationName);
+        methods.setValue("ShiftLocationId", selectedLocation?.LocationId);
+        methods.setValue("ShiftLocation", {
+          latitude: String(selectedLocation.LocationCoordinates.latitude),
+          longitude: String(selectedLocation.LocationCoordinates.longitude),
+        });
+        methods.setValue(
+          "ShiftLocationAddress",
+          selectedLocation.LocationAddress
+        );
+      }
+    } else {
+      methods.setValue("ShiftLocationId", "");
+      methods.setValue("ShiftLocationName", "");
+      methods.setValue("ShiftLocationAddress", "");
     }
-  }, [locationName]);
+  }, [locationId]);
 
   useEffect(() => {
     const branchId = companyBranches.find(
@@ -164,7 +184,7 @@ const ShiftCreateOrEdit = () => {
       setStartTime(shiftEditData.ShiftStartTime);
       setEndTime(shiftEditData.ShiftEndTime);
       setShiftDate(new Date(shiftEditData.ShiftDate));
-      setLocationName(shiftEditData.ShiftLocationName);
+      setLocationSearchQuery(shiftEditData.ShiftLocationName);
       setShiftPosition(shiftEditData.ShiftPosition);
       if (shiftEditData.ShiftCompanyBranchId) {
         const branchName = companyBranches.find(
@@ -187,7 +207,7 @@ const ShiftCreateOrEdit = () => {
     setShiftDate(new Date());
     setStartTime("09:00 AM");
     setEndTime("05:00 PM");
-    setLocationName("");
+    setLocationSearchQuery("");
     setShiftPosition("");
     setCompanyBranch(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -366,14 +386,13 @@ const ShiftCreateOrEdit = () => {
               onChange={setEndTime}
               use12Hours={true}
             />
-            <InputAutoComplete
+            <InputSelect
               label="Shift location"
               data={locations.map((loc) => {
-                return { label: loc.LocationName, value: loc.LocationName };
+                return { label: loc.LocationName, value: loc.LocationId };
               })}
-              value={locationName}
-              onChange={setLocationName}
-              dropDownHeader={
+              onChange={(e) => methods.setValue("ShiftLocationId", e as string)}
+              nothingFoundMessage={
                 <div
                   onClick={() => {
                     navigate(PageRoutes.LOCATIONS);
@@ -386,7 +405,11 @@ const ShiftCreateOrEdit = () => {
                   </div>
                 </div>
               }
-              error={methods.formState.errors.ShiftAddress?.message}
+              searchable
+              searchValue={locationSearchQuery}
+              onSearchChange={setLocationSearchQuery}
+              clearable
+              error={methods.formState.errors.ShiftLocationName?.message}
             />
 
             <InputSelect
@@ -425,14 +448,22 @@ const ShiftCreateOrEdit = () => {
               error={methods.formState.errors.ShiftRequiredEmp?.message}
             />
 
-            <InputWithTopHeader
-              label="Restricted radius (in meters)"
-              className="mx-0"
-              decimalCount={2}
-              register={methods.register}
-              name="ShiftRestrictedRadius"
-              error={methods.formState.errors.ShiftRestrictedRadius?.message}
-            />
+            <div className="col-span-2 flex items-end justify-end w-full gap-4">
+              <InputWithTopHeader
+                label="Restricted radius (in meters)"
+                className="mx-0 w-full"
+                decimalCount={2}
+                register={methods.register}
+                name="ShiftRestrictedRadius"
+                error={methods.formState.errors.ShiftRestrictedRadius?.message}
+              />
+              <SwitchWithSideHeader
+                register={methods.register}
+                name="ShiftEnableRestrictedRadius"
+                className="w-full mb-2 font-medium"
+                label="Enable restricted radius"
+              />
+            </div>
 
             <InputAutoComplete
               readonly={isEdit}
@@ -456,6 +487,16 @@ const ShiftCreateOrEdit = () => {
                     <span>Add new branch</span>
                   </div>
                 </div>
+              }
+            />
+            <InputWithTopHeader
+              label="Photo upload interval in minutes (Optional)"
+              className="mx-0"
+              register={methods.register}
+              name="ShiftPhotoUploadIntervalInMinutes"
+              error={
+                methods.formState.errors.ShiftPhotoUploadIntervalInMinutes
+                  ?.message
               }
             />
             <TextareaWithTopHeader

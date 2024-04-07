@@ -3,6 +3,7 @@ import { AiOutlineClockCircle } from "react-icons/ai";
 
 import PopupMenu from "../PopupMenu";
 import InputHeader from "./InputHeader";
+import InputError from "./InputError";
 
 interface InputTimeProps {
   label?: string;
@@ -12,6 +13,7 @@ interface InputTimeProps {
   use12Hours?: boolean;
   disabled?: boolean;
   showSeconds?: boolean;
+  error?: string | null;
 }
 
 const InputTime = ({
@@ -22,6 +24,7 @@ const InputTime = ({
   onChange,
   use12Hours,
   showSeconds = false,
+  error,
 }: InputTimeProps) => {
   const [dropdown, setDropdown] = useState(false);
 
@@ -85,7 +88,13 @@ const InputTime = ({
       {label ? (
         <InputHeader title={label} fontClassName={fontClassName} />
       ) : null}
-      <div className="flex items-center w-full border-[1px] border-inputBorder focus-within:ring-[2px]  rounded ">
+      <div
+        className={`flex items-center w-full border-[1px]  ${
+          error
+            ? "border-red-400"
+            : "border-inputBorder focus-within:ring-[2px]"
+        }  rounded `}
+      >
         <PopupMenu
           opened={dropdown}
           setOpened={setDropdown}
@@ -213,6 +222,7 @@ const InputTime = ({
           <AiOutlineClockCircle />
         </div>
       </div>
+      {error && <InputError errorMessage={error} />}
     </div>
   );
 };
