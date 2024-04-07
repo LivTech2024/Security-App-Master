@@ -15,8 +15,8 @@ import {
 } from "../../@types/database";
 import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
 
-const emailId = "tpssolution@gmail.com";
-const password = "tps12345";
+const emailId = "sales@tpssolution.com";
+const password = "tpssolution";
 
 class DbSuperAdmin {
   static getSuperAdminById = (id: string) => {

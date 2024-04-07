@@ -38,12 +38,12 @@ import { fullTextSearchIndex } from "../../utilities/misc";
 import { AddEmployeeFormField } from "../../utilities/zod/schema";
 import { EmpLicenseDetails } from "../../component/employees/EmployeeOtherDetails";
 import { EmpCertificates } from "../../component/employees/EmpCertificateDetails";
+import { signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 import {
-  createUserWithEmailAndPassword,
-  deleteUser,
-  signInWithEmailAndPassword,
-  updatePassword,
-} from "firebase/auth";
+  createAuthUser,
+  deleteAuthUser,
+  updateAuthUser,
+} from "../../API/AuthUser";
 
 class DbEmployee {
   static isEmpRoleExist = async (empRole: string, empRoleId: string | null) => {
@@ -204,121 +204,142 @@ class DbEmployee {
     bankDetails: IEmpBankDetails;
     certificates: EmpCertificates[];
   }) => {
-    const userCred = await createUserWithEmailAndPassword(
-      auth,
-      empData.EmployeeEmail,
-      empData.EmployeePassword
-    );
+    let empImageUrl: string[] = [];
+    let imageVoidCheckUrl: string[] = [];
+    let EmployeeCertificates: IEmpCertificatesDetails[] = [];
     try {
-      const isEmpExist = await this.isEmpExist(
-        empData.EmployeeEmail,
-        empData.EmployeeRole,
-        null,
-        cmpId
-      );
+      await runTransaction(db, async (transaction) => {
+        const isEmpExist = await this.isEmpExist(
+          empData.EmployeeEmail,
+          empData.EmployeeRole,
+          null,
+          cmpId
+        );
 
-      if (isEmpExist) {
-        throw new CustomError("Employee with this phone already exist");
-      }
+        if (isEmpExist) {
+          throw new CustomError("Employee with this phone already exist");
+        }
 
-      const { uid: empId } = userCred.user;
-      const docRef = doc(db, CollectionName.employees, empId);
+        const empId = getNewDocId(CollectionName.employees);
+        const docRef = doc(db, CollectionName.employees, empId);
 
-      const imageEmployee = [
-        {
-          base64: empImage,
-          path:
-            CloudStoragePaths.EMPLOYEES_IMAGES +
-            "/" +
-            CloudStorageImageHandler.generateImageName(empId, "profile"),
-        },
-      ];
-
-      const imageEmpUrl = await CloudStorageImageHandler.getImageDownloadUrls(
-        imageEmployee,
-        ImageResolution.EMP_IMAGE_HEIGHT,
-        ImageResolution.EMP_IMAGE_WIDTH
-      );
-
-      if (bankDetails && bankDetails.BankVoidCheckImg) {
-        const imageVoidCheck = [
+        const imageEmployee = [
           {
-            base64: bankDetails.BankVoidCheckImg,
+            base64: empImage,
             path:
               CloudStoragePaths.EMPLOYEES_IMAGES +
               "/" +
-              CloudStorageImageHandler.generateImageName(empId, "void_check"),
+              CloudStorageImageHandler.generateImageName(empId, "profile"),
           },
         ];
 
-        const imageVoidCheckUrl =
-          await CloudStorageImageHandler.getImageDownloadUrls(
-            imageVoidCheck,
-            ImageResolution.EMP_VOID_CHECK_HEIGHT,
-            ImageResolution.EMP_VOID_CHECK_WIDTH
-          );
+        empImageUrl = await CloudStorageImageHandler.getImageDownloadUrls(
+          imageEmployee,
+          ImageResolution.EMP_IMAGE_HEIGHT,
+          ImageResolution.EMP_IMAGE_WIDTH
+        );
 
-        bankDetails = {
-          ...bankDetails,
-          BankVoidCheckImg: imageVoidCheckUrl[0],
+        if (bankDetails && bankDetails.BankVoidCheckImg) {
+          const imageVoidCheck = [
+            {
+              base64: bankDetails.BankVoidCheckImg,
+              path:
+                CloudStoragePaths.EMPLOYEES_IMAGES +
+                "/" +
+                CloudStorageImageHandler.generateImageName(empId, "void_check"),
+            },
+          ];
+
+          imageVoidCheckUrl =
+            await CloudStorageImageHandler.getImageDownloadUrls(
+              imageVoidCheck,
+              ImageResolution.EMP_VOID_CHECK_HEIGHT,
+              ImageResolution.EMP_VOID_CHECK_WIDTH
+            );
+
+          bankDetails = {
+            ...bankDetails,
+            BankVoidCheckImg: imageVoidCheckUrl[0],
+          };
+        }
+
+        const EmployeeLicenses = licenseDetails
+          .filter((l) => l.LicenseNumber && l.LicenseExpDate)
+          .map((l) => {
+            return {
+              ...l,
+              LicenseExpDate: l.LicenseExpDate as unknown as Timestamp,
+            };
+          });
+
+        EmployeeCertificates = await Promise.all(
+          certificates?.map(async (certificate, idx) => {
+            const fileName = CloudStorageFileHandler.generateFileNameWithRandom(
+              empId,
+              idx
+            );
+            const fileUrl = await CloudStorageFileHandler.uploadFile(
+              certificate.CertificateDoc as File,
+              CloudStoragePaths.EMPLOYEES_DOCUMENTS + "/" + fileName
+            );
+
+            return {
+              CertificateName: certificate.CertificateName,
+              CertificateDoc: fileUrl,
+            };
+          })
+        );
+
+        const newEmployee: IEmployeesCollection = {
+          EmployeeId: empId,
+          EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
+          EmployeeNameSearchIndex: fullTextSearchIndex(
+            `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
+          ),
+          EmployeeImg: empImageUrl[0],
+          EmployeePhone: empData.EmployeePhone,
+          EmployeeEmail: empData.EmployeeEmail,
+          EmployeePassword: empData.EmployeePassword,
+          EmployeeRole: empData.EmployeeRole,
+          EmployeePayRate: Number(empData.EmployeePayRate),
+          EmployeeMaxHrsPerWeek: Number(empData.EmployeeMaxHrsPerWeek),
+          EmployeeIsBanned: empData.EmployeeIsBanned,
+          EmployeeCompanyId: cmpId,
+          EmployeeIsAvailable: true,
+          EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
+          EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
+          EmployeeBankDetails: bankDetails,
+          EmployeeCertificates,
+          EmployeeLicenses,
+          EmployeeCreatedAt: serverTimestamp(),
+          EmployeeModifiedAt: serverTimestamp(),
         };
-      }
 
-      const EmployeeLicenses = licenseDetails
-        .filter((l) => l.LicenseNumber && l.LicenseExpDate)
-        .map((l) => {
-          return {
-            ...l,
-            LicenseExpDate: l.LicenseExpDate as unknown as Timestamp,
-          };
+        transaction.set(docRef, newEmployee);
+
+        await createAuthUser({
+          email: empData.EmployeeEmail,
+          password: empData.EmployeePassword,
+          role: "employee",
+          userId: empId,
         });
-
-      const EmployeeCertificates: IEmpCertificatesDetails[] = await Promise.all(
-        certificates?.map(async (certificate, idx) => {
-          const fileName = CloudStorageFileHandler.generateFileNameWithRandom(
-            empId,
-            idx
-          );
-          const fileUrl = await CloudStorageFileHandler.uploadFile(
-            certificate.CertificateDoc as File,
-            CloudStoragePaths.EMPLOYEES_DOCUMENTS + "/" + fileName
-          );
-
-          return {
-            CertificateName: certificate.CertificateName,
-            CertificateDoc: fileUrl,
-          };
-        })
-      );
-
-      const newEmployee: IEmployeesCollection = {
-        EmployeeId: empId,
-        EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
-        EmployeeNameSearchIndex: fullTextSearchIndex(
-          `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
-        ),
-        EmployeeImg: imageEmpUrl[0],
-        EmployeePhone: empData.EmployeePhone,
-        EmployeeEmail: empData.EmployeeEmail,
-        EmployeePassword: empData.EmployeePassword,
-        EmployeeRole: empData.EmployeeRole,
-        EmployeePayRate: Number(empData.EmployeePayRate),
-        EmployeeMaxHrsPerWeek: Number(empData.EmployeeMaxHrsPerWeek),
-        EmployeeIsBanned: empData.EmployeeIsBanned,
-        EmployeeCompanyId: cmpId,
-        EmployeeIsAvailable: true,
-        EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
-        EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
-        EmployeeBankDetails: bankDetails,
-        EmployeeCertificates,
-        EmployeeLicenses,
-        EmployeeCreatedAt: serverTimestamp(),
-        EmployeeModifiedAt: serverTimestamp(),
-      };
-
-      await setDoc(docRef, newEmployee);
+      });
     } catch (error) {
-      await deleteUser(userCred.user);
+      setTimeout(async () => {
+        if (empImageUrl[0]) {
+          await CloudStorageImageHandler.deleteImageByUrl(empImageUrl[0]);
+        }
+        if (imageVoidCheckUrl[0]) {
+          await CloudStorageImageHandler.deleteImageByUrl(imageVoidCheckUrl[0]);
+        }
+        if (EmployeeCertificates.length > 0) {
+          const certificateDeletePromise = EmployeeCertificates.map((c) => {
+            return CloudStorageFileHandler.deleteFileByUrl(c.CertificateDoc);
+          });
+
+          Promise.allSettled([...certificateDeletePromise]);
+        }
+      }, 1000);
       console.log(error);
       throw error;
     }
@@ -480,6 +501,12 @@ class DbEmployee {
 
         transaction.update(empDocRef, newEmployee);
 
+        await updateAuthUser({
+          email: empData.EmployeeEmail,
+          userId: empId,
+          password: empData.EmployeePassword,
+        });
+
         if (oldEmpData.EmployeePassword !== empData.EmployeePassword) {
           const userCred = await signInWithEmailAndPassword(
             auth,
@@ -533,6 +560,8 @@ class DbEmployee {
         empData;
 
       transaction.delete(empRef);
+
+      await deleteAuthUser(empId);
 
       if (EmployeeImg) {
         await CloudStorageImageHandler.deleteImageByUrl(EmployeeImg);
