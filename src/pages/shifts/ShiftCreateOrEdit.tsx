@@ -25,7 +25,6 @@ import { AiOutlinePlus } from "react-icons/ai";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 import InputTime from "../../common/inputs/InputTime";
 import useFetchLocations from "../../hooks/fetch/useFetchLocations";
-import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
 import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
 import ShiftTaskForm, { ShiftTask } from "../../component/shifts/ShiftTaskForm";
 import useFetchClients from "../../hooks/fetch/useFetchClients";
@@ -501,8 +500,8 @@ const ShiftCreateOrEdit = () => {
               }
             />
 
-            <TextareaWithTopHeader
-              title="Description (Optional)"
+            <InputWithTopHeader
+              label="Description (Optional)"
               className="mx-0"
               register={methods.register}
               name="ShiftDescription"
