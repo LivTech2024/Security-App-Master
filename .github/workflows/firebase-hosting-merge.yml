@@ -19,16 +19,16 @@ jobs:
           channelId: live
           projectId: livtech-dbcf2
         env:
-          VITE_FIREBASE_API_KEY: ${{secrets.VITE_FIREBASE_API_KEY}}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{secrets.VITE_FIREBASE_AUTH_DOMAIN}}
-          VITE_FIREBASE_PROJECT_ID: ${{secrets.VITE_FIREBASE_PROJECT_ID}}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{secrets.VITE_FIREBASE_STORAGE_BUCKET}}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{secrets.VITE_FIREBASE_MESSAGING_SENDER_ID}}
-          VITE_FIREBASE_APP_ID: ${{secrets.VITE_FIREBASE_APP_ID}}
-          VITE_FIREBASE_MEASUREMENT_ID: ${{secrets.VITE_FIREBASE_MEASUREMENT_ID}}
-          VITE_EMAIL_JS_USER_ID: ${{secrets.VITE_EMAIL_JS_USER_ID}}
-          VITE_EMAIL_JS_SERVICE_ID: ${{secrets.VITE_EMAIL_JS_SERVICE_ID}}
-          VITE_EMAIL_JS_TEMPLATE_ID: ${{secrets.VITE_EMAIL_JS_TEMPLATE_ID}}
-          VITE_GOOGLE_MAPS_JAVASCRIPT_API: ${{secrets.VITE_GOOGLE_MAPS_JAVASCRIPT_API}}
-          VITE_SERVER_BASE_URL: ${{secrets.VITE_SERVER_BASE_URL}}
+          VITE_FIREBASE_API_KEY: AIzaSyA0pgJYdWixpYuxIc0E8Jre_uyANLZMDDQ
+          VITE_FIREBASE_AUTH_DOMAIN: security-app-3b156.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID: security-app-3b156
+          VITE_FIREBASE_STORAGE_BUCKET: security-app-3b156.appspot.com
+          VITE_FIREBASE_MESSAGING_SENDER_ID: 1014048520427
+          VITE_FIREBASE_APP_ID: 1:1014048520427:web:779dc9e1860e4ebb0566ae
+          VITE_FIREBASE_MEASUREMENT_ID: G-SBDYEN7H4T
+          VITE_EMAIL_JS_USER_ID: DAtUR9kGOvEyWhbq-
+          VITE_EMAIL_JS_SERVICE_ID: service_6mmak1z
+          VITE_EMAIL_JS_TEMPLATE_ID: template_lm9ftk9
+          VITE_GOOGLE_MAPS_JAVASCRIPT_API: AIzaSyDd_MBd7IV8MRQKpyrhW9O1BGLlp-mlOSc
+          VITE_SERVER_BASE_URL: https://backend-sceurity-app.onrender.com
           
