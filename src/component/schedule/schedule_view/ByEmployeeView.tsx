@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuthState } from "../../../store";
-import InputSelect from "../../../common/inputs/InputSelect";
 import DbSchedule, { ISchedule } from "../../../firebase_configs/DB/DbSchedule";
 import { useQuery } from "@tanstack/react-query";
 import { REACT_QUERY_KEYS } from "../../../@types/enum";
@@ -25,13 +24,14 @@ import {
 } from "../../../utilities/TsxUtils";
 import { errorHandler } from "../../../utilities/CustomError";
 import { sendEmail } from "../../../utilities/sendEmail";
+import SelectBranch from "../../../common/SelectBranch";
 
 interface ByEmployeeViewProps {
   datesArray: Date[];
 }
 
 const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
-  const { companyBranches, company } = useAuthState();
+  const { company } = useAuthState();
 
   const [branchId, setBranchId] = useState("");
 
@@ -263,21 +263,11 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
     <DndProvider backend={HTML5Backend}>
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4 justify-between">
-          <InputSelect
-            data={[
-              { label: "All branch", value: "" },
-              ...companyBranches.map((branches) => {
-                return {
-                  label: branches.CompanyBranchName,
-                  value: branches.CompanyBranchId,
-                };
-              }),
-            ]}
-            placeholder="Select branch"
-            className="text-lg"
-            value={branchId}
-            onChange={(e) => setBranchId(e as string)}
+          <SelectBranch
+            selectedBranch={branchId}
+            setSelectedBranch={setBranchId}
           />
+
           <div className="flex items-center gap-4">
             <button
               disabled={resultToBePublished.length === 0}

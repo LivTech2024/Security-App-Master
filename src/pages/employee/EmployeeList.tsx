@@ -20,7 +20,7 @@ import Button from "../../common/button/Button";
 import AddEmpRoleModal from "../../component/employees/modal/AddEmpRoleModal";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../../common/inputs/SearchBar";
-import InputSelect from "../../common/inputs/InputSelect";
+import SelectBranch from "../../common/SelectBranch";
 
 const EmployeeList = () => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const EmployeeList = () => {
 
   const { setEmployeeEditData } = useEditFormStore();
 
-  const { company, companyBranches } = useAuthState();
+  const { company } = useAuthState();
 
   const [query, setQuery] = useState("");
 
@@ -146,21 +146,7 @@ const EmployeeList = () => {
           setValue={setQuery}
           placeholder="Search employee"
         />
-        <InputSelect
-          data={[
-            { label: "All branch", value: "" },
-            ...companyBranches.map((branches) => {
-              return {
-                label: branches.CompanyBranchName,
-                value: branches.CompanyBranchId,
-              };
-            }),
-          ]}
-          placeholder="Select branch"
-          className="text-lg"
-          value={branch}
-          onChange={(e) => setBranch(e as string)}
-        />
+        <SelectBranch selectedBranch={branch} setSelectedBranch={setBranch} />
       </div>
 
       <AddEmpRoleModal

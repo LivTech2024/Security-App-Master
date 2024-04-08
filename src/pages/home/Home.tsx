@@ -6,6 +6,8 @@ import { SiAdguard } from "react-icons/si";
 import { FaExclamationTriangle, FaToolbox } from "react-icons/fa";
 import { PageRoutes } from "../../@types/enum";
 import { RiBillLine } from "react-icons/ri";
+import SelectBranch from "../../common/SelectBranch";
+import { useState } from "react";
 
 const HomeItem = ({
   name,
@@ -36,6 +38,8 @@ const HomeItem = ({
 const Home = () => {
   const { company } = useAuthState();
 
+  const [selectedBranch, setSelectedBranch] = useState("");
+
   return (
     <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center">
       <div className="flex w-full justify-center items-center">
@@ -49,6 +53,11 @@ const Home = () => {
           <div className="font-semibold text-lg">
             Welcome {company?.CompanyName}
           </div>
+
+          <SelectBranch
+            selectedBranch={selectedBranch}
+            setSelectedBranch={setSelectedBranch}
+          />
         </div>
       </div>
 

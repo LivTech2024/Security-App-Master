@@ -11,7 +11,7 @@ import { IReportsCollection } from "../../@types/database";
 import { useInView } from "react-intersection-observer";
 import { formatDate } from "../../utilities/misc";
 import TableShimmer from "../../common/shimmer/TableShimmer";
-import InputSelect from "../../common/inputs/InputSelect";
+import SelectBranch from "../../common/SelectBranch";
 
 const Reports = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -26,7 +26,7 @@ const Reports = () => {
 
   const [branchId, setBranchId] = useState("");
 
-  const { company, companyBranches } = useAuthState();
+  const { company } = useAuthState();
 
   const {
     data: snapshotData,
@@ -120,20 +120,9 @@ const Reports = () => {
           setStartDate={setStartDate}
           startDate={startDate}
         />
-        <InputSelect
-          data={[
-            { label: "All branch", value: "" },
-            ...companyBranches.map((branches) => {
-              return {
-                label: branches.CompanyBranchName,
-                value: branches.CompanyBranchId,
-              };
-            }),
-          ]}
-          placeholder="Select branch"
-          className="text-lg"
-          value={branchId}
-          onChange={(e) => setBranchId(e as string)}
+        <SelectBranch
+          selectedBranch={branchId}
+          setSelectedBranch={setBranchId}
         />
       </div>
       <table className="rounded overflow-hidden w-full">

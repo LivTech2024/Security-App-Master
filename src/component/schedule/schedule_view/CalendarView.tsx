@@ -23,8 +23,8 @@ import {
 import { errorHandler } from "../../../utilities/CustomError";
 import { sendEmail } from "../../../utilities/sendEmail";
 import { useAuthState } from "../../../store";
-import InputSelect from "../../../common/inputs/InputSelect";
 import AssignShiftModal from "../modal/AssignShiftModal";
+import SelectBranch from "../../../common/SelectBranch";
 //import { Accordion } from "@mantine/core";
 
 interface CalendarViewProps {
@@ -128,7 +128,7 @@ const AvailableEmpList = ({
 const CalendarView = ({ datesArray }: CalendarViewProps) => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
-  const { company, companyBranches } = useAuthState();
+  const { company } = useAuthState();
 
   const [branch, setBranch] = useState("");
 
@@ -384,20 +384,9 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
       <DndProvider backend={HTML5Backend}>
         <div className="flex flex-col gap-4 overflow-hidden">
           <div className="flex items-center gap-4 justify-between">
-            <InputSelect
-              data={[
-                { label: "All branch", value: "" },
-                ...companyBranches.map((branches) => {
-                  return {
-                    label: branches.CompanyBranchName,
-                    value: branches.CompanyBranchId,
-                  };
-                }),
-              ]}
-              placeholder="Select branch"
-              className="text-lg"
-              value={branch}
-              onChange={(e) => setBranch(e as string)}
+            <SelectBranch
+              selectedBranch={branch}
+              setSelectedBranch={setBranch}
             />
             <div className="flex items-center gap-4">
               <button
