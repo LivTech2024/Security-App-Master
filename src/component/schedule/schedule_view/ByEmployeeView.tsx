@@ -214,6 +214,7 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
           to_name: res.empName,
           message: res.message,
           subject: "Your schedule update",
+          from_name: company!.CompanyName,
         });
       });
 

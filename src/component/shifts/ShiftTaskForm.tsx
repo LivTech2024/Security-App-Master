@@ -6,6 +6,7 @@ import InputRadio from "../../common/inputs/InputRadio";
 export interface ShiftTask {
   TaskName: string;
   TaskQrCodeRequired: boolean;
+  TaskReturnReq: boolean;
 }
 
 interface Props {
@@ -20,6 +21,7 @@ const ShiftTaskForm: React.FC<Props> = ({ tasks, setTasks }) => {
       {
         TaskName: "",
         TaskQrCodeRequired: false,
+        TaskReturnReq: false,
       },
     ]);
   };
@@ -64,6 +66,16 @@ const ShiftTaskForm: React.FC<Props> = ({ tasks, setTasks }) => {
                 checked={task.TaskQrCodeRequired}
                 onChange={(e) =>
                   handleChange(index, "TaskQrCodeRequired", e.target.checked)
+                }
+              />
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              Return Required
+              <InputRadio
+                type="checkbox"
+                checked={task.TaskReturnReq}
+                onChange={(e) =>
+                  handleChange(index, "TaskReturnReq", e.target.checked)
                 }
               />
             </label>

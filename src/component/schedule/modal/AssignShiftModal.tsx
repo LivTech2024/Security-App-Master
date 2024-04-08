@@ -68,7 +68,7 @@ const AssignShiftModal = ({
   }, [opened, schedule, company]);
 
   const onSubmit = async () => {
-    if (!schedule || selectedEmps.length === 0) {
+    if (!schedule || selectedEmps.length === 0 || !company) {
       return;
     }
     if (schedule.shift.ShiftRequiredEmp !== selectedEmps.length) {
@@ -94,6 +94,7 @@ const AssignShiftModal = ({
           to_name: emp.EmployeeName,
           message: `You have been assigned for the shift.\n Shift Name: ${schedule.shift.ShiftName}\n Timing: ${schedule.shift.ShiftStartTime}-${schedule.shift.ShiftEndTime} \n Address: ${schedule.shift.ShiftLocationAddress}`,
           subject: "Your schedule update",
+          from_name: company?.CompanyName,
         });
       });
 

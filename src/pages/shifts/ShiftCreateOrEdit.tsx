@@ -98,7 +98,7 @@ const ShiftCreateOrEdit = () => {
   );
 
   const [shiftTasks, setShiftTasks] = useState<ShiftTask[]>([
-    { TaskName: "", TaskQrCodeRequired: false },
+    { TaskName: "", TaskQrCodeRequired: false, TaskReturnReq: false },
   ]);
 
   const { data: locations } = useFetchLocations({
@@ -198,6 +198,7 @@ const ShiftCreateOrEdit = () => {
             return {
               TaskName: task.ShiftTask,
               TaskQrCodeRequired: task.ShiftTaskQrCodeReq,
+              TaskReturnReq: task.ShiftTaskReturnReq,
             };
           })
         );

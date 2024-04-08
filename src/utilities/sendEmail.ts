@@ -1,11 +1,11 @@
 import emailjs from "emailjs-com";
-import { ConstCompanyDetails } from "../constants/ConstCompanyDetails";
 
 interface sendEmailArgs {
   to_email: string;
   to_name: string;
   subject: string;
   message: string;
+  from_name: string;
 }
 
 export const sendEmail = async ({
@@ -13,6 +13,7 @@ export const sendEmail = async ({
   subject,
   to_email,
   to_name,
+  from_name,
 }: sendEmailArgs) => {
   const response = await emailjs.send(
     import.meta.env.VITE_EMAIL_JS_SERVICE_ID,
@@ -20,7 +21,7 @@ export const sendEmail = async ({
     {
       to_email,
       to_name,
-      from_name: ConstCompanyDetails.CONST_COMPANY_NAME,
+      from_name,
       subject,
       message,
     },

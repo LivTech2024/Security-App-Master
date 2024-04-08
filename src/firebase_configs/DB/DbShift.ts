@@ -44,6 +44,7 @@ class DbShift {
           ShiftTaskId: `${shiftId}${idx}`,
           ShiftTask: task.TaskName,
           ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
+          ShiftTaskReturnReq: task.TaskReturnReq,
           ShiftTaskStatus: [],
         });
       }
@@ -124,6 +125,7 @@ class DbShift {
             ShiftTaskId: `${shiftId}${idx}`,
             ShiftTask: task.TaskName,
             ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
+            ShiftTaskReturnReq: task.TaskReturnReq,
             ShiftTaskStatus: [],
           });
         }
