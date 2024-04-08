@@ -12,7 +12,6 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
         </span>
       </div>
       <div className="mb-4">
-        <p className="text-textSecondary">Time: {patrolData.PatrolTime}</p>
         <p className="text-textSecondary">
           Required count: {patrolData.PatrolRequiredCount}
         </p>
@@ -64,82 +63,106 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
       <div className="mb-4">
         <div className="font-semibold">Checkpoints:</div>
 
-        {patrolData.PatrolCurrentStatus?.map((data, idx) => {
-          return (
-            <div key={idx} className="flex gap-4 flex-wrap">
-              <div className="flex flex-col gap-2 mt-2">
-                <div>
-                  {idx + 1}. Guard:{" "}
-                  <span className="font-semibold">
-                    {" "}
-                    {data.StatusReportedByName || "No guard assigned"}
-                  </span>
-                </div>
-                <TimelineVertical
-                  timelineItems={patrolData.PatrolCheckPoints.map((ch) => {
-                    return {
-                      icon: "",
-                      text: ch.CheckPointName,
-                      isActive:
-                        ch.CheckPointStatus?.find(
-                          (s) =>
-                            s?.StatusReportedById === data?.StatusReportedById
-                        )?.Status === "checked"
-                          ? true
-                          : false,
-                      description: (
-                        <div className="flex flex-col">
-                          <span>
-                            Status:{" "}
-                            <span className="capitalize font-medium">
-                              {ch.CheckPointStatus?.find(
-                                (s) =>
-                                  s?.StatusReportedById ===
-                                  data?.StatusReportedById
-                              )?.Status === "checked"
-                                ? "Checked"
-                                : "Not checked"}
-                            </span>{" "}
-                          </span>
-                          {ch.CheckPointStatus?.find(
+        {patrolData.PatrolCurrentStatus.length > 0 ? (
+          patrolData.PatrolCurrentStatus?.map((data, idx) => {
+            return (
+              <div key={idx} className="flex gap-4 flex-wrap">
+                <div className="flex flex-col gap-2 mt-2">
+                  <div>
+                    {idx + 1}. Guard:{" "}
+                    <span className="font-semibold">
+                      {" "}
+                      {data.StatusReportedByName || "No guard assigned"}
+                    </span>
+                  </div>
+                  <TimelineVertical
+                    timelineItems={patrolData.PatrolCheckPoints.map((ch) => {
+                      return {
+                        icon: "",
+                        text: ch.CheckPointName,
+                        isActive:
+                          ch.CheckPointStatus?.find(
                             (s) =>
                               s?.StatusReportedById === data?.StatusReportedById
-                          )?.StatusFailureReason && (
+                          )?.Status === "checked"
+                            ? true
+                            : false,
+                        description: (
+                          <div className="flex flex-col">
                             <span>
-                              Failure reason:{" "}
-                              {
-                                ch.CheckPointStatus?.find(
+                              Status:{" "}
+                              <span className="capitalize font-medium">
+                                {ch.CheckPointStatus?.find(
                                   (s) =>
                                     s?.StatusReportedById ===
                                     data?.StatusReportedById
-                                )?.StatusFailureReason
-                              }
+                                )?.Status === "checked"
+                                  ? "Checked"
+                                  : "Not checked"}
+                              </span>{" "}
                             </span>
-                          )}
-                          {ch.CheckPointStatus?.find(
-                            (s) =>
-                              s?.StatusReportedById === data?.StatusReportedById
-                          )?.StatusReportedTime && (
-                            <span className="text-textTertiary">
-                              {formatDate(
-                                ch.CheckPointStatus?.find(
-                                  (s) =>
-                                    s?.StatusReportedById ===
-                                    data?.StatusReportedById
-                                )?.StatusReportedTime,
-                                "hh:mm A"
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      ),
-                    };
-                  })}
-                />
+                            {ch.CheckPointStatus?.find(
+                              (s) =>
+                                s?.StatusReportedById ===
+                                data?.StatusReportedById
+                            )?.StatusFailureReason && (
+                              <span>
+                                Failure reason:{" "}
+                                {
+                                  ch.CheckPointStatus?.find(
+                                    (s) =>
+                                      s?.StatusReportedById ===
+                                      data?.StatusReportedById
+                                  )?.StatusFailureReason
+                                }
+                              </span>
+                            )}
+                            {ch.CheckPointStatus?.find(
+                              (s) =>
+                                s?.StatusReportedById ===
+                                data?.StatusReportedById
+                            )?.StatusReportedTime && (
+                              <span className="text-textTertiary">
+                                {formatDate(
+                                  ch.CheckPointStatus?.find(
+                                    (s) =>
+                                      s?.StatusReportedById ===
+                                      data?.StatusReportedById
+                                  )?.StatusReportedTime,
+                                  "hh:mm A"
+                                )}
+                              </span>
+                            )}
+                          </div>
+                        ),
+                      };
+                    })}
+                  />
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        ) : (
+          <TimelineVertical
+            timelineItems={patrolData.PatrolCheckPoints.map((ch) => {
+              return {
+                icon: "",
+                text: ch.CheckPointName,
+                isActive: false,
+                description: (
+                  <div className="flex flex-col">
+                    <span>
+                      Status:{" "}
+                      <span className="capitalize font-medium">
+                        Not checked
+                      </span>{" "}
+                    </span>
+                  </div>
+                ),
+              };
+            })}
+          />
+        )}
       </div>
 
       <div className="mb-4 text-textTertiary">
