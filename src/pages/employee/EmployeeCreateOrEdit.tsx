@@ -155,6 +155,17 @@ const EmployeeCreateOrEdit = () => {
 
   const [empCertificates, setEmpCertificates] = useState<EmpCertificates[]>([]);
 
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
+
   const onSubmit = async (data: AddEmployeeFormField) => {
     if (!empImageBase64) {
       showSnackbar({ message: "Please add employee image", type: "error" });
@@ -177,7 +188,7 @@ const EmployeeCreateOrEdit = () => {
       ) {
         throw new CustomError("Please add complete bank details");
       }
-      showModalLoader({});
+      setLoading(true);
 
       if (isEdit) {
         await DbEmployee.updateEmployee({
@@ -208,7 +219,7 @@ const EmployeeCreateOrEdit = () => {
         queryKey: [REACT_QUERY_KEYS.EMPLOYEE_LIST],
       });
 
-      closeModalLoader();
+      setLoading(false);
       navigate(PageRoutes.EMPLOYEE_LIST);
       showSnackbar({
         message: "Employee created successfully",
@@ -217,7 +228,7 @@ const EmployeeCreateOrEdit = () => {
       methods.reset();
     } catch (error) {
       console.log(error);
-      closeModalLoader();
+      setLoading(false);
       errorHandler(error);
     }
   };
@@ -225,7 +236,7 @@ const EmployeeCreateOrEdit = () => {
   const onDelete = async () => {
     if (!isEdit) return;
     try {
-      showModalLoader({});
+      setLoading(true);
 
       await DbEmployee.deleteEmployee(employeeEditData.EmployeeId);
 
@@ -238,12 +249,12 @@ const EmployeeCreateOrEdit = () => {
         type: "success",
       });
 
-      closeModalLoader();
+      setLoading(false);
       methods.reset();
       navigate(PageRoutes.EMPLOYEE_LIST);
     } catch (error) {
       console.log(error);
-      closeModalLoader();
+      setLoading(false);
       errorHandler(error);
     }
   };

@@ -205,13 +205,24 @@ const ShiftCreateOrEdit = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, shiftEditData]);
 
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
+
   const onSubmit = async (data: AddShiftFormFields) => {
     if (!company) return;
     try {
       if (selectedDays.length === 0) {
         throw new CustomError("Please select at least one day");
       }
-      showModalLoader({});
+      setLoading(true);
 
       if (isEdit) {
         await DbShift.updateShift(
@@ -238,7 +249,8 @@ const ShiftCreateOrEdit = () => {
         queryKey: [REACT_QUERY_KEYS.SCHEDULES],
       });
 
-      closeModalLoader();
+      setLoading(false);
+
       showSnackbar({
         message: "Shift created successfully",
         type: "success",
@@ -247,7 +259,7 @@ const ShiftCreateOrEdit = () => {
       navigate(PageRoutes.SHIFT_LIST);
     } catch (error) {
       console.log(error);
-      closeModalLoader();
+      setLoading(false);
       errorHandler(error);
     }
   };
@@ -255,7 +267,7 @@ const ShiftCreateOrEdit = () => {
   const onDelete = async () => {
     if (!isEdit) return;
     try {
-      showModalLoader({});
+      setLoading(true);
 
       await DbShift.deleteShift(shiftEditData.ShiftId);
 
@@ -268,15 +280,16 @@ const ShiftCreateOrEdit = () => {
         type: "success",
       });
 
-      closeModalLoader();
+      setLoading(false);
       methods.reset();
       navigate(PageRoutes.SHIFT_LIST);
     } catch (error) {
       console.log(error);
-      closeModalLoader();
+      setLoading(false);
       errorHandler(error);
     }
   };
+
   return (
     <div className="flex flex-col gap-4 p-6">
       <div className="flex items-center justify-between w-full bg-primaryGold rounded p-4 shadow">

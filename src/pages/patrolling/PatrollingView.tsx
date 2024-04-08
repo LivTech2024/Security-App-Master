@@ -18,7 +18,7 @@ const PatrollingView = () => {
 
   const patrolId = searchParam.get("id");
 
-  const [loading, setLoading] = useState(true);
+  const [isPatrolLoading, setIsPatrolLoading] = useState(true);
 
   const [data, setData] = useState<IPatrolsCollection | null>(null);
 
@@ -33,33 +33,44 @@ const PatrollingView = () => {
 
         setData(patrolData);
 
-        setLoading(false);
+        setIsPatrolLoading(false);
       } catch (error) {
         console.log(error);
-        setLoading(false);
+        setIsPatrolLoading(false);
       }
     };
 
     fetchPatrolData();
   }, [patrolId]);
 
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
+
   const deletePatrol = async () => {
     if (!patrolId) return;
     try {
-      showModalLoader({});
+      setLoading(true);
 
       await DbPatrol.deletePatrol(patrolId);
       showSnackbar({ message: "Patrol deleted successfully", type: "success" });
-      closeModalLoader();
+      setLoading(false);
       navigate(PageRoutes.PATROLLING_LIST);
     } catch (error) {
       console.log(error);
       errorHandler(error);
-      closeModalLoader();
+      setLoading(false);
     }
   };
 
-  if (!data && !loading) {
+  if (!data && !isPatrolLoading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <NoSearchResult />
@@ -67,7 +78,7 @@ const PatrollingView = () => {
     );
   }
 
-  if (loading) {
+  if (isPatrolLoading) {
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6 animate-pulse">
         <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
