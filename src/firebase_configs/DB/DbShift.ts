@@ -60,7 +60,7 @@ class DbShift {
         ShiftStartTime: shiftData.ShiftStartTime,
         ShiftEndTime: shiftData.ShiftEndTime,
         ShiftDescription: shiftData.ShiftDescription || null,
-        ShiftAssignedUserId: shiftData.ShiftAssignedUserId,
+        ShiftAssignedUserId: shiftData.ShiftAssignedUserId || [],
         ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
         ShiftLocation: new GeoPoint(
           Number(shiftData.ShiftLocation.latitude),

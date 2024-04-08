@@ -110,7 +110,7 @@ export const addShiftFormSchema = z
       defaultValue: 1,
     }),
     ShiftPhotoUploadIntervalInMinutes: z.coerce.number().nullable().optional(),
-    ShiftAssignedUserId: z.array(z.string()),
+    ShiftAssignedUserId: z.array(z.string()).default([]).optional(),
   })
   .superRefine(({ ShiftRequiredEmp }, ctx) => {
     if (!Number(ShiftRequiredEmp)) {
