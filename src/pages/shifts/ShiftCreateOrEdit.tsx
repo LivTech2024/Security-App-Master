@@ -17,22 +17,22 @@ import {
   showSnackbar,
 } from "../../utilities/TsxUtils";
 import DbShift from "../../firebase_configs/DB/DbShift";
-import { errorHandler } from "../../utilities/CustomError";
+import CustomError, { errorHandler } from "../../utilities/CustomError";
 import InputAutoComplete from "../../common/inputs/InputAutocomplete";
 import { useEffect, useState } from "react";
 import AddEmpRoleModal from "../../component/employees/modal/AddEmpRoleModal";
 import { AiOutlinePlus } from "react-icons/ai";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
-import InputDate from "../../common/inputs/InputDate";
 import InputTime from "../../common/inputs/InputTime";
 import useFetchLocations from "../../hooks/fetch/useFetchLocations";
 import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
-import { toDate } from "../../utilities/misc";
 import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
 import ShiftTaskForm, { ShiftTask } from "../../component/shifts/ShiftTaskForm";
 import useFetchClients from "../../hooks/fetch/useFetchClients";
 import InputSelect from "../../common/inputs/InputSelect";
 import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
+import DaysOfWeekSelector from "../../component/shifts/DayOfWeekSelector";
+import { toDate } from "../../utilities/misc";
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -49,7 +49,6 @@ const ShiftCreateOrEdit = () => {
           ShiftEnableRestrictedRadius:
             shiftEditData.ShiftEnableRestrictedRadius,
           ShiftCompanyBranchId: shiftEditData.ShiftCompanyBranchId,
-          ShiftDate: toDate(shiftEditData.ShiftDate),
           ShiftDescription: shiftEditData.ShiftDescription,
           ShiftEndTime: shiftEditData.ShiftEndTime,
           ShiftLocation: {
@@ -85,8 +84,6 @@ const ShiftCreateOrEdit = () => {
     ""
   );
 
-  const [shiftDate, setShiftDate] = useState<Date | null>(new Date());
-
   const [startTime, setStartTime] = useState("09:00 AM");
 
   const [endTime, setEndTime] = useState("05:00 PM");
@@ -100,6 +97,8 @@ const ShiftCreateOrEdit = () => {
   const [shiftTasks, setShiftTasks] = useState<ShiftTask[]>([
     { TaskName: "", TaskQrCodeRequired: false, TaskReturnReq: false },
   ]);
+
+  const [selectedDays, setSelectedDays] = useState<Date[]>([]);
 
   const { data: locations } = useFetchLocations({
     limit: 5,
@@ -116,13 +115,6 @@ const ShiftCreateOrEdit = () => {
   useEffect(() => {
     console.log(methods.formState.errors);
   }, [methods.formState.errors]);
-
-  useEffect(() => {
-    if (shiftDate) {
-      methods.setValue("ShiftDate", shiftDate);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shiftDate]);
 
   useEffect(() => {
     if (startTime) {
@@ -183,9 +175,9 @@ const ShiftCreateOrEdit = () => {
     if (isEdit) {
       setStartTime(shiftEditData.ShiftStartTime);
       setEndTime(shiftEditData.ShiftEndTime);
-      setShiftDate(new Date(shiftEditData.ShiftDate));
       setLocationSearchQuery(shiftEditData.ShiftLocationName);
       setShiftPosition(shiftEditData.ShiftPosition);
+      setSelectedDays([toDate(shiftEditData.ShiftDate)]);
       if (shiftEditData.ShiftCompanyBranchId) {
         const branchName = companyBranches.find(
           (b) => b.CompanyBranchId === shiftEditData.ShiftCompanyBranchId
@@ -205,7 +197,7 @@ const ShiftCreateOrEdit = () => {
       }
       return;
     }
-    setShiftDate(new Date());
+    setSelectedDays([]);
     setStartTime("09:00 AM");
     setEndTime("05:00 PM");
     setLocationSearchQuery("");
@@ -217,6 +209,9 @@ const ShiftCreateOrEdit = () => {
   const onSubmit = async (data: AddShiftFormFields) => {
     if (!company) return;
     try {
+      if (selectedDays.length === 0) {
+        throw new CustomError("Please select at least one day");
+      }
       showModalLoader({});
 
       if (isEdit) {
@@ -224,10 +219,16 @@ const ShiftCreateOrEdit = () => {
           data,
           shiftEditData.ShiftId,
           company.CompanyId,
-          shiftTasks
+          shiftTasks,
+          selectedDays[0]
         );
       } else {
-        await DbShift.addShift(data, company.CompanyId, shiftTasks);
+        await DbShift.addShift(
+          data,
+          company.CompanyId,
+          shiftTasks,
+          selectedDays
+        );
       }
 
       await queryClient.invalidateQueries({
@@ -372,8 +373,6 @@ const ShiftCreateOrEdit = () => {
               error={methods.formState.errors?.ShiftName?.message}
             />
 
-            <InputDate label="Date" value={shiftDate} setValue={setShiftDate} />
-
             <InputTime
               label="Start time"
               value={startTime}
@@ -449,6 +448,17 @@ const ShiftCreateOrEdit = () => {
               error={methods.formState.errors.ShiftRequiredEmp?.message}
             />
 
+            <InputWithTopHeader
+              label="Photo upload interval in minutes (Optional)"
+              className="mx-0"
+              register={methods.register}
+              name="ShiftPhotoUploadIntervalInMinutes"
+              error={
+                methods.formState.errors.ShiftPhotoUploadIntervalInMinutes
+                  ?.message
+              }
+            />
+
             <div className="col-span-2 flex items-end justify-end w-full gap-4">
               <InputWithTopHeader
                 label="Restricted radius (in meters)"
@@ -490,22 +500,21 @@ const ShiftCreateOrEdit = () => {
                 </div>
               }
             />
-            <InputWithTopHeader
-              label="Photo upload interval in minutes (Optional)"
-              className="mx-0"
-              register={methods.register}
-              name="ShiftPhotoUploadIntervalInMinutes"
-              error={
-                methods.formState.errors.ShiftPhotoUploadIntervalInMinutes
-                  ?.message
-              }
-            />
+
             <TextareaWithTopHeader
               title="Description (Optional)"
               className="mx-0"
               register={methods.register}
               name="ShiftDescription"
             />
+
+            <div className="col-span-2">
+              <DaysOfWeekSelector
+                selectedDays={selectedDays}
+                setSelectedDays={setSelectedDays}
+                isMultipleSelectable={!isEdit}
+              />
+            </div>
           </div>
         </form>
       </FormProvider>

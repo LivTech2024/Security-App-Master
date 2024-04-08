@@ -31,60 +31,63 @@ class DbShift {
   static addShift = async (
     shiftData: AddShiftFormFields,
     cmpId: string,
-    tasks: ShiftTask[]
+    tasks: ShiftTask[],
+    selectedDays: Date[]
   ) => {
-    const shiftId = getNewDocId(CollectionName.shifts);
-    const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
-
     const shiftTasks: IShiftTasksChild[] = [];
 
-    tasks.map((task, idx) => {
-      if (task.TaskName && task.TaskName.length > 0) {
-        shiftTasks.push({
-          ShiftTaskId: `${shiftId}${idx}`,
-          ShiftTask: task.TaskName,
-          ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
-          ShiftTaskReturnReq: task.TaskReturnReq,
-          ShiftTaskStatus: [],
-        });
-      }
+    const shiftCreatePromise = selectedDays.map(async (day) => {
+      const shiftId = getNewDocId(CollectionName.shifts);
+      const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
+
+      tasks.map((task, idx) => {
+        if (task.TaskName && task.TaskName.length > 0) {
+          shiftTasks.push({
+            ShiftTaskId: `${shiftId}${idx}`,
+            ShiftTask: task.TaskName,
+            ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
+            ShiftTaskReturnReq: task.TaskReturnReq,
+            ShiftTaskStatus: [],
+          });
+        }
+      });
+
+      const newShift: IShiftsCollection = {
+        ShiftId: shiftId,
+        ShiftName: shiftData.ShiftName,
+        ShiftPosition: shiftData.ShiftPosition,
+        ShiftDate: removeTimeFromDate(day) as unknown as Timestamp,
+        ShiftStartTime: shiftData.ShiftStartTime,
+        ShiftEndTime: shiftData.ShiftEndTime,
+        ShiftDescription: shiftData.ShiftDescription || null,
+        ShiftAssignedUserId: [],
+        ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
+        ShiftLocation: new GeoPoint(
+          Number(shiftData.ShiftLocation.latitude),
+          Number(shiftData.ShiftLocation.longitude)
+        ),
+        ShiftGuardWellnessReport: [],
+        ShiftPhotoUploadIntervalInMinutes:
+          shiftData.ShiftPhotoUploadIntervalInMinutes,
+        ShiftClientId: shiftData.ShiftClientId,
+        ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
+        ShiftCurrentStatus: [],
+        ShiftTask: shiftTasks,
+        ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
+        ShiftAcknowledgedByEmpId: [],
+        ShiftCompanyId: cmpId,
+        ShiftLocationId: shiftData.ShiftLocationId,
+        ShiftLocationAddress: shiftData.ShiftLocationAddress,
+        ShiftLocationName: shiftData.ShiftLocationName,
+        ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
+        ShiftCreatedAt: serverTimestamp(),
+        ShiftModifiedAt: serverTimestamp(),
+      };
+
+      return setDoc(shiftDocRef, newShift);
     });
 
-    const newShift: IShiftsCollection = {
-      ShiftId: shiftId,
-      ShiftName: shiftData.ShiftName,
-      ShiftPosition: shiftData.ShiftPosition,
-      ShiftDate: removeTimeFromDate(
-        shiftData.ShiftDate
-      ) as unknown as Timestamp,
-      ShiftStartTime: shiftData.ShiftStartTime,
-      ShiftEndTime: shiftData.ShiftEndTime,
-      ShiftDescription: shiftData.ShiftDescription || null,
-      ShiftAssignedUserId: [],
-      ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
-      ShiftLocation: new GeoPoint(
-        Number(shiftData.ShiftLocation.latitude),
-        Number(shiftData.ShiftLocation.longitude)
-      ),
-      ShiftGuardWellnessReport: [],
-      ShiftPhotoUploadIntervalInMinutes:
-        shiftData.ShiftPhotoUploadIntervalInMinutes,
-      ShiftClientId: shiftData.ShiftClientId,
-      ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
-      ShiftCurrentStatus: [],
-      ShiftTask: shiftTasks,
-      ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
-      ShiftAcknowledgedByEmpId: [],
-      ShiftCompanyId: cmpId,
-      ShiftLocationId: shiftData.ShiftLocationId,
-      ShiftLocationAddress: shiftData.ShiftLocationAddress,
-      ShiftLocationName: shiftData.ShiftLocationName,
-      ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
-      ShiftCreatedAt: serverTimestamp(),
-      ShiftModifiedAt: serverTimestamp(),
-    };
-
-    await setDoc(shiftDocRef, newShift);
+    await Promise.all(shiftCreatePromise);
 
     const barcodesToBeGenerated = shiftTasks.filter(
       (t) => t.ShiftTaskQrCodeReq
@@ -104,7 +107,8 @@ class DbShift {
     shiftData: AddShiftFormFields,
     shiftId: string,
     cmpId: string,
-    tasks: ShiftTask[]
+    tasks: ShiftTask[],
+    shiftDate: Date
   ) => {
     await runTransaction(db, async (transaction) => {
       const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
@@ -134,9 +138,7 @@ class DbShift {
       const newShift: Partial<IShiftsCollection> = {
         ShiftName: shiftData.ShiftName,
         ShiftPosition: shiftData.ShiftPosition,
-        ShiftDate: removeTimeFromDate(
-          shiftData.ShiftDate
-        ) as unknown as Timestamp,
+        ShiftDate: removeTimeFromDate(shiftDate) as unknown as Timestamp,
         ShiftStartTime: shiftData.ShiftStartTime,
         ShiftEndTime: shiftData.ShiftEndTime,
         ShiftDescription: shiftData.ShiftDescription || null,
@@ -158,7 +160,7 @@ class DbShift {
         ShiftModifiedAt: serverTimestamp(),
       };
 
-      await updateDoc(shiftDocRef, newShift);
+      transaction.update(shiftDocRef, newShift);
 
       const barcodesToBeGenerated = shiftTasks.filter(
         (t) => t.ShiftTaskQrCodeReq

@@ -90,7 +90,6 @@ export const addShiftFormSchema = z
   .object({
     ShiftName: z.string().min(2, { message: "Shift name is required" }),
     ShiftPosition: z.string().min(1, { message: "Shift position is required" }),
-    ShiftDate: z.date().default(new Date()),
     ShiftStartTime: z.string().min(2, { message: "Start time is required" }),
     ShiftEndTime: z.string().min(2, { message: "End time is required" }),
     ShiftDescription: z.string().nullable().optional(),
