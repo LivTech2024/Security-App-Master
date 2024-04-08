@@ -4,7 +4,7 @@ import { IEmployeesCollection } from "../../@types/database";
 import DbEmployee from "../../firebase_configs/DB/DbEmployee";
 
 interface Props {
-  limit: number;
+  limit?: number;
   empRole?: string;
   searchQuery?: string | null;
 }

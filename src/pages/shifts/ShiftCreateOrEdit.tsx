@@ -32,6 +32,10 @@ import InputSelect from "../../common/inputs/InputSelect";
 import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 import DaysOfWeekSelector from "../../component/shifts/DayOfWeekSelector";
 import { toDate } from "../../utilities/misc";
+import { MultiSelect } from "@mantine/core";
+import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
+import InputHeader from "../../common/inputs/InputHeader";
+import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -66,6 +70,9 @@ const ShiftCreateOrEdit = () => {
             shiftEditData.ShiftRequiredEmp
           ) as unknown as number,
           ShiftLocationId: shiftEditData.ShiftLocationId,
+          ShiftAssignedUserId: shiftEditData.ShiftAssignedUserId,
+          ShiftPhotoUploadIntervalInMinutes:
+            shiftEditData.ShiftPhotoUploadIntervalInMinutes,
         }
       : { ShiftRequiredEmp: String(1) as unknown as number },
   });
@@ -111,6 +118,13 @@ const ShiftCreateOrEdit = () => {
     searchQuery: clientSearchValue,
   });
 
+  const [empSearchQuery, setEmpSearchQuery] = useState("");
+
+  const { data: employees } = useFetchEmployees({
+    empRole: methods.watch("ShiftPosition"),
+    searchQuery: empSearchQuery,
+  });
+
   useEffect(() => {
     console.log(methods.formState.errors);
   }, [methods.formState.errors]);
@@ -137,7 +151,6 @@ const ShiftCreateOrEdit = () => {
   const locationId = methods.watch("ShiftLocationId");
 
   useEffect(() => {
-    console.log(locationId, "id");
     if (locationId) {
       const selectedLocation = locations.find(
         (loc) => loc.LocationId === locationId
@@ -488,33 +501,62 @@ const ShiftCreateOrEdit = () => {
               />
             </div>
 
-            <InputAutoComplete
-              readonly={isEdit}
-              label="Branch (Optional)"
-              value={companyBranch}
-              onChange={setCompanyBranch}
-              isFilterReq={true}
-              data={companyBranches.map((branch) => {
-                return {
-                  label: branch.CompanyBranchName,
-                  value: branch.CompanyBranchName,
-                };
-              })}
-              dropDownHeader={
-                <div
-                  onClick={() => setAddCmpBranchModal(true)}
-                  className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <AiOutlinePlus size={18} />
-                    <span>Add new branch</span>
+            <div className="flex flex-col gap-4 row-span-2">
+              <InputAutoComplete
+                readonly={isEdit}
+                label="Branch (Optional)"
+                value={companyBranch}
+                onChange={setCompanyBranch}
+                isFilterReq={true}
+                data={companyBranches.map((branch) => {
+                  return {
+                    label: branch.CompanyBranchName,
+                    value: branch.CompanyBranchName,
+                  };
+                })}
+                dropDownHeader={
+                  <div
+                    onClick={() => setAddCmpBranchModal(true)}
+                    className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <AiOutlinePlus size={18} />
+                      <span>Add new branch</span>
+                    </div>
                   </div>
-                </div>
-              }
-            />
+                }
+              />
 
-            <InputWithTopHeader
-              label="Description (Optional)"
+              <div className="flex flex-col gap-1">
+                <InputHeader title="Assign employees (Optional)" />
+                <MultiSelect
+                  maxValues={Number(methods.watch("ShiftRequiredEmp"))}
+                  searchable
+                  data={employees.map((emp) => {
+                    return { label: emp.EmployeeName, value: emp.EmployeeId };
+                  })}
+                  value={methods.watch("ShiftAssignedUserId")}
+                  onChange={(e) => methods.setValue("ShiftAssignedUserId", e)}
+                  searchValue={empSearchQuery}
+                  onSearchChange={setEmpSearchQuery}
+                  disabled={isEdit}
+                  styles={{
+                    input: {
+                      border: `1px solid #0000001A`,
+                      fontWeight: "normal",
+                      fontSize: "18px",
+                      borderRadius: "4px",
+                      background: "#FFFFFF",
+                      color: "#000000",
+                      padding: "8px 8px",
+                    },
+                  }}
+                />
+              </div>
+            </div>
+
+            <TextareaWithTopHeader
+              title="Description (Optional)"
               className="mx-0"
               register={methods.register}
               name="ShiftDescription"
