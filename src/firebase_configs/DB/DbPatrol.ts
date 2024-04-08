@@ -86,7 +86,7 @@ class DbPatrol {
     );
   };
 
-  static getPatrols = ({
+  static getPatrols = async ({
     lmt,
     lastDoc,
     searchQuery,
@@ -101,7 +101,7 @@ class DbPatrol {
 
     let queryParams: QueryConstraint[] = [
       where("PatrolCompanyId", "==", cmpId),
-      orderBy("PatrolTime", "desc"),
+      orderBy("PatrolCreatedAt", "desc"),
     ];
 
     if (searchQuery && searchQuery.length > 0) {
@@ -125,7 +125,11 @@ class DbPatrol {
 
     const patrolQuery = query(patrolRef, ...queryParams);
 
-    return getDocs(patrolQuery);
+    const snap = await getDocs(patrolQuery);
+
+    console.log(snap.docs.map((doc) => doc.data()));
+
+    return snap;
   };
 
   static getPatrolById = (patrolId: string) => {

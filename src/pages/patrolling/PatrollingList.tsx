@@ -150,7 +150,6 @@ const PatrollingList = () => {
               Patrol Name
             </th>
             <th className="uppercase px-4 py-2 w-[20%] text-start">Location</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">Time</th>
             <th className="uppercase px-4 py-2 w-[10%] text-center">
               Checkpoints
             </th>
@@ -188,9 +187,7 @@ const PatrollingList = () => {
                       {patrol.PatrolLocationName}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-start align-top">
-                    <span className="line-clamp-2">{patrol.PatrolTime}</span>
-                  </td>
+
                   <td className="px-4 py-2 text-center align-top">
                     {patrol.PatrolCheckPoints.length.toFixed(1)}
                   </td>
