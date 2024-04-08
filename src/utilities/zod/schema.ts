@@ -133,9 +133,12 @@ export const patrollingSchema = z.object({
   }),
   PatrolLocationId: z.string().min(3, { message: "Location id is required" }),
   PatrolLocationName: z.string().min(3, { message: "Location is required" }),
-  PatrolTime: z.string().min(1, { message: "Patrol time is required" }),
   PatrolCheckPoints: z.array(
-    z.object({ name: z.string(), category: z.string().nullable().optional() })
+    z.object({
+      name: z.string(),
+      category: z.string().nullable().optional(),
+      hint: z.string().optional().nullable(),
+    })
   ),
   PatrolRestrictedRadius: z.coerce
     .number()

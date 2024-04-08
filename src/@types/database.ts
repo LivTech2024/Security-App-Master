@@ -138,6 +138,7 @@ export interface IPatrolCheckPointsChild {
   CheckPointId: string;
   CheckPointName: string;
   CheckPointCategory: string | null;
+  CheckPointHint: string | null;
   CheckPointStatus: {
     Status: "checked" | "not_checked";
     StatusReportedById?: string;
@@ -155,7 +156,6 @@ export interface IPatrolsCollection {
   PatrolLocation: GeoPoint;
   PatrolLocationId: string;
   PatrolLocationName: string;
-  PatrolTime: string;
   PatrolRequiredCount: number;
   PatrolCheckPoints: IPatrolCheckPointsChild[];
   PatrolCurrentStatus: {

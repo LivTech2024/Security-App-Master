@@ -23,7 +23,6 @@ import DbPatrol from "../../firebase_configs/DB/DbPatrol";
 import useFetchLocations from "../../hooks/fetch/useFetchLocations";
 import { AiOutlinePlus } from "react-icons/ai";
 import InputSelect from "../../common/inputs/InputSelect";
-import InputTime from "../../common/inputs/InputTime";
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -38,10 +37,12 @@ const PatrollingCreateOrEdit = () => {
   const { company } = useAuthState();
 
   const [checkPoints, setCheckPoints] = useState<
-    { checkPointName: string; checkPointCategory: string | null }[]
-  >([{ checkPointName: "", checkPointCategory: null }]);
-
-  const [patrolTime, setPatrolTime] = useState("");
+    {
+      checkPointName: string;
+      checkPointCategory: string | null;
+      checkPointHint: string | null;
+    }[]
+  >([{ checkPointName: "", checkPointCategory: null, checkPointHint: null }]);
 
   const [locationSearchQuery, setLocationSearchQuery] = useState("");
 
@@ -82,15 +83,15 @@ const PatrollingCreateOrEdit = () => {
       checkPoints
         .filter((d) => d.checkPointName)
         .map((ch) => {
-          return { name: ch.checkPointName, category: ch.checkPointCategory };
+          return {
+            name: ch.checkPointName,
+            category: ch.checkPointCategory,
+            hint: ch.checkPointHint,
+          };
         })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkPoints]);
-
-  useEffect(() => {
-    methods.setValue("PatrolTime", patrolTime);
-  }, [patrolTime]);
 
   const [checkpointsCategories, setCheckpointsCategories] = useState<string[]>(
     []
@@ -184,14 +185,6 @@ const PatrollingCreateOrEdit = () => {
             error={methods.formState.errors.PatrolLocationName?.message}
           />
 
-          <InputTime
-            use12Hours
-            value={patrolTime}
-            onChange={setPatrolTime}
-            label="Patrolling Time"
-            error={methods.formState.errors.PatrolTime?.message}
-          />
-
           <InputWithTopHeader
             className="mx-0"
             label="Patrolling Required Count"
@@ -199,6 +192,15 @@ const PatrollingCreateOrEdit = () => {
             name="PatrolRequiredCount"
             decimalCount={0}
             error={methods.formState.errors.PatrolRequiredCount?.message}
+          />
+
+          <InputWithTopHeader
+            className="mx-0"
+            label="Patrolling reminder to guard in minutes"
+            register={methods.register}
+            name="PatrolReminderInMinutes"
+            decimalCount={0}
+            error={methods.formState.errors.PatrolReminderInMinutes?.message}
           />
 
           <div className="md:col-span-2 flex items-end w-full gap-4">
@@ -217,15 +219,6 @@ const PatrollingCreateOrEdit = () => {
               label="Restrict guard from moving out from this radius while patrolling"
             />
           </div>
-
-          <InputWithTopHeader
-            className="mx-0"
-            label="Patrolling reminder to guard in minutes"
-            register={methods.register}
-            name="PatrolReminderInMinutes"
-            decimalCount={0}
-            error={methods.formState.errors.PatrolReminderInMinutes?.message}
-          />
 
           <div className="col-span-2 w-full gap-4 flex flex-col">
             <div className="font-medium text-lg ">Create checkpoints</div>

@@ -47,6 +47,7 @@ class DbPatrol {
         CheckPointName: ch.name,
         CheckPointStatus: [],
         CheckPointCategory: ch.category || null,
+        CheckPointHint: ch.hint || null,
       });
     });
 
@@ -66,7 +67,6 @@ class DbPatrol {
       PatrolReminderInMinutes: data.PatrolReminderInMinutes,
       PatrolLocationId: data.PatrolLocationId,
       PatrolLocationName: data.PatrolLocationName,
-      PatrolTime: data.PatrolTime,
       PatrolRequiredCount: Number(data.PatrolRequiredCount),
       PatrolCheckPoints,
       PatrolCurrentStatus: [],

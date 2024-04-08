@@ -3,11 +3,20 @@ import Button from "../../common/button/Button";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 
 import InputSelect from "../../common/inputs/InputSelect";
+import { MdClose } from "react-icons/md";
 
 interface CheckPointInputProps {
-  checkpoints: { checkPointName: string; checkPointCategory: string | null }[];
+  checkpoints: {
+    checkPointName: string;
+    checkPointCategory: string | null;
+    checkPointHint: string | null;
+  }[];
   setCheckpoints: (
-    checkpoints: { checkPointName: string; checkPointCategory: string | null }[]
+    checkpoints: {
+      checkPointName: string;
+      checkPointCategory: string | null;
+      checkPointHint: string | null;
+    }[]
   ) => void;
   checkpointCategories: string[];
   setCheckpointCategories: React.Dispatch<React.SetStateAction<string[]>>;
@@ -25,6 +34,7 @@ const CheckpointForm = ({
       {
         checkPointName: "",
         checkPointCategory: null,
+        checkPointHint: null,
       },
     ]);
   };
@@ -36,7 +46,7 @@ const CheckpointForm = ({
 
   const handleChange = (
     index: number,
-    key: "checkPointName" | "checkPointCategory",
+    key: "checkPointName" | "checkPointCategory" | "checkPointHint",
     value: string
   ) => {
     const updatedCheckpoints = [...checkpoints];
@@ -49,6 +59,7 @@ const CheckpointForm = ({
       <TagsInput
         label="Create checkpoints category"
         placeholder="Enter category and press enter"
+        className="max-w-[50%]"
         value={checkpointCategories}
         onChange={setCheckpointCategories}
         styles={{
@@ -67,13 +78,12 @@ const CheckpointForm = ({
         {checkpoints.map((checkpoint, index) => (
           <div key={index} className="flex items-center space-x-4">
             {checkpoints.length > 1 && (
-              <Button
-                type="red"
-                className="px-2 py-[6px] text-base"
-                onClick={() => handleRemoveCheckpoint(index)}
-                disabled={checkpoints.length < 2}
-                label="Remove"
-              />
+              <div className="bg-onHoverBg rounded-full p-2">
+                <MdClose
+                  className="text-textPrimaryRed text-xl cursor-pointer"
+                  onClick={() => handleRemoveCheckpoint(index)}
+                />
+              </div>
             )}
             <div className="flex items-center gap-4">
               <InputWithTopHeader
@@ -84,6 +94,14 @@ const CheckpointForm = ({
                 value={checkpoint.checkPointName}
                 onChange={(e) =>
                   handleChange(index, "checkPointName", e.target.value)
+                }
+              />
+              <InputWithTopHeader
+                className={`mx-0 `}
+                placeholder="Hint"
+                value={checkpoint.checkPointHint || ""}
+                onChange={(e) =>
+                  handleChange(index, "checkPointHint", e.target.value)
                 }
               />
               {checkpointCategories.length > 0 && (
