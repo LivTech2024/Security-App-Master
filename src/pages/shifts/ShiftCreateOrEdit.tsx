@@ -36,6 +36,7 @@ import { MultiSelect } from "@mantine/core";
 import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
 import InputHeader from "../../common/inputs/InputHeader";
 import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
+import { sendEmail } from "../../utilities/sendEmail";
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -252,6 +253,26 @@ const ShiftCreateOrEdit = () => {
           shiftTasks,
           selectedDays
         );
+
+        //* Send emails to assigned employees
+        const shiftAssignedUserId = methods.watch("ShiftAssignedUserId") || [];
+
+        if (shiftAssignedUserId?.length > 0) {
+          const sendEmailPromise = shiftAssignedUserId.map(async (empId) => {
+            const emp = employees.find((emp) => emp.EmployeeId === empId);
+            if (emp) {
+              return sendEmail({
+                to_email: emp.EmployeeEmail,
+                to_name: emp.EmployeeName,
+                message: `You have been assigned for the shift.\n Shift Name: ${data.ShiftName}\n Timing: ${data.ShiftStartTime}-${data.ShiftEndTime} \n Address: ${data.ShiftLocationAddress}`,
+                subject: "Your schedule update",
+                from_name: company?.CompanyName,
+              });
+            }
+          });
+
+          await Promise.all(sendEmailPromise);
+        }
       }
 
       await queryClient.invalidateQueries({
