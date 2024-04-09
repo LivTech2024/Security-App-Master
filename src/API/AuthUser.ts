@@ -1,8 +1,6 @@
 import axios from "axios";
 
-const baseUrl = import.meta.env.VITE_SERVER_BASE_URL;
-
-//const baseUrl = "http://localhost:3000";
+const baseUrl = import.meta.env.VITE_SERVER_BASE_URL || "http://localhost:3000";
 
 export const createAuthUser = ({
   email,

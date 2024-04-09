@@ -128,6 +128,19 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
 
     if (!selectedEmp || !selectedShift) return;
 
+    if (selectedEmp.EmployeeIsAvailable !== "available") {
+      showSnackbar({
+        message: `This employee is ${
+          selectedEmp.EmployeeIsAvailable === "on_vacation"
+            ? "On vacation"
+            : selectedEmp.EmployeeIsAvailable === "out_of_reach" &&
+              "Out of reach"
+        }`,
+        type: "error",
+      });
+      return;
+    }
+
     if (selectedShift?.shift && selectedShift.shift.ShiftRequiredEmp > 1) {
       showSnackbar({
         message:
@@ -142,7 +155,22 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
       selectedShift.shift.ShiftEndTime
     );
 
-    console.log(shiftHours, "hours");
+    const empShifts = getEmpShiftForWeek(selectedEmp.EmployeeId);
+
+    const empWeekHours = empShifts.reduce((acc, shift) => {
+      const shiftHours = getHoursDiffInTwoTimeString(
+        shift.ShiftStartTime,
+        shift.ShiftEndTime
+      );
+      return acc + shiftHours;
+    }, 0);
+
+    if (empWeekHours + shiftHours > selectedEmp.EmployeeMaxHrsPerWeek) {
+      showSnackbar({
+        message: "Employee maximum hours per week exceeded",
+        type: "info",
+      });
+    }
 
     setResultToBePublished((prev) => [
       ...prev,
@@ -205,8 +233,6 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
           });
         }
       });
-
-      console.log(aggregatedEmails, "aggregatedEmails");
 
       const sendEmailPromise = aggregatedEmails.map(async (res) => {
         return sendEmail({
@@ -328,6 +354,15 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                             <div className="">Not Scheduled</div>
                           )}
                         </span>
+                        {emp.EmployeeIsAvailable !== "available" && (
+                          <span>
+                            {emp.EmployeeIsAvailable === "on_vacation"
+                              ? "On vacation"
+                              : emp.EmployeeIsAvailable === "out_of_reach"
+                              ? "Out of reach"
+                              : "Available"}
+                          </span>
+                        )}
                       </div>
                     </td>
                     {datesArray.map((date, idx) => {

@@ -111,6 +111,7 @@ class DbSchedule {
       const empRef = collection(db, CollectionName.employees);
       let queryParams: QueryConstraint[] = [
         where("EmployeeCompanyId", "==", cmpId),
+        where("EmployeeIsBanned", "==", false),
       ];
       if (empRole) {
         queryParams = [...queryParams, where("EmployeeRole", "==", empRole)];
