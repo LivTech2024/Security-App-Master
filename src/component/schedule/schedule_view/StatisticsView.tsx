@@ -11,9 +11,21 @@ import { useAuthState } from "../../../store";
 import SelectBranch from "../../../common/SelectBranch";
 import dayjs from "dayjs";
 import { numberFormatter } from "../../../utilities/NumberFormater";
+import Button from "../../../common/button/Button";
 
 const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
+
+  const [empHavingShifts, setEmpHavingShifts] = useState<
+    {
+      empId: string;
+      empName: string;
+      empShifts: number;
+      empHours: number;
+      empPayRate: number;
+      empApproxCost: number;
+    }[]
+  >([]);
 
   const { company } = useAuthState();
 
@@ -121,13 +133,72 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
       totalCost,
     };
   };
+
+  //*Populate emps and his shifts
+
+  useEffect(() => {
+    const updatedEmpHavingShifts: {
+      empId: string;
+      empName: string;
+      empShifts: number;
+      empHours: number;
+      empPayRate: number;
+      empApproxCost: number;
+    }[] = [];
+
+    schedules?.forEach((schedule) => {
+      if (schedule?.employee?.length > 0) {
+        const { employee, shift } = schedule;
+        const shiftHours = getHoursDiffInTwoTimeString(
+          shift.ShiftStartTime,
+          shift.ShiftEndTime
+        );
+
+        employee.forEach((emp) => {
+          const existingEmpIndex = updatedEmpHavingShifts.findIndex(
+            (e) => e.empId === emp.EmployeeId
+          );
+          if (existingEmpIndex !== -1) {
+            updatedEmpHavingShifts[existingEmpIndex] = {
+              ...updatedEmpHavingShifts[existingEmpIndex],
+              empShifts: updatedEmpHavingShifts[existingEmpIndex].empShifts + 1,
+              empHours:
+                updatedEmpHavingShifts[existingEmpIndex].empHours + shiftHours,
+              empApproxCost:
+                updatedEmpHavingShifts[existingEmpIndex].empApproxCost +
+                shiftHours *
+                  updatedEmpHavingShifts[existingEmpIndex].empPayRate,
+            };
+          } else {
+            updatedEmpHavingShifts.push({
+              empId: emp.EmployeeId,
+              empName: emp.EmployeeName,
+              empApproxCost: shiftHours * emp.EmployeePayRate,
+              empHours: shiftHours,
+              empPayRate: emp.EmployeePayRate,
+              empShifts: 1,
+            });
+          }
+        });
+      }
+    });
+
+    setEmpHavingShifts(updatedEmpHavingShifts); // Update state with the accumulated changes
+  }, [schedules]);
+
   return (
     <div className="flex flex-col gap-4 w-full">
       <div className="flex items-center gap-4 justify-between">
         <SelectBranch selectedBranch={branch} setSelectedBranch={setBranch} />
+        <Button
+          label="Print"
+          onClick={() => {}}
+          type="black"
+          className="px-12 py-2"
+        />
       </div>
-      <div className="flex w-full justify-between items-start">
-        <div className="flex flex-col p-4 rounded-md bg-gray-200 gap-4 w-[40%]">
+      <div className="flex w-full justify-between items-start gap-8">
+        <div className="flex flex-col p-4 rounded-lg bg-surface shadow-md gap-4 w-[40%]">
           <div className="font-semibold text-xl">Shifts summary</div>
 
           <table className="w-full">
@@ -216,6 +287,64 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
                 <td className="p-2 text-end">
                   {" "}
                   {numberFormatter(getTotals().totalCost, true)}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div className="flex flex-col p-4 rounded-lg bg-surface shadow-md gap-4 w-[calc(60%-32px)]">
+          <div className="font-semibold text-xl">
+            Employees Scheduled This Week
+          </div>
+          <table>
+            <thead>
+              <tr className="bg-onHoverBg border-b border-gray-400">
+                <th className="px-2 py-1 text-start">Employee Name</th>
+                <th className="px-2 py-1 text-center">Shifts</th>
+                <th className="px-2 py-1 text-center">Hours</th>
+                <th className="px-2 py-1 text-center">Pay Rate</th>
+                <th className="px-2 py-1 text-end">Approx Cost</th>
+              </tr>
+            </thead>
+            <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
+              {empHavingShifts.map((data) => {
+                return (
+                  <tr key={data.empId}>
+                    <td className="px-2 py-2 text-start">{data.empName}</td>
+                    <td className="px-2 py-2 text-center">{data.empShifts}</td>
+                    <td className="px-2 py-2 text-center">
+                      {data.empHours.toFixed(2)}
+                    </td>
+                    <td className="px-2 py-2 text-center">
+                      {numberFormatter(data.empPayRate, true)}
+                    </td>
+                    <td className="px-2 py-2 text-end">
+                      {numberFormatter(data.empApproxCost, true)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr className="font-semibold border-t border-gray-400">
+                <td className="px-2 py-2 text-start">Total</td>
+                <td className="px-2 py-2 text-center">
+                  {empHavingShifts.reduce((acc, obj) => acc + obj.empShifts, 0)}
+                </td>
+                <td className="px-2 py-2 text-center">
+                  {empHavingShifts
+                    .reduce((acc, obj) => acc + obj.empHours, 0)
+                    .toFixed(2)}
+                </td>
+                <td className="px-2 py-2 text-center"></td>
+                <td className="px-2 py-2 text-end">
+                  {numberFormatter(
+                    empHavingShifts.reduce(
+                      (acc, obj) => acc + obj.empApproxCost,
+                      0
+                    ),
+                    true
+                  )}
                 </td>
               </tr>
             </tfoot>
