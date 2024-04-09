@@ -45,6 +45,7 @@ export interface IEmpLicenseDetails {
   LicenseType: "driving" | "security";
   LicenseNumber: string;
   LicenseExpDate: Timestamp | FieldValue;
+  LicenseImg: string | null;
 }
 export interface IEmpBankDetails {
   BankName: string;

@@ -10,6 +10,7 @@ export interface EmpLicenseDetails {
   LicenseType: "driving" | "security";
   LicenseNumber: string;
   LicenseExpDate: Date | null;
+  LicenseImg: string | null;
 }
 
 interface EmployeeOtherDetailsProps {

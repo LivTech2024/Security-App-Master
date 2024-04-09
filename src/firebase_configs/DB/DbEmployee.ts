@@ -263,14 +263,40 @@ class DbEmployee {
           };
         }
 
-        const EmployeeLicenses = licenseDetails
-          .filter((l) => l.LicenseNumber && l.LicenseExpDate)
-          .map((l) => {
-            return {
-              ...l,
-              LicenseExpDate: l.LicenseExpDate as unknown as Timestamp,
-            };
-          });
+        const EmployeeLicenses = await Promise.all(
+          licenseDetails
+            .filter((l) => l.LicenseNumber && l.LicenseExpDate)
+            .map(async (l) => {
+              let licenseImgUrl: string | null = null;
+              if (l.LicenseImg) {
+                const imageEmployee = [
+                  {
+                    base64: l.LicenseImg,
+                    path:
+                      CloudStoragePaths.EMPLOYEES_IMAGES +
+                      "/" +
+                      CloudStorageImageHandler.generateImageName(
+                        empId,
+                        `license_${l.LicenseType}`
+                      ),
+                  },
+                ];
+
+                const licenseImg =
+                  await CloudStorageImageHandler.getImageDownloadUrls(
+                    imageEmployee,
+                    ImageResolution.EMP_LICENSE_HEIGHT,
+                    ImageResolution.EMP_LICENSE_WIDTH
+                  );
+                licenseImgUrl = licenseImg[0];
+              }
+              return {
+                ...l,
+                LicenseExpDate: l.LicenseExpDate as unknown as Timestamp,
+                LicenseImg: licenseImgUrl,
+              };
+            })
+        );
 
         EmployeeCertificates = await Promise.all(
           certificates?.map(async (certificate, idx) => {
@@ -427,15 +453,41 @@ class DbEmployee {
           };
         }
 
-        const EmployeeLicenses =
+        const EmployeeLicenses = await Promise.all(
           licenseDetails
-            ?.filter((l) => l.LicenseNumber && l.LicenseExpDate)
-            ?.map((l) => {
+            .filter((l) => l.LicenseNumber && l.LicenseExpDate)
+            .map(async (l) => {
+              let licenseImgUrl = l.LicenseImg;
+
+              if (l.LicenseImg && !l.LicenseImg.startsWith("https")) {
+                const image = [
+                  {
+                    base64: l.LicenseImg,
+                    path:
+                      CloudStoragePaths.EMPLOYEES_IMAGES +
+                      "/" +
+                      CloudStorageImageHandler.generateImageName(
+                        empId,
+                        `license_${l.LicenseType}`
+                      ),
+                  },
+                ];
+
+                const licenseImg =
+                  await CloudStorageImageHandler.getImageDownloadUrls(
+                    image,
+                    ImageResolution.EMP_LICENSE_HEIGHT,
+                    ImageResolution.EMP_LICENSE_WIDTH
+                  );
+                licenseImgUrl = licenseImg[0];
+              }
               return {
                 ...l,
                 LicenseExpDate: l.LicenseExpDate as unknown as Timestamp,
+                LicenseImg: licenseImgUrl,
               };
-            }) || [];
+            })
+        );
 
         //*This is for emp certificates
         const EmployeeCertificates: IEmpCertificatesDetails[] =
