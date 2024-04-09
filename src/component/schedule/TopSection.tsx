@@ -65,6 +65,7 @@ const TopSection = ({
           data={[
             { label: "Calendar view", value: ScheduleView.CALENDAR_VIEW },
             { label: "By Employee view", value: ScheduleView.BY_EMPLOYEE_VIEW },
+            { label: "Statistics view", value: ScheduleView.STATISTICS_VIEW },
           ]}
           className="text-lg"
           styles={{

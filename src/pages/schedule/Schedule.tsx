@@ -4,6 +4,7 @@ import TopSection from "../../component/schedule/TopSection";
 import { ScheduleView } from "../../@types/enum";
 import ByEmployeeView from "../../component/schedule/schedule_view/ByEmployeeView";
 import CalendarView from "../../component/schedule/schedule_view/CalendarView";
+import StatisticsView from "../../component/schedule/schedule_view/StatisticsView";
 
 const Schedule = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -14,7 +15,7 @@ const Schedule = () => {
     "weekly"
   );
   const [selectedView, setSelectedView] = useState<ScheduleView>(
-    ScheduleView.CALENDAR_VIEW
+    ScheduleView.STATISTICS_VIEW
   );
 
   useEffect(() => {
@@ -50,12 +51,14 @@ const Schedule = () => {
         setSelectedTenure={setSelectedTenure}
         selectedView={selectedView}
         setSelectedView={setSelectedView}
-        isSelectTenureDisabled={selectedView !== ScheduleView.CALENDAR_VIEW}
+        isSelectTenureDisabled={selectedView === ScheduleView.BY_EMPLOYEE_VIEW}
       />
       {selectedView === ScheduleView.CALENDAR_VIEW ? (
         <CalendarView datesArray={datesArray} />
-      ) : (
+      ) : selectedView === ScheduleView.BY_EMPLOYEE_VIEW ? (
         <ByEmployeeView datesArray={datesArray} />
+      ) : (
+        <StatisticsView datesArray={datesArray} />
       )}
     </div>
   );

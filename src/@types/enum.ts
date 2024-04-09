@@ -102,4 +102,5 @@ export interface LocalStorageLoggedInUserData {
 export enum ScheduleView {
   CALENDAR_VIEW = "calendar_view",
   BY_EMPLOYEE_VIEW = "by_employee_view",
+  STATISTICS_VIEW = "statistics_view",
 }
