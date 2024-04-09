@@ -70,7 +70,11 @@ export interface IEmployeesCollection {
   EmployeeRole: string;
   EmployeePayRate: number;
   EmployeeMaxHrsPerWeek: number;
-  EmployeeIsAvailable: boolean;
+  EmployeeIsAvailable:
+    | "available"
+    | "on_shift"
+    | "out_of_reach"
+    | "on_vacation";
   EmployeeSupervisorId: string | null;
   EmployeeIsBanned: boolean;
   EmployeeCompanyId: string;

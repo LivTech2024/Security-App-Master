@@ -305,7 +305,7 @@ class DbEmployee {
           EmployeeMaxHrsPerWeek: Number(empData.EmployeeMaxHrsPerWeek),
           EmployeeIsBanned: empData.EmployeeIsBanned,
           EmployeeCompanyId: cmpId,
-          EmployeeIsAvailable: true,
+          EmployeeIsAvailable: "available",
           EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
           EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
           EmployeeBankDetails: bankDetails,
