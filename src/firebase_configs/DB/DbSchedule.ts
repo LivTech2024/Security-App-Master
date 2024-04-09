@@ -23,6 +23,7 @@ export interface IEmpScheduleForWeek {
   EmpId: string;
   EmpName: string;
   EmpImg: string;
+  EmpRole: string;
   EmpPhone: string;
   EmpEmail: string;
   EmpWeekShifts: number;
@@ -100,7 +101,7 @@ class DbSchedule {
     startDate: Date;
     endDate: Date;
     currentDate: Date;
-    empRole: string;
+    empRole?: string;
     cmpId: string;
     cmpBranchId?: string | null;
   }) => {
@@ -110,8 +111,10 @@ class DbSchedule {
       const empRef = collection(db, CollectionName.employees);
       let queryParams: QueryConstraint[] = [
         where("EmployeeCompanyId", "==", cmpId),
-        where("EmployeeRole", "==", empRole),
       ];
+      if (empRole) {
+        queryParams = [...queryParams, where("EmployeeRole", "==", empRole)];
+      }
       if (cmpBranchId && cmpBranchId.length > 0) {
         queryParams = [
           ...queryParams,
@@ -153,13 +156,15 @@ class DbSchedule {
           EmpPhone: emp.EmployeePhone,
           EmpEmail: emp.EmployeeEmail,
           EmpWeekShifts: shifts.length,
-          EmpIsAvailable: shifts.some((s) =>
-            dayjs(toDate(s.ShiftDate)).isSame(currentDate, "date")
-          )
-            ? false
-            : true,
+          EmpIsAvailable:
+            shifts.some((s) =>
+              dayjs(toDate(s.ShiftDate)).isSame(currentDate, "date")
+            ) || emp.EmployeeIsAvailable !== "available"
+              ? false
+              : true,
           EmpWeekHours: totalWorkHours,
           EmpMaxWeekHours: emp.EmployeeMaxHrsPerWeek,
+          EmpRole: emp.EmployeeRole,
         });
       });
 

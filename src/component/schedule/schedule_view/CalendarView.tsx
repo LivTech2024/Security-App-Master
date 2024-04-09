@@ -14,7 +14,6 @@ import {
   IEmployeesCollection,
   IShiftsCollection,
 } from "../../../@types/database";
-import { MdOutlineClose } from "react-icons/md";
 import {
   closeModalLoader,
   showModalLoader,
@@ -25,110 +24,17 @@ import { sendEmail } from "../../../utilities/sendEmail";
 import { useAuthState } from "../../../store";
 import AssignShiftModal from "../modal/AssignShiftModal";
 import SelectBranch from "../../../common/SelectBranch";
+import { Accordion } from "@mantine/core";
 //import { Accordion } from "@mantine/core";
 
 interface CalendarViewProps {
   datesArray: Date[];
 }
 
-interface AvailableEmpListProps {
-  selectedSchedule: ISchedule;
-  setSelectedSchedule: React.Dispatch<React.SetStateAction<ISchedule | null>>;
-  empAvailableForShift: IEmpScheduleForWeek[];
-  isEmpLoading: boolean;
-  dropResult: (draggableId: string, dropPointId: string) => void;
-}
-
-const AvailableEmpList = ({
-  selectedSchedule,
-  setSelectedSchedule,
-  empAvailableForShift,
-  isEmpLoading,
-  dropResult,
-}: AvailableEmpListProps) => {
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="font-medium flex items-center gap-2">
-        Available
-        <span className="capitalize font-semibold">
-          {selectedSchedule.shift.ShiftPosition}
-        </span>
-        for{" "}
-        <span className="font-semibold">
-          {dayjs(toDate(selectedSchedule.shift.ShiftDate)).format("ddd MMM-DD")}
-        </span>
-        <MdOutlineClose
-          onClick={() => {
-            setSelectedSchedule(null);
-          }}
-          className="text-textPrimaryRed text-xl ml-4 cursor-pointer mb-[1px]"
-        />
-      </div>
-      <div className="flex items-center gap-4 flex-wrap">
-        {empAvailableForShift.length > 0 && !isEmpLoading ? (
-          empAvailableForShift.map((data) => {
-            return (
-              <Draggable
-                draggableId={data.EmpId}
-                type={`${toDate(selectedSchedule.shift.ShiftDate).toString()}${
-                  selectedSchedule.shift.ShiftPosition
-                }`}
-                callback={dropResult}
-              >
-                <div className="flex items-center gap-2 bg-primaryGold p-2 rounded text-sm text-surface">
-                  <img
-                    src={data.EmpImg}
-                    alt=""
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                  <div key={data.EmpId} className="flex flex-col ">
-                    <div className="flex items-center gap-2">
-                      Name:{" "}
-                      <span className="font-semibold">{data.EmpName}</span>{" "}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      Week shifts:{" "}
-                      <span className="font-semibold">
-                        {data.EmpWeekShifts}
-                      </span>{" "}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      Week hours:{" "}
-                      <span className="font-semibold">
-                        {data.EmpWeekHours.toFixed(1)}
-                      </span>{" "}
-                    </div>
-                  </div>
-                </div>
-              </Draggable>
-            );
-          })
-        ) : isEmpLoading ? (
-          Array.from({ length: 5 }).map((_, idx) => {
-            return (
-              <div
-                key={idx}
-                className="bg-shimmerColor animate-pulse w-[150px] h-[80px]"
-              ></div>
-            );
-          })
-        ) : (
-          <div className="bg-primaryGold font-bold py-1 px-2 rounded">
-            No {selectedSchedule.shift.ShiftPosition} available for{" "}
-            {dayjs(toDate(selectedSchedule.shift.ShiftDate)).format(
-              "ddd MMM-DD"
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
 const CalendarView = ({ datesArray }: CalendarViewProps) => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
-  const { company } = useAuthState();
+  const { company, empRoles } = useAuthState();
 
   const [branch, setBranch] = useState("");
 
@@ -172,25 +78,22 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
   const [isEmpLoading, setIsEmpLoading] = useState(false);
 
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
   useEffect(() => {
     const fetchEmpSchedule = async () => {
-      if (!selectedSchedule || !company) return;
+      if (!selectedDate || !company) return;
       try {
         setIsEmpLoading(true);
         const data = await DbSchedule.getEmployeesSchedule({
-          startDate: dayjs(toDate(selectedSchedule.shift.ShiftDate))
-            .startOf("week")
-            .toDate(),
-          endDate: dayjs(toDate(selectedSchedule.shift.ShiftDate))
-            .endOf("week")
-            .toDate(),
-          currentDate: toDate(toDate(selectedSchedule.shift.ShiftDate)),
-          empRole: selectedSchedule.shift.ShiftPosition,
+          startDate: dayjs(selectedDate).startOf("week").toDate(),
+          endDate: dayjs(selectedDate).endOf("week").toDate(),
+          currentDate: toDate(selectedDate),
           cmpId: company.CompanyId,
-          cmpBranchId: selectedSchedule.shift.ShiftCompanyBranchId,
+          cmpBranchId: branch,
         });
         if (data) {
-          setEmpAvailableForShift(data.filter((emp) => emp.EmpIsAvailable));
+          setEmpAvailableForShift(data);
         }
         setIsEmpLoading(false);
       } catch (error) {
@@ -201,7 +104,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     };
     fetchEmpSchedule();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSchedule]);
+  }, [selectedDate]);
 
   const [resultToBePublished, setResultToBePublished] = useState<
     {
@@ -352,6 +255,8 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
     const resultToBeUndo = resultToBePublished[lastResultIndex];
 
+    setSelectedDate(toDate(resultToBeUndo.shift.ShiftDate));
+
     const { emp, shift } = resultToBeUndo;
 
     setResultToBePublished((prev) => prev.slice(0, -1));
@@ -405,25 +310,19 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
               </button>
             </div>
           </div>
-          {/* Employee list */}
-          {selectedSchedule && !assignMultipleEmpModal && (
-            <AvailableEmpList
-              dropResult={dropResult}
-              empAvailableForShift={empAvailableForShift}
-              isEmpLoading={isEmpLoading}
-              selectedSchedule={selectedSchedule}
-              setSelectedSchedule={setSelectedSchedule}
-            />
-          )}
+
           <div className="flex items-start gap-6 w-full justify-between">
             <div className="flex w-full flex-wrap overflow-hidden">
               {datesArray.map((date, index) => {
                 return (
                   <div
                     key={index}
-                    className="flex flex-col w-[14.23%] text-center"
+                    className="flex flex-col min-w-[180px] w-[14.23%] text-center"
                   >
-                    <div className="font-semibold">
+                    <div
+                      onClick={() => setSelectedDate(date)}
+                      className="font-semibold cursor-pointer text-textPrimaryBlue"
+                    >
                       {dayjs(date).format("ddd MMM-DD")}
                     </div>
 
@@ -448,9 +347,12 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                   }
                                 }}
                                 key={data.shift.ShiftId + idx}
-                                className={`flex flex-col p-2 cursor-pointer`}
+                                className={`flex flex-col p-2 ${
+                                  data.shift.ShiftRequiredEmp > 1 &&
+                                  "cursor-pointer"
+                                }`}
                               >
-                                <div className="h-[30px] bg-gray-200 py-1 text-sm font-semibold  text-textPrimaryBlue capitalize">
+                                <div className="h-[30px] bg-gray-200 py-1 text-sm font-semibold ">
                                   {data.shift.ShiftPosition}
                                 </div>
 
@@ -488,35 +390,108 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                 );
               })}
             </div>
-            {/* <div className="flex flex-col gap-4 p-4 bg-onHoverBg rounded shadow w-[20%]">
-              <div className="font-semibold">Available Employees</div>
-              <Accordion variant="contained">
-                <Accordion.Item value="photos">
-                  <Accordion.Control>GUARDS</Accordion.Control>
-                  <Accordion.Panel>
-                    {selectedSchedule && !assignMultipleEmpModal && (
-                      <AvailableEmpList
-                        dropResult={dropResult}
-                        empAvailableForShift={empAvailableForShift}
-                        isEmpLoading={isEmpLoading}
-                        selectedSchedule={selectedSchedule}
-                        setSelectedSchedule={setSelectedSchedule}
-                      />
-                    )}
-                  </Accordion.Panel>
-                </Accordion.Item>
-
-                <Accordion.Item value="print">
-                  <Accordion.Control>SUPERVISORS</Accordion.Control>
-                  <Accordion.Panel>Content</Accordion.Panel>
-                </Accordion.Item>
-
-                <Accordion.Item value="camera">
-                  <Accordion.Control>OTHERS</Accordion.Control>
-                  <Accordion.Panel>Content</Accordion.Panel>
-                </Accordion.Item>
-              </Accordion>
-            </div> */}
+            {selectedDate && (
+              <div className="flex flex-col gap-4 p-4 bg-onHoverBg rounded shadow w-[30%]">
+                <div className="font-semibold">
+                  Available Employees ({dayjs(selectedDate).format("ddd MMM-D")}
+                  )
+                </div>
+                <Accordion variant="contained">
+                  {empRoles
+                    .sort((a, b) =>
+                      a.EmployeeRoleName.localeCompare(b.EmployeeRoleName)
+                    )
+                    .map((role) => {
+                      return (
+                        <Accordion.Item
+                          key={role.EmployeeRoleId}
+                          value={role.EmployeeRoleName}
+                        >
+                          <Accordion.Control>
+                            {role.EmployeeRoleName}
+                          </Accordion.Control>
+                          <Accordion.Panel>
+                            <div className="flex flex-col gap-4">
+                              {empAvailableForShift.filter(
+                                (emp) => emp.EmpRole === role.EmployeeRoleName
+                              ).length > 0 && !isEmpLoading ? (
+                                empAvailableForShift
+                                  .filter(
+                                    (emp) =>
+                                      emp.EmpRole === role.EmployeeRoleName
+                                  )
+                                  .map((data) => {
+                                    return (
+                                      <Draggable
+                                        draggableId={data.EmpId}
+                                        type={`${selectedDate.toString()}${
+                                          data.EmpRole
+                                        }`}
+                                        callback={dropResult}
+                                        canDrag={data.EmpIsAvailable}
+                                      >
+                                        <div
+                                          className={`flex items-center gap-2  p-2 rounded text-sm  ${
+                                            data.EmpIsAvailable
+                                              ? "bg-primaryGold text-surface"
+                                              : "bg-gray-200 cursor-not-allowed"
+                                          }`}
+                                        >
+                                          <img
+                                            src={data.EmpImg}
+                                            alt=""
+                                            className="w-12 h-12 rounded-full object-cover"
+                                          />
+                                          <div
+                                            key={data.EmpId}
+                                            className="flex flex-col "
+                                          >
+                                            <div className="flex items-center gap-2">
+                                              Name:{" "}
+                                              <span className="font-semibold">
+                                                {data.EmpName}
+                                              </span>{" "}
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              Week shifts:{" "}
+                                              <span className="font-semibold">
+                                                {data.EmpWeekShifts}
+                                              </span>{" "}
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              Week hours:{" "}
+                                              <span className="font-semibold">
+                                                {data.EmpWeekHours.toFixed(1)}
+                                              </span>{" "}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </Draggable>
+                                    );
+                                  })
+                              ) : isEmpLoading ? (
+                                Array.from({ length: 5 }).map((_, idx) => {
+                                  return (
+                                    <div
+                                      key={idx}
+                                      className="bg-shimmerColor animate-pulse w-[150px] h-[80px]"
+                                    ></div>
+                                  );
+                                })
+                              ) : (
+                                <div className="bg-primaryGold font-bold py-1 px-2 rounded">
+                                  No {role.EmployeeRoleName} available for{" "}
+                                  {dayjs(selectedDate).format("ddd MMM-DD")}
+                                </div>
+                              )}
+                            </div>
+                          </Accordion.Panel>
+                        </Accordion.Item>
+                      );
+                    })}
+                </Accordion>
+              </div>
+            )}
           </div>
 
           {/* Modal */}
