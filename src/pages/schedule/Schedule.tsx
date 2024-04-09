@@ -15,7 +15,7 @@ const Schedule = () => {
     "weekly"
   );
   const [selectedView, setSelectedView] = useState<ScheduleView>(
-    ScheduleView.STATISTICS_VIEW
+    ScheduleView.CALENDAR_VIEW
   );
 
   useEffect(() => {
