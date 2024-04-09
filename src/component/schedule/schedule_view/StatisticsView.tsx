@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   formatDate,
   getHoursDiffInTwoTimeString,
@@ -12,6 +12,8 @@ import SelectBranch from "../../../common/SelectBranch";
 import dayjs from "dayjs";
 import { numberFormatter } from "../../../utilities/NumberFormater";
 import Button from "../../../common/button/Button";
+import { generateStatsViewHtml } from "../../../utilities/genrateStatsViewHtml";
+import { htmlStringToPdf } from "../../../utilities/htmlStringToPdf";
 
 const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
@@ -192,13 +194,29 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
         <SelectBranch selectedBranch={branch} setSelectedBranch={setBranch} />
         <Button
           label="Print"
-          onClick={() => {}}
+          onClick={async () => {
+            const shiftsSummaryHtml =
+              document.getElementById("shiftsSummary")?.outerHTML || "";
+            const employeesScheduledHtml =
+              document.getElementById("employeesScheduled")?.outerHTML || "";
+
+            const pdfHtml = generateStatsViewHtml(
+              shiftsSummaryHtml as unknown as JSX.Element,
+              employeesScheduledHtml as unknown as JSX.Element,
+              company!.CompanyName,
+              datesArray[0]
+            );
+            await htmlStringToPdf("test.pdf", pdfHtml);
+          }}
           type="black"
           className="px-12 py-2"
         />
       </div>
       <div className="flex w-full justify-between items-start gap-8">
-        <div className="flex flex-col p-4 rounded-lg bg-surface shadow-md gap-4 w-[40%]">
+        <div
+          id="shiftsSummary"
+          className="flex flex-col p-4 rounded-lg bg-surface shadow-md gap-4 w-full"
+        >
           <div className="font-semibold text-xl">Shifts summary</div>
 
           <table className="w-full">
@@ -292,7 +310,10 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
             </tfoot>
           </table>
         </div>
-        <div className="flex flex-col p-4 rounded-lg bg-surface shadow-md gap-4 w-[calc(60%-32px)]">
+        <div
+          id="employeesScheduled"
+          className="flex flex-col p-4 rounded-lg bg-surface shadow-md gap-4 w-full"
+        >
           <div className="font-semibold text-xl">
             Employees Scheduled This Week
           </div>
