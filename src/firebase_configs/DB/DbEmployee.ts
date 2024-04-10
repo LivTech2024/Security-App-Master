@@ -22,7 +22,7 @@ import {
   CollectionName,
   ImageResolution,
 } from "../../@types/enum";
-import { auth, db } from "../config";
+import { db } from "../config";
 import CloudStorageImageHandler, {
   CloudStorageFileHandler,
   getNewDocId,
@@ -38,7 +38,6 @@ import { fullTextSearchIndex } from "../../utilities/misc";
 import { AddEmployeeFormField } from "../../utilities/zod/schema";
 import { EmpLicenseDetails } from "../../component/employees/EmployeeOtherDetails";
 import { EmpCertificates } from "../../component/employees/EmpCertificateDetails";
-import { signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 import {
   createAuthUser,
   deleteAuthUser,
@@ -554,19 +553,11 @@ class DbEmployee {
 
         transaction.update(empDocRef, newEmployee);
 
-        await updateAuthUser({
-          userId: empId,
-          email: empData.EmployeeEmail,
-        });
-
-        if (oldEmpData.EmployeePassword !== empData.EmployeePassword) {
-          const userCred = await signInWithEmailAndPassword(
-            auth,
-            oldEmpData.EmployeeEmail,
-            oldEmpData.EmployeePassword
-          );
-
-          await updatePassword(userCred.user, empData.EmployeePassword);
+        if (empData.EmployeeEmail !== oldEmpData.EmployeeEmail) {
+          await updateAuthUser({
+            userId: empId,
+            email: empData.EmployeeEmail,
+          });
         }
 
         const fileDeletePromises = deletedCertificates?.map((fileUrl) => {

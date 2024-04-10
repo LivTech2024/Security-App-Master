@@ -134,6 +134,9 @@ class DbClient {
     );
 
     await runTransaction(db, async (transaction) => {
+      const clientSnapshot = await transaction.get(clientRefRef);
+      const oldClientData = clientSnapshot.data() as IClientsCollection;
+
       const updatedClient: Partial<IClientsCollection> = {
         ClientName: data.ClientName,
         ClientNameSearchIndex,
@@ -153,7 +156,9 @@ class DbClient {
 
       transaction.update(clientRefRef, updatedClient);
 
-      await updateAuthUser({ email: data.ClientEmail, userId: clientId });
+      if (oldClientData.ClientEmail !== data.ClientEmail) {
+        await updateAuthUser({ email: data.ClientEmail, userId: clientId });
+      }
     });
   };
 
