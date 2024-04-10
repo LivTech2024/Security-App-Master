@@ -1,13 +1,28 @@
-import { MdPeople } from "react-icons/md";
+import {
+  MdAssuredWorkload,
+  MdEmergencyShare,
+  MdOutlineSensors,
+  MdPeople,
+} from "react-icons/md";
 import { useAuthState } from "../../store";
 import { useNavigate } from "react-router-dom";
-import { AiOutlineSchedule } from "react-icons/ai";
+import { AiOutlineAudit, AiOutlineSchedule } from "react-icons/ai";
 import { SiAdguard } from "react-icons/si";
-import { FaExclamationTriangle, FaToolbox } from "react-icons/fa";
+import {
+  FaClock,
+  FaCommentDots,
+  FaExclamationTriangle,
+  FaTasks,
+  FaToolbox,
+} from "react-icons/fa";
 import { PageRoutes } from "../../@types/enum";
 import { RiBillLine } from "react-icons/ri";
 import SelectBranch from "../../common/SelectBranch";
 import { useState } from "react";
+import { IoMdDocument } from "react-icons/io";
+import { GrCertificate } from "react-icons/gr";
+import { FaPeopleGroup } from "react-icons/fa6";
+import { TbReport } from "react-icons/tb";
 
 const HomeItem = ({
   name,
@@ -94,17 +109,61 @@ const Home = () => {
           icon={<RiBillLine className="text-2xl text-primaryGold" />}
           name="Billing and Invoicing"
         />
-        <HomeItem path={PageRoutes.HOME} name="Training & Certification" />
-        <HomeItem path={PageRoutes.HOME} name="Visitor management" />
-        <HomeItem path={PageRoutes.HOME} name="Reports & analysis" />
-        <HomeItem path={PageRoutes.HOME} name="Communication center" />
-        <HomeItem path={PageRoutes.HOME} name="Document repository" />
-        <HomeItem path={PageRoutes.HOME} name="Emergency response" />
-        <HomeItem path={PageRoutes.HOME} name="Environmental sensor" />
-        <HomeItem path={PageRoutes.HOME} name="Time & Attendance" />
-        <HomeItem path={PageRoutes.HOME} name="Audit" />
-        <HomeItem path={PageRoutes.HOME} name="Quality Assurance" />
-        <HomeItem path={PageRoutes.HOME} name="Task assignment and tracking" />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Training & Certification"
+          icon={<GrCertificate className="text-2xl text-primaryGold" />}
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Visitor management"
+          icon={<FaPeopleGroup className="text-2xl text-primaryGold" />}
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Reports & analysis"
+          icon={<TbReport className="text-2xl text-primaryGold" />}
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Communication center"
+          icon={<FaCommentDots className="text-2xl text-primaryGold" />}
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Document repository"
+          icon={<IoMdDocument className="text-3xl text-primaryGold" />}
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Emergency response"
+          icon={<MdEmergencyShare className="text-2xl text-primaryGold" />}
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Environmental sensor"
+          icon={<MdOutlineSensors className="text-2xl text-primaryGold" />}
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Time & Attendance"
+          icon={<FaClock className="text-2xl text-primaryGold" />}
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Audit"
+          icon={<AiOutlineAudit className="text-2xl text-primaryGold" />}
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Performance Assurance"
+          icon={<MdAssuredWorkload className="text-2xl text-primaryGold" />}
+        />
+        <HomeItem
+          path={PageRoutes.HOME}
+          name="Task assignment and tracking"
+          icon={<FaTasks className="text-2xl text-primaryGold" />}
+        />
       </div>
     </div>
   );
