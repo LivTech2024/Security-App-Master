@@ -37,6 +37,7 @@ import Clients from "./pages/client/Clients";
 import CreateNewCompany from "./pages/super_admin/CreateNewCompany";
 import ShiftView from "./pages/shifts/ShiftView";
 import ClientCreateOrEdit from "./pages/client/ClientCreateOrEdit";
+import ClientView from "./pages/client/ClientView";
 
 function App() {
   useOnAuthStateChanged();
@@ -146,6 +147,7 @@ function App() {
               Component={InvoiceGenerate}
             />
             <Route path={PageRoutes.CLIENTS} Component={Clients} />
+            <Route path={PageRoutes.CLIENT_VIEW} Component={ClientView} />
             <Route
               path={PageRoutes.CLIENT_CREATE_OR_EDIT}
               Component={ClientCreateOrEdit}

@@ -248,6 +248,22 @@ class DbClient {
     const clientRef = doc(db, CollectionName.clients, clientId);
     return getDoc(clientRef);
   };
+
+  static getAllShiftsOfClient = (
+    clientId: string,
+    startDate: Date,
+    endDate: Date
+  ) => {
+    const shiftRef = collection(db, CollectionName.shifts);
+    const shiftQuery = query(
+      shiftRef,
+      where("ShiftClientId", "==", clientId),
+      where("ShiftDate", ">=", startDate),
+      where("ShiftDate", "<=", endDate)
+    );
+
+    return getDocs(shiftQuery);
+  };
 }
 
 export default DbClient;

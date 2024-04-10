@@ -17,7 +17,6 @@ import { useInView } from "react-intersection-observer";
 import NoSearchResult from "../../common/NoSearchResult";
 import TableShimmer from "../../common/shimmer/TableShimmer";
 import { numberFormatter } from "../../utilities/NumberFormater";
-import { Client } from "../../store/slice/editForm.slice";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utilities/misc";
 
@@ -144,10 +143,10 @@ const Clients = () => {
             <th className="uppercase px-4 py-2 w-[20%] text-start">Email</th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">Phone</th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">
-              Contract End Date
+              <span className="line-clamp-1">Contract End Date</span>
             </th>
             <th className="uppercase px-4 py-2 w-[15%] text-center">
-              Contract Amount
+              <span className="line-clamp-1">Contract Amount</span>
             </th>
             <th className="uppercase px-4 py-2 w-[15%] text-end">Balance</th>
           </tr>
@@ -155,7 +154,7 @@ const Clients = () => {
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={5}>
+              <td colSpan={6}>
                 <NoSearchResult text="No clients" />
               </td>
             </tr>
@@ -165,22 +164,23 @@ const Clients = () => {
                 <tr
                   key={client.ClientId}
                   onClick={() => {
-                    setClientEditData(client as unknown as Client);
-                    navigate(PageRoutes.CLIENT_CREATE_OR_EDIT);
+                    navigate(PageRoutes.CLIENT_VIEW + `?id=${client.ClientId}`);
                   }}
                   className="cursor-pointer"
                 >
                   <td className="align-top px-4 py-2 text-start">
-                    {client.ClientName}
+                    <span className="line-clamp-1">{client.ClientName}</span>
                   </td>
                   <td className="align-top px-4 py-2 text-start">
-                    {client.ClientEmail}
+                    <span className="line-clamp-1">{client.ClientEmail}</span>
                   </td>
                   <td className="align-top px-4 py-2 text-start">
-                    {client.ClientPhone}
+                    <span className="line-clamp-1">{client.ClientPhone}</span>
                   </td>
                   <td className="align-top px-4 py-2 text-start">
-                    {formatDate(client.ClientContractEndDate)}
+                    <span className="line-clamp-1">
+                      {formatDate(client.ClientContractEndDate)}
+                    </span>
                   </td>
                   <td className="align-top px-4 py-2 text-center ">
                     {numberFormatter(client.ClientContractAmount, true)}
@@ -193,7 +193,7 @@ const Clients = () => {
             })
           )}
           <tr ref={ref}>
-            <td colSpan={5}>
+            <td colSpan={6}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />
