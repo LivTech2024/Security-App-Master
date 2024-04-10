@@ -39,7 +39,7 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                     &nbsp;
                   </div>
                   <div className="capitalize">
-                    {data.Status} {data.StatusCompletedCount}/
+                    {data.Status} {data.StatusCompletedCount ?? 0}/
                     {patrolData.PatrolRequiredCount} .
                   </div>
 
