@@ -7,9 +7,8 @@ import { IShiftsCollection } from "../../@types/database";
 import { useInView } from "react-intersection-observer";
 import NoSearchResult from "../../common/NoSearchResult";
 import TableShimmer from "../../common/shimmer/TableShimmer";
-import { firebaseDataToObject, formatDate } from "../../utilities/misc";
+import { formatDate } from "../../utilities/misc";
 import { useAuthState, useEditFormStore } from "../../store";
-import { Shift } from "../../store/slice/editForm.slice";
 import { useNavigate } from "react-router-dom";
 
 const ShiftList = () => {
@@ -132,14 +131,9 @@ const ShiftList = () => {
               return (
                 <tr
                   key={shift.ShiftId}
-                  onClick={() => {
-                    setShiftEditData(
-                      firebaseDataToObject(
-                        shift as unknown as Record<string, unknown>
-                      ) as unknown as Shift
-                    );
-                    navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
-                  }}
+                  onClick={() =>
+                    navigate(PageRoutes.SHIFT_VIEW + `?id=${shift.ShiftId}`)
+                  }
                   className="cursor-pointer "
                 >
                   <td className="px-4 py-2 text-start">{shift.ShiftName}</td>

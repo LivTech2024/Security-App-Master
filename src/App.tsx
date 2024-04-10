@@ -35,6 +35,7 @@ import InvoiceGenerate from "./pages/payments_and_billing/invoice/InvoiceGenerat
 import InvoiceList from "./pages/payments_and_billing/invoice/InvoiceList";
 import Clients from "./pages/client/Clients";
 import CreateNewCompany from "./pages/super_admin/CreateNewCompany";
+import ShiftView from "./pages/shifts/ShiftView";
 
 function App() {
   useOnAuthStateChanged();
@@ -108,6 +109,7 @@ function App() {
               path={PageRoutes.SHIFT_CREATE_OR_EDIT}
               Component={ShiftCreateOrEdit}
             />
+            <Route path={PageRoutes.SHIFT_VIEW} Component={ShiftView} />
             <Route path={PageRoutes.EMPLOYEE_LIST} Component={EmployeeList} />
             <Route
               path={PageRoutes.EMPLOYEE_CREATE_OR_EDIT}

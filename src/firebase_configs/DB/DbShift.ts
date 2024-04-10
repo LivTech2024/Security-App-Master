@@ -6,6 +6,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
@@ -208,6 +209,11 @@ class DbShift {
     const shiftQuery = query(shiftRef, ...queryParams);
 
     return getDocs(shiftQuery);
+  };
+
+  static getShiftById = (shiftId: string) => {
+    const shiftRef = doc(db, CollectionName.shifts, shiftId);
+    return getDoc(shiftRef);
   };
 
   static changeShiftDate = (shiftId: string, newDate: Date) => {
