@@ -3,7 +3,6 @@ import {
   QueryConstraint,
   Timestamp,
   collection,
-  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -22,7 +21,11 @@ import { IClientsCollection } from "../../@types/database";
 import CustomError from "../../utilities/CustomError";
 import { getNewDocId } from "./utils";
 import { fullTextSearchIndex, removeTimeFromDate } from "../../utilities/misc";
-import { createAuthUser, updateAuthUser } from "../../API/AuthUser";
+import {
+  createAuthUser,
+  deleteAuthUser,
+  updateAuthUser,
+} from "../../API/AuthUser";
 
 class DbClient {
   static isClientExist = async (
@@ -180,8 +183,11 @@ class DbClient {
       throw new CustomError("This client is already in use");
     }
 
-    const clientRef = doc(db, CollectionName.clients, clientId);
-    return deleteDoc(clientRef);
+    await runTransaction(db, async (transaction) => {
+      const clientRef = doc(db, CollectionName.clients, clientId);
+      transaction.delete(clientRef);
+      await deleteAuthUser(clientId);
+    });
   };
 
   static getClients = ({
