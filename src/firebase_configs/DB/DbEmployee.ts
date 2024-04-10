@@ -347,6 +347,8 @@ class DbEmployee {
           password: empData.EmployeePassword,
           role: "employee",
           userId: empId,
+        }).catch(() => {
+          throw new CustomError("This email id is already registered");
         });
       });
     } catch (error) {
@@ -557,6 +559,8 @@ class DbEmployee {
           await updateAuthUser({
             userId: empId,
             email: empData.EmployeeEmail,
+          }).catch(() => {
+            throw new CustomError("This email id is already registered");
           });
         }
 

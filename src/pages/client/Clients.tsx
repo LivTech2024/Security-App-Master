@@ -19,6 +19,7 @@ import TableShimmer from "../../common/shimmer/TableShimmer";
 import { numberFormatter } from "../../utilities/NumberFormater";
 import { Client } from "../../store/slice/editForm.slice";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "../../utilities/misc";
 
 const Clients = () => {
   const { company } = useAuthState();
@@ -142,7 +143,12 @@ const Clients = () => {
             </th>
             <th className="uppercase px-4 py-2 w-[20%] text-start">Email</th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">Phone</th>
-            <th className="uppercase px-4 py-2 w-[30%] text-start">Address</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
+              Contract End Date
+            </th>
+            <th className="uppercase px-4 py-2 w-[15%] text-center">
+              Contract Amount
+            </th>
             <th className="uppercase px-4 py-2 w-[15%] text-end">Balance</th>
           </tr>
         </thead>
@@ -174,7 +180,10 @@ const Clients = () => {
                     {client.ClientPhone}
                   </td>
                   <td className="align-top px-4 py-2 text-start">
-                    <span className="line-clamp-3">{client.ClientAddress}</span>
+                    {formatDate(client.ClientContractEndDate)}
+                  </td>
+                  <td className="align-top px-4 py-2 text-center ">
+                    {numberFormatter(client.ClientContractAmount, true)}
                   </td>
                   <td className="align-top px-4 py-2 text-end ">
                     {numberFormatter(client.ClientBalance, true)}

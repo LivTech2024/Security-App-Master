@@ -104,6 +104,8 @@ class DbClient {
         password: data.ClientPassword,
         role: "client",
         userId: clientId,
+      }).catch(() => {
+        throw new CustomError("This email id is already registered");
       });
     });
   };
@@ -157,7 +159,12 @@ class DbClient {
       transaction.update(clientRefRef, updatedClient);
 
       if (oldClientData.ClientEmail !== data.ClientEmail) {
-        await updateAuthUser({ email: data.ClientEmail, userId: clientId });
+        await updateAuthUser({
+          email: data.ClientEmail,
+          userId: clientId,
+        }).catch(() => {
+          throw new CustomError("This email id is already registered");
+        });
       }
     });
   };
