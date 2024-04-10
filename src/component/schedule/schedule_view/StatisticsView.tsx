@@ -302,7 +302,7 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
                   {getTotals().assignedShiftTotal.toFixed(2)}
                 </td>
                 <td className="p-2 text-center">
-                  {getTotals().assignedShiftTotal.toFixed(2)}
+                  {getTotals().assignedShiftHours.toFixed(2)}
                 </td>
                 <td className="p-2 text-end">
                   {" "}
