@@ -7,6 +7,7 @@ import DbClient from "../../firebase_configs/DB/DbClient";
 import {
   DisplayCount,
   MinimumQueryCharacter,
+  PageRoutes,
   REACT_QUERY_KEYS,
 } from "../../@types/enum";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -15,9 +16,9 @@ import { IClientsCollection } from "../../@types/database";
 import { useInView } from "react-intersection-observer";
 import NoSearchResult from "../../common/NoSearchResult";
 import TableShimmer from "../../common/shimmer/TableShimmer";
-import AddClientModal from "../../component/client/modal/AddClientModal";
 import { numberFormatter } from "../../utilities/NumberFormater";
 import { Client } from "../../store/slice/editForm.slice";
+import { useNavigate } from "react-router-dom";
 
 const Clients = () => {
   const { company } = useAuthState();
@@ -25,8 +26,6 @@ const Clients = () => {
   const { setClientEditData } = useEditFormStore();
 
   const [query, setQuery] = useState("");
-
-  const [addClientModal, setAddClientModal] = useState(false);
 
   const [debouncedQuery] = useDebouncedValue(query, 200);
 
@@ -107,6 +106,8 @@ const Clients = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -118,7 +119,7 @@ const Clients = () => {
             label="Create new client"
             onClick={() => {
               setClientEditData(null);
-              setAddClientModal(true);
+              navigate(PageRoutes.CLIENT_CREATE_OR_EDIT);
             }}
             className="px-4 py-2"
           />
@@ -132,8 +133,6 @@ const Clients = () => {
           placeholder="Search client"
         />
       </div>
-
-      <AddClientModal opened={addClientModal} setOpened={setAddClientModal} />
 
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
@@ -161,7 +160,7 @@ const Clients = () => {
                   key={client.ClientId}
                   onClick={() => {
                     setClientEditData(client as unknown as Client);
-                    setAddClientModal(true);
+                    navigate(PageRoutes.CLIENT_CREATE_OR_EDIT);
                   }}
                   className="cursor-pointer"
                 >

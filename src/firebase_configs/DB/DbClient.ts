@@ -1,6 +1,7 @@
 import {
   DocumentData,
   QueryConstraint,
+  Timestamp,
   collection,
   deleteDoc,
   doc,
@@ -9,10 +10,9 @@ import {
   limit,
   orderBy,
   query,
+  runTransaction,
   serverTimestamp,
-  setDoc,
   startAfter,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "../config";
@@ -21,7 +21,8 @@ import { ClientFormFields } from "../../utilities/zod/schema";
 import { IClientsCollection } from "../../@types/database";
 import CustomError from "../../utilities/CustomError";
 import { getNewDocId } from "./utils";
-import { fullTextSearchIndex } from "../../utilities/misc";
+import { fullTextSearchIndex, removeTimeFromDate } from "../../utilities/misc";
+import { createAuthUser, updateAuthUser } from "../../API/AuthUser";
 
 class DbClient {
   static isClientExist = async (
@@ -78,12 +79,30 @@ class DbClient {
       ClientEmail: data.ClientEmail,
       ClientPhone: data.ClientPhone,
       ClientAddress: data.ClientAddress || null,
-      ClientBalance: Number(data.ClientBalance),
+      ClientBalance: 0,
       ClientCreatedAt: serverTimestamp(),
       ClientModifiedAt: serverTimestamp(),
+      ClientPassword: data.ClientPassword,
+      ClientContractStartDate: removeTimeFromDate(
+        data.ClientContractStartDate
+      ) as unknown as Timestamp,
+      ClientContractEndDate: removeTimeFromDate(
+        data.ClientContractEndDate
+      ) as unknown as Timestamp,
+      ClientContractAmount: data.ClientContractAmount,
+      ClientHourlyRate: data.ClientHourlyRate,
     };
 
-    return setDoc(clientRefRef, newClient);
+    await runTransaction(db, async (transaction) => {
+      transaction.set(clientRefRef, newClient);
+
+      await createAuthUser({
+        email: data.ClientEmail,
+        password: data.ClientPassword,
+        role: "client",
+        userId: clientId,
+      });
+    });
   };
 
   static updateClient = async ({
@@ -111,30 +130,54 @@ class DbClient {
       data.ClientName.trim().toLowerCase()
     );
 
-    const updatedClient: Partial<IClientsCollection> = {
-      ClientName: data.ClientName,
-      ClientNameSearchIndex,
-      ClientEmail: data.ClientEmail,
-      ClientPhone: data.ClientPhone,
-      ClientAddress: data.ClientAddress || null,
-      ClientModifiedAt: serverTimestamp(),
-    };
+    await runTransaction(db, async (transaction) => {
+      const updatedClient: Partial<IClientsCollection> = {
+        ClientName: data.ClientName,
+        ClientNameSearchIndex,
+        ClientEmail: data.ClientEmail,
+        ClientPhone: data.ClientPhone,
+        ClientAddress: data.ClientAddress || null,
+        ClientContractStartDate: removeTimeFromDate(
+          data.ClientContractStartDate
+        ) as unknown as Timestamp,
+        ClientContractEndDate: removeTimeFromDate(
+          data.ClientContractEndDate
+        ) as unknown as Timestamp,
+        ClientContractAmount: data.ClientContractAmount,
+        ClientHourlyRate: data.ClientHourlyRate,
+        ClientModifiedAt: serverTimestamp(),
+      };
 
-    return updateDoc(clientRefRef, updatedClient);
+      transaction.update(clientRefRef, updatedClient);
+
+      await updateAuthUser({ email: data.ClientEmail, userId: clientId });
+    });
   };
 
   static deleteClient = async (clientId: string) => {
-    //* check if any invoices exist with this client
+    //* check if this client is used anywhere
     const invoiceRef = collection(db, CollectionName.invoices);
     const invoiceQuery = query(
       invoiceRef,
       where("InvoiceClientId", "==", clientId),
       limit(1)
     );
-    const snapshot = await getDocs(invoiceQuery);
+    const invoiceTask = getDocs(invoiceQuery);
 
-    if (!snapshot.empty) {
-      throw new CustomError("Invoices with this client already exist");
+    const shiftRef = collection(db, CollectionName.shifts);
+    const shiftQuery = query(
+      shiftRef,
+      where("ShiftClientId", "==", clientId),
+      limit(1)
+    );
+    const shiftTask = getDocs(shiftQuery);
+
+    const querySnapshots = await Promise.all([invoiceTask, shiftTask]);
+
+    const isClientUsed = querySnapshots.some((snapshot) => snapshot.size > 0);
+
+    if (isClientUsed) {
+      throw new CustomError("This client is already in use");
     }
 
     const clientRef = doc(db, CollectionName.clients, clientId);

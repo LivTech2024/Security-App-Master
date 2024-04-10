@@ -36,6 +36,7 @@ import InvoiceList from "./pages/payments_and_billing/invoice/InvoiceList";
 import Clients from "./pages/client/Clients";
 import CreateNewCompany from "./pages/super_admin/CreateNewCompany";
 import ShiftView from "./pages/shifts/ShiftView";
+import ClientCreateOrEdit from "./pages/client/ClientCreateOrEdit";
 
 function App() {
   useOnAuthStateChanged();
@@ -145,6 +146,10 @@ function App() {
               Component={InvoiceGenerate}
             />
             <Route path={PageRoutes.CLIENTS} Component={Clients} />
+            <Route
+              path={PageRoutes.CLIENT_CREATE_OR_EDIT}
+              Component={ClientCreateOrEdit}
+            />
           </Routes>
         </Layout>
       </ModalsProvider>

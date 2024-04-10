@@ -261,10 +261,15 @@ export interface IClientsCollection {
   ClientId: string;
   ClientCompanyId: string;
   ClientName: string;
-  ClientNameSearchIndex: string[];
-  ClientEmail: string;
   ClientPhone: string;
+  ClientNameSearchIndex: string[];
+  ClientEmail: string; //* This will be used for client portal login
+  ClientPassword: string; //* This will be used for client portal login
   ClientAddress: string | null;
+  ClientContractStartDate: Timestamp | FieldValue;
+  ClientContractEndDate: Timestamp | FieldValue;
+  ClientContractAmount: number;
+  ClientHourlyRate: number;
   ClientBalance: number;
   ClientCreatedAt: Timestamp | FieldValue;
   ClientModifiedAt: Timestamp | FieldValue;

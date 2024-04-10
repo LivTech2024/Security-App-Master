@@ -225,17 +225,27 @@ export const clientSchema = z.object({
   ClientName: z
     .string()
     .min(2, { message: "Client name should be at least 2 characters" }),
+  ClientPhone: z
+    .string()
+    .min(8, { message: "Client phone should be at least 8 characters" }),
   ClientEmail: z
     .string()
     .min(3, { message: "Client email is required" })
     .regex(ConstRegex.EMAIL_OPTIONAL, {
       message: "Invalid email",
     }),
-  ClientPhone: z
+  ClientPassword: z
     .string()
-    .min(8, { message: "Client phone should be at least 8 characters" }),
+    .min(6, { message: "Client password should be at least 6 characters" }),
   ClientAddress: z.string().nullable().optional(),
-  ClientBalance: numberString({ message: "Balance is required" }),
+  ClientContractStartDate: z.date(),
+  ClientContractEndDate: z.date(),
+  ClientContractAmount: z.coerce
+    .number()
+    .min(1, { message: "Client contract should be at least 1" }),
+  ClientHourlyRate: z.coerce
+    .number()
+    .min(1, { message: "Client hourly rate should be at least 1" }),
 });
 
 export type ClientFormFields = z.infer<typeof clientSchema>;
