@@ -61,115 +61,118 @@ const ShiftView = () => {
     );
   }
 
-  return (
-    <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold  items-center">
-        <div
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-4 cursor-pointer "
-        >
-          <div className="cursor-pointer">
-            <IoArrowBackCircle className="h-6 w-6" />
+  if (data)
+    return (
+      <div className="flex flex-col w-full h-full p-6 gap-6">
+        <div className="flex justify-between w-full p-4 rounded bg-primaryGold  items-center">
+          <div
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-4 cursor-pointer "
+          >
+            <div className="cursor-pointer">
+              <IoArrowBackCircle className="h-6 w-6" />
+            </div>
+            <div className="font-semibold text-lg">Shift data</div>
           </div>
-          <div className="font-semibold text-lg">Shift data</div>
-        </div>
-        <Button
-          type="black"
-          onClick={() => {
-            setShiftEditData(
-              firebaseDataToObject(
-                data as unknown as Record<string, unknown>
-              ) as unknown as Shift
-            );
-            navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
-          }}
-          className="bg-primary text-surface px-4 py-2 rounded"
-          label="Edit Shift"
-        />
-      </div>
-
-      <div className="bg-surface shadow-md rounded-lg p-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="font-semibold">Shift Name:</p>
-            <p>{data?.ShiftName || "N/A"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift Position:</p>
-            <p>{data?.ShiftPosition || "N/A"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift Date:</p>
-            <p>{data?.ShiftDate ? formatDate(data?.ShiftDate) : "N/A"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift Start Time:</p>
-            <p>{data?.ShiftStartTime || "N/A"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift End Time:</p>
-            <p>{data?.ShiftEndTime || "N/A"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift Location:</p>
-            <p>{data?.ShiftLocationName || "N/A"}</p>
-            {data?.ShiftLocationAddress && <p>{data?.ShiftLocationAddress}</p>}
-          </div>
-          <div>
-            <p className="font-semibold">Shift Restricted Radius:</p>
-            <p>
-              {data?.ShiftEnableRestrictedRadius
-                ? `${data?.ShiftRestrictedRadius} meters`
-                : "Not enabled"}
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift Description:</p>
-            <p>{data?.ShiftDescription || "N/A"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift Assigned Users:</p>
-            <p>{data?.ShiftAssignedUserId.length ?? 0}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift Acknowledged By Employees:</p>
-            <ul>{data?.ShiftAcknowledgedByEmpId.length ?? 0}</ul>
-          </div>
-          <div>
-            <p className="font-semibold">Shift Current Status</p>
-            <ul className="px-4">
-              {data?.ShiftCurrentStatus &&
-              data?.ShiftCurrentStatus?.length > 0 ? (
-                data?.ShiftCurrentStatus.map((data, idx) => {
-                  return (
-                    <li key={idx} className="capitalize list-decimal">
-                      {data.Status} by {data.StatusReportedByName}
-                    </li>
-                  );
-                })
-              ) : (
-                <li>Pending</li>
-              )}
-            </ul>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap">
-          {data?.ShiftPhotos &&
-            data?.ShiftPhotos?.map((img, idx) => {
-              return (
-                <img
-                  src={img}
-                  alt="shift_photos"
-                  key={idx}
-                  className="w-[100px] object-cover"
-                />
+          <Button
+            type="black"
+            onClick={() => {
+              setShiftEditData(
+                firebaseDataToObject(
+                  data as unknown as Record<string, unknown>
+                ) as unknown as Shift
               );
-            })}
+              navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
+            }}
+            className="bg-primary text-surface px-4 py-2 rounded"
+            label="Edit Shift"
+          />
+        </div>
+
+        <div className="bg-surface shadow-md rounded-lg p-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="font-semibold">Shift Name:</p>
+              <p>{data?.ShiftName || "N/A"}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Shift Position:</p>
+              <p>{data?.ShiftPosition || "N/A"}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Shift Date:</p>
+              <p>{data?.ShiftDate ? formatDate(data?.ShiftDate) : "N/A"}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Shift Start Time:</p>
+              <p>{data?.ShiftStartTime || "N/A"}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Shift End Time:</p>
+              <p>{data?.ShiftEndTime || "N/A"}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Shift Location:</p>
+              <p>{data?.ShiftLocationName || "N/A"}</p>
+              {data?.ShiftLocationAddress && (
+                <p>{data?.ShiftLocationAddress}</p>
+              )}
+            </div>
+            <div>
+              <p className="font-semibold">Shift Restricted Radius:</p>
+              <p>
+                {data?.ShiftEnableRestrictedRadius
+                  ? `${data?.ShiftRestrictedRadius} meters`
+                  : "Not enabled"}
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold">Shift Description:</p>
+              <p>{data?.ShiftDescription || "N/A"}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Shift Assigned Users:</p>
+              <p>{data?.ShiftAssignedUserId?.length ?? 0}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Shift Acknowledged By Employees:</p>
+              <ul>{data?.ShiftAcknowledgedByEmpId?.length ?? 0}</ul>
+            </div>
+            <div>
+              <p className="font-semibold">Shift Current Status</p>
+              <ul className="px-4">
+                {data?.ShiftCurrentStatus &&
+                data?.ShiftCurrentStatus?.length > 0 ? (
+                  data?.ShiftCurrentStatus?.map((data, idx) => {
+                    return (
+                      <li key={idx} className="capitalize list-decimal">
+                        {data.Status} by {data.StatusReportedByName}
+                      </li>
+                    );
+                  })
+                ) : (
+                  <li>Pending</li>
+                )}
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap">
+            {data?.ShiftPhotos &&
+              data?.ShiftPhotos?.map((img, idx) => {
+                return (
+                  <img
+                    src={img}
+                    alt="shift_photos"
+                    key={idx}
+                    className="w-[100px] object-cover"
+                  />
+                );
+              })}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default ShiftView;

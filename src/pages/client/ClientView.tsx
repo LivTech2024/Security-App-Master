@@ -54,7 +54,7 @@ const ClientView = () => {
           toDate(clientData.ClientContractStartDate),
           toDate(clientData.ClientContractEndDate)
         );
-        const shifts = shiftSnapshot.docs.map(
+        const shifts = shiftSnapshot.docs?.map(
           (doc) => doc.data() as IShiftsCollection
         );
 
@@ -62,7 +62,7 @@ const ClientView = () => {
         let totalCostToClient = 0;
 
         await Promise.all(
-          shifts.map(async (shift) => {
+          shifts?.map(async (shift) => {
             const {
               ShiftAssignedUserId,
               ShiftStartTime,
