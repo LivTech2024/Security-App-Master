@@ -130,6 +130,7 @@ export interface IShiftsCollection {
     StatusReportedById?: string;
     StatusReportedByName?: string;
     StatusReportedTime?: Timestamp | FieldValue;
+    StatusShiftTotalHrs?: number;
   }[];
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;
