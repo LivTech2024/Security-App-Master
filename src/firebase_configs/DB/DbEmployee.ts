@@ -648,7 +648,7 @@ class DbEmployee {
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId: string;
-    empRole?: string;
+    empRole?: string | null;
     branch?: string;
   }) => {
     const empRef = collection(db, CollectionName.employees);

@@ -122,7 +122,7 @@ const ShiftCreateOrEdit = () => {
   const [empSearchQuery, setEmpSearchQuery] = useState("");
 
   const { data: employees } = useFetchEmployees({
-    empRole: methods.watch("ShiftPosition"),
+    empRole: shiftPosition || null,
     searchQuery: empSearchQuery,
   });
 

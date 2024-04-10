@@ -105,6 +105,7 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
       const assigned = getAssignedShiftForDay(date);
 
       unAssignedShiftTotal += unAssigned.length;
+
       unAssignedShiftHours += unAssigned.reduce((acc, obj) => {
         const shiftHours = getHoursDiffInTwoTimeString(
           obj.shift.ShiftStartTime,
@@ -115,6 +116,7 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
       }, 0);
 
       assignedShiftTotal += assigned.length;
+
       assignedShiftHours += assigned.reduce((acc, obj) => {
         const shiftHours = getHoursDiffInTwoTimeString(
           obj.shift.ShiftStartTime,

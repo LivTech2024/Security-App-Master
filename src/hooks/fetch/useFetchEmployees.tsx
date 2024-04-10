@@ -5,7 +5,7 @@ import DbEmployee from "../../firebase_configs/DB/DbEmployee";
 
 interface Props {
   limit?: number;
-  empRole?: string;
+  empRole?: string | null;
   searchQuery?: string | null;
 }
 
@@ -52,7 +52,7 @@ const useFetchEmployees = ({ limit, searchQuery, empRole }: Props) => {
     } catch (error) {
       console.log(error);
     }
-  }, [limit, company, searchQuery]);
+  }, [limit, company, searchQuery, empRole]);
 
   return { data };
 };
