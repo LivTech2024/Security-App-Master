@@ -37,6 +37,7 @@ import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
 import InputHeader from "../../common/inputs/InputHeader";
 import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
 import { sendEmail } from "../../utilities/sendEmail";
+import useFetchPatrols from "../../hooks/fetch/useFetchPatrols";
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -49,17 +50,19 @@ const ShiftCreateOrEdit = () => {
     resolver: zodResolver(addShiftFormSchema),
     defaultValues: isEdit
       ? {
-          ShiftLocationAddress: shiftEditData.ShiftLocationAddress,
+          ShiftLocationAddress: shiftEditData.ShiftLocationAddress ?? null,
           ShiftEnableRestrictedRadius:
             shiftEditData.ShiftEnableRestrictedRadius,
           ShiftCompanyBranchId: shiftEditData.ShiftCompanyBranchId,
           ShiftDescription: shiftEditData.ShiftDescription,
           ShiftEndTime: shiftEditData.ShiftEndTime,
-          ShiftLocation: {
-            latitude: String(shiftEditData.ShiftLocation.latitude),
-            longitude: String(shiftEditData.ShiftLocation.longitude),
-          },
-          ShiftLocationName: shiftEditData.ShiftLocationName,
+          ShiftLocation: shiftEditData.ShiftLocation
+            ? {
+                latitude: String(shiftEditData.ShiftLocation.latitude),
+                longitude: String(shiftEditData.ShiftLocation.longitude),
+              }
+            : null,
+          ShiftLocationName: shiftEditData.ShiftLocationName ?? null,
           ShiftName: shiftEditData.ShiftName,
           ShiftPosition: shiftEditData.ShiftPosition,
           ShiftStartTime: shiftEditData.ShiftStartTime,
@@ -70,10 +73,11 @@ const ShiftCreateOrEdit = () => {
           ShiftRequiredEmp: String(
             shiftEditData.ShiftRequiredEmp
           ) as unknown as number,
-          ShiftLocationId: shiftEditData.ShiftLocationId,
+          ShiftLocationId: shiftEditData.ShiftLocationId ?? null,
           ShiftAssignedUserId: shiftEditData.ShiftAssignedUserId,
           ShiftPhotoUploadIntervalInMinutes:
             shiftEditData.ShiftPhotoUploadIntervalInMinutes,
+          ShiftLinkedPatrolIds: shiftEditData.ShiftLinkedPatrolIds,
         }
       : { ShiftRequiredEmp: String(1) as unknown as number },
   });
@@ -126,6 +130,14 @@ const ShiftCreateOrEdit = () => {
     searchQuery: empSearchQuery,
   });
 
+  const [patrolSearchQuery, setPatrolSearchQuery] = useState("");
+
+  const { data: patrols } = useFetchPatrols({
+    searchQuery: patrolSearchQuery,
+  });
+
+  console.log(methods.watch("ShiftLinkedPatrolIds"), "ids");
+
   useEffect(() => {
     console.log(methods.formState.errors);
   }, [methods.formState.errors]);
@@ -167,11 +179,24 @@ const ShiftCreateOrEdit = () => {
           "ShiftLocationAddress",
           selectedLocation.LocationAddress
         );
+
+        const patrolsOnLocation = patrols.filter(
+          (p) => p.PatrolLocationId === selectedLocation?.LocationId
+        );
+
+        methods.setValue(
+          "ShiftLinkedPatrolIds",
+          patrolsOnLocation.map((patrol) => patrol.PatrolId)
+        );
       }
     } else {
-      methods.setValue("ShiftLocationId", "");
-      methods.setValue("ShiftLocationName", "");
-      methods.setValue("ShiftLocationAddress", "");
+      methods.setValue("ShiftLocationId", null);
+      methods.setValue("ShiftLocationName", null);
+      methods.setValue("ShiftLocationAddress", null);
+      methods.setValue(
+        "ShiftLinkedPatrolIds",
+        shiftEditData?.ShiftLinkedPatrolIds ?? []
+      );
     }
   }, [locationId]);
 
@@ -188,7 +213,7 @@ const ShiftCreateOrEdit = () => {
     if (isEdit) {
       setStartTime(shiftEditData.ShiftStartTime);
       setEndTime(shiftEditData.ShiftEndTime);
-      setLocationSearchQuery(shiftEditData.ShiftLocationName);
+      setLocationSearchQuery(shiftEditData.ShiftLocationName ?? "");
       setShiftPosition(shiftEditData.ShiftPosition);
       setSelectedDays([toDate(shiftEditData.ShiftDate)]);
       if (shiftEditData.ShiftCompanyBranchId) {
@@ -349,7 +374,7 @@ const ShiftCreateOrEdit = () => {
                   closeOnClickOutside: true,
                   innerProps: {
                     title: "Confirm",
-                    body: "Are you sure to delete this employee",
+                    body: "Are you sure to delete this shift",
                     onConfirm: () => {
                       onDelete();
                     },
@@ -433,7 +458,7 @@ const ShiftCreateOrEdit = () => {
               use12Hours={true}
             />
             <InputSelect
-              label="Shift location"
+              label="Shift location (Optional for mobile guard)"
               data={locations.map((loc) => {
                 return { label: loc.LocationName, value: loc.LocationId };
               })}
@@ -459,8 +484,8 @@ const ShiftCreateOrEdit = () => {
             />
 
             <InputSelect
-              label="Client"
-              value={methods.watch("ShiftClientId")}
+              label="Client (Optional for mobile guard)"
+              value={methods.watch("ShiftClientId") || ""}
               onChange={(e) => methods.setValue("ShiftClientId", e || "")}
               data={clients.map((client) => {
                 return { label: client.ClientName, value: client.ClientId };
@@ -519,6 +544,32 @@ const ShiftCreateOrEdit = () => {
                 name="ShiftEnableRestrictedRadius"
                 className="w-full mb-2 font-medium"
                 label="Enable restricted radius"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1 col-span-2">
+              <InputHeader title="Assign patrols (Optional)" />
+              <MultiSelect
+                searchable
+                data={patrols.map((patrol) => {
+                  return { label: patrol.PatrolName, value: patrol.PatrolId };
+                })}
+                value={methods.watch("ShiftLinkedPatrolIds")}
+                onChange={(e) => methods.setValue("ShiftLinkedPatrolIds", e)}
+                searchValue={patrolSearchQuery}
+                onSearchChange={setPatrolSearchQuery}
+                disabled={isEdit}
+                styles={{
+                  input: {
+                    border: `1px solid #0000001A`,
+                    fontWeight: "normal",
+                    fontSize: "18px",
+                    borderRadius: "4px",
+                    background: "#FFFFFF",
+                    color: "#000000",
+                    padding: "8px 8px",
+                  },
+                }}
               />
             </div>
 

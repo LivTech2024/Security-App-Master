@@ -105,15 +105,15 @@ export interface IShiftsCollection {
   ShiftDate: Timestamp | FieldValue;
   ShiftStartTime: string;
   ShiftEndTime: string;
-  ShiftLocation: GeoPoint;
-  ShiftLocationId: string;
-  ShiftLocationName: string;
-  ShiftLocationAddress: string;
+  ShiftLocation: GeoPoint | null; //* Null for mobile guard
+  ShiftLocationId: string | null; //* Null for mobile guard
+  ShiftLocationName: string | null; //* Null for mobile guard
+  ShiftLocationAddress: string | null; //* Null for mobile guard
   ShiftRestrictedRadius: number;
   ShiftEnableRestrictedRadius: boolean;
   ShiftDescription: string | null;
   ShiftAssignedUserId: string[];
-  ShiftClientId: string;
+  ShiftClientId: string | null; //*Null for mobile guard
   ShiftCompanyId: string;
   ShiftRequiredEmp: number; //* By default 1
   ShiftCompanyBranchId?: string | null;
@@ -132,6 +132,7 @@ export interface IShiftsCollection {
     StatusReportedTime?: Timestamp | FieldValue;
     StatusShiftTotalHrs?: number;
   }[];
+  ShiftLinkedPatrolIds: string[];
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;
 }
@@ -168,6 +169,7 @@ export interface IPatrolsCollection {
     StatusReportedTime?: Timestamp | FieldValue;
   }[];
   PatrolFailureReason?: string;
+  PatrolClientId?: string | null;
   PatrolRestrictedRadius: number;
   PatrolKeepGuardInRadiusOfLocation: boolean;
   PatrolReminderInMinutes: number;

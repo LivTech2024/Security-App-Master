@@ -35,12 +35,12 @@ class DbShift {
     tasks: ShiftTask[],
     selectedDays: Date[]
   ) => {
-    const shiftTasks: IShiftTasksChild[] = [];
+    let shiftTasks: IShiftTasksChild[] = [];
 
     const shiftCreatePromise = selectedDays.map(async (day) => {
       const shiftId = getNewDocId(CollectionName.shifts);
       const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
-
+      shiftTasks = [];
       tasks.map((task, idx) => {
         if (task.TaskName && task.TaskName.length > 0) {
           shiftTasks.push({
@@ -63,24 +63,27 @@ class DbShift {
         ShiftDescription: shiftData.ShiftDescription || null,
         ShiftAssignedUserId: shiftData.ShiftAssignedUserId || [],
         ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
-        ShiftLocation: new GeoPoint(
-          Number(shiftData.ShiftLocation.latitude),
-          Number(shiftData.ShiftLocation.longitude)
-        ),
+        ShiftLocation: shiftData.ShiftLocation
+          ? new GeoPoint(
+              Number(shiftData.ShiftLocation.latitude),
+              Number(shiftData.ShiftLocation.longitude)
+            )
+          : null,
         ShiftGuardWellnessReport: [],
         ShiftPhotoUploadIntervalInMinutes:
           shiftData.ShiftPhotoUploadIntervalInMinutes,
-        ShiftClientId: shiftData.ShiftClientId,
+        ShiftClientId: shiftData.ShiftClientId ?? null,
         ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
         ShiftCurrentStatus: [],
         ShiftTask: shiftTasks,
         ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
         ShiftAcknowledgedByEmpId: [],
         ShiftCompanyId: cmpId,
-        ShiftLocationId: shiftData.ShiftLocationId,
-        ShiftLocationAddress: shiftData.ShiftLocationAddress,
-        ShiftLocationName: shiftData.ShiftLocationName,
+        ShiftLocationId: shiftData.ShiftLocationId ?? null,
+        ShiftLocationAddress: shiftData.ShiftLocationAddress ?? null,
+        ShiftLocationName: shiftData.ShiftLocationName ?? null,
         ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
+        ShiftLinkedPatrolIds: shiftData.ShiftLinkedPatrolIds ?? [],
         ShiftCreatedAt: serverTimestamp(),
         ShiftModifiedAt: serverTimestamp(),
       };
@@ -144,20 +147,25 @@ class DbShift {
         ShiftEndTime: shiftData.ShiftEndTime,
         ShiftDescription: shiftData.ShiftDescription || null,
         ShiftTask: shiftTasks,
-        ShiftLocation: new GeoPoint(
-          Number(shiftData.ShiftLocation.latitude),
-          Number(shiftData.ShiftLocation.longitude)
-        ),
+        ShiftLocation: shiftData.ShiftLocation
+          ? new GeoPoint(
+              Number(shiftData.ShiftLocation.latitude),
+              Number(shiftData.ShiftLocation.longitude)
+            )
+          : null,
         ShiftPhotoUploadIntervalInMinutes:
           shiftData.ShiftPhotoUploadIntervalInMinutes,
         ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
-        ShiftLocationName: shiftData.ShiftLocationName,
-        ShiftClientId: shiftData.ShiftClientId,
-        ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
+        ShiftLocationName: shiftData.ShiftLocationName ?? null,
+        ShiftClientId: shiftData.ShiftClientId ?? null,
+        ShiftRestrictedRadius: shiftData.ShiftRestrictedRadius
+          ? Number(shiftData.ShiftRestrictedRadius)
+          : 0,
         ShiftCompanyId: cmpId,
-        ShiftLocationId: shiftData.ShiftLocationId,
-        ShiftLocationAddress: shiftData.ShiftLocationAddress,
+        ShiftLocationId: shiftData.ShiftLocationId ?? null,
+        ShiftLocationAddress: shiftData.ShiftLocationAddress ?? null,
         ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
+        ShiftLinkedPatrolIds: shiftData.ShiftLinkedPatrolIds ?? [],
         ShiftModifiedAt: serverTimestamp(),
       };
 

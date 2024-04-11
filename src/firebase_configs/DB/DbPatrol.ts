@@ -72,6 +72,7 @@ class DbPatrol {
       PatrolCurrentStatus: [],
       PatrolRestrictedRadius: Number(data.PatrolRestrictedRadius),
       PatrolKeepGuardInRadiusOfLocation: data.PatrolKeepGuardInRadiusOfLocation,
+      PatrolClientId: data.PatrolClientId || null,
       PatrolCreatedAt: serverTimestamp(),
       PatrolModifiedAt: serverTimestamp(),
     };
@@ -91,11 +92,13 @@ class DbPatrol {
     lastDoc,
     searchQuery,
     cmpId,
+    locationId,
   }: {
-    lmt: number;
+    lmt?: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId: string;
+    locationId?: string | null;
   }) => {
     const patrolRef = collection(db, CollectionName.patrols);
 
@@ -103,6 +106,13 @@ class DbPatrol {
       where("PatrolCompanyId", "==", cmpId),
       orderBy("PatrolCreatedAt", "desc"),
     ];
+
+    if (locationId && locationId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where("PatrolLocationId", "==", locationId),
+      ];
+    }
 
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [
@@ -126,8 +136,6 @@ class DbPatrol {
     const patrolQuery = query(patrolRef, ...queryParams);
 
     const snap = await getDocs(patrolQuery);
-
-    console.log(snap.docs.map((doc) => doc.data()));
 
     return snap;
   };

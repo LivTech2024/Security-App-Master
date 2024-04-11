@@ -23,6 +23,7 @@ import DbPatrol from "../../firebase_configs/DB/DbPatrol";
 import useFetchLocations from "../../hooks/fetch/useFetchLocations";
 import { AiOutlinePlus } from "react-icons/ai";
 import InputSelect from "../../common/inputs/InputSelect";
+import useFetchClients from "../../hooks/fetch/useFetchClients";
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -49,6 +50,13 @@ const PatrollingCreateOrEdit = () => {
   const { data: locData } = useFetchLocations({
     limit: 100,
     searchQuery: locationSearchQuery,
+  });
+
+  const [clientSearchValue, setClientSearchValue] = useState("");
+
+  const { data: clients } = useFetchClients({
+    limit: 5,
+    searchQuery: clientSearchValue,
   });
 
   useEffect(() => {
@@ -219,6 +227,33 @@ const PatrollingCreateOrEdit = () => {
               label="Restrict guard from moving out from this radius while patrolling"
             />
           </div>
+
+          <InputSelect
+            label="Client (Optional)"
+            value={methods.watch("PatrolClientId") || ""}
+            onChange={(e) => methods.setValue("PatrolClientId", e || "")}
+            data={clients.map((client) => {
+              return { label: client.ClientName, value: client.ClientId };
+            })}
+            searchable
+            clearable
+            searchValue={clientSearchValue}
+            onSearchChange={setClientSearchValue}
+            error={methods.formState.errors.PatrolClientId?.message}
+            nothingFoundMessage={
+              <div
+                onClick={() => {
+                  navigate(PageRoutes.CLIENTS);
+                }}
+                className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <AiOutlinePlus size={18} />
+                  <span>Add Client</span>
+                </div>
+              </div>
+            }
+          />
 
           <div className="col-span-2 w-full gap-4 flex flex-col">
             <div className="font-medium text-lg ">Create checkpoints</div>

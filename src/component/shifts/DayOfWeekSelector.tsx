@@ -35,8 +35,6 @@ const DaysOfWeekSelector = ({
     }
   };
 
-  console.log(selectedDays, "selected one");
-
   return (
     <div className="p-4 bg-onHoverBg flex flex-col w-full gap-2">
       <div className="font-semibold">Add to</div>

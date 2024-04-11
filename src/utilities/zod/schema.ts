@@ -93,24 +93,37 @@ export const addShiftFormSchema = z
     ShiftStartTime: z.string().min(2, { message: "Start time is required" }),
     ShiftEndTime: z.string().min(2, { message: "End time is required" }),
     ShiftDescription: z.string().nullable().optional(),
-    ShiftLocation: z.object({ latitude: z.string(), longitude: z.string() }),
-    ShiftLocationId: z.string().min(3, { message: "Location id required" }),
-    ShiftLocationName: z.string().min(3, { message: "Location name required" }),
+    ShiftLocation: z
+      .object({ latitude: z.string(), longitude: z.string() })
+      .nullable()
+      .optional(),
+    ShiftLocationId: z
+      .string()
+      .min(3, { message: "Shift address is required" })
+      .min(3, { message: "Location id required" })
+      .nullable()
+      .optional(),
+    ShiftLocationName: z.string().nullable().optional(),
     ShiftLocationAddress: z
       .string()
-      .min(3, { message: "Shift address is required" }),
+      .min(3, { message: "Shift address is required" })
+      .nullable()
+      .optional(),
     ShiftCompanyBranchId: z.string().nullable().optional(),
-    ShiftRestrictedRadius: numberString({
-      message: "Restricted radius is required",
-    }),
+    ShiftRestrictedRadius: z.coerce.number().min(1),
     ShiftEnableRestrictedRadius: z.boolean(),
-    ShiftClientId: z.string().min(2, { message: "Client is required" }),
+    ShiftClientId: z
+      .string()
+      .min(2, { message: "Client is required" })
+      .nullable()
+      .optional(),
     ShiftRequiredEmp: numberString({
       message: "Please enter the required no. of employees",
       defaultValue: 1,
     }),
     ShiftPhotoUploadIntervalInMinutes: z.coerce.number().nullable().optional(),
     ShiftAssignedUserId: z.array(z.string()).default([]).optional(),
+    ShiftLinkedPatrolIds: z.array(z.string()).default([]).optional(),
   })
   .superRefine(({ ShiftRequiredEmp }, ctx) => {
     if (!Number(ShiftRequiredEmp)) {
@@ -155,6 +168,7 @@ export const patrollingSchema = z.object({
     .max(720, {
       message: "Patrol reminder in minutes cannot be more than 720",
     }),
+  PatrolClientId: z.string().nullable().optional(),
 });
 
 export type PatrollingFormFields = z.infer<typeof patrollingSchema>;
