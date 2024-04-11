@@ -5,7 +5,7 @@ import DbSchedule, {
   ISchedule,
 } from "../../../firebase_configs/DB/DbSchedule";
 import dayjs from "dayjs";
-import { splitName, toDate } from "../../../utilities/misc";
+import { formatDate, splitName, toDate } from "../../../utilities/misc";
 import { TiTick } from "react-icons/ti";
 import { RxCross1 } from "react-icons/rx";
 import {
@@ -16,9 +16,9 @@ import {
 import { errorHandler } from "../../../utilities/CustomError";
 import { useQueryClient } from "@tanstack/react-query";
 import { REACT_QUERY_KEYS } from "../../../@types/enum";
-import { sendEmail } from "../../../utilities/sendEmail";
 import { IEmployeesCollection } from "../../../@types/database";
 import { useAuthState } from "../../../store";
+import { sendShiftDetailsEmail } from "../../../utilities/scheduleHelper";
 
 const AssignShiftModal = ({
   opened,
@@ -88,13 +88,18 @@ const AssignShiftModal = ({
         selectedEmps.map((emp) => emp.EmployeeId)
       );
 
+      const { shift } = schedule;
+
       const sendEmailPromise = selectedEmps.map(async (emp) => {
-        return sendEmail({
-          to_email: emp.EmployeeEmail,
-          to_name: emp.EmployeeName,
-          message: `You have been assigned for the shift.\n Shift Name: ${schedule.shift.ShiftName}\n Timing: ${schedule.shift.ShiftStartTime}-${schedule.shift.ShiftEndTime} \n Address: ${schedule.shift.ShiftLocationAddress}`,
-          subject: "Your schedule update",
-          from_name: company?.CompanyName,
+        return sendShiftDetailsEmail({
+          companyName: company!.CompanyName,
+          empEmail: emp.EmployeeEmail,
+          empName: emp.EmployeeName,
+          shiftAddress: shift.ShiftLocationAddress || "N/A",
+          shiftDate: formatDate(shift.ShiftDate),
+          shiftEndTime: shift.ShiftEndTime,
+          shiftName: shift.ShiftName,
+          shiftStartTime: shift.ShiftStartTime,
         });
       });
 

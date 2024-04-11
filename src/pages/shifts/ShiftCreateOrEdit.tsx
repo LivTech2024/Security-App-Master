@@ -31,13 +31,13 @@ import useFetchClients from "../../hooks/fetch/useFetchClients";
 import InputSelect from "../../common/inputs/InputSelect";
 import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 import DaysOfWeekSelector from "../../component/shifts/DayOfWeekSelector";
-import { toDate } from "../../utilities/misc";
+import { formatDate, toDate } from "../../utilities/misc";
 import { MultiSelect } from "@mantine/core";
 import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
 import InputHeader from "../../common/inputs/InputHeader";
 import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
-import { sendEmail } from "../../utilities/sendEmail";
 import useFetchPatrols from "../../hooks/fetch/useFetchPatrols";
+import { sendShiftDetailsEmail } from "../../utilities/scheduleHelper";
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -286,12 +286,17 @@ const ShiftCreateOrEdit = () => {
           const sendEmailPromise = shiftAssignedUserId.map(async (empId) => {
             const emp = employees.find((emp) => emp.EmployeeId === empId);
             if (emp) {
-              return sendEmail({
-                to_email: emp.EmployeeEmail,
-                to_name: emp.EmployeeName,
-                message: `You have been assigned for the shift.\n Shift Name: ${data.ShiftName}\n Timing: ${data.ShiftStartTime}-${data.ShiftEndTime} \n Address: ${data.ShiftLocationAddress}`,
-                subject: "Your schedule update",
-                from_name: company?.CompanyName,
+              return sendShiftDetailsEmail({
+                companyName: company!.CompanyName,
+                empEmail: emp.EmployeeEmail,
+                empName: emp.EmployeeName,
+                shiftAddress: data.ShiftLocationAddress || "N/A",
+                shiftDate: selectedDays
+                  .map((date) => formatDate(date))
+                  .join(","),
+                shiftEndTime: data.ShiftEndTime,
+                shiftName: data.ShiftName,
+                shiftStartTime: data.ShiftStartTime,
               });
             }
           });

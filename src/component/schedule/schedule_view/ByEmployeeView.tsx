@@ -224,12 +224,20 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
           const prevMessage = aggregatedEmails[isExistIndex].message;
           aggregatedEmails[
             isExistIndex
-          ].message = `${prevMessage}\n\nShift Name: ${shift.ShiftName}\nTiming: ${shift.ShiftStartTime}-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
+          ].message = `${prevMessage}\n\nShift Name: ${
+            shift.ShiftName
+          }\nDate: ${formatDate(shift.ShiftDate)} \nTiming: ${
+            shift.ShiftStartTime
+          }-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
         } else {
           aggregatedEmails.push({
             empEmail: emp.EmployeeEmail,
             empName: emp.EmployeeName,
-            message: `You have been assigned for the following shift.\n\n Shift Name: ${shift.ShiftName}\n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
+            message: `You have been assigned for the following shift.\n\n Shift Name: ${
+              shift.ShiftName
+            } \n Date: ${formatDate(shift.ShiftDate)} \n Timing: ${
+              shift.ShiftStartTime
+            }-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
           });
         }
       });
