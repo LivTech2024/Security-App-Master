@@ -598,6 +598,7 @@ class DbCompany {
 
     try {
       const newDocument: IDocumentsCollection = {
+        DocumentId: documentId,
         DocumentName: documentName,
         DocumentNameSearchIndex: fullTextSearchIndex(
           documentName.trim().toLowerCase()

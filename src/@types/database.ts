@@ -210,6 +210,7 @@ export interface IDocumentCategories {
 }
 
 export interface IDocumentsCollection {
+  DocumentId: string;
   DocumentName: string;
   DocumentNameSearchIndex: string[];
   DocumentCompanyId: string;

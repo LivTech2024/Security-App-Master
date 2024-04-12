@@ -27,6 +27,7 @@ export const DisplayCount = {
   REPORT_LIST: 20,
   INVOICE_LIST: 20,
   CLIENT_LIST: 20,
+  DOCUMENT_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -39,6 +40,8 @@ export const REACT_QUERY_KEYS = {
   REPORT_CATEGORIES: "report-categories",
   INVOICE_LIST: "invoice-list",
   CLIENT_LIST: "client-list",
+  DOCUMENT_LIST: "document-list",
+  DOCUMENT_CATEGORIES: "document-categories",
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -46,6 +49,7 @@ export const MinimumQueryCharacter = {
   PATROL: 1,
   LOCATION: 1,
   CLIENT: 1,
+  DOCUMENT: 1,
 } as const;
 
 export const CloudStoragePaths = {
