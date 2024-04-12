@@ -3,12 +3,17 @@ import {
   CollectionName,
   ImageResolution,
 } from "../../@types/enum";
-import CloudStorageImageHandler, { getNewDocId } from "./utils";
+import CloudStorageImageHandler, {
+  CloudStorageFileHandler,
+  getNewDocId,
+} from "./utils";
 import { db } from "../config";
 import {
   IAdminsCollection,
   ICompaniesCollection,
   ICompanyBranchesCollection,
+  IDocumentCategories,
+  IDocumentsCollection,
   ILocationsCollection,
   IReportCategoriesCollection,
   ISettingsCollection,
@@ -528,6 +533,211 @@ class DbCompany {
     const catRef = collection(db, CollectionName.reportCategories);
     const catQuery = query(catRef, where("ReportCompanyId", "==", cmpId));
     return getDocs(catQuery);
+  };
+
+  //*For document categories
+  static addDocumentCategory = (catName: string, cmpId: string) => {
+    const catId = getNewDocId(CollectionName.documentCategories);
+    const catRef = doc(db, CollectionName.documentCategories, catId);
+
+    const newCat: IDocumentCategories = {
+      DocumentCategoryId: catId,
+      DocumentCategoryCompanyId: cmpId,
+      DocumentCategoryName: catName,
+      DocumentCategoryCreatedAt: serverTimestamp(),
+    };
+
+    return setDoc(catRef, newCat);
+  };
+
+  static deleteDocumentCategory = (catId: string) => {
+    const catRef = doc(db, CollectionName.documentCategories, catId);
+    return deleteDoc(catRef);
+  };
+
+  static getDocumentCategories = (cmpId: string) => {
+    const catRef = collection(db, CollectionName.documentCategories);
+    const catQuery = query(
+      catRef,
+      where("DocumentCategoryCompanyId", "==", cmpId)
+    );
+    return getDocs(catQuery);
+  };
+
+  //*For document repository
+
+  static addDocument = async ({
+    cmpId,
+    data,
+  }: {
+    cmpId: string;
+    data: {
+      documentName: string;
+      categoryName: string;
+      categoryId: string;
+      document: File;
+    };
+  }) => {
+    const { categoryId, categoryName, document, documentName } = data;
+
+    const documentId = getNewDocId(CollectionName.documents);
+    const documentRef = doc(db, CollectionName.documents, documentId);
+
+    const fileName = CloudStorageFileHandler.generateFileNameWithRandom(
+      documentId,
+      0
+    );
+
+    const fileUrl = await CloudStorageFileHandler.uploadFile(
+      document,
+      CloudStoragePaths.EMPLOYEES_DOCUMENTS +
+        `/${categoryName}` +
+        "/" +
+        fileName
+    );
+
+    try {
+      const newDocument: IDocumentsCollection = {
+        DocumentName: documentName,
+        DocumentNameSearchIndex: fullTextSearchIndex(
+          documentName.trim().toLowerCase()
+        ),
+        DocumentCompanyId: cmpId,
+        DocumentCategoryId: categoryId,
+        DocumentCategoryName: categoryName,
+        DocumentUrl: fileUrl,
+        DocumentCreatedAt: serverTimestamp(),
+        DocumentModifiedAt: serverTimestamp(),
+      };
+
+      await setDoc(documentRef, newDocument);
+    } catch (error) {
+      console.log(error);
+      await CloudStorageFileHandler.deleteFileByUrl(fileUrl);
+      throw error;
+    }
+  };
+
+  static updateDocument = async ({
+    data,
+    documentId,
+  }: {
+    documentId: string;
+    data: {
+      documentName: string;
+      categoryName: string;
+      categoryId: string;
+      document: File | string;
+    };
+  }) => {
+    const { categoryId, categoryName, document, documentName } = data;
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const documentRef = doc(db, CollectionName.documents, documentId);
+        const docSnap = await transaction.get(documentRef);
+        const oldDocData = docSnap.data() as IDocumentsCollection;
+
+        let fileUrl = oldDocData.DocumentUrl;
+        let fileToBeDeleted: string | null = null;
+
+        if (typeof document !== "string") {
+          const fileName = CloudStorageFileHandler.generateFileNameWithRandom(
+            documentId,
+            0
+          );
+
+          fileUrl = await CloudStorageFileHandler.uploadFile(
+            document,
+            CloudStoragePaths.EMPLOYEES_DOCUMENTS +
+              `/${categoryName}` +
+              "/" +
+              fileName
+          );
+
+          fileToBeDeleted = oldDocData.DocumentUrl;
+        }
+
+        const newDocument: Partial<IDocumentsCollection> = {
+          DocumentName: documentName,
+          DocumentNameSearchIndex: fullTextSearchIndex(
+            documentName.trim().toLowerCase()
+          ),
+          DocumentCategoryId: categoryId,
+          DocumentCategoryName: categoryName,
+          DocumentUrl: fileUrl,
+          DocumentModifiedAt: serverTimestamp(),
+        };
+
+        transaction.update(documentRef, newDocument);
+
+        if (fileToBeDeleted) {
+          await CloudStorageFileHandler.deleteFileByUrl(fileToBeDeleted);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
+
+  static deleteDocument = async (documentId: string) => {
+    try {
+      await runTransaction(db, async (transaction) => {
+        const documentRef = doc(db, CollectionName.documents, documentId);
+        const docSnap = await transaction.get(documentRef);
+        const docData = docSnap.data() as IDocumentsCollection;
+
+        transaction.delete(documentRef);
+
+        await CloudStorageFileHandler.deleteFileByUrl(docData.DocumentUrl);
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
+
+  static getDocuments = ({
+    lmt,
+    lastDoc,
+    searchQuery,
+    cmpId,
+  }: {
+    lmt?: number;
+    lastDoc?: DocumentData | null;
+    searchQuery?: string;
+    cmpId: string;
+  }) => {
+    const docRef = collection(db, CollectionName.documents);
+
+    let queryParams: QueryConstraint[] = [
+      where("DocumentCompanyId", "==", cmpId),
+      orderBy("DocumentCreatedAt", "desc"),
+    ];
+
+    if (searchQuery && searchQuery.length > 0) {
+      queryParams = [
+        ...queryParams,
+        where(
+          "DocumentNameSearchIndex",
+          "array-contains",
+          searchQuery.toLocaleLowerCase()
+        ),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const docQuery = query(docRef, ...queryParams);
+
+    return getDocs(docQuery);
   };
 }
 

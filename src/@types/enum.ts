@@ -52,6 +52,7 @@ export const CloudStoragePaths = {
   EMPLOYEES_IMAGES: "employees/images/",
   EMPLOYEES_DOCUMENTS: "employees/documents",
   COMPANIES_LOGOS: "companies/logos",
+  DOCUMENTS: "documents",
 };
 
 export const ImageResolution = {
@@ -87,6 +88,7 @@ export const PageRoutes = {
   CLIENT_VIEW: "/client_view",
   CLIENT_CREATE_OR_EDIT: "/client_create_or_edit",
   SUPER_ADMIN_CREATE_NEW_COMPANY: "/super_admin/create_new_company",
+  DOCUMENT_REPOSITORY: "/document_repository",
 };
 
 export const LocalStorageKey = {

@@ -130,7 +130,7 @@ const Home = () => {
           icon={<FaCommentDots className="text-2xl text-primaryGold" />}
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.DOCUMENT_REPOSITORY}
           name="Document repository"
           icon={<IoMdDocument className="text-3xl text-primaryGold" />}
         />

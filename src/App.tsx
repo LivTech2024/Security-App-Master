@@ -38,6 +38,7 @@ import CreateNewCompany from "./pages/super_admin/CreateNewCompany";
 import ShiftView from "./pages/shifts/ShiftView";
 import ClientCreateOrEdit from "./pages/client/ClientCreateOrEdit";
 import ClientView from "./pages/client/ClientView";
+import DocumentRepository from "./pages/document_repository/DocumentRepository";
 
 function App() {
   useOnAuthStateChanged();
@@ -151,6 +152,10 @@ function App() {
             <Route
               path={PageRoutes.CLIENT_CREATE_OR_EDIT}
               Component={ClientCreateOrEdit}
+            />
+            <Route
+              path={PageRoutes.DOCUMENT_REPOSITORY}
+              Component={DocumentRepository}
             />
           </Routes>
         </Layout>

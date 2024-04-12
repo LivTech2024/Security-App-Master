@@ -204,13 +204,17 @@ export interface IReportsCollection {
 
 export interface IDocumentCategories {
   DocumentCategoryId: string;
+  DocumentCategoryCompanyId: string;
   DocumentCategoryName: string;
   DocumentCategoryCreatedAt: Timestamp | FieldValue;
 }
 
-export interface DocumentsCollection {
+export interface IDocumentsCollection {
   DocumentName: string;
   DocumentNameSearchIndex: string[];
+  DocumentCompanyId: string;
+  DocumentCategoryName: string;
+  DocumentCategoryId: string;
   DocumentUrl: string;
   DocumentCreatedAt: Timestamp | FieldValue;
   DocumentModifiedAt: Timestamp | FieldValue;
