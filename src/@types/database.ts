@@ -177,24 +177,46 @@ export interface IPatrolsCollection {
   PatrolModifiedAt: Timestamp | FieldValue;
 }
 
+export interface IReportCategoriesCollection {
+  ReportCategoryId: string;
+  ReportCompanyId: string;
+  ReportCategoryName: string;
+  ReportCategoryIsDeletable: boolean;
+  ReportCategoryCreatedAt: Timestamp | FieldValue;
+}
+
+//*Default unDeletable categories-> "Shift" | "Patrol" | "General concern"| "Incident"| "Maintenance"| "Security safety"| "Vagrant removal" | "Other";
+
 export interface IReportsCollection {
   ReportId: string;
   ReportCompanyId: string;
   ReportCompanyBranchId?: string;
   ReportEmployeeId: string;
   ReportEmployeeName: string;
-  ReportName: string; //* combination of location and reports name
-  ReportCategory:
-    | "general_concern"
-    | "incident"
-    | "maintenance"
-    | "security_safety"
-    | "vagrant_removal"
-    | "other";
+  ReportName: string;
+  ReportCategoryName: string;
+  ReportCategoryId: string;
   ReportData: string;
+  ReportShiftId?: string;
+  ReportPatrolId?: string;
   ReportImage?: string;
+  ReportVideo?: string;
   ReportStatus: "pending" | "started" | "completed";
   ReportCreatedAt: Timestamp | FieldValue;
+}
+
+export interface IDocumentCategories {
+  DocumentCategoryId: string;
+  DocumentCategoryName: string;
+  DocumentCategoryCreatedAt: Timestamp | FieldValue;
+}
+
+export interface DocumentsCollection {
+  DocumentName: string;
+  DocumentNameSearchIndex: string[];
+  DocumentUrl: string;
+  DocumentCreatedAt: Timestamp | FieldValue;
+  DocumentModifiedAt: Timestamp | FieldValue;
 }
 
 export interface INotificationsCollection {

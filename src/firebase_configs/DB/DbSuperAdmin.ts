@@ -1,4 +1,5 @@
 import {
+  Transaction,
   doc,
   getDoc,
   runTransaction,
@@ -11,6 +12,7 @@ import {
   IAdminsCollection,
   ICompaniesCollection,
   IEmployeeRolesCollection,
+  IReportCategoriesCollection,
   ISettingsCollection,
 } from "../../@types/database";
 import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
@@ -22,6 +24,41 @@ class DbSuperAdmin {
   static getSuperAdminById = (id: string) => {
     const superAdminRef = doc(db, CollectionName.superAdmin, id);
     return getDoc(superAdminRef);
+  };
+
+  static generateDefaultReportCategories = (
+    transaction: Transaction,
+    cmpId: string
+  ) => {
+    const defaultReportCategories = [
+      "Shift",
+      "Patrol",
+      "General concern",
+      "Incident",
+      "Maintenance",
+      "Security safety",
+      "Vagrant removal",
+      "Other",
+    ];
+
+    defaultReportCategories.forEach((cat) => {
+      const reportCatId = getNewDocId(CollectionName.reportCategories);
+      const reportCatRef = doc(
+        db,
+        CollectionName.reportCategories,
+        reportCatId
+      );
+
+      const newCategory: IReportCategoriesCollection = {
+        ReportCategoryId: reportCatId,
+        ReportCompanyId: cmpId,
+        ReportCategoryName: cat,
+        ReportCategoryIsDeletable: false,
+        ReportCategoryCreatedAt: serverTimestamp(),
+      };
+
+      return transaction.set(reportCatRef, newCategory);
+    });
   };
 
   static createNewCompany = async () => {
@@ -69,7 +106,7 @@ class DbSuperAdmin {
         //*create default employee roles
         const defaultEmpRoles = ["GUARD", "SUPERVISOR"];
 
-        defaultEmpRoles.forEach(async (role) => {
+        defaultEmpRoles.forEach((role) => {
           const empRoleId = getNewDocId(CollectionName.employeeRoles);
           const empRoleDocRef = doc(
             db,
@@ -98,6 +135,8 @@ class DbSuperAdmin {
         };
 
         transaction.set(settingRef, newSetting);
+
+        this.generateDefaultReportCategories(transaction, companyId);
       });
     } catch (error) {
       console.log(error);

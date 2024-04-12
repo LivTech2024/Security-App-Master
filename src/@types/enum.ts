@@ -9,9 +9,12 @@ export enum CollectionName {
   notifications = "Notifications",
   loggedInUsers = "LoggedInUsers",
   locations = "Locations",
+  reportCategories = "ReportCategories",
   reports = "Reports",
   invoices = "Invoices",
   clients = "Clients",
+  documentCategories = "DocumentCategories",
+  documents = "Documents",
   settings = "Settings",
   superAdmin = "SuperAdmin",
 }
