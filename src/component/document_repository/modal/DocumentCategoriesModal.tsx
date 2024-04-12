@@ -88,7 +88,7 @@ const DocumentCategoriesModal = ({
       showBottomTool={false}
     >
       <div className="flex flex-col gap-4">
-        <div className="font-semibold">Add new role</div>
+        <div className="font-semibold">Add new document category</div>
         <div className="flex items-center w-full gap-4">
           <InputWithTopHeader
             placeholder="Enter category name"

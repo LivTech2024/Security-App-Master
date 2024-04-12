@@ -590,10 +590,7 @@ class DbCompany {
 
     const fileUrl = await CloudStorageFileHandler.uploadFile(
       document,
-      CloudStoragePaths.EMPLOYEES_DOCUMENTS +
-        `/${categoryName}` +
-        "/" +
-        fileName
+      CloudStoragePaths.DOCUMENTS + `/${categoryName}` + "/" + fileName
     );
 
     try {
@@ -650,10 +647,7 @@ class DbCompany {
 
           fileUrl = await CloudStorageFileHandler.uploadFile(
             document,
-            CloudStoragePaths.EMPLOYEES_DOCUMENTS +
-              `/${categoryName}` +
-              "/" +
-              fileName
+            CloudStoragePaths.DOCUMENTS + `/${categoryName}` + "/" + fileName
           );
 
           fileToBeDeleted = oldDocData.DocumentUrl;
@@ -704,11 +698,13 @@ class DbCompany {
     lastDoc,
     searchQuery,
     cmpId,
+    categoryId,
   }: {
     lmt?: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId: string;
+    categoryId?: string | null;
   }) => {
     const docRef = collection(db, CollectionName.documents);
 
@@ -725,6 +721,13 @@ class DbCompany {
           "array-contains",
           searchQuery.toLocaleLowerCase()
         ),
+      ];
+    }
+
+    if (categoryId) {
+      queryParams = [
+        ...queryParams,
+        where("DocumentCategoryId", "==", categoryId),
       ];
     }
 

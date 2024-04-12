@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Button from "../../common/button/Button";
-import { useAuthState } from "../../store";
+import { useAuthState, useEditFormStore } from "../../store";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
@@ -20,13 +20,20 @@ import TableShimmer from "../../common/shimmer/TableShimmer";
 import { formatDate } from "../../utilities/misc";
 import SearchBar from "../../common/inputs/SearchBar";
 import DocumentCategoriesModal from "../../component/document_repository/modal/DocumentCategoriesModal";
+import InputSelect from "../../common/inputs/InputSelect";
+import AddDocumentModal from "../../component/document_repository/modal/AddDocumentModal";
+import { IDocument } from "../../store/slice/editForm.slice";
 
 const DocumentRepository = () => {
   const { company } = useAuthState();
 
+  const { setDocumentEditData } = useEditFormStore();
+
   const [query, setQuery] = useState("");
 
   const [debouncedQuery] = useDebouncedValue(query, 200);
+
+  const [categoryId, setCategoryId] = useState("");
 
   const {
     data: snapshotData,
@@ -41,6 +48,7 @@ const DocumentRepository = () => {
       REACT_QUERY_KEYS.DOCUMENT_LIST,
       debouncedQuery,
       company!.CompanyId,
+      categoryId,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbCompany.getDocuments({
@@ -135,15 +143,28 @@ const DocumentRepository = () => {
   }, [categoriesSnapshot]);
 
   const [documentCategoriesModal, setDocumentCategoriesModal] = useState(false);
+
+  const [addDocumentModal, setAddDocumentModal] = useState(false);
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
         <span className="font-semibold text-xl">Document Repository</span>
-        <Button
-          label="Document Categories"
-          onClick={() => setDocumentCategoriesModal(true)}
-          type="black"
-        />
+        <div className="flex items-center gap-4">
+          <Button
+            label="Document Categories"
+            onClick={() => setDocumentCategoriesModal(true)}
+            type="blue"
+          />
+          <Button
+            label="Add New Document"
+            onClick={() => {
+              setDocumentEditData(null);
+              setAddDocumentModal(true);
+            }}
+            type="black"
+          />
+        </div>
       </div>
 
       <DocumentCategoriesModal
@@ -153,11 +174,30 @@ const DocumentRepository = () => {
         isCategoriesLoading={isCategoriesLoading}
       />
 
+      <AddDocumentModal
+        opened={addDocumentModal}
+        setOpened={setAddDocumentModal}
+        categories={categories}
+      />
+
       <div className="flex items-center bg-surface shadow p-4 rounded w-full justify-between">
         <SearchBar
           value={query}
           setValue={setQuery}
           placeholder="Search document"
+        />
+        <InputSelect
+          placeholder="Select Category"
+          searchable
+          clearable
+          data={categories.map((cat) => {
+            return {
+              label: cat.DocumentCategoryName,
+              value: cat.DocumentCategoryId,
+            };
+          })}
+          value={categoryId}
+          onChange={(e) => setCategoryId(e as string)}
         />
       </div>
 
@@ -167,10 +207,8 @@ const DocumentRepository = () => {
             <th className="uppercase px-4 py-2 w-[20%] text-start">
               Document Name
             </th>
-            <th className="uppercase px-4 py-2 w-[50%] text-center">URL</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-center">
-              Category
-            </th>
+            <th className="uppercase px-4 py-2 w-[50%] text-start">URL</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">Category</th>
             <th className="uppercase px-4 py-2 w-[15%] text-end">Created At</th>
           </tr>
         </thead>
@@ -185,22 +223,46 @@ const DocumentRepository = () => {
             data.map((doc) => {
               return (
                 <tr key={doc.DocumentId} className="cursor-pointer">
-                  <td className="px-4 py-2 text-start">
+                  <td
+                    onClick={() => {
+                      setDocumentEditData(doc as unknown as IDocument);
+                      setAddDocumentModal(true);
+                    }}
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-2">{doc.DocumentName}</span>
                   </td>
-                  <td className="px-4 py-2 text-center">
+                  <td className="align-top px-4 py-2 text-start">
                     {" "}
-                    <span className="line-clamp-2">{doc.DocumentUrl}</span>
+                    <a
+                      href={doc.DocumentUrl}
+                      target="_blank"
+                      className="line-clamp-3 text-textPrimaryBlue cursor-pointer"
+                    >
+                      {doc.DocumentUrl}
+                    </a>
                   </td>
-                  <td className="px-4 py-2 text-center">
+                  <td
+                    onClick={() => {
+                      setDocumentEditData(doc as unknown as IDocument);
+                      setAddDocumentModal(true);
+                    }}
+                    className="align-top px-4 py-2 text-end"
+                  >
                     {" "}
                     <span className="line-clamp-2">
                       {doc.DocumentCategoryName}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-center">
+                  <td
+                    onClick={() => {
+                      setDocumentEditData(doc as unknown as IDocument);
+                      setAddDocumentModal(true);
+                    }}
+                    className="align-top px-4 py-2 text-end"
+                  >
                     <span className="line-clamp-2">
-                      {formatDate(doc.DocumentCreatedAt)}
+                      {formatDate(doc.DocumentCreatedAt, "DD MMM-YY hh:mm A")}
                     </span>
                   </td>
                 </tr>
