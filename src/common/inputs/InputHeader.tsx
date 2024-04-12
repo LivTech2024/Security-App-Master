@@ -14,7 +14,7 @@ const InputHeader = ({
     <div className={`flex ${className}`}>
       <span
         className={` ${twMerge(
-          "text-xs line-clamp-1 font-sfProTextMedium font-medium",
+          "text-sm line-clamp-1 font-sfProTextMedium font-medium",
           fontClassName
         )}`}
       >
