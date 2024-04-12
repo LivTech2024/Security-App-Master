@@ -185,8 +185,6 @@ export interface IReportCategoriesCollection {
   ReportCategoryCreatedAt: Timestamp | FieldValue;
 }
 
-//*Default unDeletable categories-> "Shift" | "Patrol" | "General concern"| "Incident"| "Maintenance"| "Security safety"| "Vagrant removal" | "Other";
-
 export interface IReportsCollection {
   ReportId: string;
   ReportCompanyId: string;

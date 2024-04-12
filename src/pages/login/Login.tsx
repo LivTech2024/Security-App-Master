@@ -7,13 +7,11 @@ import {
   showSnackbar,
 } from "../../utilities/TsxUtils";
 import CustomError, { errorHandler } from "../../utilities/CustomError";
-import { useNavigate } from "react-router-dom";
 import {
   CollectionName,
   IUserType,
   LocalStorageKey,
   LocalStorageLoggedInUserData,
-  PageRoutes,
 } from "../../@types/enum";
 import { User, getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { v4 } from "uuid";
@@ -37,8 +35,6 @@ import { FirebaseError } from "firebase/app";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const navigate = useNavigate();
 
   const auth = getAuth();
 
@@ -129,8 +125,9 @@ const Login = () => {
       await signInSuccess(dbUser.user);
 
       showSnackbar({ message: "Login successful", type: "success" });
-      navigate(PageRoutes.HOME);
       closeModalLoader();
+
+      window.location.reload();
     } catch (error) {
       closeModalLoader();
       console.log(error);
