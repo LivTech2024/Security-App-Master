@@ -10,13 +10,19 @@ import { IReportCategoriesCollection } from "../../../@types/database";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { openContextModal } from "@mantine/modals";
 import TableShimmer from "../../../common/shimmer/TableShimmer";
+import { useQueryClient } from "@tanstack/react-query";
+import { REACT_QUERY_KEYS } from "../../../@types/enum";
 
 const ReportCategoriesModal = ({
   opened,
   setOpened,
+  categories,
+  isCategoriesLoading,
 }: {
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
+  categories: IReportCategoriesCollection[];
+  isCategoriesLoading: boolean;
 }) => {
   const { company } = useAuthState();
 
@@ -24,22 +30,7 @@ const ReportCategoriesModal = ({
 
   const [loading, setLoading] = useState(false);
 
-  const [categories, setCategories] = useState<IReportCategoriesCollection[]>(
-    []
-  );
-
-  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
-
-  useEffect(() => {
-    if (!company) return;
-    DbCompany.getReportCategories(company.CompanyId).then((snapshot) => {
-      const data = snapshot.docs.map(
-        (doc) => doc.data() as IReportCategoriesCollection
-      );
-      setCategories(data);
-      setIsCategoriesLoading(false);
-    });
-  }, [loading]);
+  const queryClient = useQueryClient();
 
   const onSave = async () => {
     if (!company || !category) return;
@@ -47,6 +38,10 @@ const ReportCategoriesModal = ({
       setLoading(true);
 
       await DbCompany.addReportCategory(category, company.CompanyId);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.REPORT_CATEGORIES],
+      });
 
       setLoading(false);
       setCategory("");
@@ -62,6 +57,10 @@ const ReportCategoriesModal = ({
       setLoading(true);
 
       await DbCompany.deleteReportCategory(catId);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.REPORT_CATEGORIES],
+      });
 
       setLoading(false);
     } catch (error) {

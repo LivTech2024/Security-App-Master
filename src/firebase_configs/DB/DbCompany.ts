@@ -439,6 +439,7 @@ class DbCompany {
     endDate,
     isLifeTime,
     startDate,
+    categoryId,
   }: {
     cmpId: string;
     branchId?: string;
@@ -447,6 +448,7 @@ class DbCompany {
     startDate?: Date | string | null;
     endDate?: Date | string | null;
     isLifeTime?: boolean;
+    categoryId?: string | null;
   }) => {
     const reportRef = collection(db, CollectionName.reports);
 
@@ -459,6 +461,13 @@ class DbCompany {
       queryParams = [
         ...queryParams,
         where("ReportCompanyBranchId", "==", branchId),
+      ];
+    }
+
+    if (categoryId) {
+      queryParams = [
+        ...queryParams,
+        where("ReportCategoryId", "==", categoryId),
       ];
     }
 

@@ -36,6 +36,7 @@ export const REACT_QUERY_KEYS = {
   PATROL_LIST: "patrolling-list",
   LOCATION_LIST: "location-list",
   REPORT_LIST: "report-list",
+  REPORT_CATEGORIES: "report-categories",
   INVOICE_LIST: "invoice-list",
   CLIENT_LIST: "client-list",
 } as const;

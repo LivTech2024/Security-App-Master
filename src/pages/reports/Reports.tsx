@@ -3,17 +3,21 @@ import DateFilterDropdown from "../../common/dropdown/DateFilterDropdown";
 import dayjs from "dayjs";
 import NoSearchResult from "../../common/NoSearchResult";
 import { useAuthState } from "../../store";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { DisplayCount, REACT_QUERY_KEYS } from "../../@types/enum";
 import DbCompany from "../../firebase_configs/DB/DbCompany";
 import { DocumentData } from "firebase/firestore";
-import { IReportsCollection } from "../../@types/database";
+import {
+  IReportCategoriesCollection,
+  IReportsCollection,
+} from "../../@types/database";
 import { useInView } from "react-intersection-observer";
 import { formatDate } from "../../utilities/misc";
 import TableShimmer from "../../common/shimmer/TableShimmer";
 import SelectBranch from "../../common/SelectBranch";
 import Button from "../../common/button/Button";
 import ReportCategoriesModal from "../../component/report/modal/ReportCategoriesModal";
+import InputSelect from "../../common/inputs/InputSelect";
 
 const Reports = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -27,6 +31,8 @@ const Reports = () => {
   const [isLifeTime, setIsLifeTime] = useState(false);
 
   const [branchId, setBranchId] = useState("");
+
+  const [categoryId, setCategoryId] = useState("");
 
   const { company } = useAuthState();
 
@@ -46,6 +52,7 @@ const Reports = () => {
       startDate,
       endDate,
       branchId,
+      categoryId,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbCompany.getReports({
@@ -56,6 +63,7 @@ const Reports = () => {
         startDate,
         endDate,
         branchId,
+        categoryId,
       });
       return snapshot.docs;
     },
@@ -108,6 +116,38 @@ const Reports = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const { data: categoriesSnapshot, isLoading: isCategoriesLoading } = useQuery(
+    {
+      queryKey: [REACT_QUERY_KEYS.REPORT_CATEGORIES, company!.CompanyId],
+      queryFn: async () => {
+        const snapshot = await DbCompany.getReportCategories(
+          company!.CompanyId
+        );
+        return snapshot.docs;
+      },
+    }
+  );
+
+  const [categories, setCategories] = useState<IReportCategoriesCollection[]>(
+    () => {
+      if (categoriesSnapshot) {
+        return categoriesSnapshot.map(
+          (doc) => doc.data() as IReportCategoriesCollection
+        );
+      }
+      return [];
+    }
+  );
+
+  useEffect(() => {
+    if (categoriesSnapshot) {
+      const docData = categoriesSnapshot.map(
+        (doc) => doc.data() as IReportCategoriesCollection
+      );
+      setCategories(docData);
+    }
+  }, [categoriesSnapshot]);
+
   const [reportCategoriesModal, setReportCategoriesModal] = useState(false);
 
   return (
@@ -123,6 +163,8 @@ const Reports = () => {
       <ReportCategoriesModal
         opened={reportCategoriesModal}
         setOpened={setReportCategoriesModal}
+        categories={categories}
+        isCategoriesLoading={isCategoriesLoading}
       />
       <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
         <DateFilterDropdown
@@ -133,10 +175,25 @@ const Reports = () => {
           setStartDate={setStartDate}
           startDate={startDate}
         />
-        <SelectBranch
-          selectedBranch={branchId}
-          setSelectedBranch={setBranchId}
-        />
+        <div className="flex items-center gap-4">
+          <InputSelect
+            placeholder="Select Category"
+            searchable
+            clearable
+            data={categories.map((cat) => {
+              return {
+                label: cat.ReportCategoryName,
+                value: cat.ReportCategoryId,
+              };
+            })}
+            value={categoryId}
+            onChange={(e) => setCategoryId(e as string)}
+          />
+          <SelectBranch
+            selectedBranch={branchId}
+            setSelectedBranch={setBranchId}
+          />
+        </div>
       </div>
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
