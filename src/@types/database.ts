@@ -307,6 +307,30 @@ export interface ISettingsCollection {
   SettingEmpWellnessIntervalInMins: number;
 }
 
+export interface IEquipmentsCollection {
+  EquipmentId: string;
+  EquipmentName: string;
+  EquipmentDescription: string;
+  EquipmentAllotedQuantity: number;
+  EquipmentTotalQuantity: number;
+  EquipmentCreatedAt: Timestamp | FieldValue;
+  EquipmentModifiedAt: Timestamp | FieldValue;
+}
+
+export interface IEquipmentAllocations {
+  EquipmentAllocationId: string;
+  EquipmentAllocationCompanyId: string;
+  EquipmentAllocationEquipId: string;
+  EquipmentAllocationEquipQty: number;
+  EquipmentAllocationDate: Timestamp | FieldValue;
+  EquipmentAllocationEmpId: string;
+  EquipmentAllocationEmpName: string;
+  EquipmentAllocationStartDate: Timestamp | FieldValue;
+  EquipmentAllocationEndDate: Timestamp | FieldValue;
+  EquipmentAllocationIsReturned: boolean;
+  EquipmentAllocationCreatedAt: Timestamp | FieldValue;
+}
+
 //*SuperAdmin
 export interface ISuperAdminCollection {
   SuperAdminId: string;
