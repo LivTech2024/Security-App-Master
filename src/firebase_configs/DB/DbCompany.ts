@@ -10,6 +10,7 @@ import {
   ICompaniesCollection,
   ICompanyBranchesCollection,
   ILocationsCollection,
+  IReportCategoriesCollection,
   ISettingsCollection,
 } from "../../@types/database";
 import {
@@ -493,6 +494,31 @@ class DbCompany {
     };
 
     return setDoc(settingRef, newSetting);
+  };
+
+  static addReportCategory = (catName: string, cmpId: string) => {
+    const catId = getNewDocId(CollectionName.reportCategories);
+    const catRef = doc(db, CollectionName.reportCategories, catId);
+
+    const newCat: IReportCategoriesCollection = {
+      ReportCategoryId: catId,
+      ReportCompanyId: cmpId,
+      ReportCategoryName: catName,
+      ReportCategoryCreatedAt: serverTimestamp(),
+    };
+
+    return setDoc(catRef, newCat);
+  };
+
+  static deleteReportCategory = (catId: string) => {
+    const catRef = doc(db, CollectionName.reportCategories, catId);
+    return deleteDoc(catRef);
+  };
+
+  static getReportCategories = (cmpId: string) => {
+    const catRef = collection(db, CollectionName.reportCategories);
+    const catQuery = query(catRef, where("ReportCompanyId", "==", cmpId));
+    return getDocs(catQuery);
   };
 }
 

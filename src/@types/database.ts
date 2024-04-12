@@ -181,7 +181,6 @@ export interface IReportCategoriesCollection {
   ReportCategoryId: string;
   ReportCompanyId: string;
   ReportCategoryName: string;
-  ReportCategoryIsDeletable: boolean;
   ReportCategoryCreatedAt: Timestamp | FieldValue;
 }
 

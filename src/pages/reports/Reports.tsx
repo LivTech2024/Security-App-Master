@@ -12,6 +12,8 @@ import { useInView } from "react-intersection-observer";
 import { formatDate } from "../../utilities/misc";
 import TableShimmer from "../../common/shimmer/TableShimmer";
 import SelectBranch from "../../common/SelectBranch";
+import Button from "../../common/button/Button";
+import ReportCategoriesModal from "../../component/report/modal/ReportCategoriesModal";
 
 const Reports = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -106,11 +108,22 @@ const Reports = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const [reportCategoriesModal, setReportCategoriesModal] = useState(false);
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
         <span className="font-semibold text-xl">Reports</span>
+        <Button
+          label="Report Categories"
+          onClick={() => setReportCategoriesModal(true)}
+          type="black"
+        />
       </div>
+      <ReportCategoriesModal
+        opened={reportCategoriesModal}
+        setOpened={setReportCategoriesModal}
+      />
       <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
         <DateFilterDropdown
           endDate={endDate}
@@ -156,7 +169,7 @@ const Reports = () => {
                     <span className="line-clamp-3">{report.ReportName}</span>
                   </td>
                   <td className="align-top px-4 py-2 text-start uppercase">
-                    {report.ReportCategory}
+                    {report.ReportCategoryName}
                   </td>
 
                   <td className="align-top px-4 py-2 text-start">

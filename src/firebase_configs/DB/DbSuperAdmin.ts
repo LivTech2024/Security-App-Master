@@ -53,7 +53,6 @@ class DbSuperAdmin {
         ReportCategoryId: reportCatId,
         ReportCompanyId: cmpId,
         ReportCategoryName: cat,
-        ReportCategoryIsDeletable: false,
         ReportCategoryCreatedAt: serverTimestamp(),
       };
 
