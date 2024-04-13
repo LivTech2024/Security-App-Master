@@ -39,7 +39,7 @@ const HomeItem = ({
   return (
     <div
       onClick={() => (path ? navigate(path) : callback && callback())}
-      className={`bg-surface shadow rounded border border-gray-300 p-4 cursor-pointer w-full h-[100px] text-center flex flex-col items-center font-semibold gap-4 ${
+      className={`bg-primaryVariant text-surface shadow rounded border border-gray-300 p-4 cursor-pointer w-full h-[100px] text-center flex flex-col items-center font-semibold gap-4 ${
         icon ? "justify-between" : "justify-center"
       }`}
     >
@@ -56,13 +56,13 @@ const Home = () => {
   const [selectedBranch, setSelectedBranch] = useState("");
 
   return (
-    <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center">
+    <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center bg-primary">
       <div className="flex w-full justify-center items-center">
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-">
           <img
             src={company?.CompanyLogo}
             alt=""
-            className="w-[120px] object-cover"
+            className="w-[140px] object-cover"
           />
 
           <div className="font-semibold text-lg">
