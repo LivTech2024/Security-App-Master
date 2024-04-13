@@ -29,7 +29,7 @@ const InputDate = ({
     <div className={`gap-1 flex flex-col w-full h-full`}>
       {label ? (
         <div className={`flex`}>
-          <span className={`text-xs line-clamp-1`}>{label}</span>
+          <span className={`text-sm line-clamp-1`}>{label}</span>
         </div>
       ) : null}
 

@@ -283,7 +283,7 @@ export const equipmentAllocationSchema = z.object({
   EquipmentAllocationEquipId: z
     .string()
     .min(3, { message: "Please select equipment" }),
-  EquipmentAllocationEquipQty: z.coerce.number().min(1),
+  EquipmentAllocationEquipQty: z.coerce.number().min(1).default(0),
   EquipmentAllocationDate: z.date(),
   EquipmentAllocationEmpId: z
     .string()

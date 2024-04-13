@@ -124,7 +124,7 @@ class DbEquipment {
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId: string;
-    branchId: string;
+    branchId?: string | null;
   }) => {
     const docRef = collection(db, CollectionName.equipments);
 
@@ -334,7 +334,7 @@ class DbEquipment {
     });
   };
 
-  static deleteEquipFromEmp = async (equipAllocId: string) => {
+  static deleteEquipAllocation = async (equipAllocId: string) => {
     const equipAllocRef = doc(
       db,
       CollectionName.equipmentAllocations,

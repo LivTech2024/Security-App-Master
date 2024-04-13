@@ -31,6 +31,7 @@ export const DisplayCount = {
   CLIENT_LIST: 20,
   DOCUMENT_LIST: 20,
   EQUIPMENT_LIST: 20,
+  EQUIPMENT_ALLOCATION_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -46,6 +47,7 @@ export const REACT_QUERY_KEYS = {
   DOCUMENT_LIST: "document-list",
   DOCUMENT_CATEGORIES: "document-categories",
   EQUIPMENT_LIST: "equipment-list",
+  EQUIPMENT_ALLOCATION_LIST: "equipment-allocation-list",
 } as const;
 
 export const MinimumQueryCharacter = {

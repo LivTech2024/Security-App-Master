@@ -56,7 +56,6 @@ const InputSelect = ({
             color: "#000000",
             padding: "22px 12px",
           },
-          dropdown: { padding: 0 },
         }}
         clearable={clearable}
         searchable={searchable}

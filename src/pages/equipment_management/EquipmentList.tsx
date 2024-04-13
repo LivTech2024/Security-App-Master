@@ -131,6 +131,7 @@ const EquipmentList = () => {
           <Button
             label="Create New Equipment"
             onClick={() => {
+              setEquipmentEditData(null);
               setAddEquipmentModal(true);
             }}
             type="black"
@@ -165,14 +166,15 @@ const EquipmentList = () => {
             <th className="uppercase px-4 py-2 w-[30%] text-start">
               Equipment Name
             </th>
-            <th className="uppercase px-4 py-2 w-[30%] text-start">
+            <th className="uppercase px-4 py-2 w-[25%] text-start">
               Description
             </th>
 
-            <th className="uppercase px-4 py-2 w-[20%] text-center">
-              Total Qty
+            <th className="uppercase px-4 py-2 w-[15%] text-end">Total Qty</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">
+              Alloted Qty
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-end">
+            <th className="uppercase px-4 py-2 w-[15%] text-end">
               Available Qty
             </th>
           </tr>
@@ -203,10 +205,13 @@ const EquipmentList = () => {
                       {eqp.EquipmentDescription || "N/A"}
                     </span>
                   </td>
-                  <td className="align-top px-4 py-2 text-center">
+                  <td className="align-top px-4 py-2 text-end">
                     {numberFormatter(eqp.EquipmentTotalQuantity, false, 1)}
                   </td>
-                  <td className="align-top px-4 py-2 text-end">
+                  <td className="align-top px-4 py-2 text-end text-textPrimaryRed font-semibold">
+                    {numberFormatter(eqp.EquipmentAllotedQuantity, false, 1)}
+                  </td>
+                  <td className="align-top px-4 py-2 text-end text-textPrimaryGreen font-extrabold">
                     {numberFormatter(
                       eqp.EquipmentTotalQuantity - eqp.EquipmentAllotedQuantity,
                       false,
