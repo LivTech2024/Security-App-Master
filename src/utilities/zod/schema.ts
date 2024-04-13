@@ -269,7 +269,7 @@ export const equipmentSchema = z.object({
   EquipmentName: z
     .string()
     .min(2, { message: "Equipment name should be at least 2 characters" }),
-  EquipmentCompanyBranchId: z.string().nullable(),
+  EquipmentCompanyBranchId: z.string().nullable().optional(),
   EquipmentDescription: z.string().nullable(),
   EquipmentTotalQuantity: z.coerce
     .number()

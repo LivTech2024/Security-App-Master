@@ -3,6 +3,8 @@ import {
   IClientsCollection,
   IDocumentsCollection,
   IEmployeesCollection,
+  IEquipmentAllocations,
+  IEquipmentsCollection,
   ILocationsCollection,
   IShiftsCollection,
 } from "../../@types/database";
@@ -47,6 +49,29 @@ export interface IDocument
   DocumentModifiedAt: string;
 }
 
+export interface Equipment
+  extends Omit<
+    IEquipmentsCollection,
+    "EquipmentCreatedAt" | "EquipmentModifiedAt"
+  > {
+  EquipmentCreatedAt: string;
+  EquipmentModifiedAt: string;
+}
+
+export interface EquipmentAllocation
+  extends Omit<
+    IEquipmentAllocations,
+    | "EquipmentAllocationDate"
+    | "EquipmentAllocationStartDate"
+    | "EquipmentAllocationEndDate"
+    | "EquipmentAllocationCreatedAt"
+  > {
+  EquipmentAllocationDate: string;
+  EquipmentAllocationStartDate: string;
+  EquipmentAllocationEndDate: string;
+  EquipmentAllocationCreatedAt: string;
+}
+
 interface EditFormState {
   employeeEditData: Employee | null;
   setEmployeeEditData: (emp: Employee | null) => void;
@@ -64,6 +89,12 @@ interface EditFormState {
 
   documentEditData: IDocument | null;
   setDocumentEditData: (doc: IDocument | null) => void;
+
+  equipmentEditData: Equipment | null;
+  setEquipmentEditData: (equip: Equipment | null) => void;
+
+  equipAllocationEditData: EquipmentAllocation | null;
+  setEquipAllocationEditData: (equipAlloc: EquipmentAllocation | null) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -96,4 +127,14 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   documentEditData: null,
   setDocumentEditData: (doc) =>
     set((state) => ({ ...state, documentEditData: doc })),
+
+  //Equipment
+  equipmentEditData: null,
+  setEquipmentEditData: (equip) =>
+    set((state) => ({ ...state, equipmentEditData: equip })),
+
+  //EquipAllocation
+  equipAllocationEditData: null,
+  setEquipAllocationEditData: (equipAlloc) =>
+    set((state) => ({ ...state, equipAllocationEditData: equipAlloc })),
 });

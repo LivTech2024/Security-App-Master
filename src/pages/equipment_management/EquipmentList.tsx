@@ -13,14 +13,18 @@ import { DocumentData } from "firebase/firestore";
 import DbEquipment from "../../firebase_configs/DB/DbEquipment";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useDebouncedValue } from "@mantine/hooks";
-import { useAuthState } from "../../store";
+import { useAuthState, useEditFormStore } from "../../store";
 import NoSearchResult from "../../common/NoSearchResult";
 import TableShimmer from "../../common/shimmer/TableShimmer";
 import AddEquipmentModal from "../../component/equipment_management/modal/AddEquipmentModal";
 import EquipAllocationModal from "../../component/equipment_management/modal/EquipAllocationModal";
+import { numberFormatter } from "../../utilities/NumberFormater";
+import { Equipment } from "../../store/slice/editForm.slice";
 
 const EquipmentList = () => {
   const { company } = useAuthState();
+
+  const { setEquipmentEditData } = useEditFormStore();
 
   const [query, setQuery] = useState("");
 
@@ -185,7 +189,10 @@ const EquipmentList = () => {
               return (
                 <tr
                   key={eqp.EquipmentId}
-                  onClick={() => {}}
+                  onClick={() => {
+                    setEquipmentEditData(eqp as unknown as Equipment);
+                    setAddEquipmentModal(true);
+                  }}
                   className="cursor-pointer"
                 >
                   <td className="align-top px-4 py-2 text-start">
@@ -193,14 +200,18 @@ const EquipmentList = () => {
                   </td>
                   <td className="align-top px-4 py-2 text-start">
                     <span className="line-clamp-2">
-                      {eqp.EquipmentDescription}
+                      {eqp.EquipmentDescription || "N/A"}
                     </span>
                   </td>
                   <td className="align-top px-4 py-2 text-center">
-                    {eqp.EquipmentTotalQuantity}
+                    {numberFormatter(eqp.EquipmentTotalQuantity, false, 1)}
                   </td>
                   <td className="align-top px-4 py-2 text-end">
-                    {eqp.EquipmentTotalQuantity - eqp.EquipmentAllotedQuantity}
+                    {numberFormatter(
+                      eqp.EquipmentTotalQuantity - eqp.EquipmentAllotedQuantity,
+                      false,
+                      1
+                    )}
                   </td>
                 </tr>
               );

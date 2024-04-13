@@ -30,7 +30,7 @@ import CustomError from "../../utilities/CustomError";
 import { fullTextSearchIndex, removeTimeFromDate } from "../../utilities/misc";
 
 class DbEquipment {
-  static createEquipment = (cmpId: string, data: EquipmentFormFields) => {
+  static createEquipment = async (cmpId: string, data: EquipmentFormFields) => {
     const equipId = getNewDocId(CollectionName.equipments);
     const equipRef = doc(db, CollectionName.equipments, equipId);
 
@@ -41,7 +41,7 @@ class DbEquipment {
         data.EquipmentName.trim().toLowerCase()
       ),
       EquipmentCompanyId: cmpId,
-      EquipmentCompanyBranchId: data.EquipmentCompanyBranchId,
+      EquipmentCompanyBranchId: data.EquipmentCompanyBranchId || null,
       EquipmentDescription: data.EquipmentDescription,
       EquipmentAllotedQuantity: 0,
       EquipmentTotalQuantity: Number(data.EquipmentTotalQuantity),
@@ -60,7 +60,7 @@ class DbEquipment {
       EquipmentNameSearchIndex: fullTextSearchIndex(
         data.EquipmentName.trim().toLowerCase()
       ),
-      EquipmentCompanyBranchId: data.EquipmentCompanyBranchId,
+      EquipmentCompanyBranchId: data.EquipmentCompanyBranchId || null,
       EquipmentDescription: data.EquipmentDescription,
       EquipmentTotalQuantity: Number(data.EquipmentTotalQuantity),
       EquipmentModifiedAt: serverTimestamp(),
