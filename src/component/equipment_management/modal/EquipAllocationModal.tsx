@@ -84,7 +84,7 @@ const EquipAllocationModal = ({
       }
 
       await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_KEYS.EQUIPMENT_ALLOCATION_LIST],
+        queryKey: [REACT_QUERY_KEYS.EQUIPMENT_LIST],
       });
 
       setEquipAllocationEditData(null);
@@ -107,7 +107,7 @@ const EquipAllocationModal = ({
       );
 
       await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_KEYS.EQUIPMENT_ALLOCATION_LIST],
+        queryKey: [REACT_QUERY_KEYS.EQUIPMENT_LIST],
       });
 
       showSnackbar({

@@ -4,6 +4,7 @@ import {
   Timestamp,
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
@@ -162,6 +163,11 @@ class DbEquipment {
     const docQuery = query(docRef, ...queryParams);
 
     return getDocs(docQuery);
+  };
+
+  static getEquipmentById = (equipId: string) => {
+    const equipRef = doc(db, CollectionName.equipments, equipId);
+    return getDoc(equipRef);
   };
 
   static createEquipAllocation = async (

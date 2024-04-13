@@ -7,6 +7,7 @@ import { IEquipmentsCollection } from "../../@types/database";
 import {
   DisplayCount,
   MinimumQueryCharacter,
+  PageRoutes,
   REACT_QUERY_KEYS,
 } from "../../@types/enum";
 import { DocumentData } from "firebase/firestore";
@@ -19,9 +20,11 @@ import TableShimmer from "../../common/shimmer/TableShimmer";
 import AddEquipmentModal from "../../component/equipment_management/modal/AddEquipmentModal";
 import EquipAllocationModal from "../../component/equipment_management/modal/EquipAllocationModal";
 import { numberFormatter } from "../../utilities/NumberFormater";
-import { Equipment } from "../../store/slice/editForm.slice";
+import { useNavigate } from "react-router-dom";
 
 const EquipmentList = () => {
+  const navigate = useNavigate();
+
   const { company } = useAuthState();
 
   const { setEquipmentEditData } = useEditFormStore();
@@ -182,7 +185,7 @@ const EquipmentList = () => {
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={4}>
+              <td colSpan={5}>
                 <NoSearchResult text="No equipment" />
               </td>
             </tr>
@@ -191,10 +194,11 @@ const EquipmentList = () => {
               return (
                 <tr
                   key={eqp.EquipmentId}
-                  onClick={() => {
-                    setEquipmentEditData(eqp as unknown as Equipment);
-                    setAddEquipmentModal(true);
-                  }}
+                  onClick={() =>
+                    navigate(
+                      PageRoutes.EQUIPMENT_VIEW + `?id=${eqp.EquipmentId}`
+                    )
+                  }
                   className="cursor-pointer"
                 >
                   <td className="align-top px-4 py-2 text-start">
@@ -223,7 +227,7 @@ const EquipmentList = () => {
             })
           )}
           <tr ref={ref}>
-            <td colSpan={4}>
+            <td colSpan={5}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />
