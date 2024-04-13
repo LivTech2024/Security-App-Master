@@ -6,7 +6,7 @@ import {
   REACT_QUERY_KEYS,
 } from "../../@types/enum";
 import { useEffect, useState } from "react";
-import { useAuthState } from "../../store";
+import { useAuthState, useEditFormStore } from "../../store";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import DbPatrol from "../../firebase_configs/DB/DbPatrol";
@@ -45,6 +45,8 @@ export const PatrolStatus = ({
 
 const PatrollingList = () => {
   const navigate = useNavigate();
+
+  const { setPatrolEditData } = useEditFormStore();
 
   const { company } = useAuthState();
 
@@ -135,6 +137,7 @@ const PatrollingList = () => {
 
         <button
           onClick={() => {
+            setPatrolEditData(null);
             navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT);
           }}
           className="bg-primary text-surface px-4 py-2 rounded"

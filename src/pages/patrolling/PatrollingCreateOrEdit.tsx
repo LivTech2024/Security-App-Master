@@ -2,7 +2,6 @@ import { IoArrowBackCircle } from "react-icons/io5";
 import { useNavigate } from "react-router";
 import { PageRoutes } from "../../@types/enum";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
-import Button from "../../common/button/Button";
 import {
   PatrollingFormFields,
   patrollingSchema,
@@ -12,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
 import { useEffect, useState } from "react";
 import CheckpointForm from "../../component/patrolling/CheckpointForm";
-import { useAuthState } from "../../store";
+import { useAuthState, useEditFormStore } from "../../store";
 import CustomError, { errorHandler } from "../../utilities/CustomError";
 import {
   closeModalLoader,
@@ -24,15 +23,31 @@ import useFetchLocations from "../../hooks/fetch/useFetchLocations";
 import { AiOutlinePlus } from "react-icons/ai";
 import InputSelect from "../../common/inputs/InputSelect";
 import useFetchClients from "../../hooks/fetch/useFetchClients";
+import { openContextModal } from "@mantine/modals";
+import Button from "../../common/button/Button";
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
+
+  const { patrolEditData } = useEditFormStore();
+  const isEdit = !!patrolEditData;
+
   const methods = useForm<PatrollingFormFields>({
     resolver: zodResolver(patrollingSchema),
-    defaultValues: {
-      PatrolReminderInMinutes: 60,
-      PatrolRestrictedRadius: 100,
-    },
+    defaultValues: isEdit
+      ? {
+          PatrolName: patrolEditData.PatrolName,
+          PatrolRequiredCount: patrolEditData.PatrolRequiredCount,
+          PatrolReminderInMinutes: patrolEditData.PatrolReminderInMinutes,
+          PatrolRestrictedRadius: patrolEditData.PatrolRestrictedRadius,
+          PatrolKeepGuardInRadiusOfLocation:
+            patrolEditData.PatrolKeepGuardInRadiusOfLocation,
+          PatrolClientId: patrolEditData.PatrolClientId,
+        }
+      : {
+          PatrolReminderInMinutes: 60,
+          PatrolRestrictedRadius: 100,
+        },
   });
 
   const { company } = useAuthState();
@@ -66,7 +81,6 @@ const PatrollingCreateOrEdit = () => {
   const locationId = methods.watch("PatrolLocationId");
 
   useEffect(() => {
-    console.log(locationId, "id");
     if (locationId) {
       const selectedLocation = locData.find(
         (loc) => loc.LocationId === locationId
@@ -105,6 +119,47 @@ const PatrollingCreateOrEdit = () => {
     []
   );
 
+  const [loading, setLoading] = useState(false);
+
+  //*Populate editdata in form
+  useEffect(() => {
+    if (isEdit) {
+      setCheckPoints(
+        patrolEditData.PatrolCheckPoints.map((ch) => {
+          return {
+            checkPointCategory: ch.CheckPointCategory,
+            checkPointHint: ch.CheckPointHint,
+            checkPointName: ch.CheckPointName,
+          };
+        })
+      );
+
+      patrolEditData.PatrolCheckPoints.map((ch) => {
+        if (ch.CheckPointCategory) {
+          setCheckpointsCategories((prev) => {
+            if (
+              ch.CheckPointCategory &&
+              !prev.includes(ch.CheckPointCategory)
+            ) {
+              return [...prev, ch.CheckPointCategory];
+            }
+            return prev;
+          });
+        }
+      });
+
+      methods.setValue(
+        "PatrolLocationName",
+        patrolEditData?.PatrolLocationName
+      );
+      methods.setValue("PatrolLocationId", patrolEditData?.PatrolLocationId);
+      methods.setValue("PatrolLocation", {
+        latitude: String(patrolEditData.PatrolLocation.latitude),
+        longitude: String(patrolEditData.PatrolLocation.longitude),
+      });
+    }
+  }, [isEdit, patrolEditData]);
+
   const onSubmit = async (data: PatrollingFormFields) => {
     if (!company) return;
     try {
@@ -119,12 +174,26 @@ const PatrollingCreateOrEdit = () => {
 
       showModalLoader({});
 
-      await DbPatrol.createPatrol({
-        cmpId: company.CompanyId,
-        data,
-      });
+      if (isEdit) {
+        await DbPatrol.updatePatrol({
+          data,
+          patrolId: patrolEditData.PatrolId,
+        });
+        showSnackbar({
+          message: "Patrol updated successfully",
+          type: "success",
+        });
+      } else {
+        await DbPatrol.createPatrol({
+          cmpId: company.CompanyId,
+          data,
+        });
+        showSnackbar({
+          message: "Patrol created successfully",
+          type: "success",
+        });
+      }
 
-      showSnackbar({ message: "Patrol created successfully", type: "success" });
       closeModalLoader();
       navigate(PageRoutes.PATROLLING_LIST);
     } catch (error) {
@@ -133,6 +202,31 @@ const PatrollingCreateOrEdit = () => {
       console.log(error);
     }
   };
+
+  const deletePatrol = async () => {
+    if (!isEdit) return;
+    try {
+      setLoading(true);
+
+      await DbPatrol.deletePatrol(patrolEditData.PatrolId);
+      showSnackbar({ message: "Patrol deleted successfully", type: "success" });
+      setLoading(false);
+      navigate(PageRoutes.PATROLLING_LIST);
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
 
   return (
     <FormProvider {...methods}>
@@ -150,12 +244,41 @@ const PatrollingCreateOrEdit = () => {
             </div>
             <div className="font-semibold text-lg">Create new patrol</div>
           </div>
-          <Button
-            label="Save"
-            type="black"
-            onClick={methods.handleSubmit(onSubmit)}
-            className="px-14 py-2"
-          />
+
+          <div className="flex items-center gap-4">
+            {isEdit && (
+              <Button
+                label="Delete"
+                type="white"
+                onClick={() => {
+                  openContextModal({
+                    modal: "confirmModal",
+                    withCloseButton: false,
+                    centered: true,
+                    closeOnClickOutside: true,
+                    innerProps: {
+                      title: "Confirm",
+                      body: "Are you sure to delete this patrol",
+                      onConfirm: () => {
+                        deletePatrol();
+                      },
+                    },
+                    size: "30%",
+                    styles: {
+                      body: { padding: "0px" },
+                    },
+                  });
+                }}
+                className="px-12 py-2"
+              ></Button>
+            )}
+            <Button
+              label="Save"
+              type="black"
+              onClick={methods.handleSubmit(onSubmit)}
+              className="px-14 py-2"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 bg-surface shadow-md rounded border">
@@ -172,6 +295,7 @@ const PatrollingCreateOrEdit = () => {
             data={locData.map((loc) => {
               return { label: loc.LocationName, value: loc.LocationId };
             })}
+            value={methods.watch("PatrolLocationId")}
             onChange={(e) => methods.setValue("PatrolLocationId", e as string)}
             nothingFoundMessage={
               <div

@@ -6,6 +6,7 @@ import {
   IEquipmentAllocations,
   IEquipmentsCollection,
   ILocationsCollection,
+  IPatrolsCollection,
   IShiftsCollection,
 } from "../../@types/database";
 import { CompanyBranches } from "./auth.slice";
@@ -75,8 +76,12 @@ export interface EquipmentAllocation
 interface EditFormState {
   employeeEditData: Employee | null;
   setEmployeeEditData: (emp: Employee | null) => void;
+
   shiftEditData: Shift | null;
   setShiftEditData: (shift: Shift | null) => void;
+
+  patrolEditData: IPatrolsCollection | null;
+  setPatrolEditData: (patrol: IPatrolsCollection | null) => void;
 
   locationEditData: Location | null;
   setLocationEditData: (loc: Location | null) => void;
@@ -107,6 +112,11 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   shiftEditData: null,
   setShiftEditData: (shift) =>
     set((state) => ({ ...state, shiftEditData: shift })),
+
+  //Patrol
+  patrolEditData: null,
+  setPatrolEditData: (patrol) =>
+    set((state) => ({ ...state, patrolEditData: patrol })),
 
   //Location
   locationEditData: null,

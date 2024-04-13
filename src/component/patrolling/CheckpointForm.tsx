@@ -108,6 +108,7 @@ const CheckpointForm = ({
                 <InputSelect
                   placeholder="Select category"
                   data={checkpointCategories}
+                  value={checkpoint.checkPointCategory || ""}
                   className="w-full"
                   onChange={(e) =>
                     handleChange(index, "checkPointCategory", e as string)

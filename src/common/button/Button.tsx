@@ -69,7 +69,7 @@ const Button = ({
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          "bg-whiteButtonBg hover:bg-whiteButtonHoverBg active:bg-whiteButtonActiveBg flex items-center justify-center gap-2 px-4 py-2 rounded-[4px]  text-textPrimaryLight whitespace-nowrap overflow-hidden font-semibold shadow",
+          "bg-whiteButtonBg hover:bg-whiteButtonHoverBg active:bg-whiteButtonActiveBg flex items-center justify-center gap-2 px-4 py-2 rounded-[4px]  text-textPrimary whitespace-nowrap overflow-hidden font-semibold shadow",
           className
         )}`}
       >

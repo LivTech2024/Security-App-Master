@@ -10,6 +10,7 @@ import {
   limit,
   orderBy,
   query,
+  runTransaction,
   serverTimestamp,
   setDoc,
   startAfter,
@@ -25,6 +26,7 @@ import {
 import { PatrollingFormFields } from "../../utilities/zod/schema";
 import { generateBarcodesAndDownloadPDF } from "../../utilities/generateBarcodesAndDownloadPdf";
 import { fullTextSearchIndex, removeTimeFromDate } from "../../utilities/misc";
+import CustomError from "../../utilities/CustomError";
 
 class DbPatrol {
   static createPatrol = async ({
@@ -85,6 +87,81 @@ class DbPatrol {
         return { code: ch.CheckPointId, label: ch.CheckPointName };
       })
     );
+  };
+
+  static updatePatrol = async ({
+    patrolId,
+    data,
+  }: {
+    patrolId: string;
+    data: PatrollingFormFields;
+  }) => {
+    const patrolRef = doc(db, CollectionName.patrols, patrolId);
+
+    await runTransaction(db, async (transaction) => {
+      const patrolSnapshot = await transaction.get(patrolRef);
+      const oldPatrolData = patrolSnapshot.data() as IPatrolsCollection;
+
+      if (
+        oldPatrolData.PatrolCurrentStatus.some(
+          (s) => s.Status === "pending" || s.Status === "started"
+        ) ||
+        oldPatrolData.PatrolCheckPoints.some((ch) =>
+          ch.CheckPointStatus.some((s) => s.Status === "not_checked")
+        )
+      ) {
+        throw new CustomError(
+          "Can't edit this patrol as its being assigned to some employees"
+        );
+      }
+
+      const PatrolCheckPoints: IPatrolCheckPointsChild[] = [];
+
+      data.PatrolCheckPoints.map((ch, idx) => {
+        const checkPointId = `${patrolId}${idx}`;
+
+        PatrolCheckPoints.push({
+          CheckPointId: checkPointId,
+          CheckPointName: ch.name,
+          CheckPointStatus: [],
+          CheckPointCategory: ch.category || null,
+          CheckPointHint: ch.hint || null,
+        });
+      });
+
+      const PatrolNameSearchIndex = fullTextSearchIndex(
+        data.PatrolName.trim().toLowerCase()
+      );
+
+      const newPatrol: Partial<IPatrolsCollection> = {
+        PatrolName: data.PatrolName,
+        PatrolNameSearchIndex,
+        PatrolLocation: new GeoPoint(
+          Number(data.PatrolLocation.latitude),
+          Number(data.PatrolLocation.longitude)
+        ),
+        PatrolCurrentStatus: [],
+        PatrolReminderInMinutes: data.PatrolReminderInMinutes,
+        PatrolLocationId: data.PatrolLocationId,
+        PatrolLocationName: data.PatrolLocationName,
+        PatrolRequiredCount: Number(data.PatrolRequiredCount),
+        PatrolCheckPoints,
+        PatrolRestrictedRadius: Number(data.PatrolRestrictedRadius),
+        PatrolKeepGuardInRadiusOfLocation:
+          data.PatrolKeepGuardInRadiusOfLocation,
+        PatrolClientId: data.PatrolClientId || null,
+        PatrolModifiedAt: serverTimestamp(),
+      };
+
+      transaction.update(patrolRef, newPatrol);
+
+      await generateBarcodesAndDownloadPDF(
+        data.PatrolLocationName,
+        PatrolCheckPoints.map((ch) => {
+          return { code: ch.CheckPointId, label: ch.CheckPointName };
+        })
+      );
+    });
   };
 
   static getPatrols = async ({

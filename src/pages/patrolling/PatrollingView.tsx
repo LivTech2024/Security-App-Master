@@ -4,16 +4,13 @@ import { useEffect, useState } from "react";
 import DbPatrol from "../../firebase_configs/DB/DbPatrol";
 import { IPatrolsCollection } from "../../@types/database";
 import NoSearchResult from "../../common/NoSearchResult";
-import { errorHandler } from "../../utilities/CustomError";
-import {
-  closeModalLoader,
-  showModalLoader,
-  showSnackbar,
-} from "../../utilities/TsxUtils";
-import { openContextModal } from "@mantine/modals";
 import { PageRoutes } from "../../@types/enum";
+import Button from "../../common/button/Button";
+import { useEditFormStore } from "../../store";
 
 const PatrollingView = () => {
+  const { setPatrolEditData } = useEditFormStore();
+
   const [searchParam] = useSearchParams();
 
   const patrolId = searchParam.get("id");
@@ -43,33 +40,6 @@ const PatrollingView = () => {
     fetchPatrolData();
   }, [patrolId]);
 
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (loading) {
-      showModalLoader({});
-    } else {
-      closeModalLoader();
-    }
-    return () => closeModalLoader();
-  }, [loading]);
-
-  const deletePatrol = async () => {
-    if (!patrolId) return;
-    try {
-      setLoading(true);
-
-      await DbPatrol.deletePatrol(patrolId);
-      showSnackbar({ message: "Patrol deleted successfully", type: "success" });
-      setLoading(false);
-      navigate(PageRoutes.PATROLLING_LIST);
-    } catch (error) {
-      console.log(error);
-      errorHandler(error);
-      setLoading(false);
-    }
-  };
-
   if (!data && !isPatrolLoading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -95,30 +65,17 @@ const PatrollingView = () => {
         <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
           <span className="font-semibold text-xl">Patrolling data</span>
 
-          <button
-            onClick={() => {
-              openContextModal({
-                modal: "confirmModal",
-                withCloseButton: false,
-                centered: true,
-                closeOnClickOutside: true,
-                innerProps: {
-                  title: "Confirm",
-                  body: "Are you sure to delete this patrol",
-                  onConfirm: () => {
-                    deletePatrol();
-                  },
-                },
-                size: "30%",
-                styles: {
-                  body: { padding: "0px" },
-                },
-              });
-            }}
-            className="bg-primary text-surface px-4 py-2 rounded"
-          >
-            Delete
-          </button>
+          <div className="flex items-center gap-4">
+            <Button
+              label="Edit"
+              onClick={() => {
+                setPatrolEditData(data);
+                navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT);
+              }}
+              type="black"
+              className="px-12 py-2 "
+            />
+          </div>
         </div>
         <PatrolViewCard patrolData={data} />
       </div>
