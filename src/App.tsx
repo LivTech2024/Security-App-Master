@@ -39,6 +39,8 @@ import ShiftView from "./pages/shifts/ShiftView";
 import ClientCreateOrEdit from "./pages/client/ClientCreateOrEdit";
 import ClientView from "./pages/client/ClientView";
 import DocumentRepository from "./pages/document_repository/DocumentRepository";
+import EquipmentList from "./pages/equipment_management/EquipmentList";
+import EquipmentView from "./pages/equipment_management/EquipmentView";
 
 function App() {
   useOnAuthStateChanged();
@@ -157,6 +159,8 @@ function App() {
               path={PageRoutes.DOCUMENT_REPOSITORY}
               Component={DocumentRepository}
             />
+            <Route path={PageRoutes.EQUIPMENT_LIST} Component={EquipmentList} />
+            <Route path={PageRoutes.EQUIPMENT_VIEW} Component={EquipmentView} />
           </Routes>
         </Layout>
       </ModalsProvider>

@@ -17,6 +17,8 @@ export enum CollectionName {
   documents = "Documents",
   settings = "Settings",
   superAdmin = "SuperAdmin",
+  equipments = "Equipments",
+  equipmentAllocations = "EquipmentAllocations",
 }
 
 export const DisplayCount = {
@@ -93,6 +95,8 @@ export const PageRoutes = {
   CLIENT_CREATE_OR_EDIT: "/client_create_or_edit",
   SUPER_ADMIN_CREATE_NEW_COMPANY: "/super_admin/create_new_company",
   DOCUMENT_REPOSITORY: "/document_repository",
+  EQUIPMENT_LIST: "/equipment_list",
+  EQUIPMENT_VIEW: "/equipment_view",
 };
 
 export const LocalStorageKey = {

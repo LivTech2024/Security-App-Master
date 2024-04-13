@@ -263,3 +263,38 @@ export const clientSchema = z.object({
 });
 
 export type ClientFormFields = z.infer<typeof clientSchema>;
+
+//*Equipment Schema
+export const equipmentSchema = z.object({
+  EquipmentName: z
+    .string()
+    .min(2, { message: "Equipment name should be at least 2 characters" }),
+  EquipmentCompanyBranchId: z.string().nullable(),
+  EquipmentDescription: z.string().nullable(),
+  EquipmentTotalQuantity: z.coerce
+    .number()
+    .min(1, { message: "Equipment total quantity should be at least 1" }),
+});
+
+export type EquipmentFormFields = z.infer<typeof equipmentSchema>;
+
+//*Equipment Allocation Schema
+export const equipmentAllocationSchema = z.object({
+  EquipmentAllocationEquipId: z
+    .string()
+    .min(3, { message: "Please select equipment" }),
+  EquipmentAllocationEquipQty: z.coerce.number().min(1),
+  EquipmentAllocationDate: z.date(),
+  EquipmentAllocationEmpId: z
+    .string()
+    .min(3, { message: "Please select employee" }),
+  EquipmentAllocationEmpName: z
+    .string()
+    .min(3, { message: "Please select employee" }),
+  EquipmentAllocationStartDate: z.date(),
+  EquipmentAllocationEndDate: z.date(),
+});
+
+export type EquipmentAllocationFormFields = z.infer<
+  typeof equipmentAllocationSchema
+>;

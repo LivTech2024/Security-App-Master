@@ -83,7 +83,7 @@ const Home = () => {
           name="Employee Management"
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.REPORTS}
           icon={<FaExclamationTriangle className="text-3xl text-primaryGold" />}
           name="Incident Reports"
         />
@@ -100,17 +100,17 @@ const Home = () => {
         />
 
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.EQUIPMENT_LIST}
           icon={<FaToolbox className="text-2xl text-primaryGold" />}
           name="Equipment Management"
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.PAYMENTS_AND_BILLING}
           icon={<RiBillLine className="text-2xl text-primaryGold" />}
           name="Billing and Invoicing"
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.EMPLOYEE_LIST}
           name="Training & Certification"
           icon={<GrCertificate className="text-2xl text-primaryGold" />}
         />
@@ -120,7 +120,7 @@ const Home = () => {
           icon={<FaPeopleGroup className="text-2xl text-primaryGold" />}
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.REPORTS}
           name="Reports & analysis"
           icon={<TbReport className="text-2xl text-primaryGold" />}
         />
@@ -145,7 +145,7 @@ const Home = () => {
           icon={<MdOutlineSensors className="text-2xl text-primaryGold" />}
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.SHIFT_LIST}
           name="Time & Attendance"
           icon={<FaClock className="text-2xl text-primaryGold" />}
         />

@@ -309,8 +309,11 @@ export interface ISettingsCollection {
 
 export interface IEquipmentsCollection {
   EquipmentId: string;
+  EquipmentCompanyId: string;
+  EquipmentCompanyBranchId: string | null;
   EquipmentName: string;
-  EquipmentDescription: string;
+  EquipmentNameSearchIndex: string[];
+  EquipmentDescription: string | null;
   EquipmentAllotedQuantity: number;
   EquipmentTotalQuantity: number;
   EquipmentCreatedAt: Timestamp | FieldValue;
@@ -319,7 +322,6 @@ export interface IEquipmentsCollection {
 
 export interface IEquipmentAllocations {
   EquipmentAllocationId: string;
-  EquipmentAllocationCompanyId: string;
   EquipmentAllocationEquipId: string;
   EquipmentAllocationEquipQty: number;
   EquipmentAllocationDate: Timestamp | FieldValue;
