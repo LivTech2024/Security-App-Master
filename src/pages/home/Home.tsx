@@ -62,7 +62,7 @@ const Home = () => {
           <img
             src={company?.CompanyLogo}
             alt=""
-            className="w-[140px] object-cover"
+            className="w-[140px] object-cover "
           />
 
           <div className="font-semibold text-lg">

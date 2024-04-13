@@ -118,11 +118,13 @@ class DbEquipment {
     lastDoc,
     searchQuery,
     cmpId,
+    branchId,
   }: {
     lmt?: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId: string;
+    branchId: string;
   }) => {
     const docRef = collection(db, CollectionName.equipments);
 
@@ -130,6 +132,13 @@ class DbEquipment {
       where("EquipmentCompanyId", "==", cmpId),
       orderBy("EquipmentCreatedAt", "desc"),
     ];
+
+    if (branchId) {
+      queryParams = [
+        ...queryParams,
+        where("EquipmentCompanyBranchId", "==", branchId),
+      ];
+    }
 
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [
