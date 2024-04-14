@@ -15,7 +15,7 @@ import {
 import DbEmployee from "../../firebase_configs/DB/DbEmployee";
 import { PageRoutes, REACT_QUERY_KEYS } from "../../@types/enum";
 import { useNavigate } from "react-router-dom";
-import CustomError, { errorHandler } from "../../utilities/CustomError";
+import { errorHandler } from "../../utilities/CustomError";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 import InputAutoComplete from "../../common/inputs/InputAutocomplete";
 import { AiOutlinePlus } from "react-icons/ai";
@@ -167,27 +167,8 @@ const EmployeeCreateOrEdit = () => {
   }, [loading]);
 
   const onSubmit = async (data: AddEmployeeFormField) => {
-    if (!empImageBase64) {
-      showSnackbar({ message: "Please add employee image", type: "error" });
-      return;
-    }
     if (!company) return;
     try {
-      const requiredFields = [
-        "BankAccName",
-        "BankAccNumber",
-        "BankIfscCode",
-        "BankName",
-        "BankVoidCheckImg",
-      ];
-
-      if (
-        !requiredFields.every(
-          (field) => empBankDetails[field as keyof IEmpBankDetails]
-        )
-      ) {
-        throw new CustomError("Please add complete bank details");
-      }
       setLoading(true);
 
       if (isEdit) {

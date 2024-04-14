@@ -21,6 +21,7 @@ import AddEmpRoleModal from "../../component/employees/modal/AddEmpRoleModal";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../../common/inputs/SearchBar";
 import SelectBranch from "../../common/SelectBranch";
+import empDefaultPlaceHolder from "../../../public/assets/avatar.png";
 
 const EmployeeList = () => {
   const navigate = useNavigate();
@@ -196,7 +197,7 @@ const EmployeeList = () => {
                 >
                   <td className="px-4 py-2 text-start">
                     <img
-                      src={emp.EmployeeImg}
+                      src={emp.EmployeeImg ?? empDefaultPlaceHolder}
                       alt=""
                       className="rounded-full object-cover w-14 h-14"
                     />

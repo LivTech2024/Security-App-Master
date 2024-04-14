@@ -197,10 +197,10 @@ class DbEmployee {
     certificates,
   }: {
     empData: AddEmployeeFormField;
-    empImage: string;
+    empImage: string | null;
     cmpId: string;
     licenseDetails: EmpLicenseDetails[];
-    bankDetails: IEmpBankDetails;
+    bankDetails: IEmpBankDetails | null;
     certificates: EmpCertificates[];
   }) => {
     let empImageUrl: string[] = [];
@@ -222,21 +222,23 @@ class DbEmployee {
         const empId = getNewDocId(CollectionName.employees);
         const docRef = doc(db, CollectionName.employees, empId);
 
-        const imageEmployee = [
-          {
-            base64: empImage,
-            path:
-              CloudStoragePaths.EMPLOYEES_IMAGES +
-              "/" +
-              CloudStorageImageHandler.generateImageName(empId, "profile"),
-          },
-        ];
+        if (empImage && empImage?.length > 3) {
+          const imageEmployee = [
+            {
+              base64: empImage,
+              path:
+                CloudStoragePaths.EMPLOYEES_IMAGES +
+                "/" +
+                CloudStorageImageHandler.generateImageName(empId, "profile"),
+            },
+          ];
 
-        empImageUrl = await CloudStorageImageHandler.getImageDownloadUrls(
-          imageEmployee,
-          ImageResolution.EMP_IMAGE_HEIGHT,
-          ImageResolution.EMP_IMAGE_WIDTH
-        );
+          empImageUrl = await CloudStorageImageHandler.getImageDownloadUrls(
+            imageEmployee,
+            ImageResolution.EMP_IMAGE_HEIGHT,
+            ImageResolution.EMP_IMAGE_WIDTH
+          );
+        }
 
         if (bankDetails && bankDetails.BankVoidCheckImg) {
           const imageVoidCheck = [
@@ -321,7 +323,7 @@ class DbEmployee {
           EmployeeNameSearchIndex: fullTextSearchIndex(
             `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
           ),
-          EmployeeImg: empImageUrl[0],
+          EmployeeImg: empImageUrl[0]?.length > 3 ? empImageUrl[0] : null,
           EmployeePhone: empData.EmployeePhone,
           EmployeeEmail: empData.EmployeeEmail,
           EmployeePassword: empData.EmployeePassword,
@@ -333,7 +335,7 @@ class DbEmployee {
           EmployeeIsAvailable: "available",
           EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
           EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
-          EmployeeBankDetails: bankDetails,
+          EmployeeBankDetails: bankDetails || null,
           EmployeeCertificates,
           EmployeeLicenses,
           EmployeeCreatedAt: serverTimestamp(),
@@ -353,10 +355,10 @@ class DbEmployee {
       });
     } catch (error) {
       setTimeout(async () => {
-        if (empImageUrl[0]) {
+        if (empImageUrl[0]?.length > 3) {
           await CloudStorageImageHandler.deleteImageByUrl(empImageUrl[0]);
         }
-        if (imageVoidCheckUrl[0]) {
+        if (imageVoidCheckUrl[0]?.length > 3) {
           await CloudStorageImageHandler.deleteImageByUrl(imageVoidCheckUrl[0]);
         }
         if (EmployeeCertificates.length > 0) {
@@ -382,11 +384,11 @@ class DbEmployee {
     certificates,
   }: {
     empData: AddEmployeeFormField;
-    empImage: string;
+    empImage: string | null;
     empId: string;
     cmpId: string;
     licenseDetails: EmpLicenseDetails[];
-    bankDetails: IEmpBankDetails;
+    bankDetails: IEmpBankDetails | null;
     certificates: EmpCertificates[];
   }) => {
     try {
@@ -409,7 +411,8 @@ class DbEmployee {
 
         let empImageUrl = empImage;
 
-        if (!empImageUrl.startsWith("https")) {
+        if (empImage && !empImage.startsWith("https")) {
+          console.log(empImage, "image");
           const imageEmployee = [
             {
               base64: empImage,
@@ -419,6 +422,8 @@ class DbEmployee {
                 CloudStorageImageHandler.generateImageName(empId, "profile"),
             },
           ];
+
+          console.log(imageEmployee, "imageEmployee");
 
           const imageEmpUrl =
             await CloudStorageImageHandler.getImageDownloadUrls(
@@ -430,7 +435,11 @@ class DbEmployee {
           empImageUrl = imageEmpUrl[0];
         }
 
-        if (bankDetails && !bankDetails.BankVoidCheckImg.startsWith("https")) {
+        if (
+          bankDetails &&
+          bankDetails.BankVoidCheckImg.length > 3 &&
+          !bankDetails.BankVoidCheckImg.startsWith("https")
+        ) {
           const imageVoidCheck = [
             {
               base64: bankDetails.BankVoidCheckImg,
@@ -534,7 +543,7 @@ class DbEmployee {
 
         const newEmployee: Partial<IEmployeesCollection> = {
           EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
-          EmployeeImg: empImageUrl,
+          EmployeeImg: empImageUrl || null,
           EmployeeNameSearchIndex: fullTextSearchIndex(
             `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
           ),
@@ -549,7 +558,7 @@ class DbEmployee {
           EmployeeIsBanned: empData.EmployeeIsBanned,
           EmployeeLicenses,
           EmployeeCertificates,
-          EmployeeBankDetails: bankDetails,
+          EmployeeBankDetails: bankDetails || null,
           EmployeeModifiedAt: serverTimestamp(),
         };
 
@@ -615,7 +624,7 @@ class DbEmployee {
       if (EmployeeImg) {
         await CloudStorageImageHandler.deleteImageByUrl(EmployeeImg);
       }
-      if (EmployeeBankDetails.BankVoidCheckImg) {
+      if (EmployeeBankDetails && EmployeeBankDetails.BankVoidCheckImg) {
         await CloudStorageImageHandler.deleteImageByUrl(
           EmployeeBankDetails.BankVoidCheckImg
         );

@@ -67,7 +67,7 @@ export interface IEmployeesCollection {
   EmployeePhone: string;
   EmployeeEmail: string;
   EmployeePassword: string;
-  EmployeeImg: string;
+  EmployeeImg: string | null;
   EmployeeRole: string;
   EmployeePayRate: number;
   EmployeeMaxHrsPerWeek: number;
@@ -77,7 +77,7 @@ export interface IEmployeesCollection {
   EmployeeCompanyId: string;
   EmployeeCompanyBranchId?: string | null;
   EmployeeLicenses: IEmpLicenseDetails[];
-  EmployeeBankDetails: IEmpBankDetails;
+  EmployeeBankDetails: IEmpBankDetails | null;
   EmployeeCertificates: IEmpCertificatesDetails[];
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;
