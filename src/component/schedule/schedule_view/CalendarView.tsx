@@ -212,7 +212,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
           const prevMessage = aggregatedEmails[isExistIndex].message;
           aggregatedEmails[
             isExistIndex
-          ].message = `${prevMessage}\n\nShift Name: ${shift.ShiftName}\nTiming: ${shift.ShiftStartTime}-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
+          ].message = `${prevMessage}\n\nShift Name: ${shift.ShiftName} \n Date: ${shift.ShiftDate} \nTiming: ${shift.ShiftStartTime}-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
         } else {
           aggregatedEmails.push({
             empEmail: emp.EmpEmail,
