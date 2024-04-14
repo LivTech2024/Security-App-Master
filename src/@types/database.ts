@@ -78,6 +78,7 @@ export interface IEmployeesCollection {
   EmployeeCompanyBranchId?: string | null;
   EmployeeLicenses: IEmpLicenseDetails[];
   EmployeeBankDetails: IEmpBankDetails | null;
+  EmployeeSinNumber: string | null;
   EmployeeCertificates: IEmpCertificatesDetails[];
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;

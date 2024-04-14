@@ -336,6 +336,7 @@ class DbEmployee {
           EmployeeSupervisorId: empData.EmployeeSupervisorId || null,
           EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
           EmployeeBankDetails: bankDetails || null,
+          EmployeeSinNumber: empData.EmployeeSinNumber || null,
           EmployeeCertificates,
           EmployeeLicenses,
           EmployeeCreatedAt: serverTimestamp(),
@@ -559,6 +560,7 @@ class DbEmployee {
           EmployeeLicenses,
           EmployeeCertificates,
           EmployeeBankDetails: bankDetails || null,
+          EmployeeSinNumber: empData.EmployeeSinNumber || null,
           EmployeeModifiedAt: serverTimestamp(),
         };
 

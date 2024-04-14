@@ -60,10 +60,12 @@ const EmployeeCreateOrEdit = () => {
           EmployeeSupervisorId: employeeEditData.EmployeeSupervisorId,
           EmployeeCompanyBranchId: employeeEditData.EmployeeCompanyBranchId,
           EmployeeIsBanned: employeeEditData.EmployeeIsBanned,
+          EmployeeSinNumber: employeeEditData.EmployeeSinNumber,
         }
       : { EmployeeMaxHrsPerWeek: String(45) as unknown as number },
   });
 
+  console.log(methods.watch("EmployeeSinNumber"), "here");
   const navigate = useNavigate();
 
   const { company, empRoles, companyBranches } = useAuthState();
