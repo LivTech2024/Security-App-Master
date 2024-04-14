@@ -216,7 +216,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
           aggregatedEmails.push({
             empEmail: emp.EmpEmail,
             empName: emp.EmpName,
-            message: `You have been assigned for the following shift.\n\n Shift Name: ${shift.ShiftName}\n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
+            message: `You have been assigned for the following shift.\n\n Shift Name: ${shift.ShiftName} \n Date: ${shift.ShiftDate} \n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
           });
         }
       });
