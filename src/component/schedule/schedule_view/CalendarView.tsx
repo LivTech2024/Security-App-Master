@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import empDefaultPlaceHolder from "../../../../public/assets/avatar.png";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { REACT_QUERY_KEYS } from "../../../@types/enum";
@@ -438,7 +439,10 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                           }`}
                                         >
                                           <img
-                                            src={data.EmpImg}
+                                            src={
+                                              data.EmpImg ??
+                                              empDefaultPlaceHolder
+                                            }
                                             alt=""
                                             className="w-12 h-12 rounded-full object-cover"
                                           />

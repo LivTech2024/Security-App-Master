@@ -19,6 +19,7 @@ import { REACT_QUERY_KEYS } from "../../../@types/enum";
 import { IEmployeesCollection } from "../../../@types/database";
 import { useAuthState } from "../../../store";
 import { sendShiftDetailsEmail } from "../../../utilities/scheduleHelper";
+import empDefaultPlaceHolder from "../../../../public/assets/avatar.png";
 
 const AssignShiftModal = ({
   opened,
@@ -209,7 +210,7 @@ const AssignShiftModal = ({
                   >
                     <td className="text-start px-4 py-2">
                       <img
-                        src={data.EmpImg}
+                        src={data.EmpImg ?? empDefaultPlaceHolder}
                         alt=""
                         className="w-8 h-8 rounded-full object-cover"
                       />

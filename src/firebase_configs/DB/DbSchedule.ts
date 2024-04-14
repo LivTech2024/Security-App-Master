@@ -22,7 +22,7 @@ export interface ISchedule {
 export interface IEmpScheduleForWeek {
   EmpId: string;
   EmpName: string;
-  EmpImg: string;
+  EmpImg: string | null;
   EmpRole: string;
   EmpPhone: string;
   EmpEmail: string;
