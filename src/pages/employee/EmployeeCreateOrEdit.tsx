@@ -362,7 +362,10 @@ const EmployeeCreateOrEdit = () => {
                 })}
                 dropDownHeader={
                   <div
-                    onClick={() => setAddEmpRoleModal(true)}
+                    onClick={() => {
+                      navigate(PageRoutes.EMPLOYEE_LIST);
+                      setAddEmpRoleModal(true);
+                    }}
                     className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                   >
                     <div className="flex items-center gap-2">
@@ -442,7 +445,10 @@ const EmployeeCreateOrEdit = () => {
                   })}
                   dropDownHeader={
                     <div
-                      onClick={() => setAddCmpBranchModal(true)}
+                      onClick={() => {
+                        navigate(PageRoutes.COMPANY_BRANCHES);
+                        setAddCmpBranchModal(true);
+                      }}
                       className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
