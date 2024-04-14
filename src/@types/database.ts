@@ -94,8 +94,8 @@ export interface IShiftTasksChild {
     TaskCompletedByName?: string;
     TaskCompletionTime?: Timestamp | FieldValue;
     TaskFailureReason?: string;
+    TaskPhotos?: string[];
   }[];
-  ShiftTaskPhotos?: string[];
 }
 
 export interface IShiftsCollection {
@@ -148,6 +148,8 @@ export interface IPatrolCheckPointsChild {
     StatusReportedByName?: string;
     StatusReportedTime?: Timestamp | FieldValue;
     StatusFailureReason?: string;
+    StatusComment?: string | null;
+    StatusImage?: string[];
   }[];
 }
 

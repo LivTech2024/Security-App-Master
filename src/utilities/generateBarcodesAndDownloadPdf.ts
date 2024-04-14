@@ -18,18 +18,21 @@ const qrCodesHtmlString = async (qrCodesData: QrCodeData[]) => {
 
   html =
     html +
-    '<body> <div style="display: flex; gap: 20px; flex-wrap: wrap; vertical-align: top; width: 100%; height:100%;">';
+    '<body> <div style="display: flex; flex-wrap: wrap; vertical-align: top; width: 100%; height:100%; justify-content:between;  column-gap:6px; row-gap:18px;">';
 
   let barcodeCounter = 0;
   for (const item of qrCodesData) {
-    if (barcodeCounter % 10 === 0 && barcodeCounter !== 0) {
+    if (barcodeCounter % 20 === 0 && barcodeCounter !== 0) {
       html =
         html +
-        '</div><div style="page-break-after: always;"></div><div style="display: flex; gap: 20px; flex-wrap: wrap; vertical-align: top; width: 100%; height:100%;">';
+        '</div><div style="page-break-after: always;"></div><div style="display: flex; gap: 0px; flex-wrap: wrap; vertical-align: top; width: 100%; height:100%; justify-content:between;  column-gap:6px; row-gap:18px;">';
     }
     const barcodeBase64 = await QRCode.toDataURL(item.code);
 
-    html += `<div style="display: flex; flex-direction: column; align-items:center; height:192px; width:384px; padding:16px;"><img src=${barcodeBase64} style="width:150px;";/><div style="padding-bottom:10px;">${item.label}</div></div>`;
+    html += `<div style="display: flex; flex-direction: column; align-items:center; height:210px; width:192px; padding:16px; border:1px solid black; border-radius:8px;">
+       <img src=${barcodeBase64} style="width:150px; object-fit:cover;"/>
+       <div style="padding-bottom:12px;">${item.label}</div>
+    </div>`;
 
     // Increase counter
     barcodeCounter++;
