@@ -45,7 +45,7 @@ class DbSchedule {
     let queryParams: QueryConstraint[] = [
       where("ShiftCompanyId", "==", cmpId),
       where("ShiftDate", ">=", startDate),
-      where("ShiftDate", "<=", endDate),
+      where("ShiftDate", "<=", dayjs(endDate).endOf("day").toDate()),
     ];
 
     if (cmpBranchId && cmpBranchId.length > 0) {
