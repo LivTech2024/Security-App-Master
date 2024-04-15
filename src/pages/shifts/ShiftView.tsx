@@ -151,7 +151,7 @@ const ShiftView = () => {
                     );
                   })
                 ) : (
-                  <li>Pending</li>
+                  <li className="capitalize list-decimal">Pending</li>
                 )}
               </ul>
             </div>
@@ -169,6 +169,57 @@ const ShiftView = () => {
                   />
                 );
               })}
+          </div>
+
+          <div className="flex flex-col gap-1 mt-4">
+            <p className="font-semibold">Shift Tasks</p>
+            <div className="flex flex-wrap gap-6">
+              {data.ShiftTask.map((task, idx) => {
+                return (
+                  <div className="flex flex-col ">
+                    <span className="text-lg font-semibold">
+                      {idx + 1}. {task.ShiftTask}
+                    </span>
+                    {task?.ShiftTaskStatus?.length > 0 ? (
+                      <div className="flex flex-col gap-4">
+                        {task.ShiftTaskStatus?.map((s) => {
+                          return (
+                            <div className="pl-4 flex flex-col bg-onHoverBg rounded p-4">
+                              <span className="capitalize">
+                                Status: {s.TaskStatus}
+                              </span>
+                              <span>Employee: {s.TaskCompletedByName}</span>
+                              <span>
+                                Completion Time:{" "}
+                                {formatDate(
+                                  s.TaskCompletionTime,
+                                  "DD MMM-YY hh-mm A"
+                                )}
+                              </span>
+                              <span>Images: </span>
+                              {s.TaskPhotos?.map((img, idx) => {
+                                return (
+                                  <a
+                                    key={img}
+                                    href={img}
+                                    target="_blank"
+                                    className="cursor-pointer text-textPrimaryBlue"
+                                  >
+                                    {idx + 1}. {img.slice(0, 30)}...
+                                  </a>
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <span className="pl-4">Status: Pending</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
