@@ -9,7 +9,11 @@ import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
 } from "../../../firebase_configs/DB/DbSchedule";
-import { getHoursDiffInTwoTimeString, toDate } from "../../../utilities/misc";
+import {
+  formatDate,
+  getHoursDiffInTwoTimeString,
+  toDate,
+} from "../../../utilities/misc";
 import { Draggable, DropPoint } from "../../../utilities/DragAndDropHelper";
 import {
   IEmployeesCollection,
@@ -212,12 +216,20 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
           const prevMessage = aggregatedEmails[isExistIndex].message;
           aggregatedEmails[
             isExistIndex
-          ].message = `${prevMessage}\n\nShift Name: ${shift.ShiftName} \n Date: ${shift.ShiftDate} \nTiming: ${shift.ShiftStartTime}-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
+          ].message = `${prevMessage}\n\nShift Name: ${
+            shift.ShiftName
+          } \n Date: ${formatDate(shift.ShiftDate)} \nTiming: ${
+            shift.ShiftStartTime
+          }-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
         } else {
           aggregatedEmails.push({
             empEmail: emp.EmpEmail,
             empName: emp.EmpName,
-            message: `You have been assigned for the following shift.\n\n Shift Name: ${shift.ShiftName} \n Date: ${shift.ShiftDate} \n Timing: ${shift.ShiftStartTime}-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
+            message: `You have been assigned for the following shift.\n\n Shift Name: ${
+              shift.ShiftName
+            } \n Date: ${formatDate(shift.ShiftDate)} \n Timing: ${
+              shift.ShiftStartTime
+            }-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
           });
         }
       });
