@@ -221,6 +221,46 @@ const ShiftView = () => {
               })}
             </div>
           </div>
+
+          <div className="flex flex-col gap-1 mt-4">
+            <p className="font-semibold">Wellness report</p>
+            <div className="flex flex-wrap gap-6">
+              {data?.ShiftGuardWellnessReport.length > 0
+                ? data?.ShiftGuardWellnessReport?.map((res, idx) => {
+                    return (
+                      <div key={idx} className="flex flex-col">
+                        {res.WellnessEmpName && (
+                          <div>Employee Name: {res?.WellnessEmpName}</div>
+                        )}
+                        {res.WellnessReportedAt && (
+                          <div>
+                            Reported At:{" "}
+                            {formatDate(
+                              res?.WellnessReportedAt,
+                              "DD MMM-YY hh:mm A"
+                            )}
+                          </div>
+                        )}
+                        {res.WellnessComment && (
+                          <div>Comment: {res?.WellnessComment}</div>
+                        )}
+                        {res.WellnessImg && (
+                          <div>
+                            Image:{" "}
+                            <a
+                              href={res?.WellnessImg}
+                              className="text-textPrimaryBlue cursor-pointer"
+                            >
+                              {res?.WellnessImg?.slice(0, 30)}...
+                            </a>{" "}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                : "N/A"}
+            </div>
+          </div>
         </div>
       </div>
     );

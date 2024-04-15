@@ -121,8 +121,11 @@ export interface IShiftsCollection {
   ShiftAcknowledgedByEmpId: string[];
   ShiftTask: IShiftTasksChild[];
   ShiftGuardWellnessReport: {
-    WellnessLastReported: Timestamp | FieldValue;
-    WellnessReportedById: string; //*Emp id
+    WellnessEmpId: string;
+    WellnessEmpName: string;
+    WellnessReportedAt: Timestamp | FieldValue;
+    WellnessComment?: string | null;
+    WellnessImg?: string | null;
   }[];
   ShiftPhotos?: string[];
   ShiftPhotoUploadIntervalInMinutes?: number | null;
