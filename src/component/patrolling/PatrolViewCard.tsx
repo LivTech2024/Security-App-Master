@@ -63,11 +63,11 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
       <div className="mb-4">
         <div className="font-semibold">Checkpoints:</div>
 
-        {patrolData.PatrolCurrentStatus.length > 0 ? (
-          patrolData.PatrolCurrentStatus?.map((data, idx) => {
-            return (
-              <div key={idx} className="flex gap-4 flex-wrap">
-                <div className="flex flex-col gap-2 mt-2">
+        <div className="flex gap-4 flex-wrap">
+          {patrolData.PatrolCurrentStatus.length > 0 ? (
+            patrolData.PatrolCurrentStatus?.map((data, idx) => {
+              return (
+                <div key={idx} className="flex flex-col gap-2 mt-2">
                   <div>
                     {idx + 1}. Guard:{" "}
                     <span className="font-semibold">
@@ -121,6 +121,41 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                               (s) =>
                                 s?.StatusReportedById ===
                                 data?.StatusReportedById
+                            )?.StatusImage?.length && (
+                              <span className="flex flex-col">
+                                <span>Images: </span>
+                                {ch.CheckPointStatus?.find(
+                                  (s) =>
+                                    s?.StatusReportedById ===
+                                    data?.StatusReportedById
+                                )?.StatusImage?.map((img) => {
+                                  return (
+                                    <a href={img} target="_blank">
+                                      {img.slice(0, 12)}
+                                    </a>
+                                  );
+                                })}
+                              </span>
+                            )}
+                            {ch.CheckPointStatus?.find(
+                              (s) =>
+                                s?.StatusReportedById ===
+                                data?.StatusReportedById
+                            )?.StatusComment && (
+                              <span>
+                                {
+                                  ch.CheckPointStatus?.find(
+                                    (s) =>
+                                      s?.StatusReportedById ===
+                                      data?.StatusReportedById
+                                  )?.StatusComment
+                                }
+                              </span>
+                            )}
+                            {ch.CheckPointStatus?.find(
+                              (s) =>
+                                s?.StatusReportedById ===
+                                data?.StatusReportedById
                             )?.StatusReportedTime && (
                               <span className="text-textTertiary">
                                 {formatDate(
@@ -139,30 +174,30 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                     })}
                   />
                 </div>
-              </div>
-            );
-          })
-        ) : (
-          <TimelineVertical
-            timelineItems={patrolData.PatrolCheckPoints.map((ch) => {
-              return {
-                icon: "",
-                text: ch.CheckPointName,
-                isActive: false,
-                description: (
-                  <div className="flex flex-col">
-                    <span>
-                      Status:{" "}
-                      <span className="capitalize font-medium">
-                        Not checked
-                      </span>{" "}
-                    </span>
-                  </div>
-                ),
-              };
-            })}
-          />
-        )}
+              );
+            })
+          ) : (
+            <TimelineVertical
+              timelineItems={patrolData.PatrolCheckPoints.map((ch) => {
+                return {
+                  icon: "",
+                  text: ch.CheckPointName,
+                  isActive: false,
+                  description: (
+                    <div className="flex flex-col">
+                      <span>
+                        Status:{" "}
+                        <span className="capitalize font-medium">
+                          Not checked
+                        </span>{" "}
+                      </span>
+                    </div>
+                  ),
+                };
+              })}
+            />
+          )}
+        </div>
       </div>
 
       <div className="mb-4 text-textTertiary">
