@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import NoSearchResult from "../../common/NoSearchResult";
 import { useAuthState } from "../../store";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { DisplayCount, REACT_QUERY_KEYS } from "../../@types/enum";
+import { DisplayCount, PageRoutes, REACT_QUERY_KEYS } from "../../@types/enum";
 import DbCompany from "../../firebase_configs/DB/DbCompany";
 import { DocumentData } from "firebase/firestore";
 import {
@@ -18,6 +18,7 @@ import SelectBranch from "../../common/SelectBranch";
 import Button from "../../common/button/Button";
 import ReportCategoriesModal from "../../component/report/modal/ReportCategoriesModal";
 import InputSelect from "../../common/inputs/InputSelect";
+import { useNavigate } from "react-router-dom";
 
 const Reports = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -35,6 +36,8 @@ const Reports = () => {
   const [categoryId, setCategoryId] = useState("");
 
   const { company } = useAuthState();
+
+  const navigate = useNavigate();
 
   const {
     data: snapshotData,
@@ -221,7 +224,13 @@ const Reports = () => {
           ) : (
             data.map((report) => {
               return (
-                <tr key={report.ReportId}>
+                <tr
+                  key={report.ReportId}
+                  className="cursor-pointer"
+                  onClick={() =>
+                    navigate(PageRoutes.REPORT_VIEW + `?id=${report.ReportId}`)
+                  }
+                >
                   <td className="align-top px-4 py-2 text-start">
                     <span className="line-clamp-3">{report.ReportName}</span>
                   </td>

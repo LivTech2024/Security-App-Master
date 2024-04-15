@@ -91,6 +91,7 @@ export const PageRoutes = {
   LOCATIONS: "/locations",
   COMPANY_BRANCHES: "/company_branches",
   REPORTS: "/reports",
+  REPORT_VIEW: "/report_view",
   SETTINGS: "/settings",
   PAYMENTS_AND_BILLING: "/payments_and_billing",
   INVOICE_LIST: "/invoice_list",

@@ -497,6 +497,11 @@ class DbCompany {
     return getDocs(empQuery);
   };
 
+  static getReportById = (reportId: string) => {
+    const reportDocRef = doc(db, CollectionName.reports, reportId);
+    return getDoc(reportDocRef);
+  };
+
   static createSettings = (cmpId: string) => {
     const settingId = getNewDocId(CollectionName.settings);
     const settingRef = doc(db, CollectionName.settings, settingId);

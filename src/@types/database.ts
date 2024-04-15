@@ -199,8 +199,8 @@ export interface IReportsCollection {
   ReportData: string;
   ReportShiftId?: string;
   ReportPatrolId?: string;
-  ReportImage?: string;
-  ReportVideo?: string;
+  ReportImage?: string[];
+  ReportVideo?: string[];
   ReportStatus: "pending" | "started" | "completed";
   ReportCreatedAt: Timestamp | FieldValue;
 }

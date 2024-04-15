@@ -41,6 +41,7 @@ import ClientView from "./pages/client/ClientView";
 import DocumentRepository from "./pages/document_repository/DocumentRepository";
 import EquipmentList from "./pages/equipment_management/EquipmentList";
 import EquipmentView from "./pages/equipment_management/EquipmentView";
+import ReportView from "./pages/reports/ReportView";
 
 function App() {
   useOnAuthStateChanged();
@@ -139,6 +140,7 @@ function App() {
               Component={CompanyBranches}
             />
             <Route path={PageRoutes.REPORTS} Component={Reports} />
+            <Route path={PageRoutes.REPORT_VIEW} Component={ReportView} />
             <Route path={PageRoutes.SETTINGS} Component={Settings} />
             <Route
               path={PageRoutes.PAYMENTS_AND_BILLING}
