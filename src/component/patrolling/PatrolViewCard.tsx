@@ -128,10 +128,14 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                                   (s) =>
                                     s?.StatusReportedById ===
                                     data?.StatusReportedById
-                                )?.StatusImage?.map((img) => {
+                                )?.StatusImage?.map((img, idx) => {
                                   return (
-                                    <a href={img} target="_blank">
-                                      {img.slice(0, 12)}
+                                    <a
+                                      href={img}
+                                      target="_blank"
+                                      className="text-textPrimaryBlue"
+                                    >
+                                      {idx + 1}. {img.slice(0, 30)}...
                                     </a>
                                   );
                                 })}
@@ -143,6 +147,7 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                                 data?.StatusReportedById
                             )?.StatusComment && (
                               <span>
+                                Comment:{" "}
                                 {
                                   ch.CheckPointStatus?.find(
                                     (s) =>
