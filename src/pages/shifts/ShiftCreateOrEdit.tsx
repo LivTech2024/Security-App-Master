@@ -278,31 +278,29 @@ const ShiftCreateOrEdit = () => {
           shiftTasks,
           selectedDays
         );
+      }
 
-        //* Send emails to assigned employees
-        const shiftAssignedUserId = methods.watch("ShiftAssignedUserId") || [];
+      //* Send emails to assigned employees
+      const shiftAssignedUserId = methods.watch("ShiftAssignedUserId") || [];
 
-        if (shiftAssignedUserId?.length > 0) {
-          const sendEmailPromise = shiftAssignedUserId.map(async (empId) => {
-            const emp = employees.find((emp) => emp.EmployeeId === empId);
-            if (emp) {
-              return sendShiftDetailsEmail({
-                companyName: company!.CompanyName,
-                empEmail: emp.EmployeeEmail,
-                empName: emp.EmployeeName,
-                shiftAddress: data.ShiftLocationAddress || "N/A",
-                shiftDate: selectedDays
-                  .map((date) => formatDate(date))
-                  .join(","),
-                shiftEndTime: data.ShiftEndTime,
-                shiftName: data.ShiftName,
-                shiftStartTime: data.ShiftStartTime,
-              });
-            }
-          });
+      if (shiftAssignedUserId?.length > 0) {
+        const sendEmailPromise = shiftAssignedUserId.map(async (empId) => {
+          const emp = employees.find((emp) => emp.EmployeeId === empId);
+          if (emp) {
+            return sendShiftDetailsEmail({
+              companyName: company!.CompanyName,
+              empEmail: emp.EmployeeEmail,
+              empName: emp.EmployeeName,
+              shiftAddress: data.ShiftLocationAddress || "N/A",
+              shiftDate: selectedDays.map((date) => formatDate(date)).join(","),
+              shiftEndTime: data.ShiftEndTime,
+              shiftName: data.ShiftName,
+              shiftStartTime: data.ShiftStartTime,
+            });
+          }
+        });
 
-          await Promise.all(sendEmailPromise);
-        }
+        await Promise.all(sendEmailPromise);
       }
 
       await queryClient.invalidateQueries({
@@ -566,7 +564,6 @@ const ShiftCreateOrEdit = () => {
                 onChange={(e) => methods.setValue("ShiftLinkedPatrolIds", e)}
                 searchValue={patrolSearchQuery}
                 onSearchChange={setPatrolSearchQuery}
-                disabled={isEdit}
                 styles={{
                   input: {
                     border: `1px solid #0000001A`,
@@ -622,7 +619,6 @@ const ShiftCreateOrEdit = () => {
                   onChange={(e) => methods.setValue("ShiftAssignedUserId", e)}
                   searchValue={empSearchQuery}
                   onSearchChange={setEmpSearchQuery}
-                  disabled={isEdit}
                   styles={{
                     input: {
                       border: `1px solid #0000001A`,
