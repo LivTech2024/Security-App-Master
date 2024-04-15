@@ -5,6 +5,7 @@ import {
   ICompanyBranchesCollection,
   IEmployeeRolesCollection,
   ILoggedInUsersCollection,
+  ISettingsCollection,
   ISuperAdminCollection,
 } from "../../@types/database";
 import * as storage from "../../utilities/Storage";
@@ -48,6 +49,8 @@ interface AuthState {
   setCompanyBranches: (cmpBranches: CompanyBranches[]) => void;
   empRoles: EmployeeRoles[];
   setEmpRoles: (empRoles: EmployeeRoles[]) => void;
+  settings: ISettingsCollection | null;
+  setSettings: (settings: ISettingsCollection | null) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
   userSignOut: () => void;
@@ -65,6 +68,8 @@ export const createAuthSlice: StateCreator<AuthState> = (set) => ({
     set((state) => ({ ...state, companyBranches })),
   empRoles: [],
   setEmpRoles: (empRoles) => set((state) => ({ ...state, empRoles })),
+  settings: null,
+  setSettings: (settings) => set((state) => ({ ...state, settings })),
   loading: true,
   setLoading: (loading) => set((state) => ({ ...state, loading })),
   // For logging out user

@@ -299,3 +299,10 @@ export const equipmentAllocationSchema = z.object({
 export type EquipmentAllocationFormFields = z.infer<
   typeof equipmentAllocationSchema
 >;
+
+//*Settings Schema
+export const settingsSchema = z.object({
+  SettingEmpWellnessIntervalInMins: z.coerce.number().min(1),
+});
+
+export type SettingsFormFields = z.infer<typeof settingsSchema>;

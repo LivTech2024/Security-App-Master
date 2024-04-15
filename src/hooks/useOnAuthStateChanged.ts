@@ -13,6 +13,7 @@ import {
   ICompanyBranchesCollection,
   IEmployeeRolesCollection,
   ILoggedInUsersCollection,
+  ISettingsCollection,
   ISuperAdminCollection,
 } from "../@types/database";
 import { useAuthState } from "../store";
@@ -35,6 +36,7 @@ const useOnAuthStateChanged = () => {
     setEmpRoles,
     setCompanyBranches,
     setSuperAdmin,
+    setSettings,
   } = useAuthState();
 
   useEffect(() => {
@@ -123,6 +125,14 @@ const useOnAuthStateChanged = () => {
             );
 
             setCompanyBranches(cmpBranches as unknown as CompanyBranches[]);
+
+            //*Fetch company settings
+            const settingSnapshot = await DbCompany.getSettingsByCmpId(
+              admin.AdminCompanyId
+            );
+            const settings =
+              settingSnapshot?.docs[0]?.data() as ISettingsCollection;
+            setSettings(settings);
           }
         } else {
           //* Fetch super admin and store in zustand

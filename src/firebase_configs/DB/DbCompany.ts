@@ -42,6 +42,7 @@ import {
   AdminUpdateFormFields,
   CompanyBranchFormFields,
   CompanyCreateFormFields,
+  SettingsFormFields,
 } from "../../utilities/zod/schema";
 import CustomError from "../../utilities/CustomError";
 
@@ -281,6 +282,21 @@ class DbCompany {
   static getCompanyById = (cmpId: string) => {
     const cmpRef = doc(db, CollectionName.companies, cmpId);
     return getDoc(cmpRef);
+  };
+
+  static getSettingsByCmpId = (cmpId: string) => {
+    const settingRef = collection(db, CollectionName.settings);
+    const settingQuery = query(
+      settingRef,
+      where("SettingCompanyId", "==", cmpId),
+      limit(1)
+    );
+    return getDocs(settingQuery);
+  };
+
+  static updateSetting = (settingId: string, data: SettingsFormFields) => {
+    const settingRef = doc(db, CollectionName.settings, settingId);
+    return updateDoc(settingRef, data);
   };
 
   static getUserLoggedInData = async (
