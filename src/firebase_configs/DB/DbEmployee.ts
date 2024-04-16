@@ -337,6 +337,10 @@ class DbEmployee {
           EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
           EmployeeBankDetails: bankDetails || null,
           EmployeeSinNumber: empData.EmployeeSinNumber || null,
+          EmployeeAddress: empData.EmployeeAddress || null,
+          EmployeeCity: empData.EmployeeCity || null,
+          EmployeePostalCode: empData.EmployeePostalCode || null,
+          EmployeeProvince: empData.EmployeeProvince || null,
           EmployeeCertificates,
           EmployeeLicenses,
           EmployeeCreatedAt: serverTimestamp(),
@@ -561,6 +565,10 @@ class DbEmployee {
           EmployeeCertificates,
           EmployeeBankDetails: bankDetails || null,
           EmployeeSinNumber: empData.EmployeeSinNumber || null,
+          EmployeeAddress: empData.EmployeeAddress || null,
+          EmployeeCity: empData.EmployeeCity || null,
+          EmployeePostalCode: empData.EmployeePostalCode || null,
+          EmployeeProvince: empData.EmployeeProvince || null,
           EmployeeModifiedAt: serverTimestamp(),
         };
 

@@ -8,6 +8,7 @@ import { IEmpBankDetails } from "../../@types/database";
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 import { useFormContext } from "react-hook-form";
 import { AddEmployeeFormField } from "../../utilities/zod/schema";
+import EmpAddressDetails from "./EmpAddressDetails";
 
 export interface EmpLicenseDetails {
   LicenseType: "driving" | "security";
@@ -35,7 +36,10 @@ const EmployeeOtherDetails = ({
   certificates,
   setCertificates,
 }: EmployeeOtherDetailsProps) => {
-  const { register, formState } = useFormContext<AddEmployeeFormField>();
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<AddEmployeeFormField>();
 
   return (
     <div className="flex flex-col gap-4 p-4 bg-gray-100 rounded-lg shadow-md w-full">
@@ -64,7 +68,7 @@ const EmployeeOtherDetails = ({
               label="SIN Number"
               register={register}
               name="EmployeeSinNumber"
-              error={formState.errors?.EmployeeSinNumber?.message}
+              error={errors?.EmployeeSinNumber?.message}
             />
           </Accordion.Panel>
         </Accordion.Item>
@@ -90,6 +94,14 @@ const EmployeeOtherDetails = ({
               certificates={certificates}
               setCertificates={setCertificates}
             />
+          </Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value="address">
+          <Accordion.Control>
+            <span className="font-semibold">Add Address</span>
+          </Accordion.Control>
+          <Accordion.Panel>
+            <EmpAddressDetails />
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>

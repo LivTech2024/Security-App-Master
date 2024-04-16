@@ -58,32 +58,6 @@ const EmpBankDetails = ({
       <div className="grid grid-cols-2 gap-4">
         <InputWithTopHeader
           className="mx-0"
-          label="Account Name"
-          value={empBankDetails?.BankAccName}
-          onChange={(e) =>
-            setEmpBankDetails((prev) => {
-              return {
-                ...prev,
-                BankAccName: e.target.value,
-              } as IEmpBankDetails;
-            })
-          }
-        />
-        <InputWithTopHeader
-          className="mx-0"
-          label="Bank Name"
-          value={empBankDetails?.BankName}
-          onChange={(e) =>
-            setEmpBankDetails((prev) => {
-              return {
-                ...prev,
-                BankName: e.target.value,
-              } as IEmpBankDetails;
-            })
-          }
-        />
-        <InputWithTopHeader
-          className="mx-0"
           label="Account Number"
           value={empBankDetails?.BankAccNumber}
           onChange={(e) =>
@@ -97,13 +71,26 @@ const EmpBankDetails = ({
         />
         <InputWithTopHeader
           className="mx-0"
-          label="IFSC Code"
-          value={empBankDetails?.BankIfscCode}
+          label="Transit Number"
+          value={empBankDetails?.BankTransitNumber}
           onChange={(e) =>
             setEmpBankDetails((prev) => {
               return {
                 ...prev,
-                BankIfscCode: e.target.value,
+                BankTransitNumber: e.target.value,
+              } as IEmpBankDetails;
+            })
+          }
+        />
+        <InputWithTopHeader
+          className="mx-0"
+          label="Institution Number"
+          value={empBankDetails?.BankInstitutionNumber}
+          onChange={(e) =>
+            setEmpBankDetails((prev) => {
+              return {
+                ...prev,
+                BankInstitutionNumber: e.target.value,
               } as IEmpBankDetails;
             })
           }

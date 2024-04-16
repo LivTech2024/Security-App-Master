@@ -66,15 +66,19 @@ export const addEmployeeFormSchema = z
     EmployeeMaxHrsPerWeek: numberString({
       message: "Employee max week hours is required",
     }),
-    EmployeeSupervisorId: z.string().nullable().optional(),
+    EmployeeSupervisorId: z.array(z.string()).nullable().optional(),
     EmployeeCompanyBranchId: z.string().nullable().optional(),
     EmployeeIsBanned: z.boolean(),
     EmployeeSinNumber: z.string().optional().nullable(),
+    EmployeeAddress: z.string().optional().nullable(),
+    EmployeePostalCode: z.string().optional().nullable(),
+    EmployeeCity: z.string().optional().nullable(),
+    EmployeeProvince: z.string().optional().nullable(),
   })
   .superRefine(({ EmployeeRole, EmployeeSupervisorId }, ctx) => {
     if (
       EmployeeRole === "GUARD" &&
-      (!EmployeeSupervisorId || EmployeeSupervisorId.length < 3)
+      (!EmployeeSupervisorId || EmployeeSupervisorId.length < 1)
     ) {
       ctx.addIssue({
         path: ["EmployeeSupervisorId"],

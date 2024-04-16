@@ -48,10 +48,9 @@ export interface IEmpLicenseDetails {
   LicenseImg: string | null;
 }
 export interface IEmpBankDetails {
-  BankName: string;
-  BankAccName: string;
   BankAccNumber: string;
-  BankIfscCode: string;
+  BankTransitNumber: string;
+  BankInstitutionNumber: string;
   BankVoidCheckImg: string;
 }
 
@@ -72,7 +71,7 @@ export interface IEmployeesCollection {
   EmployeePayRate: number;
   EmployeeMaxHrsPerWeek: number;
   EmployeeIsAvailable: "available" | "out_of_reach" | "on_vacation";
-  EmployeeSupervisorId: string | null;
+  EmployeeSupervisorId: string[] | null;
   EmployeeIsBanned: boolean;
   EmployeeCompanyId: string;
   EmployeeCompanyBranchId?: string | null;
@@ -80,6 +79,10 @@ export interface IEmployeesCollection {
   EmployeeBankDetails: IEmpBankDetails | null;
   EmployeeSinNumber: string | null;
   EmployeeCertificates: IEmpCertificatesDetails[];
+  EmployeeAddress?: string | null;
+  EmployeePostalCode?: string | null;
+  EmployeeCity?: string | null;
+  EmployeeProvince?: string | null;
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;
 }
