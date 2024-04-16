@@ -56,7 +56,7 @@ const EmployeeCreateOrEdit = () => {
             employeeEditData.EmployeePayRate
           ) as unknown as number,
           EmployeeMaxHrsPerWeek: String(
-            employeeEditData.EmployeeMaxHrsPerWeek || 45
+            employeeEditData.EmployeeMaxHrsPerWeek || 40
           ) as unknown as number,
           EmployeeSupervisorId: employeeEditData.EmployeeSupervisorId,
           EmployeeCompanyBranchId: employeeEditData.EmployeeCompanyBranchId,
