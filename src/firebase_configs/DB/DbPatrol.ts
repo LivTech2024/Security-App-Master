@@ -72,7 +72,7 @@ class DbPatrol {
       PatrolRequiredCount: Number(data.PatrolRequiredCount),
       PatrolCheckPoints,
       PatrolCurrentStatus: [],
-      PatrolRestrictedRadius: Number(data.PatrolRestrictedRadius),
+      PatrolRestrictedRadius: data.PatrolRestrictedRadius || null,
       PatrolKeepGuardInRadiusOfLocation: data.PatrolKeepGuardInRadiusOfLocation,
       PatrolClientId: data.PatrolClientId || null,
       PatrolCreatedAt: serverTimestamp(),
@@ -146,7 +146,7 @@ class DbPatrol {
         PatrolLocationName: data.PatrolLocationName,
         PatrolRequiredCount: Number(data.PatrolRequiredCount),
         PatrolCheckPoints,
-        PatrolRestrictedRadius: Number(data.PatrolRestrictedRadius),
+        PatrolRestrictedRadius: data.PatrolRestrictedRadius || null,
         PatrolKeepGuardInRadiusOfLocation:
           data.PatrolKeepGuardInRadiusOfLocation,
         PatrolClientId: data.PatrolClientId || null,

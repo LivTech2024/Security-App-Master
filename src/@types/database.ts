@@ -113,7 +113,7 @@ export interface IShiftsCollection {
   ShiftLocationId: string | null; //* Null for mobile guard
   ShiftLocationName: string | null; //* Null for mobile guard
   ShiftLocationAddress: string | null; //* Null for mobile guard
-  ShiftRestrictedRadius: number;
+  ShiftRestrictedRadius: number | null;
   ShiftEnableRestrictedRadius: boolean;
   ShiftDescription: string | null;
   ShiftAssignedUserId: string[];
@@ -179,7 +179,7 @@ export interface IPatrolsCollection {
   }[];
   PatrolFailureReason?: string;
   PatrolClientId?: string | null;
-  PatrolRestrictedRadius: number;
+  PatrolRestrictedRadius: number | null;
   PatrolKeepGuardInRadiusOfLocation: boolean;
   PatrolReminderInMinutes: number;
   PatrolCreatedAt: Timestamp | FieldValue;

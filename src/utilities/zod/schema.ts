@@ -115,7 +115,7 @@ export const addShiftFormSchema = z
       .nullable()
       .optional(),
     ShiftCompanyBranchId: z.string().nullable().optional(),
-    ShiftRestrictedRadius: z.coerce.number().min(1),
+    ShiftRestrictedRadius: z.coerce.number().nullable().optional(),
     ShiftEnableRestrictedRadius: z.boolean(),
     ShiftClientId: z
       .string()
@@ -158,10 +158,7 @@ export const patrollingSchema = z.object({
       hint: z.string().optional().nullable(),
     })
   ),
-  PatrolRestrictedRadius: z.coerce
-    .number()
-    .min(100, { message: "Restricted radius must be at least 100 meters" })
-    .max(10000, { message: "Restricted radius must be at most 10000 meters" }),
+  PatrolRestrictedRadius: z.coerce.number().nullable().optional(),
   PatrolKeepGuardInRadiusOfLocation: z.boolean(),
   PatrolRequiredCount: z.coerce
     .number()

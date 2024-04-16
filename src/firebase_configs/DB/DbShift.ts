@@ -72,7 +72,7 @@ class DbShift {
         ShiftPhotoUploadIntervalInMinutes:
           shiftData.ShiftPhotoUploadIntervalInMinutes,
         ShiftClientId: shiftData.ShiftClientId ?? null,
-        ShiftRestrictedRadius: Number(shiftData.ShiftRestrictedRadius),
+        ShiftRestrictedRadius: shiftData.ShiftRestrictedRadius || null,
         ShiftCurrentStatus: [],
         ShiftTask: shiftTasks,
         ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
@@ -157,9 +157,7 @@ class DbShift {
         ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
         ShiftLocationName: shiftData.ShiftLocationName ?? null,
         ShiftClientId: shiftData.ShiftClientId ?? null,
-        ShiftRestrictedRadius: shiftData.ShiftRestrictedRadius
-          ? Number(shiftData.ShiftRestrictedRadius)
-          : 0,
+        ShiftRestrictedRadius: shiftData.ShiftRestrictedRadius || null,
         ShiftCompanyId: cmpId,
         ShiftLocationId: shiftData.ShiftLocationId ?? null,
         ShiftLocationAddress: shiftData.ShiftLocationAddress ?? null,
