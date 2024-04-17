@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:3000";
+const baseUrl = import.meta.env.VITE_SERVER_BASE_URL || "http://localhost:3000";
 
 interface SendEmailArgs {
   to_email: string;
@@ -10,7 +10,11 @@ interface SendEmailArgs {
   html?: string | null;
   cc?: string[];
   bcc?: string[];
-  attachments?: { filename: string; content: string; contentType: string }[];
+  attachments?: {
+    filename: string;
+    content: string; //*In base64 format
+    contentType: string;
+  }[];
 }
 
 export const sendEmail = ({
