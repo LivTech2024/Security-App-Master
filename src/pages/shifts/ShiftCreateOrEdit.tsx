@@ -93,9 +93,9 @@ const ShiftCreateOrEdit = () => {
     ""
   );
 
-  const [startTime, setStartTime] = useState("09:00 AM");
+  const [startTime, setStartTime] = useState("09:00");
 
-  const [endTime, setEndTime] = useState("05:00 PM");
+  const [endTime, setEndTime] = useState("17:00");
 
   const [locationSearchQuery, setLocationSearchQuery] = useState("");
 
@@ -133,8 +133,6 @@ const ShiftCreateOrEdit = () => {
   const { data: patrols } = useFetchPatrols({
     searchQuery: patrolSearchQuery,
   });
-
-  console.log(methods.watch("ShiftLinkedPatrolIds"), "ids");
 
   useEffect(() => {
     console.log(methods.formState.errors);
@@ -234,8 +232,8 @@ const ShiftCreateOrEdit = () => {
       return;
     }
     setSelectedDays([]);
-    setStartTime("09:00 AM");
-    setEndTime("05:00 PM");
+    setStartTime("09:00");
+    setEndTime("17:00");
     setLocationSearchQuery("");
     setShiftPosition("");
     setCompanyBranch(null);
@@ -452,15 +450,9 @@ const ShiftCreateOrEdit = () => {
               label="Start time"
               value={startTime}
               onChange={setStartTime}
-              use12Hours={true}
             />
 
-            <InputTime
-              label="End time"
-              value={endTime}
-              onChange={setEndTime}
-              use12Hours={true}
-            />
+            <InputTime label="End time" value={endTime} onChange={setEndTime} />
             <InputSelect
               label="Shift location (Optional for mobile guard)"
               data={locations.map((loc) => {
