@@ -129,16 +129,30 @@ export const addShiftFormSchema = z
     ShiftPhotoUploadIntervalInMinutes: z.coerce.number().nullable().optional(),
     ShiftAssignedUserId: z.array(z.string()).default([]).optional(),
     ShiftLinkedPatrolIds: z.array(z.string()).default([]).optional(),
+    ShiftIsSpecialShift: z.boolean(),
   })
-  .superRefine(({ ShiftRequiredEmp }, ctx) => {
-    if (!Number(ShiftRequiredEmp)) {
-      ctx.addIssue({
-        path: ["ShiftRequiredEmp"],
-        message: `Required no. of employees must be at least 1`,
-        code: "custom",
-      });
+  .superRefine(
+    ({ ShiftRequiredEmp, ShiftIsSpecialShift, ShiftAssignedUserId }, ctx) => {
+      if (!Number(ShiftRequiredEmp)) {
+        ctx.addIssue({
+          path: ["ShiftRequiredEmp"],
+          message: `Required no. of employees must be at least 1`,
+          code: "custom",
+        });
+      }
+
+      if (
+        ShiftIsSpecialShift &&
+        (!ShiftAssignedUserId || ShiftAssignedUserId?.length === 0)
+      ) {
+        ctx.addIssue({
+          path: ["ShiftAssignedUserId"],
+          message: `Pleas assign employee to this special shift`,
+          code: "custom",
+        });
+      }
     }
-  });
+  );
 
 export type AddShiftFormFields = z.infer<typeof addShiftFormSchema>;
 

@@ -140,6 +140,7 @@ export interface IShiftsCollection {
     StatusShiftTotalHrs?: number;
   }[];
   ShiftLinkedPatrolIds: string[];
+  ShiftIsSpecialShift: boolean;
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;
 }

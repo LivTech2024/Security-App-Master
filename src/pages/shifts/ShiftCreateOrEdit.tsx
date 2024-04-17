@@ -123,8 +123,14 @@ const ShiftCreateOrEdit = () => {
 
   const [empSearchQuery, setEmpSearchQuery] = useState("");
 
+  const [isSpecialShift, setIsSpecialShift] = useState(false);
+
+  useEffect(() => {
+    methods.setValue("ShiftIsSpecialShift", isSpecialShift);
+  }, [isSpecialShift]);
+
   const { data: employees } = useFetchEmployees({
-    empRole: shiftPosition || null,
+    empRole: isSpecialShift ? null : shiftPosition || null,
     searchQuery: empSearchQuery,
   });
 
@@ -194,6 +200,7 @@ const ShiftCreateOrEdit = () => {
         shiftEditData?.ShiftLinkedPatrolIds ?? []
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationId]);
 
   useEffect(() => {
@@ -212,6 +219,7 @@ const ShiftCreateOrEdit = () => {
       setLocationSearchQuery(shiftEditData.ShiftLocationName ?? "");
       setShiftPosition(shiftEditData.ShiftPosition);
       setSelectedDays([toDate(shiftEditData.ShiftDate)]);
+      setIsSpecialShift(shiftEditData.ShiftIsSpecialShift);
       if (shiftEditData.ShiftCompanyBranchId) {
         const branchName = companyBranches.find(
           (b) => b.CompanyBranchId === shiftEditData.ShiftCompanyBranchId
@@ -403,13 +411,22 @@ const ShiftCreateOrEdit = () => {
           className="flex w-full gap-4"
         >
           <div className="w-[30%] bg-surface shadow rounded p-4 flex flex-col gap-4">
-            <div className="font-medium text-lg">Add shift task (Optional)</div>
+            <div className="font-semibold text-lg">
+              Add shift task (Optional)
+            </div>
             <ShiftTaskForm tasks={shiftTasks} setTasks={setShiftTasks} />
           </div>
           <div className="grid grid-cols-2 w-[70%] gap-4 bg-surface shadow rounded p-4">
-            <div className="font-medium col-span-2 text-lg">
-              Add shift details
+            <div className="flex items-start justify-between font-medium col-span-2 text-lg">
+              <div className="font-semibold text-lg">Add shift details</div>
+              <SwitchWithSideHeader
+                checked={isSpecialShift}
+                onChange={() => setIsSpecialShift(!isSpecialShift)}
+                className="w-1/2 mb-2 font-medium text-base bg-gray-200 px-[10px] py-1 rounded"
+                label="Is this special shift"
+              />
             </div>
+
             <InputAutoComplete
               label="Shift position"
               value={shiftPosition}
@@ -620,6 +637,7 @@ const ShiftCreateOrEdit = () => {
                       padding: "8px 8px",
                     },
                   }}
+                  error={methods.formState.errors.ShiftAssignedUserId?.message}
                 />
               </div>
             </div>

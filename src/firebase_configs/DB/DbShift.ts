@@ -83,6 +83,7 @@ class DbShift {
         ShiftLocationName: shiftData.ShiftLocationName ?? null,
         ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
         ShiftLinkedPatrolIds: shiftData.ShiftLinkedPatrolIds ?? [],
+        ShiftIsSpecialShift: shiftData.ShiftIsSpecialShift,
         ShiftCreatedAt: serverTimestamp(),
         ShiftModifiedAt: serverTimestamp(),
       };
@@ -164,6 +165,7 @@ class DbShift {
         ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
         ShiftLinkedPatrolIds: shiftData.ShiftLinkedPatrolIds ?? [],
         ShiftAssignedUserId: shiftData.ShiftAssignedUserId,
+        ShiftIsSpecialShift: shiftData.ShiftIsSpecialShift,
         ShiftModifiedAt: serverTimestamp(),
       };
 
