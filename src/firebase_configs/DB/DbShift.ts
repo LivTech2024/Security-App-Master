@@ -163,6 +163,7 @@ class DbShift {
         ShiftLocationAddress: shiftData.ShiftLocationAddress ?? null,
         ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
         ShiftLinkedPatrolIds: shiftData.ShiftLinkedPatrolIds ?? [],
+        ShiftAssignedUserId: shiftData.ShiftAssignedUserId,
         ShiftModifiedAt: serverTimestamp(),
       };
 
