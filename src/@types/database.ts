@@ -179,7 +179,7 @@ export interface IPatrolsCollection {
     StatusReportedTime?: Timestamp | FieldValue;
   }[];
   PatrolFailureReason?: string;
-  PatrolClientId?: string | null;
+  PatrolClientId: string;
   PatrolRestrictedRadius: number | null;
   PatrolKeepGuardInRadiusOfLocation: boolean;
   PatrolReminderInMinutes: number;

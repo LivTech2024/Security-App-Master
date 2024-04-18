@@ -74,7 +74,7 @@ class DbPatrol {
       PatrolCurrentStatus: [],
       PatrolRestrictedRadius: data.PatrolRestrictedRadius || null,
       PatrolKeepGuardInRadiusOfLocation: data.PatrolKeepGuardInRadiusOfLocation,
-      PatrolClientId: data.PatrolClientId || null,
+      PatrolClientId: data.PatrolClientId,
       PatrolCreatedAt: serverTimestamp(),
       PatrolModifiedAt: serverTimestamp(),
     };
@@ -149,7 +149,7 @@ class DbPatrol {
         PatrolRestrictedRadius: data.PatrolRestrictedRadius || null,
         PatrolKeepGuardInRadiusOfLocation:
           data.PatrolKeepGuardInRadiusOfLocation,
-        PatrolClientId: data.PatrolClientId || null,
+        PatrolClientId: data.PatrolClientId,
         PatrolModifiedAt: serverTimestamp(),
       };
 

@@ -353,7 +353,7 @@ const PatrollingCreateOrEdit = () => {
           </div>
 
           <InputSelect
-            label="Client (Optional)"
+            label="Client"
             value={methods.watch("PatrolClientId") || ""}
             onChange={(e) => methods.setValue("PatrolClientId", e || "")}
             data={clients.map((client) => {
