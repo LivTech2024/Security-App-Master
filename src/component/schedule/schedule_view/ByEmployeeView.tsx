@@ -23,8 +23,8 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import { errorHandler } from "../../../utilities/CustomError";
-import { sendEmail } from "../../../utilities/sendEmail";
 import SelectBranch from "../../../common/SelectBranch";
+import { sendEmail } from "../../../API/SendEmail";
 
 interface ByEmployeeViewProps {
   datesArray: Date[];
@@ -245,8 +245,7 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
       const sendEmailPromise = aggregatedEmails.map(async (res) => {
         return sendEmail({
           to_email: res.empEmail,
-          to_name: res.empName,
-          message: res.message,
+          text: res.message,
           subject: "Your schedule update",
           from_name: company!.CompanyName,
         });

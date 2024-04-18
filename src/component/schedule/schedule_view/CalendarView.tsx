@@ -25,11 +25,11 @@ import {
   showSnackbar,
 } from "../../../utilities/TsxUtils";
 import { errorHandler } from "../../../utilities/CustomError";
-import { sendEmail } from "../../../utilities/sendEmail";
 import { useAuthState } from "../../../store";
 import AssignShiftModal from "../modal/AssignShiftModal";
 import SelectBranch from "../../../common/SelectBranch";
 import { Accordion } from "@mantine/core";
+import { sendEmail } from "../../../API/SendEmail";
 //import { Accordion } from "@mantine/core";
 
 interface CalendarViewProps {
@@ -234,19 +234,17 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
         }
       });
 
-      const sendEmailPromise = aggregatedEmails.map(async (res) => {
-        return sendEmail({
-          to_email: res.empEmail,
-          to_name: res.empName,
-          message: res.message,
-          subject: "Your schedule update",
-          from_name: company!.CompanyName,
-        });
-      });
-
-      Promise.allSettled(sendEmailPromise).catch((error) => {
-        console.log(error, "Error while sending emails to employees");
-      });
+      await Promise.all(
+        aggregatedEmails.map(async (res) => {
+          console.log(res, "res");
+          return sendEmail({
+            to_email: res.empEmail,
+            text: res.message,
+            subject: "Your schedule update",
+            from_name: company!.CompanyName,
+          });
+        })
+      );
 
       setResultToBePublished([]);
 

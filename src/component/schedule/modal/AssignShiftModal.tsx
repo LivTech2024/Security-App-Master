@@ -95,7 +95,6 @@ const AssignShiftModal = ({
         return sendShiftDetailsEmail({
           companyName: company!.CompanyName,
           empEmail: emp.EmployeeEmail,
-          empName: emp.EmployeeName,
           shiftAddress: shift.ShiftLocationAddress || "N/A",
           shiftDate: formatDate(shift.ShiftDate),
           shiftEndTime: shift.ShiftEndTime,

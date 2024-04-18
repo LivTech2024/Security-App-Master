@@ -294,7 +294,6 @@ const ShiftCreateOrEdit = () => {
             return sendShiftDetailsEmail({
               companyName: company!.CompanyName,
               empEmail: emp.EmployeeEmail,
-              empName: emp.EmployeeName,
               shiftAddress: data.ShiftLocationAddress || "N/A",
               shiftDate: selectedDays.map((date) => formatDate(date)).join(","),
               shiftEndTime: data.ShiftEndTime,
