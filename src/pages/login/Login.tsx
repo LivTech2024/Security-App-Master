@@ -54,8 +54,6 @@ const Login = () => {
       const idTokenResult = await dbUser.getIdTokenResult();
       const claims = idTokenResult.claims;
 
-      console.log(claims, "claims");
-
       let userType = IUserType.ADMIN;
 
       if (claims.role === "client") {
