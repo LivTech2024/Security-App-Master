@@ -187,6 +187,27 @@ export interface IPatrolsCollection {
   PatrolModifiedAt: Timestamp | FieldValue;
 }
 
+export interface IPatrolLogsCollection {
+  PatrolLogId: string;
+  PatrolId: string;
+  PatrolDate: Timestamp | FieldValue; //*Same as ShiftDate
+  PatrolLogGuardId: string;
+  PatrolLogGuardName: string;
+  PatrolLogStartedAt: Timestamp | FieldValue;
+  PatrolLogPatrolCount: number;
+  PatrolLogCheckPoints: {
+    CheckPointName: string;
+    CheckPointStatus: "checked" | "not_checked";
+    CheckPointReportedAt: Timestamp | FieldValue;
+    CheckPointFailureReason?: string;
+    CheckPointComment?: string | null;
+    CheckPointImage?: string[];
+  }[];
+  PatrolLogStatus: "started" | "completed";
+  PatrolLogEndedAt: Timestamp | FieldValue;
+  PatrolLogCreatedAt: Timestamp;
+}
+
 export interface IReportCategoriesCollection {
   ReportCategoryId: string;
   ReportCompanyId: string;
