@@ -4,11 +4,13 @@ import {
   IUserType,
   LocalStorageKey,
   LocalStorageLoggedInUserData,
+  PageRoutes,
 } from "../@types/enum";
 import DbCompany from "../firebase_configs/DB/DbCompany";
 import { firebaseDataToObject } from "../utilities/misc";
 import {
   IAdminsCollection,
+  IClientsCollection,
   ICompaniesCollection,
   ICompanyBranchesCollection,
   IEmployeeRolesCollection,
@@ -27,6 +29,9 @@ import DbEmployee from "../firebase_configs/DB/DbEmployee";
 import DbSuperAdmin from "../firebase_configs/DB/DbSuperAdmin";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase_configs/config";
+import DbClient from "../firebase_configs/DB/DbClient";
+import { Client } from "../store/slice/editForm.slice";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const useOnAuthStateChanged = () => {
   const {
@@ -36,8 +41,12 @@ const useOnAuthStateChanged = () => {
     setEmpRoles,
     setCompanyBranches,
     setSuperAdmin,
+    setClient,
     setSettings,
   } = useAuthState();
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
@@ -134,13 +143,25 @@ const useOnAuthStateChanged = () => {
               settingSnapshot?.docs[0]?.data() as ISettingsCollection;
             setSettings(settings);
           }
-        } else {
+        } else if(_loggedInUser.LoggedInUserType === IUserType.SUPER_ADMIN) {
           //* Fetch super admin and store in zustand
           const superAdminSnapshot = await DbSuperAdmin.getSuperAdminById(
             _loggedInUser.LoggedInUserId
           );
           const superAdmin = superAdminSnapshot.data() as ISuperAdminCollection;
           setSuperAdmin(superAdmin);
+        }
+        else if(_loggedInUser.LoggedInUserType === IUserType.CLIENT) {
+          //* Fetch clientand store in zustand
+          const superAdminSnapshot = await DbClient.getClientById(
+            _loggedInUser.LoggedInUserId
+          );
+          const client = superAdminSnapshot.data() as IClientsCollection;
+          setClient(client as unknown as Client);
+          if(!location.pathname.includes("/client_portal")){
+            navigate(PageRoutes.CLIENT_PORTAL_HOME)
+          }
+          
         }
 
         setLoading(false);

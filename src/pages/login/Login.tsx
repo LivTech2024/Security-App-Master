@@ -1,3 +1,4 @@
+/* eslint-disable no-extra-boolean-cast */
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 import Button from "../../common/button/Button";
 import { useState } from "react";
@@ -19,6 +20,7 @@ import * as storage from "../../utilities/Storage";
 import { getNewDocId } from "../../firebase_configs/DB/utils";
 import {
   IAdminsCollection,
+  IClientsCollection,
   ICompaniesCollection,
   ILoggedInUsersCollection,
   ISuperAdminCollection,
@@ -31,6 +33,8 @@ import { firebaseDataToObject } from "../../utilities/misc";
 import { Admin, Company } from "../../store/slice/auth.slice";
 import DbSuperAdmin from "../../firebase_configs/DB/DbSuperAdmin";
 import { FirebaseError } from "firebase/app";
+import DbClient from "../../firebase_configs/DB/DbClient";
+import { Client } from "../../store/slice/editForm.slice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -38,7 +42,7 @@ const Login = () => {
 
   const auth = getAuth();
 
-  const { setAdmin, setCompany, setSuperAdmin } = useAuthState();
+  const { setAdmin, setCompany, setSuperAdmin, setClient } = useAuthState();
 
   const signInSuccess = async (dbUser: User) => {
     try {
@@ -47,36 +51,50 @@ const Login = () => {
       const randomChar = v4();
       const loggedInCrypt = randNum + randomChar + uId;
 
+      const idTokenResult = await dbUser.getIdTokenResult();
+      const claims = idTokenResult.claims;
+
+      console.log(claims, "claims");
+
       let userType = IUserType.ADMIN;
 
-      //* Fetch admin and store in zustand
-      const adminSnapshot = await DbCompany.getAdminById(uId);
-      const superAdminSnapshot = await DbSuperAdmin.getSuperAdminById(uId);
-
-      if (adminSnapshot.exists()) {
-        const admin = adminSnapshot.data() as IAdminsCollection;
-        const _admin = firebaseDataToObject(
-          admin as unknown as Record<string, unknown>
-        ) as unknown as Admin;
-        setAdmin(_admin);
-
-        //*Fetch company and store in zustand;
-        const cmpSnapshot = await DbCompany.getCompanyById(
-          admin.AdminCompanyId
-        );
-        const company = cmpSnapshot.data() as ICompaniesCollection;
-        const _company = firebaseDataToObject(
-          company as unknown as Record<string, unknown>
-        ) as unknown as Company;
-        setCompany(_company);
-      } else if (superAdminSnapshot.exists()) {
-        const superAdmin = superAdminSnapshot.data() as ISuperAdminCollection;
-        setSuperAdmin(superAdmin);
-        userType = IUserType.SUPER_ADMIN;
+      if (claims.role === "client") {
+        userType = IUserType.CLIENT;
+      } else if (claims.role === "employee") {
+        throw new CustomError("Invalid credentials");
       }
 
-      if (!adminSnapshot.exists() && !superAdminSnapshot.exists()) {
-        throw new CustomError("Invalid credentials");
+      //* Fetch auth user and store in zustand
+
+      if (userType === IUserType.ADMIN) {
+        const adminSnapshot = await DbCompany.getAdminById(uId);
+        const superAdminSnapshot = await DbSuperAdmin.getSuperAdminById(uId);
+
+        if (adminSnapshot.exists()) {
+          const admin = adminSnapshot.data() as IAdminsCollection;
+          const _admin = firebaseDataToObject(
+            admin as unknown as Record<string, unknown>
+          ) as unknown as Admin;
+          setAdmin(_admin);
+
+          //*Fetch company and store in zustand;
+          const cmpSnapshot = await DbCompany.getCompanyById(
+            admin.AdminCompanyId
+          );
+          const company = cmpSnapshot.data() as ICompaniesCollection;
+          const _company = firebaseDataToObject(
+            company as unknown as Record<string, unknown>
+          ) as unknown as Company;
+          setCompany(_company);
+        } else if (superAdminSnapshot.exists()) {
+          const superAdmin = superAdminSnapshot.data() as ISuperAdminCollection;
+          setSuperAdmin(superAdmin);
+          userType = IUserType.SUPER_ADMIN;
+        }
+      } else if (userType === IUserType.CLIENT) {
+        const clientSnapshot = await DbClient.getClientById(uId);
+        const client = clientSnapshot.data() as IClientsCollection;
+        setClient(client as unknown as Client);
       }
 
       //* Create a new loggedInUser doc

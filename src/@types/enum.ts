@@ -116,6 +116,7 @@ export const LocalStorageKey = {
 export enum IUserType {
   ADMIN = "admin",
   SUPER_ADMIN = "super_admin",
+  CLIENT = "CLIENT"
 }
 
 export interface LocalStorageLoggedInUserData {

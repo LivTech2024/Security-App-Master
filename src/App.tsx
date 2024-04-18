@@ -70,29 +70,31 @@ function App() {
   }
 
   if (location.pathname.includes("/client_portal") && client) {
-    <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
-      <ModalsProvider
-        modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
-      >
-        <Layout userType="client">
-          <ToastContainer />
-          <Routes>
-            <Route
-              path={PageRoutes.CLIENT_PORTAL_HOME}
-              Component={ClientHome}
-            />
-            <Route
-              path={PageRoutes.CLIENT_PORTAL_PATROLS}
-              Component={ClientPatrols}
-            />
-            <Route
-              path={PageRoutes.CLIENT_PORTAL_REPORTS}
-              Component={ClientReports}
-            />
-          </Routes>
-        </Layout>
-      </ModalsProvider>
-    </MantineProvider>;
+    return (
+      <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
+        <ModalsProvider
+          modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
+        >
+          <Layout userType="client">
+            <ToastContainer />
+            <Routes>
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_HOME}
+                Component={ClientHome}
+              />
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_PATROLS}
+                Component={ClientPatrols}
+              />
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_REPORTS}
+                Component={ClientReports}
+              />
+            </Routes>
+          </Layout>
+        </ModalsProvider>
+      </MantineProvider>
+    );
   }
 
   if (location.pathname.includes("/super_admin") && superAdmin) {

@@ -83,8 +83,13 @@ const Nav = ({
   userType: "admin" | "client" | "super_admin";
 }) => {
   const { userSignOut } = useAuthState();
+  const navigate = useNavigate();
   return (
-    <div className="flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1 justify-between">
+    <div
+      className={`flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1 ${
+        userType === "admin" && "justify-between"
+      }`}
+    >
       {userType === "admin" && (
         <>
           <NavItem path={PageRoutes.HOME} name="Home" />
@@ -130,6 +135,7 @@ const Nav = ({
               title: "Confirm",
               body: "Are you sure to sign out",
               onConfirm: () => {
+                navigate(PageRoutes.HOME);
                 userSignOut();
               },
             },
