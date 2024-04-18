@@ -42,11 +42,14 @@ import DocumentRepository from "./pages/document_repository/DocumentRepository";
 import EquipmentList from "./pages/equipment_management/EquipmentList";
 import EquipmentView from "./pages/equipment_management/EquipmentView";
 import ReportView from "./pages/reports/ReportView";
+import ClientHome from "./pages/client_portal/ClientHome";
+import ClientPatrols from "./pages/client_portal/ClientPatrols";
+import ClientReports from "./pages/client_portal/ClientReports";
 
 function App() {
   useOnAuthStateChanged();
 
-  const { company, admin, loading, superAdmin } = useAuthState();
+  const { company, admin, loading, superAdmin, client } = useAuthState();
 
   const { notification } = useListenNotifications();
 
@@ -64,6 +67,32 @@ function App() {
 
   if (loading) {
     return <SplashScreen />;
+  }
+
+  if (location.pathname.includes("/client_portal") && client) {
+    <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
+      <ModalsProvider
+        modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
+      >
+        <Layout userType="client">
+          <ToastContainer />
+          <Routes>
+            <Route
+              path={PageRoutes.CLIENT_PORTAL_HOME}
+              Component={ClientHome}
+            />
+            <Route
+              path={PageRoutes.CLIENT_PORTAL_PATROLS}
+              Component={ClientPatrols}
+            />
+            <Route
+              path={PageRoutes.CLIENT_PORTAL_REPORTS}
+              Component={ClientReports}
+            />
+          </Routes>
+        </Layout>
+      </ModalsProvider>
+    </MantineProvider>;
   }
 
   if (location.pathname.includes("/super_admin") && superAdmin) {
@@ -88,7 +117,8 @@ function App() {
   if (
     !admin ||
     !company ||
-    (location.pathname.includes("/super_admin") && !superAdmin)
+    (location.pathname.includes("/super_admin") && !superAdmin) ||
+    (location.pathname.includes("/client_portal") && !client)
   ) {
     return (
       <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
@@ -106,7 +136,7 @@ function App() {
       <ModalsProvider
         modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
       >
-        <Layout>
+        <Layout userType="admin">
           <ToastContainer />
           <Routes>
             <Route path={PageRoutes.HOME} Component={Home} />

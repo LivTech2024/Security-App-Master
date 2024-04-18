@@ -103,6 +103,9 @@ export const PageRoutes = {
   DOCUMENT_REPOSITORY: "/document_repository",
   EQUIPMENT_LIST: "/equipment_list",
   EQUIPMENT_VIEW: "/equipment_view",
+  CLIENT_PORTAL_HOME:"/client_portal/",
+  CLIENT_PORTAL_PATROLS:"/client_portal/patrols",
+  CLIENT_PORTAL_REPORTS:"/client_portal/reports"
 };
 
 export const LocalStorageKey = {

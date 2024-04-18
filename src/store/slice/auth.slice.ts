@@ -11,6 +11,7 @@ import {
 import * as storage from "../../utilities/Storage";
 import { LocalStorageKey } from "../../@types/enum";
 import DbCompany from "../../firebase_configs/DB/DbCompany";
+import { Client } from "./editForm.slice";
 
 export interface Company
   extends Omit<ICompaniesCollection, "CompanyCreatedAt" | "CompanyModifiedAt"> {
@@ -23,6 +24,8 @@ export interface Admin
   AdminCreatedAt: string;
   AdminModifiedAt: string;
 }
+
+
 
 export interface EmployeeRoles
   extends Omit<IEmployeeRolesCollection, "EmployeeRoleCreatedAt"> {
@@ -45,6 +48,8 @@ interface AuthState {
   setCompany: (cmp: Company | null) => void;
   admin: Admin | null;
   setAdmin: (admin: Admin | null) => void;
+  client: Client | null;
+  setClient: (client: Client | null) => void;
   companyBranches: CompanyBranches[];
   setCompanyBranches: (cmpBranches: CompanyBranches[]) => void;
   empRoles: EmployeeRoles[];
@@ -63,6 +68,8 @@ export const createAuthSlice: StateCreator<AuthState> = (set) => ({
   setCompany: (cmp) => set((state) => ({ ...state, company: cmp })),
   admin: null,
   setAdmin: (admin) => set((state) => ({ ...state, admin })),
+  client: null,
+  setClient: (client) => set((state) => ({ ...state, client })),
   companyBranches: [],
   setCompanyBranches: (companyBranches) =>
     set((state) => ({ ...state, companyBranches })),
@@ -83,6 +90,8 @@ export const createAuthSlice: StateCreator<AuthState> = (set) => ({
         ...state,
         admin: null,
         company: null,
+        client: null,
+        superAdmin: null
       }));
       DbCompany.deleteUserLoggedInDoc(loggedInUser.LoggedInId)
         .then(() => {

@@ -209,6 +209,7 @@ export interface IReportsCollection {
   ReportImage?: string[];
   ReportVideo?: string[];
   ReportStatus: "pending" | "started" | "completed";
+  ReportClientId: string;
   ReportCreatedAt: Timestamp | FieldValue;
 }
 

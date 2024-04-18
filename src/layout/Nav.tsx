@@ -77,32 +77,47 @@ const NavItem = ({
   );
 };
 
-const Nav = () => {
+const Nav = ({
+  userType,
+}: {
+  userType: "admin" | "client" | "super_admin";
+}) => {
   const { userSignOut } = useAuthState();
   return (
     <div className="flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1 justify-between">
-      <NavItem path={PageRoutes.HOME} name="Home" />
-      <NavItem path={PageRoutes.SCHEDULES} name="Schedules" />
-      <NavItem path={PageRoutes.EMPLOYEE_LIST} name="Employees" />
-      {/* <NavItem path={PageRoutes.SHIFT_LIST} name="Shifts" /> */}
-      <NavItem path={PageRoutes.PATROLLING_LIST} name="Patrolling" />
-      <NavItem
-        name="Company"
-        isDropdownReq
-        dropdownChildren={[
-          { name: "Company Branches", path: PageRoutes.COMPANY_BRANCHES },
-          { name: "Manage Locations", path: PageRoutes.LOCATIONS },
-          { name: "Manage Clients", path: PageRoutes.CLIENTS },
-        ]}
-      />
-      <NavItem path="#" name="Notifications" />
-      <NavItem path={PageRoutes.REPORTS} name="Reports" />
-      <NavItem
-        path={PageRoutes.PAYMENTS_AND_BILLING}
-        name="Payments & Billing"
-      />
-      <NavItem path={PageRoutes.SETTINGS} name="Settings" />
+      {userType === "admin" && (
+        <>
+          <NavItem path={PageRoutes.HOME} name="Home" />
+          <NavItem path={PageRoutes.SCHEDULES} name="Schedules" />
+          <NavItem path={PageRoutes.EMPLOYEE_LIST} name="Employees" />
+          {/* <NavItem path={PageRoutes.SHIFT_LIST} name="Shifts" /> */}
+          <NavItem path={PageRoutes.PATROLLING_LIST} name="Patrolling" />
+          <NavItem
+            name="Company"
+            isDropdownReq
+            dropdownChildren={[
+              { name: "Company Branches", path: PageRoutes.COMPANY_BRANCHES },
+              { name: "Manage Locations", path: PageRoutes.LOCATIONS },
+              { name: "Manage Clients", path: PageRoutes.CLIENTS },
+            ]}
+          />
+          <NavItem path="#" name="Notifications" />
+          <NavItem path={PageRoutes.REPORTS} name="Reports" />
+          <NavItem
+            path={PageRoutes.PAYMENTS_AND_BILLING}
+            name="Payments & Billing"
+          />
+          <NavItem path={PageRoutes.SETTINGS} name="Settings" />
+        </>
+      )}
 
+      {userType === "client" && (
+        <>
+          <NavItem path={PageRoutes.CLIENT_PORTAL_HOME} name="Home" />
+          <NavItem path={PageRoutes.CLIENT_PORTAL_PATROLS} name="Patrols" />
+          <NavItem path={PageRoutes.CLIENT_PORTAL_REPORTS} name="Reports" />
+        </>
+      )}
       <NavItem
         name="Sign out"
         callback={() => {

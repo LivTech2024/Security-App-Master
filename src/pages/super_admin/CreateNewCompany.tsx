@@ -22,6 +22,7 @@ const CreateNewCompany = () => {
         label="Create new company"
         onClick={createNewCompany}
         type="black"
+        disabled
       />
     </div>
   );
