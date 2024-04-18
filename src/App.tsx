@@ -43,8 +43,9 @@ import EquipmentList from "./pages/equipment_management/EquipmentList";
 import EquipmentView from "./pages/equipment_management/EquipmentView";
 import ReportView from "./pages/reports/ReportView";
 import ClientHome from "./pages/client_portal/ClientHome";
-import ClientPatrols from "./pages/client_portal/ClientPatrols";
 import ClientReports from "./pages/client_portal/ClientReports";
+import ClientPatrolsList from "./pages/client_portal/patrol/ClientPatrolsList";
+import ClientPatrolView from "./pages/client_portal/patrol/ClientPatrolView";
 
 function App() {
   useOnAuthStateChanged();
@@ -84,7 +85,11 @@ function App() {
               />
               <Route
                 path={PageRoutes.CLIENT_PORTAL_PATROLS}
-                Component={ClientPatrols}
+                Component={ClientPatrolsList}
+              />
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_PATROL_VIEW}
+                Component={ClientPatrolView}
               />
               <Route
                 path={PageRoutes.CLIENT_PORTAL_REPORTS}

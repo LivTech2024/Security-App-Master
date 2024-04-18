@@ -105,6 +105,7 @@ export const PageRoutes = {
   EQUIPMENT_VIEW: "/equipment_view",
   CLIENT_PORTAL_HOME:"/client_portal/",
   CLIENT_PORTAL_PATROLS:"/client_portal/patrols",
+  CLIENT_PORTAL_PATROL_VIEW:"/client_portal/patrol_view",
   CLIENT_PORTAL_REPORTS:"/client_portal/reports"
 };
 

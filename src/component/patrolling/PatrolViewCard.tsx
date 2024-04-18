@@ -121,32 +121,38 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                               (s) =>
                                 s?.StatusReportedById ===
                                 data?.StatusReportedById
-                            )?.StatusImage?.length && (
+                            )?.StatusImage?.length ? (
                               <span className="flex flex-col">
                                 <span>Images: </span>
                                 {ch.CheckPointStatus?.find(
                                   (s) =>
                                     s?.StatusReportedById ===
                                     data?.StatusReportedById
-                                )?.StatusImage?.map((img, idx) => {
+                                )?.StatusImage?.map((img) => {
                                   return (
-                                    <a
-                                      href={img}
-                                      target="_blank"
-                                      className="text-textPrimaryBlue"
-                                    >
-                                      {idx + 1}. {img.slice(0, 30)}...
-                                    </a>
+                                    <div className="flex items-center gap-4 flex-wrap">
+                                      <a
+                                        href={img}
+                                        target="_blank"
+                                        className="text-textPrimaryBlue"
+                                      >
+                                        <img
+                                          src={img}
+                                          alt=""
+                                          className="w-[100px] h-[100px] rounded object-cover"
+                                        />
+                                      </a>
+                                    </div>
                                   );
                                 })}
                               </span>
-                            )}
+                            ) : null}
                             {ch.CheckPointStatus?.find(
                               (s) =>
                                 s?.StatusReportedById ===
                                 data?.StatusReportedById
                             )?.StatusComment && (
-                              <span>
+                              <span className="mt-2">
                                 Comment:{" "}
                                 {
                                   ch.CheckPointStatus?.find(

@@ -264,6 +264,53 @@ class DbClient {
 
     return getDocs(shiftQuery);
   };
+
+  //*For client portal
+  static getClientPatrols = async ({
+    lmt,
+    lastDoc,
+    searchQuery,
+    clientId
+  }: {
+    lmt?: number;
+    lastDoc?: DocumentData | null;
+    searchQuery?: string;
+    clientId:string
+  }) => {
+    const patrolRef = collection(db, CollectionName.patrols);
+
+    let queryParams: QueryConstraint[] = [
+      where("PatrolClientId", "==", clientId),
+      orderBy("PatrolCreatedAt", "desc"),
+    ];
+
+    
+
+    if (searchQuery && searchQuery.length > 0) {
+      queryParams = [
+        ...queryParams,
+        where(
+          "PatrolNameSearchIndex",
+          "array-contains",
+          searchQuery.toLocaleLowerCase()
+        ),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const patrolQuery = query(patrolRef, ...queryParams);
+
+    const snap = await getDocs(patrolQuery);
+
+    return snap;
+  };
 }
 
 export default DbClient;

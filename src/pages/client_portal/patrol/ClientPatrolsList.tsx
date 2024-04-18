@@ -1,53 +1,21 @@
-import { useNavigate } from "react-router";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   DisplayCount,
   MinimumQueryCharacter,
   PageRoutes,
   REACT_QUERY_KEYS,
-} from "../../@types/enum";
-import { useEffect, useState } from "react";
-import { useAuthState, useEditFormStore } from "../../store";
+} from "../../../@types/enum";
+import { useAuthState } from "../../../store";
 import { useDebouncedValue } from "@mantine/hooks";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import DbPatrol from "../../firebase_configs/DB/DbPatrol";
+import DbClient from "../../../firebase_configs/DB/DbClient";
 import { DocumentData } from "firebase/firestore";
-import { IPatrolsCollection } from "../../@types/database";
+import { IPatrolsCollection } from "../../../@types/database";
+import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import PatrolListTable from "../../component/patrolling/PatrolListTable";
+import PatrolListTable from "../../../component/patrolling/PatrolListTable";
 
-export const PatrolStatus = ({
-  status,
-}: {
-  status: "pending" | "started" | "completed";
-}) => {
-  return (
-    <div className="flex justify-end">
-      <div className="flex items-center gap-2">
-        {status === "pending" ? (
-          <div className="w-[12px] h-[12px] rounded-full bg-primaryGold">
-            &nbsp;
-          </div>
-        ) : status === "started" ? (
-          <div className="w-[12px] h-[12px] rounded-full bg-primaryRed">
-            &nbsp;
-          </div>
-        ) : (
-          <div className="w-[12px] h-[12px] rounded-full bg-primaryGreen">
-            &nbsp;
-          </div>
-        )}
-        <span className="capitalize font-medium">{status}</span>
-      </div>
-    </div>
-  );
-};
-
-const PatrollingList = () => {
-  const navigate = useNavigate();
-
-  const { setPatrolEditData } = useEditFormStore();
-
-  const { company } = useAuthState();
+const ClientPatrolsList = () => {
+  const { client } = useAuthState();
 
   //const [query, setQuery] = useState("");
 
@@ -62,17 +30,13 @@ const PatrollingList = () => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [
-      REACT_QUERY_KEYS.PATROL_LIST,
-      debouncedQuery,
-      company!.CompanyId,
-    ],
+    queryKey: [REACT_QUERY_KEYS.PATROL_LIST, debouncedQuery, client!.ClientId],
     queryFn: async ({ pageParam }) => {
-      const snapshot = await DbPatrol.getPatrols({
+      const snapshot = await DbClient.getClientPatrols({
         lmt: DisplayCount.PATROL_LIST,
         lastDoc: pageParam,
         searchQuery: debouncedQuery,
-        cmpId: company!.CompanyId,
+        clientId: client!.ClientId,
       });
       return snapshot.docs;
     },
@@ -132,28 +96,18 @@ const PatrollingList = () => {
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Patrolling</span>
-
-        <button
-          onClick={() => {
-            setPatrolEditData(null);
-            navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT);
-          }}
-          className="bg-primary text-surface px-4 py-2 rounded"
-        >
-          Create Patrolling
-        </button>
+        <span className="font-semibold text-xl">Patrols</span>
       </div>
 
       <PatrolListTable
         data={data}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
-        redirectOnClick={PageRoutes.PATROLLING_VIEW}
+        redirectOnClick={PageRoutes.CLIENT_PORTAL_PATROL_VIEW}
         ref={ref}
       />
     </div>
   );
 };
 
-export default PatrollingList;
+export default ClientPatrolsList;
