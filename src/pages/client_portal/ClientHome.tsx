@@ -1,8 +1,9 @@
 import { SiAdguard } from "react-icons/si";
 import { PageRoutes } from "../../@types/enum";
 import { useAuthState } from "../../store";
-import { FaCommentDots, FaExclamationTriangle } from "react-icons/fa";
+import { FaCommentDots } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { TbReport } from "react-icons/tb";
 
 const HomeItem = ({
   name,
@@ -44,8 +45,8 @@ const ClientHome = () => {
         />
         <HomeItem
           path={PageRoutes.CLIENT_PORTAL_REPORTS}
-          icon={<FaExclamationTriangle className="text-3xl text-primaryGold" />}
-          name="Incident"
+          icon={<TbReport className="text-3xl text-primaryGold" />}
+          name="Reports"
         />{" "}
         <HomeItem
           path={PageRoutes.CLIENT_PORTAL_HOME}

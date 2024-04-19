@@ -1,4 +1,3 @@
-/* eslint-disable no-extra-boolean-cast */
 import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
 import Button from "../../common/button/Button";
 import { useState } from "react";
