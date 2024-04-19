@@ -1,18 +1,19 @@
-import { useState, useEffect } from 'react';
-import { DisplayCount, PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
-import DbShift from '../../firebase_configs/DB/DbShift';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import {
+  DisplayCount,
+  PageRoutes,
+  REACT_QUERY_KEYS,
+} from '../../../@types/enum';
+import DbClient from '../../../firebase_configs/DB/DbClient';
+import { useAuthState } from '../../../store';
 import { DocumentData } from 'firebase/firestore';
-import { IShiftsCollection } from '../../@types/database';
+import { IShiftsCollection } from '../../../@types/database';
+import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { useAuthState, useEditFormStore } from '../../store';
-import { useNavigate } from 'react-router-dom';
-import ShiftListTable from '../../component/shifts/ShiftListTable';
+import ShiftListTable from '../../../component/shifts/ShiftListTable';
 
-const ShiftList = () => {
-  const { setShiftEditData } = useEditFormStore();
-
-  const { company } = useAuthState();
+const ClientShifts = () => {
+  const { client } = useAuthState();
 
   const {
     data: snapshotData,
@@ -23,12 +24,12 @@ const ShiftList = () => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.SHIFT_LIST, company!.CompanyId],
+    queryKey: [REACT_QUERY_KEYS.SHIFT_LIST, client!.ClientId],
     queryFn: async ({ pageParam }) => {
-      const snapshot = await DbShift.getShifts({
+      const snapshot = await DbClient.getClientShifts({
         lmt: DisplayCount.SHIFT_LIST,
         lastDoc: pageParam,
-        cmpId: company!.CompanyId,
+        clientId: client!.ClientId,
       });
       return snapshot.docs;
     },
@@ -80,33 +81,21 @@ const ShiftList = () => {
       fetchNextPage();
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
-
-  const navigate = useNavigate();
-
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
         <span className="font-semibold text-xl">Shifts</span>
-        <button
-          onClick={() => {
-            setShiftEditData(null);
-            navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
-          }}
-          className="bg-primary text-surface px-4 py-2 rounded"
-        >
-          Create Shift
-        </button>
       </div>
 
       <ShiftListTable
         data={data}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
-        redirectOnClick={PageRoutes.SHIFT_VIEW}
+        redirectOnClick={PageRoutes.CLIENT_PORTAL_SHIFT_VIEW}
         ref={ref}
       />
     </div>
   );
 };
 
-export default ShiftList;
+export default ClientShifts;

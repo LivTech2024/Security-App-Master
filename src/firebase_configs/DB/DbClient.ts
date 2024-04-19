@@ -28,6 +28,7 @@ import {
   deleteAuthUser,
   updateAuthUser,
 } from '../../API/AuthUser';
+import dayjs from 'dayjs';
 
 class DbClient {
   static isClientExist = async (
@@ -373,6 +374,39 @@ class DbClient {
     const empQuery = query(reportRef, ...queryParams);
 
     return getDocs(empQuery);
+  };
+
+  static getClientShifts = ({
+    lmt,
+    lastDoc,
+    clientId,
+  }: {
+    lmt: number;
+    lastDoc?: DocumentData | null;
+    clientId: string;
+  }) => {
+    const shiftRef = collection(db, CollectionName.shifts);
+
+    let queryParams: QueryConstraint[] = [
+      where('ShiftClientId', '==', clientId),
+      where(
+        'ShiftDate',
+        '<=',
+        dayjs(new Date()).add(1, 'day').endOf('day').toDate()
+      ),
+      orderBy('ShiftDate', 'desc'),
+    ];
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    const shiftQuery = query(shiftRef, ...queryParams);
+
+    return getDocs(shiftQuery);
   };
 }
 

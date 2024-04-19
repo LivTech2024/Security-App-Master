@@ -47,6 +47,8 @@ import ClientReports from './pages/client_portal/report/ClientReports';
 import ClientPatrolsList from './pages/client_portal/patrol/ClientPatrolsList';
 import ClientPatrolView from './pages/client_portal/patrol/ClientPatrolView';
 import ClientReportView from './pages/client_portal/report/ClientReportView';
+import ClientShifts from './pages/client_portal/shift/ClientShifts';
+import ClientShiftView from './pages/client_portal/shift/ClientShiftView';
 
 function App() {
   useOnAuthStateChanged();
@@ -99,6 +101,14 @@ function App() {
               <Route
                 path={PageRoutes.CLIENT_PORTAL_REPORT_VIEW}
                 Component={ClientReportView}
+              />
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_SHIFTS}
+                Component={ClientShifts}
+              />
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_SHIFT_VIEW}
+                Component={ClientShiftView}
               />
             </Routes>
           </Layout>

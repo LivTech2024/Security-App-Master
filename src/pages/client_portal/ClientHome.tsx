@@ -45,7 +45,7 @@ const ClientHome = () => {
           name="Patrol"
         />
         <HomeItem
-          path={PageRoutes.CLIENT_PORTAL_PATROLS}
+          path={PageRoutes.CLIENT_PORTAL_SHIFTS}
           icon={<AiOutlineSchedule className="text-2xl text-primaryGold" />}
           name="Shifts"
         />
@@ -53,7 +53,7 @@ const ClientHome = () => {
           path={PageRoutes.CLIENT_PORTAL_REPORTS}
           icon={<TbReport className="text-3xl text-primaryGold" />}
           name="Reports"
-        />{' '}
+        />
         <HomeItem
           path={PageRoutes.CLIENT_PORTAL_HOME}
           name="Message"

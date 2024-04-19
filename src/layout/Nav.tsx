@@ -120,6 +120,7 @@ const Nav = ({
         <>
           <NavItem path={PageRoutes.CLIENT_PORTAL_HOME} name="Home" />
           <NavItem path={PageRoutes.CLIENT_PORTAL_PATROLS} name="Patrols" />
+          <NavItem path={PageRoutes.CLIENT_PORTAL_SHIFTS} name="Shifts" />
           <NavItem path={PageRoutes.CLIENT_PORTAL_REPORTS} name="Reports" />
         </>
       )}
