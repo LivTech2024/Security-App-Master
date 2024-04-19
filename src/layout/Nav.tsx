@@ -106,7 +106,7 @@ const Nav = ({
               { name: 'Manage Clients', path: PageRoutes.CLIENTS },
             ]}
           />
-          <NavItem path="#" name="Messaging" />
+          <NavItem path={PageRoutes.MESSAGING} name="Messaging" />
           <NavItem path={PageRoutes.REPORTS} name="Reports" />
           <NavItem
             path={PageRoutes.PAYMENTS_AND_BILLING}

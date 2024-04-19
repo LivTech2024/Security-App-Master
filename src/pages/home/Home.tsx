@@ -125,7 +125,7 @@ const Home = () => {
           icon={<TbReport className="text-2xl text-primaryGold" />}
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.MESSAGING}
           name="Communication center"
           icon={<FaCommentDots className="text-2xl text-primaryGold" />}
         />

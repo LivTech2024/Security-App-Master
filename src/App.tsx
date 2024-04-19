@@ -49,6 +49,7 @@ import ClientReportView from './pages/client_portal/report/ClientReportView';
 import ClientShifts from './pages/client_portal/shift/ClientShifts';
 import ClientShiftView from './pages/client_portal/shift/ClientShiftView';
 import useListenMessage from './hooks/listeners/useListenMessage';
+import Messaging from './pages/messaging/Messaging';
 
 function App() {
   useOnAuthStateChanged();
@@ -215,6 +216,8 @@ function App() {
             />
             <Route path={PageRoutes.EQUIPMENT_LIST} Component={EquipmentList} />
             <Route path={PageRoutes.EQUIPMENT_VIEW} Component={EquipmentView} />
+
+            <Route path={PageRoutes.MESSAGING} Component={Messaging} />
           </Routes>
         </Layout>
       </ModalsProvider>
