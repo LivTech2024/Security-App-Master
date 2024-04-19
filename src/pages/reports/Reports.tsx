@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
 import dayjs from 'dayjs';
 import { useAuthState } from '../../store';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
@@ -11,11 +10,10 @@ import {
   IReportsCollection,
 } from '../../@types/database';
 import { useInView } from 'react-intersection-observer';
-import SelectBranch from '../../common/SelectBranch';
 import Button from '../../common/button/Button';
 import ReportCategoriesModal from '../../component/report/modal/ReportCategoriesModal';
-import InputSelect from '../../common/inputs/InputSelect';
 import ReportListTable from '../../component/report/ReportListTable';
+import ReportListMenu from '../../component/report/ReportListMenu';
 
 const Reports = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -164,35 +162,19 @@ const Reports = () => {
         categories={categories}
         isCategoriesLoading={isCategoriesLoading}
       />
-      <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
-        <DateFilterDropdown
-          endDate={endDate}
-          isLifetime={isLifeTime}
-          setEndDate={setEndDate}
-          setIsLifetime={setIsLifeTime}
-          setStartDate={setStartDate}
-          startDate={startDate}
-        />
-        <div className="flex items-center gap-4">
-          <InputSelect
-            placeholder="Select Category"
-            searchable
-            clearable
-            data={categories.map((cat) => {
-              return {
-                label: cat.ReportCategoryName,
-                value: cat.ReportCategoryId,
-              };
-            })}
-            value={categoryId}
-            onChange={(e) => setCategoryId(e as string)}
-          />
-          <SelectBranch
-            selectedBranch={branchId}
-            setSelectedBranch={setBranchId}
-          />
-        </div>
-      </div>
+      <ReportListMenu
+        branchId={branchId}
+        categories={categories}
+        categoryId={categoryId}
+        endDate={endDate}
+        isLifeTime={isLifeTime}
+        setBranchId={setBranchId}
+        setCategoryId={setCategoryId}
+        setEndDate={setEndDate}
+        setIsLifeTime={setIsLifeTime}
+        setStartDate={setStartDate}
+        startDate={startDate}
+      />
       <ReportListTable
         data={data}
         isFetchingNextPage={isFetchingNextPage}

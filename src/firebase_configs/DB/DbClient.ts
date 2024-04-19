@@ -4,6 +4,7 @@ import {
   Timestamp,
   collection,
   doc,
+  endAt,
   getDoc,
   getDocs,
   limit,
@@ -12,6 +13,7 @@ import {
   runTransaction,
   serverTimestamp,
   startAfter,
+  startAt,
   where,
 } from 'firebase/firestore';
 import { db } from '../config';
@@ -308,6 +310,69 @@ class DbClient {
     const snap = await getDocs(patrolQuery);
 
     return snap;
+  };
+
+  static getClientReports = ({
+    clientId,
+    lastDoc,
+    lmt,
+    endDate,
+    isLifeTime,
+    startDate,
+    categoryId,
+    searchQuery,
+  }: {
+    clientId: string;
+    lastDoc?: DocumentData | null;
+    lmt?: number;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+    categoryId?: string | null;
+    searchQuery?: string | null;
+  }) => {
+    const reportRef = collection(db, CollectionName.reports);
+
+    let queryParams: QueryConstraint[] = [
+      where('ReportClientId', '==', clientId),
+      orderBy('ReportCreatedAt', 'desc'),
+      orderBy('ReportName', 'asc'),
+    ];
+
+    if (searchQuery && searchQuery.length > 0) {
+      queryParams = [
+        ...queryParams,
+        startAt(searchQuery),
+        endAt(searchQuery + '\uF8FF'),
+      ];
+    }
+
+    if (categoryId) {
+      queryParams = [
+        ...queryParams,
+        where('ReportCategoryId', '==', categoryId),
+      ];
+    }
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('ReportCreatedAt', '>=', startDate),
+        where('ReportCreatedAt', '<=', endDate),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const empQuery = query(reportRef, ...queryParams);
+
+    return getDocs(empQuery);
   };
 }
 
