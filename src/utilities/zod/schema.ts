@@ -167,6 +167,7 @@ export const patrollingSchema = z.object({
   PatrolLocationName: z.string().min(3, { message: "Location is required" }),
   PatrolCheckPoints: z.array(
     z.object({
+      id: z.string().nullable(),
       name: z.string(),
       category: z.string().nullable().optional(),
       hint: z.string().optional().nullable(),
@@ -184,7 +185,7 @@ export const patrollingSchema = z.object({
     .max(720, {
       message: "Patrol reminder in minutes cannot be more than 720",
     }),
-  PatrolClientId: z.string().min(3, {message:"Please select client"}),
+  PatrolClientId: z.string().min(3, { message: "Please select client" }),
 });
 
 export type PatrollingFormFields = z.infer<typeof patrollingSchema>;

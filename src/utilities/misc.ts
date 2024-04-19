@@ -185,3 +185,9 @@ export const getHoursDiffInTwoTimeString = (
 
   return Number(diff.toFixed(2));
 };
+
+export const getRandomNumbers = () => {
+  const random = Math.floor(Math.random() * (9999 - 1111 + 1)) + 1111;
+  const ms = new Date().getMilliseconds();
+  return Number(`${random}${ms}`);
+};

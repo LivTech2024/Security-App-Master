@@ -54,11 +54,19 @@ const PatrollingCreateOrEdit = () => {
 
   const [checkPoints, setCheckPoints] = useState<
     {
+      checkPointId: string | null;
       checkPointName: string;
       checkPointCategory: string | null;
       checkPointHint: string | null;
     }[]
-  >([{ checkPointName: "", checkPointCategory: null, checkPointHint: null }]);
+  >([
+    {
+      checkPointId: null,
+      checkPointName: "",
+      checkPointCategory: null,
+      checkPointHint: null,
+    },
+  ]);
 
   const [locationSearchQuery, setLocationSearchQuery] = useState("");
 
@@ -106,6 +114,7 @@ const PatrollingCreateOrEdit = () => {
         .filter((d) => d.checkPointName)
         .map((ch) => {
           return {
+            id: ch.checkPointId,
             name: ch.checkPointName,
             category: ch.checkPointCategory,
             hint: ch.checkPointHint,
@@ -127,6 +136,7 @@ const PatrollingCreateOrEdit = () => {
       setCheckPoints(
         patrolEditData.PatrolCheckPoints.map((ch) => {
           return {
+            checkPointId: ch.CheckPointId,
             checkPointCategory: ch.CheckPointCategory,
             checkPointHint: ch.CheckPointHint,
             checkPointName: ch.CheckPointName,

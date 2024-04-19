@@ -25,7 +25,11 @@ import {
 } from "../../@types/database";
 import { PatrollingFormFields } from "../../utilities/zod/schema";
 import { generateBarcodesAndDownloadPDF } from "../../utilities/generateBarcodesAndDownloadPdf";
-import { fullTextSearchIndex, removeTimeFromDate } from "../../utilities/misc";
+import {
+  fullTextSearchIndex,
+  getRandomNumbers,
+  removeTimeFromDate,
+} from "../../utilities/misc";
 import CustomError from "../../utilities/CustomError";
 
 class DbPatrol {
@@ -42,7 +46,8 @@ class DbPatrol {
     const PatrolCheckPoints: IPatrolCheckPointsChild[] = [];
 
     data.PatrolCheckPoints.map((ch, idx) => {
-      const checkPointId = `${patrolId}${idx}`;
+      const random = getRandomNumbers();
+      const checkPointId = `${patrolId}${random}${idx}`;
 
       PatrolCheckPoints.push({
         CheckPointId: checkPointId,
@@ -118,7 +123,12 @@ class DbPatrol {
       const PatrolCheckPoints: IPatrolCheckPointsChild[] = [];
 
       data.PatrolCheckPoints.map((ch, idx) => {
-        const checkPointId = `${patrolId}${idx}`;
+        let checkPointId = ch.id;
+
+        if (!checkPointId) {
+          const random = getRandomNumbers();
+          checkPointId = `${patrolId}${random}${idx}`;
+        }
 
         PatrolCheckPoints.push({
           CheckPointId: checkPointId,

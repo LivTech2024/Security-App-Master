@@ -7,12 +7,14 @@ import { MdClose } from "react-icons/md";
 
 interface CheckPointInputProps {
   checkpoints: {
+    checkPointId: string | null;
     checkPointName: string;
     checkPointCategory: string | null;
     checkPointHint: string | null;
   }[];
   setCheckpoints: (
     checkpoints: {
+      checkPointId: string | null;
       checkPointName: string;
       checkPointCategory: string | null;
       checkPointHint: string | null;
@@ -35,6 +37,7 @@ const CheckpointForm = ({
         checkPointName: "",
         checkPointCategory: null,
         checkPointHint: null,
+        checkPointId: null,
       },
     ]);
   };
