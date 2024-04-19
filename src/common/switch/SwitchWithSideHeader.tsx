@@ -1,16 +1,16 @@
-import { DeepMap, FieldError, Path, UseFormRegister } from "react-hook-form";
+import { DeepMap, FieldError, Path, UseFormRegister } from 'react-hook-form'
 
 interface SwitchWithSideHeaderProps<
-  FormFields extends Record<string, unknown>
+  FormFields extends Record<string, unknown>,
 > {
-  label?: string;
-  className?: string;
-  checked?: boolean;
-  onChange?: () => void;
-  register?: UseFormRegister<FormFields>;
-  name?: Path<FormFields>;
-  disabled?: boolean;
-  errors?: Partial<DeepMap<FormFields, FieldError>>;
+  label?: string
+  className?: string
+  checked?: boolean
+  onChange?: () => void
+  register?: UseFormRegister<FormFields>
+  name?: Path<FormFields>
+  disabled?: boolean
+  errors?: Partial<DeepMap<FormFields, FieldError>>
 }
 const SwitchWithSideHeader = <FormFields extends Record<string, unknown>>({
   label,
@@ -49,7 +49,7 @@ const SwitchWithSideHeader = <FormFields extends Record<string, unknown>>({
         {label && <div className=" order-1 w-[80%]">{label}</div>}
       </div>
     </label>
-  );
-};
+  )
+}
 
-export default SwitchWithSideHeader;
+export default SwitchWithSideHeader

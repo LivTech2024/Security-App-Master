@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { AiOutlineClockCircle } from "react-icons/ai";
+import React, { useEffect, useState } from 'react'
+import { AiOutlineClockCircle } from 'react-icons/ai'
 
-import PopupMenu from "../PopupMenu";
-import InputHeader from "./InputHeader";
-import InputError from "./InputError";
+import PopupMenu from '../PopupMenu'
+import InputHeader from './InputHeader'
+import InputError from './InputError'
 
 interface InputTimeProps {
-  label?: string;
-  fontClassName?: string;
-  value: string;
-  onChange: React.Dispatch<React.SetStateAction<string>>;
-  use12Hours?: boolean;
-  disabled?: boolean;
-  showSeconds?: boolean;
-  error?: string | null;
+  label?: string
+  fontClassName?: string
+  value: string
+  onChange: React.Dispatch<React.SetStateAction<string>>
+  use12Hours?: boolean
+  disabled?: boolean
+  showSeconds?: boolean
+  error?: string | null
 }
 
 const InputTime = ({
@@ -26,62 +26,62 @@ const InputTime = ({
   showSeconds = false,
   error,
 }: InputTimeProps) => {
-  const [dropdown, setDropdown] = useState(false);
+  const [dropdown, setDropdown] = useState(false)
 
-  const minutesArray = Array.from({ length: 60 }, (_, i) => i + 0);
+  const minutesArray = Array.from({ length: 60 }, (_, i) => i + 0)
 
-  const secondsArray = Array.from({ length: 60 }, (_, i) => i + 0);
+  const secondsArray = Array.from({ length: 60 }, (_, i) => i + 0)
 
-  const [hrs, setHrs] = useState(value.slice(0, 2));
+  const [hrs, setHrs] = useState(value.slice(0, 2))
 
-  const [mins, setMins] = useState(value.slice(3, 5));
+  const [mins, setMins] = useState(value.slice(3, 5))
 
-  const [sec, setSec] = useState(value?.slice(6, 8));
+  const [sec, setSec] = useState(value?.slice(6, 8))
 
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(false)
 
   const [hoursFormat, setHoursFormat] = useState(
     showSeconds ? value?.slice(9) : value.slice(6)
-  );
+  )
 
   const hoursArray = Array.from(
     { length: use12Hours ? 12 : 24 },
     use12Hours ? (_, i) => i + 1 : (_, i) => i + 0
-  );
+  )
 
   useEffect(() => {
     if (hrs?.length == 0 || mins?.length === 0 || (use12Hours && !hoursFormat))
-      return;
+      return
     if (!showSeconds) {
-      onChange(hrs + ":" + mins + " " + hoursFormat);
+      onChange(hrs + ':' + mins + ' ' + hoursFormat)
     } else if (use12Hours) {
-      onChange(hrs + ":" + mins + ":" + sec + " " + hoursFormat);
+      onChange(hrs + ':' + mins + ':' + sec + ' ' + hoursFormat)
     } else {
-      onChange(hrs + ":" + mins);
+      onChange(hrs + ':' + mins)
     }
-  }, [mins, hrs, hoursFormat]);
+  }, [mins, hrs, hoursFormat])
 
   const scrollToDiv = (id: string) => {
-    if (!id) return;
-    const element = document.querySelector("#" + id);
+    if (!id) return
+    const element = document.querySelector('#' + id)
     if (element) {
-      element.scrollIntoView({ behavior: "auto", inline: "nearest" });
+      element.scrollIntoView({ behavior: 'auto', inline: 'nearest' })
     }
-  };
+  }
 
   useEffect(() => {
     if (!dropdown && scrolled) {
-      setScrolled(false);
+      setScrolled(false)
     }
     if (dropdown && !scrolled) {
       setTimeout(() => {
-        scrollToDiv("hh" + hrs);
-        scrollToDiv("mm" + mins);
-        scrollToDiv("ss" + sec);
-        setScrolled(true);
-      }, 100);
+        scrollToDiv('hh' + hrs)
+        scrollToDiv('mm' + mins)
+        scrollToDiv('ss' + sec)
+        setScrolled(true)
+      }, 100)
     }
-  }, [dropdown, scrolled, hrs, mins, sec]);
+  }, [dropdown, scrolled, hrs, mins, sec])
 
   return (
     <div className={` gap-1 flex flex-col w-full `}>
@@ -91,8 +91,8 @@ const InputTime = ({
       <div
         className={`flex items-center w-full border-[1px]  ${
           error
-            ? "border-red-400"
-            : "border-inputBorder focus-within:ring-[2px]"
+            ? 'border-red-400'
+            : 'border-inputBorder focus-within:ring-[2px]'
         }  rounded `}
       >
         <PopupMenu
@@ -102,7 +102,7 @@ const InputTime = ({
           position="bottom"
           target={
             <input
-              value={value.length > 1 ? value : "hh:mm"}
+              value={value.length > 1 ? value : 'hh:mm'}
               type="text"
               className={`w-full text-lg py-2 pl-2
                outline-none  pr-2`}
@@ -116,20 +116,20 @@ const InputTime = ({
               {hoursArray.map((h) => {
                 return (
                   <span
-                    id={"hh" + h}
+                    id={'hh' + h}
                     onClick={() =>
-                      setHrs(h < 10 ? "0" + h.toString() : h.toString())
+                      setHrs(h < 10 ? '0' + h.toString() : h.toString())
                     }
                     className={`${
-                      hrs === (h < 10 ? "0" + h.toString() : h.toString())
-                        ? "bg-secondary text-surface"
-                        : "hover:bg-switchSecondaryBlueBg"
+                      hrs === (h < 10 ? '0' + h.toString() : h.toString())
+                        ? 'bg-secondary text-surface'
+                        : 'hover:bg-switchSecondaryBlueBg'
                     } py-2 px-[14px] flex justify-center items-center cursor-pointer rounded-md text-sm`}
                     key={h}
                   >
-                    {h < 10 ? "0" + h : h}
+                    {h < 10 ? '0' + h : h}
                   </span>
-                );
+                )
               })}
             </div>
 
@@ -137,21 +137,21 @@ const InputTime = ({
               {minutesArray.map((m) => {
                 return (
                   <span
-                    id={"mm" + m}
+                    id={'mm' + m}
                     onClick={() => {
-                      setMins(m < 10 ? "0" + m.toString() : m.toString());
-                      !use12Hours && !showSeconds && setDropdown(false);
+                      setMins(m < 10 ? '0' + m.toString() : m.toString())
+                      !use12Hours && !showSeconds && setDropdown(false)
                     }}
                     className={`${
-                      mins === (m < 10 ? "0" + m.toString() : m.toString())
-                        ? "bg-secondary text-surface"
-                        : "hover:bg-switchSecondaryBlueBg"
+                      mins === (m < 10 ? '0' + m.toString() : m.toString())
+                        ? 'bg-secondary text-surface'
+                        : 'hover:bg-switchSecondaryBlueBg'
                     } py-2 px-[14px] flex justify-center items-center cursor-pointer rounded-md text-sm`}
                     key={m}
                   >
-                    {m < 10 ? "0" + m : m}
+                    {m < 10 ? '0' + m : m}
                   </span>
-                );
+                )
               })}
             </div>
 
@@ -160,21 +160,21 @@ const InputTime = ({
                 {secondsArray.map((m) => {
                   return (
                     <span
-                      id={"ss" + m}
+                      id={'ss' + m}
                       onClick={() => {
-                        setSec(m < 10 ? "0" + m.toString() : m.toString());
-                        !use12Hours && setDropdown(false);
+                        setSec(m < 10 ? '0' + m.toString() : m.toString())
+                        !use12Hours && setDropdown(false)
                       }}
                       className={`${
-                        sec === (m < 10 ? "0" + m.toString() : m.toString())
-                          ? "bg-secondary text-surface"
-                          : "hover:bg-switchSecondaryBlueBg"
+                        sec === (m < 10 ? '0' + m.toString() : m.toString())
+                          ? 'bg-secondary text-surface'
+                          : 'hover:bg-switchSecondaryBlueBg'
                       } py-2 px-[14px] flex justify-center items-center cursor-pointer rounded-md text-sm`}
                       key={m}
                     >
-                      {m < 10 ? "0" + m : m}
+                      {m < 10 ? '0' + m : m}
                     </span>
-                  );
+                  )
                 })}
               </div>
             )}
@@ -183,26 +183,26 @@ const InputTime = ({
               <div className="flex flex-col justify-center items-end">
                 <span
                   onClick={() => {
-                    setDropdown(false);
-                    setHoursFormat("AM");
+                    setDropdown(false)
+                    setHoursFormat('AM')
                   }}
                   className={`${
-                    hoursFormat === "AM"
-                      ? "bg-secondary text-surface"
-                      : "hover:bg-switchSecondaryBlueBg"
+                    hoursFormat === 'AM'
+                      ? 'bg-secondary text-surface'
+                      : 'hover:bg-switchSecondaryBlueBg'
                   } py-2 px-[14px] flex justify-center items-center cursor-pointer rounded-md text-sm`}
                 >
                   AM
                 </span>
                 <span
                   onClick={() => {
-                    setDropdown(false);
-                    setHoursFormat("PM");
+                    setDropdown(false)
+                    setHoursFormat('PM')
                   }}
                   className={`${
-                    hoursFormat === "PM"
-                      ? "bg-secondary text-surface"
-                      : "hover:bg-switchSecondaryBlueBg"
+                    hoursFormat === 'PM'
+                      ? 'bg-secondary text-surface'
+                      : 'hover:bg-switchSecondaryBlueBg'
                   } py-2 px-[14px] flex justify-center items-center cursor-pointer rounded-md text-sm`}
                 >
                   PM
@@ -214,7 +214,7 @@ const InputTime = ({
         <div
           onClick={() => {
             if (!disabled) {
-              setDropdown(!dropdown);
+              setDropdown(!dropdown)
             }
           }}
           className="ml-auto px-2 pt-2 pb-[9px] h-full flex justify-center items-center cursor-pointer hover:bg-onHoverBg "
@@ -224,7 +224,7 @@ const InputTime = ({
       </div>
       {error && <InputError errorMessage={error} />}
     </div>
-  );
-};
+  )
+}
 
-export default InputTime;
+export default InputTime

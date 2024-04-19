@@ -1,133 +1,133 @@
-import React, { useEffect, useState } from "react";
-import Dialog from "../../../common/Dialog";
+import React, { useEffect, useState } from 'react'
+import Dialog from '../../../common/Dialog'
 import {
   EquipmentFormFields,
   equipmentSchema,
-} from "../../../utilities/zod/schema";
-import { FormProvider, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
-import InputSelect from "../../../common/inputs/InputSelect";
-import { useAuthState, useEditFormStore } from "../../../store";
-import { errorHandler } from "../../../utilities/CustomError";
+} from '../../../utilities/zod/schema'
+import { FormProvider, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader'
+import InputSelect from '../../../common/inputs/InputSelect'
+import { useAuthState, useEditFormStore } from '../../../store'
+import { errorHandler } from '../../../utilities/CustomError'
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from "../../../utilities/TsxUtils";
-import DbEquipment from "../../../firebase_configs/DB/DbEquipment";
-import { REACT_QUERY_KEYS } from "../../../@types/enum";
-import { useQueryClient } from "@tanstack/react-query";
-import { openContextModal } from "@mantine/modals";
+} from '../../../utilities/TsxUtils'
+import DbEquipment from '../../../firebase_configs/DB/DbEquipment'
+import { REACT_QUERY_KEYS } from '../../../@types/enum'
+import { useQueryClient } from '@tanstack/react-query'
+import { openContextModal } from '@mantine/modals'
 
 const AddEquipmentModal = ({
   opened,
   setOpened,
 }: {
-  opened: boolean;
-  setOpened: React.Dispatch<React.SetStateAction<boolean>>;
+  opened: boolean
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
   const methods = useForm<EquipmentFormFields>({
     resolver: zodResolver(equipmentSchema),
-  });
+  })
 
-  const { equipmentEditData, setEquipmentEditData } = useEditFormStore();
+  const { equipmentEditData, setEquipmentEditData } = useEditFormStore()
 
-  const isEdit = !!equipmentEditData;
+  const isEdit = !!equipmentEditData
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
-  const { companyBranches, company } = useAuthState();
+  const { companyBranches, company } = useAuthState()
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     let allFormFields: EquipmentFormFields = {
-      EquipmentName: "",
+      EquipmentName: '',
       EquipmentDescription: null,
       EquipmentTotalQuantity: 0,
       EquipmentCompanyBranchId: null,
-    };
+    }
     if (isEdit) {
       allFormFields = {
         EquipmentName: equipmentEditData.EquipmentName,
         EquipmentDescription: equipmentEditData.EquipmentDescription,
         EquipmentTotalQuantity: equipmentEditData.EquipmentTotalQuantity,
         EquipmentCompanyBranchId: equipmentEditData.EquipmentCompanyBranchId,
-      };
+      }
     }
-    methods.reset(allFormFields);
+    methods.reset(allFormFields)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdit, equipmentEditData, opened]);
+  }, [isEdit, equipmentEditData, opened])
 
   const onSubmit = async (data: EquipmentFormFields) => {
-    if (!company) return;
+    if (!company) return
     try {
-      setLoading(true);
+      setLoading(true)
 
       if (isEdit) {
-        await DbEquipment.updateEquipment(equipmentEditData.EquipmentId, data);
+        await DbEquipment.updateEquipment(equipmentEditData.EquipmentId, data)
         showSnackbar({
-          message: "Equipment updated successfully",
-          type: "success",
-        });
+          message: 'Equipment updated successfully',
+          type: 'success',
+        })
       } else {
-        await DbEquipment.createEquipment(company.CompanyId, data);
+        await DbEquipment.createEquipment(company.CompanyId, data)
         showSnackbar({
-          message: "Equipment created successfully",
-          type: "success",
-        });
+          message: 'Equipment created successfully',
+          type: 'success',
+        })
       }
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.EQUIPMENT_LIST],
-      });
+      })
 
-      setEquipmentEditData(null);
+      setEquipmentEditData(null)
 
-      setOpened(false);
-      setLoading(false);
+      setOpened(false)
+      setLoading(false)
     } catch (error) {
-      setLoading(false);
-      console.log(error);
-      errorHandler(error);
+      setLoading(false)
+      console.log(error)
+      errorHandler(error)
     }
-  };
+  }
 
   const onDelete = async () => {
-    if (!isEdit) return;
+    if (!isEdit) return
     try {
-      setLoading(true);
+      setLoading(true)
 
-      await DbEquipment.deleteEquipment(equipmentEditData.EquipmentId);
+      await DbEquipment.deleteEquipment(equipmentEditData.EquipmentId)
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.EQUIPMENT_LIST],
-      });
+      })
 
       showSnackbar({
-        message: "Equipment deleted successfully",
-        type: "success",
-      });
+        message: 'Equipment deleted successfully',
+        type: 'success',
+      })
 
-      setEquipmentEditData(null);
-      setOpened(false);
-      setLoading(false);
+      setEquipmentEditData(null)
+      setOpened(false)
+      setLoading(false)
     } catch (error) {
-      setLoading(false);
-      console.log(error);
-      errorHandler(error);
+      setLoading(false)
+      console.log(error)
+      errorHandler(error)
     }
-  };
+  }
 
   useEffect(() => {
     if (loading) {
-      showModalLoader({});
+      showModalLoader({})
     } else {
-      closeModalLoader();
+      closeModalLoader()
     }
-    return () => closeModalLoader();
-  }, [loading]);
+    return () => closeModalLoader()
+  }, [loading])
   return (
     <Dialog
       opened={opened}
@@ -139,29 +139,29 @@ const AddEquipmentModal = ({
       negativeCallback={() =>
         isEdit
           ? openContextModal({
-              modal: "confirmModal",
+              modal: 'confirmModal',
               withCloseButton: false,
               centered: true,
               closeOnClickOutside: true,
               innerProps: {
-                title: "Confirm",
-                body: "Are you sure to delete this equipment",
+                title: 'Confirm',
+                body: 'Are you sure to delete this equipment',
                 onConfirm: () => {
-                  onDelete();
+                  onDelete()
                 },
                 onCancel: () => {
-                  setOpened(true);
+                  setOpened(true)
                 },
               },
-              size: "30%",
+              size: '30%',
               styles: {
-                body: { padding: "0px" },
+                body: { padding: '0px' },
               },
             })
           : setOpened(false)
       }
-      negativeLabel={isEdit ? "Delete" : "Cancel"}
-      positiveLabel={isEdit ? "Update" : "Save"}
+      negativeLabel={isEdit ? 'Delete' : 'Cancel'}
+      positiveLabel={isEdit ? 'Update' : 'Save'}
     >
       <FormProvider {...methods}>
         <form
@@ -178,16 +178,16 @@ const AddEquipmentModal = ({
           <InputSelect
             label="Select Branch"
             placeholder="Select Branch"
-            value={methods.watch("EquipmentCompanyBranchId") || ""}
+            value={methods.watch('EquipmentCompanyBranchId') || ''}
             clearable
             onChange={(e) =>
-              methods.setValue("EquipmentCompanyBranchId", e as string)
+              methods.setValue('EquipmentCompanyBranchId', e as string)
             }
             data={companyBranches.map((branches) => {
               return {
                 label: branches.CompanyBranchName,
                 value: branches.CompanyBranchId,
-              };
+              }
             })}
             error={methods.formState.errors?.EquipmentCompanyBranchId?.message}
           />
@@ -209,7 +209,7 @@ const AddEquipmentModal = ({
         </form>
       </FormProvider>
     </Dialog>
-  );
-};
+  )
+}
 
-export default AddEquipmentModal;
+export default AddEquipmentModal

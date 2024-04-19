@@ -1,20 +1,20 @@
-import { MdOutlineSearch } from "react-icons/md";
+import { MdOutlineSearch } from 'react-icons/md'
 
 interface SearchBarProps {
-  placeholder?: string;
-  icon?: JSX.Element;
-  className?: string;
-  parentClassName?: string;
-  value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
-  shouldChangeBgOnFocus?: boolean;
+  placeholder?: string
+  icon?: JSX.Element
+  className?: string
+  parentClassName?: string
+  value: string
+  setValue: React.Dispatch<React.SetStateAction<string>>
+  shouldChangeBgOnFocus?: boolean
 }
 
 const SearchBar = ({
   placeholder,
   icon,
   className,
-  parentClassName = "w-full",
+  parentClassName = 'w-full',
   value,
   setValue,
   shouldChangeBgOnFocus = false,
@@ -26,8 +26,8 @@ const SearchBar = ({
       <div
         className={`${className} ${
           shouldChangeBgOnFocus
-            ? "bg-popupMenuSearchBarBg  focus-within:bg-surfaceLight border border-popupMenuSearchBarBg  focus-within:border-inputBorder "
-            : "bg-surface  border-inputBorder border"
+            ? 'bg-popupMenuSearchBarBg  focus-within:bg-surfaceLight border border-popupMenuSearchBarBg  focus-within:border-inputBorder '
+            : 'bg-surface  border-inputBorder border'
         } flex justify-center rounded items-center w-full h-10`}
       >
         <div className="p-2 h-full flex justify-center items-center cursor-pointer  mr-0">
@@ -39,13 +39,13 @@ const SearchBar = ({
           onChange={(e) => setValue(e.target.value)}
           value={value}
           type="text"
-          style={{ background: "transparent" }}
+          style={{ background: 'transparent' }}
           className="w-full outline-none pr-0 bg-transparent"
-          placeholder={placeholder ? placeholder : "Search"}
+          placeholder={placeholder ? placeholder : 'Search'}
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SearchBar;
+export default SearchBar

@@ -4,39 +4,39 @@ export const numberFormatter = (
   decimalCounts?: number
 ) => {
   if (num === null) {
-    num = 0;
+    num = 0
   }
   if (decimalCounts === undefined) {
-    decimalCounts = 2;
+    decimalCounts = 2
   }
-  let currency = "$";
+  let currency = '$'
 
-  let numberSystem = "en";
+  let numberSystem = 'en'
 
-  let formatter = new Intl.NumberFormat("en-US", {
+  let formatter = new Intl.NumberFormat('en-US', {
     maximumFractionDigits: decimalCounts,
     minimumFractionDigits: decimalCounts,
-  });
+  })
 
   if (!numberSystem) {
-    numberSystem = "indian";
+    numberSystem = 'indian'
   }
-  if (numberSystem === "indian") {
-    formatter = new Intl.NumberFormat("en-IN", {
+  if (numberSystem === 'indian') {
+    formatter = new Intl.NumberFormat('en-IN', {
       minimumFractionDigits: decimalCounts,
       maximumFractionDigits: decimalCounts,
-    });
+    })
   }
   if (!currency) {
-    currency = "$";
+    currency = '$'
   }
 
   if (showCurrency) {
-    const formattedNum = formatter.format(num);
+    const formattedNum = formatter.format(num)
     return num < 0
       ? `-${currency} ${formattedNum.slice(1)}`
-      : `${currency} ${formattedNum}`;
+      : `${currency} ${formattedNum}`
   }
 
-  return formatter.format(num);
-};
+  return formatter.format(num)
+}

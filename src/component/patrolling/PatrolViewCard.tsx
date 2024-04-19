@@ -1,6 +1,6 @@
-import { IPatrolsCollection } from "../../@types/database";
-import TimelineVertical from "../../common/TimelineVertical";
-import { formatDate } from "../../utilities/misc";
+import { IPatrolsCollection } from '../../@types/database'
+import TimelineVertical from '../../common/TimelineVertical'
+import { formatDate } from '../../utilities/misc'
 
 const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
   return (
@@ -29,11 +29,11 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                   <span>{idx + 1}.</span>
                   <div
                     className={`w-[12px] h-[12px] rounded-full ${
-                      data.Status === "pending"
-                        ? "bg-primaryGold"
-                        : data.Status === "started"
-                        ? "bg-primaryRed"
-                        : "bg-primaryGreen"
+                      data.Status === 'pending'
+                        ? 'bg-primaryGold'
+                        : data.Status === 'started'
+                          ? 'bg-primaryRed'
+                          : 'bg-primaryGreen'
                     } `}
                   >
                     &nbsp;
@@ -45,10 +45,10 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
 
                   <span className="mt-[2px]">Guard: </span>
                   <div className="font-semibold mt-[2px]">
-                    {data?.StatusReportedByName ?? "No guards assigned"}
+                    {data?.StatusReportedByName ?? 'No guards assigned'}
                   </div>
                 </div>
-              );
+              )
             })
           ) : (
             <div>No assigned guards</div>
@@ -69,37 +69,37 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
               return (
                 <div key={idx} className="flex flex-col gap-2 mt-2">
                   <div>
-                    {idx + 1}. Guard:{" "}
+                    {idx + 1}. Guard:{' '}
                     <span className="font-semibold">
-                      {" "}
-                      {data.StatusReportedByName || "No guard assigned"}
+                      {' '}
+                      {data.StatusReportedByName || 'No guard assigned'}
                     </span>
                   </div>
                   <TimelineVertical
                     timelineItems={patrolData.PatrolCheckPoints.map((ch) => {
                       return {
-                        icon: "",
+                        icon: '',
                         text: ch.CheckPointName,
                         isActive:
                           ch.CheckPointStatus?.find(
                             (s) =>
                               s?.StatusReportedById === data?.StatusReportedById
-                          )?.Status === "checked"
+                          )?.Status === 'checked'
                             ? true
                             : false,
                         description: (
                           <div className="flex flex-col">
                             <span>
-                              Status:{" "}
+                              Status:{' '}
                               <span className="capitalize font-medium">
                                 {ch.CheckPointStatus?.find(
                                   (s) =>
                                     s?.StatusReportedById ===
                                     data?.StatusReportedById
-                                )?.Status === "checked"
-                                  ? "Checked"
-                                  : "Not checked"}
-                              </span>{" "}
+                                )?.Status === 'checked'
+                                  ? 'Checked'
+                                  : 'Not checked'}
+                              </span>{' '}
                             </span>
                             {ch.CheckPointStatus?.find(
                               (s) =>
@@ -107,7 +107,7 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                                 data?.StatusReportedById
                             )?.StatusFailureReason && (
                               <span>
-                                Failure reason:{" "}
+                                Failure reason:{' '}
                                 {
                                   ch.CheckPointStatus?.find(
                                     (s) =>
@@ -143,7 +143,7 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                                         />
                                       </a>
                                     </div>
-                                  );
+                                  )
                                 })}
                               </span>
                             ) : null}
@@ -153,7 +153,7 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                                 data?.StatusReportedById
                             )?.StatusComment && (
                               <span className="mt-2">
-                                Comment:{" "}
+                                Comment:{' '}
                                 {
                                   ch.CheckPointStatus?.find(
                                     (s) =>
@@ -175,36 +175,36 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                                       s?.StatusReportedById ===
                                       data?.StatusReportedById
                                   )?.StatusReportedTime,
-                                  "hh:mm A"
+                                  'hh:mm A'
                                 )}
                               </span>
                             )}
                           </div>
                         ),
-                      };
+                      }
                     })}
                   />
                 </div>
-              );
+              )
             })
           ) : (
             <TimelineVertical
               timelineItems={patrolData.PatrolCheckPoints.map((ch) => {
                 return {
-                  icon: "",
+                  icon: '',
                   text: ch.CheckPointName,
                   isActive: false,
                   description: (
                     <div className="flex flex-col">
                       <span>
-                        Status:{" "}
+                        Status:{' '}
                         <span className="capitalize font-medium">
                           Not checked
-                        </span>{" "}
+                        </span>{' '}
                       </span>
                     </div>
                   ),
-                };
+                }
               })}
             />
           )}
@@ -212,11 +212,11 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
       </div>
 
       <div className="mb-4 text-textTertiary">
-        Last updated:{" "}
-        {formatDate(patrolData.PatrolModifiedAt, "DD MMM-YY hh:mm A")}
+        Last updated:{' '}
+        {formatDate(patrolData.PatrolModifiedAt, 'DD MMM-YY hh:mm A')}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PatrolViewCard;
+export default PatrolViewCard

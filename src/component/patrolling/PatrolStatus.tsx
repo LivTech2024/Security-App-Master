@@ -1,16 +1,16 @@
 export const PatrolStatus = ({
   status,
 }: {
-  status: "pending" | "started" | "completed";
+  status: 'pending' | 'started' | 'completed'
 }) => {
   return (
     <div className="flex justify-end">
       <div className="flex items-center gap-2">
-        {status === "pending" ? (
+        {status === 'pending' ? (
           <div className="w-[12px] h-[12px] rounded-full bg-primaryGold">
             &nbsp;
           </div>
-        ) : status === "started" ? (
+        ) : status === 'started' ? (
           <div className="w-[12px] h-[12px] rounded-full bg-primaryRed">
             &nbsp;
           </div>
@@ -22,5 +22,5 @@ export const PatrolStatus = ({
         <span className="capitalize font-medium">{status}</span>
       </div>
     </div>
-  );
-};
+  )
+}

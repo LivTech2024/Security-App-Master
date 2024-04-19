@@ -1,13 +1,13 @@
-import React from "react";
-import { Select } from "@mantine/core";
-import { FaCircleChevronLeft, FaCircleChevronRight } from "react-icons/fa6";
-import { useEditFormStore } from "../../store";
-import dayjs from "dayjs";
-import { DatePickerInput } from "@mantine/dates";
-import { MdCalendarToday } from "react-icons/md";
-import { PageRoutes, ScheduleView } from "../../@types/enum";
-import { useNavigate } from "react-router-dom";
-import Button from "../../common/button/Button";
+import React from 'react'
+import { Select } from '@mantine/core'
+import { FaCircleChevronLeft, FaCircleChevronRight } from 'react-icons/fa6'
+import { useEditFormStore } from '../../store'
+import dayjs from 'dayjs'
+import { DatePickerInput } from '@mantine/dates'
+import { MdCalendarToday } from 'react-icons/md'
+import { PageRoutes, ScheduleView } from '../../@types/enum'
+import { useNavigate } from 'react-router-dom'
+import Button from '../../common/button/Button'
 
 const TopSection = ({
   selectedDate,
@@ -18,17 +18,17 @@ const TopSection = ({
   setSelectedView,
   isSelectTenureDisabled = false,
 }: {
-  selectedDate: Date;
-  setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
-  isSelectTenureDisabled?: boolean;
-  selectedTenure: "weekly" | "monthly";
-  setSelectedTenure: React.Dispatch<React.SetStateAction<"weekly" | "monthly">>;
-  selectedView: ScheduleView;
-  setSelectedView: React.Dispatch<React.SetStateAction<ScheduleView>>;
+  selectedDate: Date
+  setSelectedDate: React.Dispatch<React.SetStateAction<Date>>
+  isSelectTenureDisabled?: boolean
+  selectedTenure: 'weekly' | 'monthly'
+  setSelectedTenure: React.Dispatch<React.SetStateAction<'weekly' | 'monthly'>>
+  selectedView: ScheduleView
+  setSelectedView: React.Dispatch<React.SetStateAction<ScheduleView>>
 }) => {
-  const { setShiftEditData } = useEditFormStore();
+  const { setShiftEditData } = useEditFormStore()
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   return (
     <div className="flex flex-col w-full gap-4">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -44,8 +44,8 @@ const TopSection = ({
           <Button
             label="Add new shift"
             onClick={() => {
-              setShiftEditData(null);
-              navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
+              setShiftEditData(null)
+              navigate(PageRoutes.SHIFT_CREATE_OR_EDIT)
             }}
             type="black"
             className="px-4 py-2"
@@ -59,24 +59,24 @@ const TopSection = ({
           allowDeselect={false}
           value={selectedView}
           onChange={(e) => {
-            console.log(e);
-            setSelectedView(e as ScheduleView);
+            console.log(e)
+            setSelectedView(e as ScheduleView)
           }}
           data={[
-            { label: "Calendar view", value: ScheduleView.CALENDAR_VIEW },
-            { label: "By Employee view", value: ScheduleView.BY_EMPLOYEE_VIEW },
-            { label: "Statistics view", value: ScheduleView.STATISTICS_VIEW },
+            { label: 'Calendar view', value: ScheduleView.CALENDAR_VIEW },
+            { label: 'By Employee view', value: ScheduleView.BY_EMPLOYEE_VIEW },
+            { label: 'Statistics view', value: ScheduleView.STATISTICS_VIEW },
           ]}
           className="text-lg"
           styles={{
             input: {
               border: `1px solid #0000001A`,
-              fontWeight: "normal",
-              fontSize: "18px",
-              borderRadius: "4px",
-              background: "#FFFFFF",
-              color: "#000000",
-              padding: "12px 12px",
+              fontWeight: 'normal',
+              fontSize: '18px',
+              borderRadius: '4px',
+              background: '#FFFFFF',
+              color: '#000000',
+              padding: '12px 12px',
             },
           }}
         />
@@ -86,7 +86,7 @@ const TopSection = ({
             className="text-2xl cursor-pointer"
             onClick={() =>
               setSelectedDate((prev) =>
-                dayjs(prev).subtract(1, "week").toDate()
+                dayjs(prev).subtract(1, 'week').toDate()
               )
             }
           />
@@ -95,7 +95,7 @@ const TopSection = ({
             className="flex items-center gap-4 cursor-pointer justify-center w-full"
           >
             <div className="font-semibold">
-              Week of {dayjs(selectedDate).format("MMM DD, YYYY")}
+              Week of {dayjs(selectedDate).format('MMM DD, YYYY')}
             </div>
 
             <DatePickerInput
@@ -114,7 +114,7 @@ const TopSection = ({
           <FaCircleChevronRight
             className="text-2xl cursor-pointer"
             onClick={() =>
-              setSelectedDate((prev) => dayjs(prev).add(1, "week").toDate())
+              setSelectedDate((prev) => dayjs(prev).add(1, 'week').toDate())
             }
           />
         </div>
@@ -123,21 +123,21 @@ const TopSection = ({
             <Select
               allowDeselect={false}
               value={selectedTenure}
-              onChange={(e) => setSelectedTenure(e as "monthly" | "weekly")}
+              onChange={(e) => setSelectedTenure(e as 'monthly' | 'weekly')}
               data={[
-                { label: "Weekly", value: "weekly" },
-                { label: "Monthly", value: "monthly" },
+                { label: 'Weekly', value: 'weekly' },
+                { label: 'Monthly', value: 'monthly' },
               ]}
               className="text-lg"
               styles={{
                 input: {
                   border: `1px solid #0000001A`,
-                  fontWeight: "normal",
-                  fontSize: "18px",
-                  borderRadius: "4px",
-                  background: "#FFFFFF",
-                  color: "#000000",
-                  padding: "12px 12px",
+                  fontWeight: 'normal',
+                  fontSize: '18px',
+                  borderRadius: '4px',
+                  background: '#FFFFFF',
+                  color: '#000000',
+                  padding: '12px 12px',
                 },
               }}
             />
@@ -147,7 +147,7 @@ const TopSection = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TopSection;
+export default TopSection

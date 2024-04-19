@@ -1,62 +1,62 @@
-import React, { useState } from "react";
-import Dialog from "../../../common/Dialog";
-import { useAuthState } from "../../../store";
-import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
-import Button from "../../../common/button/Button";
-import NoSearchResult from "../../../common/NoSearchResult";
-import { errorHandler } from "../../../utilities/CustomError";
-import { closeModalLoader, showModalLoader } from "../../../utilities/TsxUtils";
-import DbEmployee from "../../../firebase_configs/DB/DbEmployee";
-import { EmployeeRoles } from "../../../store/slice/auth.slice";
-import { FaRegTrashAlt } from "react-icons/fa";
-import { openContextModal } from "@mantine/modals";
+import React, { useState } from 'react'
+import Dialog from '../../../common/Dialog'
+import { useAuthState } from '../../../store'
+import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader'
+import Button from '../../../common/button/Button'
+import NoSearchResult from '../../../common/NoSearchResult'
+import { errorHandler } from '../../../utilities/CustomError'
+import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils'
+import DbEmployee from '../../../firebase_configs/DB/DbEmployee'
+import { EmployeeRoles } from '../../../store/slice/auth.slice'
+import { FaRegTrashAlt } from 'react-icons/fa'
+import { openContextModal } from '@mantine/modals'
 
 const AddEmpRoleModal = ({
   opened,
   setOpened,
 }: {
-  opened: boolean;
-  setOpened: React.Dispatch<React.SetStateAction<boolean>>;
+  opened: boolean
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
-  const { empRoles, setEmpRoles, company } = useAuthState();
+  const { empRoles, setEmpRoles, company } = useAuthState()
 
-  const [employeeRole, setEmployeeRole] = useState("");
+  const [employeeRole, setEmployeeRole] = useState('')
 
   const onSave = async () => {
-    if (!company || !employeeRole) return;
+    if (!company || !employeeRole) return
     try {
-      showModalLoader({});
+      showModalLoader({})
 
       const newRoleAdded = await DbEmployee.addEmpRole(
         employeeRole,
         company.CompanyId
-      );
-      setEmployeeRole("");
-      setEmpRoles([...empRoles, newRoleAdded as unknown as EmployeeRoles]);
+      )
+      setEmployeeRole('')
+      setEmpRoles([...empRoles, newRoleAdded as unknown as EmployeeRoles])
 
-      closeModalLoader();
+      closeModalLoader()
     } catch (error) {
-      errorHandler(error);
-      closeModalLoader();
-      console.log(error);
+      errorHandler(error)
+      closeModalLoader()
+      console.log(error)
     }
-  };
+  }
 
   const onDelete = async (roleId: string, empRole: string) => {
     try {
-      showModalLoader({});
+      showModalLoader({})
 
-      await DbEmployee.deleteEmpRole(roleId, empRole);
+      await DbEmployee.deleteEmpRole(roleId, empRole)
 
-      setEmpRoles(empRoles.filter((role) => role.EmployeeRoleId !== roleId));
+      setEmpRoles(empRoles.filter((role) => role.EmployeeRoleId !== roleId))
 
-      closeModalLoader();
+      closeModalLoader()
     } catch (error) {
-      errorHandler(error);
-      closeModalLoader();
-      console.log(error);
+      errorHandler(error)
+      closeModalLoader()
+      console.log(error)
     }
-  };
+  }
 
   return (
     <Dialog
@@ -101,27 +101,27 @@ const AddEmpRoleModal = ({
                         <FaRegTrashAlt
                           onClick={() =>
                             openContextModal({
-                              modal: "confirmModal",
+                              modal: 'confirmModal',
                               withCloseButton: false,
                               centered: true,
                               closeOnClickOutside: true,
                               innerProps: {
-                                title: "Confirm",
-                                body: "Are you sure to delete this role",
+                                title: 'Confirm',
+                                body: 'Are you sure to delete this role',
                                 onConfirm: () => {
-                                  if (!role.EmployeeRoleIsDeletable) return;
+                                  if (!role.EmployeeRoleIsDeletable) return
                                   onDelete(
                                     role.EmployeeRoleId,
                                     role.EmployeeRoleName
-                                  );
+                                  )
                                 },
                                 onCancel: () => {
-                                  setOpened(true);
+                                  setOpened(true)
                                 },
                               },
-                              size: "30%",
+                              size: '30%',
                               styles: {
-                                body: { padding: "0px" },
+                                body: { padding: '0px' },
                               },
                             })
                           }
@@ -130,7 +130,7 @@ const AddEmpRoleModal = ({
                       </td>
                     )}
                   </tr>
-                );
+                )
               })
             ) : (
               <tr>
@@ -143,7 +143,7 @@ const AddEmpRoleModal = ({
         </table>
       </div>
     </Dialog>
-  );
-};
+  )
+}
 
-export default AddEmpRoleModal;
+export default AddEmpRoleModal

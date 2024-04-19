@@ -1,7 +1,7 @@
-import { Tabs } from "@mantine/core";
-import CompanyInfo from "../../component/settings/CompanyInfo";
-import AdminInfo from "../../component/settings/AdminInfo";
-import AccountSettings from "../../component/settings/AccountSettings";
+import { Tabs } from '@mantine/core'
+import CompanyInfo from '../../component/settings/CompanyInfo'
+import AdminInfo from '../../component/settings/AdminInfo'
+import AccountSettings from '../../component/settings/AccountSettings'
 
 const account_settings = () => {
   return (
@@ -14,7 +14,7 @@ const account_settings = () => {
           <Tabs.Tab
             className="text-base mx-1"
             value="company_info"
-            bg={"#e5e7eb"}
+            bg={'#e5e7eb'}
             color="#363738af"
           >
             Company Info
@@ -22,7 +22,7 @@ const account_settings = () => {
           <Tabs.Tab
             className="text-base mx-1 "
             value="admin_info"
-            bg={"#e5e7eb"}
+            bg={'#e5e7eb'}
             color="#363738af"
           >
             Admin Info
@@ -30,7 +30,7 @@ const account_settings = () => {
           <Tabs.Tab
             className="text-base mx-1"
             value="account_settings"
-            bg={"#e5e7eb"}
+            bg={'#e5e7eb'}
             color="#363738af"
           >
             Account Settings
@@ -50,7 +50,7 @@ const account_settings = () => {
         </Tabs.Panel>
       </Tabs>
     </div>
-  );
-};
+  )
+}
 
-export default account_settings;
+export default account_settings

@@ -1,9 +1,9 @@
 interface InputErrorProps {
-  errorMessage: string;
+  errorMessage: string
 }
 
 const InputError = ({ errorMessage }: InputErrorProps) => {
-  return <small className="text-textPrimaryRed  text-xs">{errorMessage}</small>;
-};
+  return <small className="text-textPrimaryRed  text-xs">{errorMessage}</small>
+}
 
-export default InputError;
+export default InputError

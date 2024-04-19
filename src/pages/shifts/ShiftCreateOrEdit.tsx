@@ -1,50 +1,50 @@
-import { useNavigate } from "react-router-dom";
-import { PageRoutes, REACT_QUERY_KEYS } from "../../@types/enum";
+import { useNavigate } from 'react-router-dom'
+import { PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum'
 import {
   AddShiftFormFields,
   addShiftFormSchema,
-} from "../../utilities/zod/schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FormProvider, useForm } from "react-hook-form";
-import { IoArrowBackCircle } from "react-icons/io5";
-import { useAuthState, useEditFormStore } from "../../store";
-import { openContextModal } from "@mantine/modals";
-import Button from "../../common/button/Button";
-import { useQueryClient } from "@tanstack/react-query";
+} from '../../utilities/zod/schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FormProvider, useForm } from 'react-hook-form'
+import { IoArrowBackCircle } from 'react-icons/io5'
+import { useAuthState, useEditFormStore } from '../../store'
+import { openContextModal } from '@mantine/modals'
+import Button from '../../common/button/Button'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from "../../utilities/TsxUtils";
-import DbShift from "../../firebase_configs/DB/DbShift";
-import CustomError, { errorHandler } from "../../utilities/CustomError";
-import InputAutoComplete from "../../common/inputs/InputAutocomplete";
-import { useEffect, useState } from "react";
-import AddEmpRoleModal from "../../component/employees/modal/AddEmpRoleModal";
-import { AiOutlinePlus } from "react-icons/ai";
-import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
-import InputTime from "../../common/inputs/InputTime";
-import useFetchLocations from "../../hooks/fetch/useFetchLocations";
-import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
-import ShiftTaskForm, { ShiftTask } from "../../component/shifts/ShiftTaskForm";
-import useFetchClients from "../../hooks/fetch/useFetchClients";
-import InputSelect from "../../common/inputs/InputSelect";
-import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
-import DaysOfWeekSelector from "../../component/shifts/DayOfWeekSelector";
-import { formatDate, toDate } from "../../utilities/misc";
-import { MultiSelect } from "@mantine/core";
-import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
-import InputHeader from "../../common/inputs/InputHeader";
-import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
-import useFetchPatrols from "../../hooks/fetch/useFetchPatrols";
-import { sendShiftDetailsEmail } from "../../utilities/scheduleHelper";
+} from '../../utilities/TsxUtils'
+import DbShift from '../../firebase_configs/DB/DbShift'
+import CustomError, { errorHandler } from '../../utilities/CustomError'
+import InputAutoComplete from '../../common/inputs/InputAutocomplete'
+import { useEffect, useState } from 'react'
+import AddEmpRoleModal from '../../component/employees/modal/AddEmpRoleModal'
+import { AiOutlinePlus } from 'react-icons/ai'
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
+import InputTime from '../../common/inputs/InputTime'
+import useFetchLocations from '../../hooks/fetch/useFetchLocations'
+import AddBranchModal from '../../component/company_branches/modal/AddBranchModal'
+import ShiftTaskForm, { ShiftTask } from '../../component/shifts/ShiftTaskForm'
+import useFetchClients from '../../hooks/fetch/useFetchClients'
+import InputSelect from '../../common/inputs/InputSelect'
+import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader'
+import DaysOfWeekSelector from '../../component/shifts/DayOfWeekSelector'
+import { formatDate, toDate } from '../../utilities/misc'
+import { MultiSelect } from '@mantine/core'
+import useFetchEmployees from '../../hooks/fetch/useFetchEmployees'
+import InputHeader from '../../common/inputs/InputHeader'
+import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader'
+import useFetchPatrols from '../../hooks/fetch/useFetchPatrols'
+import { sendShiftDetailsEmail } from '../../utilities/scheduleHelper'
 
 const ShiftCreateOrEdit = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { shiftEditData } = useEditFormStore();
+  const { shiftEditData } = useEditFormStore()
 
-  const isEdit = !!shiftEditData;
+  const isEdit = !!shiftEditData
 
   const methods = useForm<AddShiftFormFields>({
     resolver: zodResolver(addShiftFormSchema),
@@ -78,153 +78,153 @@ const ShiftCreateOrEdit = () => {
           ShiftLinkedPatrolIds: shiftEditData.ShiftLinkedPatrolIds,
         }
       : { ShiftRequiredEmp: String(1) as unknown as number },
-  });
+  })
 
-  const { company, empRoles, companyBranches } = useAuthState();
+  const { company, empRoles, companyBranches } = useAuthState()
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
-  const [addEmpRoleModal, setAddEmpRoleModal] = useState(false);
+  const [addEmpRoleModal, setAddEmpRoleModal] = useState(false)
 
-  const [addCmpBranchModal, setAddCmpBranchModal] = useState(false);
+  const [addCmpBranchModal, setAddCmpBranchModal] = useState(false)
 
   //Other form fields
   const [shiftPosition, setShiftPosition] = useState<string | null | undefined>(
-    ""
-  );
+    ''
+  )
 
-  const [startTime, setStartTime] = useState("09:00");
+  const [startTime, setStartTime] = useState('09:00')
 
-  const [endTime, setEndTime] = useState("17:00");
+  const [endTime, setEndTime] = useState('17:00')
 
-  const [locationSearchQuery, setLocationSearchQuery] = useState("");
+  const [locationSearchQuery, setLocationSearchQuery] = useState('')
 
   const [companyBranch, setCompanyBranch] = useState<string | null | undefined>(
     null
-  );
+  )
 
   const [shiftTasks, setShiftTasks] = useState<ShiftTask[]>([
-    { TaskName: "", TaskQrCodeRequired: false, TaskReturnReq: false },
-  ]);
+    { TaskName: '', TaskQrCodeRequired: false, TaskReturnReq: false },
+  ])
 
-  const [selectedDays, setSelectedDays] = useState<Date[]>([]);
+  const [selectedDays, setSelectedDays] = useState<Date[]>([])
 
   const { data: locations } = useFetchLocations({
     limit: 5,
     searchQuery: locationSearchQuery,
-  });
+  })
 
-  const [clientSearchValue, setClientSearchValue] = useState("");
+  const [clientSearchValue, setClientSearchValue] = useState('')
 
   const { data: clients } = useFetchClients({
     limit: 5,
     searchQuery: clientSearchValue,
-  });
+  })
 
-  const [empSearchQuery, setEmpSearchQuery] = useState("");
+  const [empSearchQuery, setEmpSearchQuery] = useState('')
 
-  const [isSpecialShift, setIsSpecialShift] = useState(false);
+  const [isSpecialShift, setIsSpecialShift] = useState(false)
 
   useEffect(() => {
-    methods.setValue("ShiftIsSpecialShift", isSpecialShift);
-  }, [isSpecialShift]);
+    methods.setValue('ShiftIsSpecialShift', isSpecialShift)
+  }, [isSpecialShift])
 
   const { data: employees } = useFetchEmployees({
     empRole: isSpecialShift ? null : shiftPosition || null,
     searchQuery: empSearchQuery,
-  });
+  })
 
-  const [patrolSearchQuery, setPatrolSearchQuery] = useState("");
+  const [patrolSearchQuery, setPatrolSearchQuery] = useState('')
 
   const { data: patrols } = useFetchPatrols({
     searchQuery: patrolSearchQuery,
-  });
+  })
 
   useEffect(() => {
-    console.log(methods.formState.errors);
-  }, [methods.formState.errors]);
+    console.log(methods.formState.errors)
+  }, [methods.formState.errors])
 
   useEffect(() => {
     if (startTime) {
-      methods.setValue("ShiftStartTime", startTime);
+      methods.setValue('ShiftStartTime', startTime)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startTime]);
+  }, [startTime])
 
   useEffect(() => {
     if (endTime) {
-      methods.setValue("ShiftEndTime", endTime);
+      methods.setValue('ShiftEndTime', endTime)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endTime]);
+  }, [endTime])
 
   useEffect(() => {
-    methods.setValue("ShiftPosition", shiftPosition || "");
+    methods.setValue('ShiftPosition', shiftPosition || '')
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shiftPosition]);
+  }, [shiftPosition])
 
-  const locationId = methods.watch("ShiftLocationId");
+  const locationId = methods.watch('ShiftLocationId')
 
   useEffect(() => {
     if (locationId) {
       const selectedLocation = locations.find(
         (loc) => loc.LocationId === locationId
-      );
+      )
       if (selectedLocation) {
-        methods.setValue("ShiftLocationName", selectedLocation?.LocationName);
-        methods.setValue("ShiftLocationId", selectedLocation?.LocationId);
-        methods.setValue("ShiftLocation", {
+        methods.setValue('ShiftLocationName', selectedLocation?.LocationName)
+        methods.setValue('ShiftLocationId', selectedLocation?.LocationId)
+        methods.setValue('ShiftLocation', {
           latitude: String(selectedLocation.LocationCoordinates.latitude),
           longitude: String(selectedLocation.LocationCoordinates.longitude),
-        });
+        })
         methods.setValue(
-          "ShiftLocationAddress",
+          'ShiftLocationAddress',
           selectedLocation.LocationAddress
-        );
+        )
 
         const patrolsOnLocation = patrols.filter(
           (p) => p.PatrolLocationId === selectedLocation?.LocationId
-        );
+        )
 
         methods.setValue(
-          "ShiftLinkedPatrolIds",
+          'ShiftLinkedPatrolIds',
           patrolsOnLocation.map((patrol) => patrol.PatrolId)
-        );
+        )
       }
     } else {
-      methods.setValue("ShiftLocationId", null);
-      methods.setValue("ShiftLocationName", null);
-      methods.setValue("ShiftLocationAddress", null);
+      methods.setValue('ShiftLocationId', null)
+      methods.setValue('ShiftLocationName', null)
+      methods.setValue('ShiftLocationAddress', null)
       methods.setValue(
-        "ShiftLinkedPatrolIds",
+        'ShiftLinkedPatrolIds',
         shiftEditData?.ShiftLinkedPatrolIds ?? []
-      );
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locationId]);
+  }, [locationId])
 
   useEffect(() => {
     const branchId = companyBranches.find(
       (b) => b.CompanyBranchName === companyBranch
-    )?.CompanyBranchId;
-    methods.setValue("ShiftCompanyBranchId", branchId || null);
+    )?.CompanyBranchId
+    methods.setValue('ShiftCompanyBranchId', branchId || null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyBranch]);
+  }, [companyBranch])
 
   //* populate value on editing
   useEffect(() => {
     if (isEdit) {
-      setStartTime(shiftEditData.ShiftStartTime);
-      setEndTime(shiftEditData.ShiftEndTime);
-      setLocationSearchQuery(shiftEditData.ShiftLocationName ?? "");
-      setShiftPosition(shiftEditData.ShiftPosition);
-      setSelectedDays([toDate(shiftEditData.ShiftDate)]);
-      setIsSpecialShift(shiftEditData.ShiftIsSpecialShift);
+      setStartTime(shiftEditData.ShiftStartTime)
+      setEndTime(shiftEditData.ShiftEndTime)
+      setLocationSearchQuery(shiftEditData.ShiftLocationName ?? '')
+      setShiftPosition(shiftEditData.ShiftPosition)
+      setSelectedDays([toDate(shiftEditData.ShiftDate)])
+      setIsSpecialShift(shiftEditData.ShiftIsSpecialShift)
       if (shiftEditData.ShiftCompanyBranchId) {
         const branchName = companyBranches.find(
           (b) => b.CompanyBranchId === shiftEditData.ShiftCompanyBranchId
-        )?.CompanyBranchName;
-        setCompanyBranch(branchName || null);
+        )?.CompanyBranchName
+        setCompanyBranch(branchName || null)
       }
       if (shiftEditData.ShiftTask && shiftEditData.ShiftTask.length > 0) {
         setShiftTasks(
@@ -233,39 +233,39 @@ const ShiftCreateOrEdit = () => {
               TaskName: task.ShiftTask,
               TaskQrCodeRequired: task.ShiftTaskQrCodeReq,
               TaskReturnReq: task.ShiftTaskReturnReq,
-            };
+            }
           })
-        );
+        )
       }
-      return;
+      return
     }
-    setSelectedDays([]);
-    setStartTime("09:00");
-    setEndTime("17:00");
-    setLocationSearchQuery("");
-    setShiftPosition("");
-    setCompanyBranch(null);
+    setSelectedDays([])
+    setStartTime('09:00')
+    setEndTime('17:00')
+    setLocationSearchQuery('')
+    setShiftPosition('')
+    setCompanyBranch(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdit, shiftEditData]);
+  }, [isEdit, shiftEditData])
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (loading) {
-      showModalLoader({});
+      showModalLoader({})
     } else {
-      closeModalLoader();
+      closeModalLoader()
     }
-    return () => closeModalLoader();
-  }, [loading]);
+    return () => closeModalLoader()
+  }, [loading])
 
   const onSubmit = async (data: AddShiftFormFields) => {
-    if (!company) return;
+    if (!company) return
     try {
       if (selectedDays.length === 0) {
-        throw new CustomError("Please select at least one day");
+        throw new CustomError('Please select at least one day')
       }
-      setLoading(true);
+      setLoading(true)
 
       if (isEdit) {
         await DbShift.updateShift(
@@ -274,86 +274,86 @@ const ShiftCreateOrEdit = () => {
           company.CompanyId,
           shiftTasks,
           selectedDays[0]
-        );
+        )
       } else {
         await DbShift.addShift(
           data,
           company.CompanyId,
           shiftTasks,
           selectedDays
-        );
+        )
       }
 
       //* Send emails to assigned employees
-      const shiftAssignedUserId = methods.watch("ShiftAssignedUserId") || [];
+      const shiftAssignedUserId = methods.watch('ShiftAssignedUserId') || []
 
       if (shiftAssignedUserId?.length > 0) {
         const sendEmailPromise = shiftAssignedUserId.map(async (empId) => {
-          const emp = employees.find((emp) => emp.EmployeeId === empId);
+          const emp = employees.find((emp) => emp.EmployeeId === empId)
           if (emp) {
             return sendShiftDetailsEmail({
               companyName: company!.CompanyName,
               empEmail: emp.EmployeeEmail,
-              shiftAddress: data.ShiftLocationAddress || "N/A",
-              shiftDate: selectedDays.map((date) => formatDate(date)).join(","),
+              shiftAddress: data.ShiftLocationAddress || 'N/A',
+              shiftDate: selectedDays.map((date) => formatDate(date)).join(','),
               shiftEndTime: data.ShiftEndTime,
               shiftName: data.ShiftName,
               shiftStartTime: data.ShiftStartTime,
-            });
+            })
           }
-        });
+        })
 
-        await Promise.all(sendEmailPromise);
+        await Promise.all(sendEmailPromise)
       }
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.SHIFT_LIST],
-      });
+      })
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.SCHEDULES],
-      });
+      })
 
-      setLoading(false);
+      setLoading(false)
 
       showSnackbar({
-        message: "Shift created successfully",
-        type: "success",
-      });
-      methods.reset();
-      navigate(PageRoutes.SHIFT_LIST);
+        message: 'Shift created successfully',
+        type: 'success',
+      })
+      methods.reset()
+      navigate(PageRoutes.SHIFT_LIST)
     } catch (error) {
-      console.log(error);
-      setLoading(false);
-      errorHandler(error);
+      console.log(error)
+      setLoading(false)
+      errorHandler(error)
     }
-  };
+  }
 
   const onDelete = async () => {
-    if (!isEdit) return;
+    if (!isEdit) return
     try {
-      setLoading(true);
+      setLoading(true)
 
-      await DbShift.deleteShift(shiftEditData.ShiftId);
+      await DbShift.deleteShift(shiftEditData.ShiftId)
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.SHIFT_LIST],
-      });
+      })
 
       showSnackbar({
-        message: "Shift deleted successfully",
-        type: "success",
-      });
+        message: 'Shift deleted successfully',
+        type: 'success',
+      })
 
-      setLoading(false);
-      methods.reset();
-      navigate(PageRoutes.SHIFT_LIST);
+      setLoading(false)
+      methods.reset()
+      navigate(PageRoutes.SHIFT_LIST)
     } catch (error) {
-      console.log(error);
-      setLoading(false);
-      errorHandler(error);
+      console.log(error)
+      setLoading(false)
+      errorHandler(error)
     }
-  };
+  }
 
   return (
     <div className="flex flex-col gap-4 p-6">
@@ -374,20 +374,20 @@ const ShiftCreateOrEdit = () => {
               type="white"
               onClick={() =>
                 openContextModal({
-                  modal: "confirmModal",
+                  modal: 'confirmModal',
                   withCloseButton: false,
                   centered: true,
                   closeOnClickOutside: true,
                   innerProps: {
-                    title: "Confirm",
-                    body: "Are you sure to delete this shift",
+                    title: 'Confirm',
+                    body: 'Are you sure to delete this shift',
                     onConfirm: () => {
-                      onDelete();
+                      onDelete()
                     },
                   },
-                  size: "30%",
+                  size: '30%',
                   styles: {
-                    body: { padding: "0px" },
+                    body: { padding: '0px' },
                   },
                 })
               }
@@ -435,13 +435,13 @@ const ShiftCreateOrEdit = () => {
                 return {
                   label: role.EmployeeRoleName,
                   value: role.EmployeeRoleName,
-                };
+                }
               })}
               dropDownHeader={
                 <div
                   onClick={() => {
-                    navigate(PageRoutes.EMPLOYEE_LIST);
-                    setAddEmpRoleModal(true);
+                    navigate(PageRoutes.EMPLOYEE_LIST)
+                    setAddEmpRoleModal(true)
                   }}
                   className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                 >
@@ -472,13 +472,13 @@ const ShiftCreateOrEdit = () => {
             <InputSelect
               label="Shift location (Optional for mobile guard)"
               data={locations.map((loc) => {
-                return { label: loc.LocationName, value: loc.LocationId };
+                return { label: loc.LocationName, value: loc.LocationId }
               })}
-              onChange={(e) => methods.setValue("ShiftLocationId", e as string)}
+              onChange={(e) => methods.setValue('ShiftLocationId', e as string)}
               nothingFoundMessage={
                 <div
                   onClick={() => {
-                    navigate(PageRoutes.LOCATIONS);
+                    navigate(PageRoutes.LOCATIONS)
                   }}
                   className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                 >
@@ -497,10 +497,10 @@ const ShiftCreateOrEdit = () => {
 
             <InputSelect
               label="Client (Optional for mobile guard)"
-              value={methods.watch("ShiftClientId") || ""}
-              onChange={(e) => methods.setValue("ShiftClientId", e || "")}
+              value={methods.watch('ShiftClientId') || ''}
+              onChange={(e) => methods.setValue('ShiftClientId', e || '')}
               data={clients.map((client) => {
-                return { label: client.ClientName, value: client.ClientId };
+                return { label: client.ClientName, value: client.ClientId }
               })}
               searchable
               clearable
@@ -510,7 +510,7 @@ const ShiftCreateOrEdit = () => {
               nothingFoundMessage={
                 <div
                   onClick={() => {
-                    navigate(PageRoutes.CLIENTS);
+                    navigate(PageRoutes.CLIENTS)
                   }}
                   className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                 >
@@ -564,21 +564,21 @@ const ShiftCreateOrEdit = () => {
               <MultiSelect
                 searchable
                 data={patrols.map((patrol) => {
-                  return { label: patrol.PatrolName, value: patrol.PatrolId };
+                  return { label: patrol.PatrolName, value: patrol.PatrolId }
                 })}
-                value={methods.watch("ShiftLinkedPatrolIds")}
-                onChange={(e) => methods.setValue("ShiftLinkedPatrolIds", e)}
+                value={methods.watch('ShiftLinkedPatrolIds')}
+                onChange={(e) => methods.setValue('ShiftLinkedPatrolIds', e)}
                 searchValue={patrolSearchQuery}
                 onSearchChange={setPatrolSearchQuery}
                 styles={{
                   input: {
                     border: `1px solid #0000001A`,
-                    fontWeight: "normal",
-                    fontSize: "18px",
-                    borderRadius: "4px",
-                    background: "#FFFFFF",
-                    color: "#000000",
-                    padding: "8px 8px",
+                    fontWeight: 'normal',
+                    fontSize: '18px',
+                    borderRadius: '4px',
+                    background: '#FFFFFF',
+                    color: '#000000',
+                    padding: '8px 8px',
                   },
                 }}
               />
@@ -595,13 +595,13 @@ const ShiftCreateOrEdit = () => {
                   return {
                     label: branch.CompanyBranchName,
                     value: branch.CompanyBranchName,
-                  };
+                  }
                 })}
                 dropDownHeader={
                   <div
                     onClick={() => {
-                      setAddCmpBranchModal(true);
-                      navigate(PageRoutes.COMPANY_BRANCHES);
+                      setAddCmpBranchModal(true)
+                      navigate(PageRoutes.COMPANY_BRANCHES)
                     }}
                     className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                   >
@@ -616,24 +616,24 @@ const ShiftCreateOrEdit = () => {
               <div className="flex flex-col gap-1">
                 <InputHeader title="Assign employees (Optional)" />
                 <MultiSelect
-                  maxValues={Number(methods.watch("ShiftRequiredEmp"))}
+                  maxValues={Number(methods.watch('ShiftRequiredEmp'))}
                   searchable
                   data={employees.map((emp) => {
-                    return { label: emp.EmployeeName, value: emp.EmployeeId };
+                    return { label: emp.EmployeeName, value: emp.EmployeeId }
                   })}
-                  value={methods.watch("ShiftAssignedUserId")}
-                  onChange={(e) => methods.setValue("ShiftAssignedUserId", e)}
+                  value={methods.watch('ShiftAssignedUserId')}
+                  onChange={(e) => methods.setValue('ShiftAssignedUserId', e)}
                   searchValue={empSearchQuery}
                   onSearchChange={setEmpSearchQuery}
                   styles={{
                     input: {
                       border: `1px solid #0000001A`,
-                      fontWeight: "normal",
-                      fontSize: "18px",
-                      borderRadius: "4px",
-                      background: "#FFFFFF",
-                      color: "#000000",
-                      padding: "8px 8px",
+                      fontWeight: 'normal',
+                      fontSize: '18px',
+                      borderRadius: '4px',
+                      background: '#FFFFFF',
+                      color: '#000000',
+                      padding: '8px 8px',
                     },
                   }}
                   error={methods.formState.errors.ShiftAssignedUserId?.message}
@@ -668,7 +668,7 @@ const ShiftCreateOrEdit = () => {
         setOpened={setAddEmpRoleModal}
       />
     </div>
-  );
-};
+  )
+}
 
-export default ShiftCreateOrEdit;
+export default ShiftCreateOrEdit

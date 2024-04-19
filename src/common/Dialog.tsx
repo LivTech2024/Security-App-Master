@@ -1,24 +1,24 @@
-import { Modal, ScrollArea } from "@mantine/core";
-import React from "react";
-import { MdOutlineClose } from "react-icons/md";
-import { twMerge } from "tailwind-merge";
+import { Modal, ScrollArea } from '@mantine/core'
+import React from 'react'
+import { MdOutlineClose } from 'react-icons/md'
+import { twMerge } from 'tailwind-merge'
 
 interface DialogProps {
-  className?: string;
-  size?: string;
-  title: string;
-  children: React.ReactNode;
-  opened: boolean;
-  setOpened: React.Dispatch<React.SetStateAction<boolean>>;
-  positiveLabel?: string;
-  negativeLabel?: string;
-  disableSubmit?: boolean;
-  positiveCallback?: () => void;
-  negativeCallback?: () => void;
-  onClose?: () => void;
-  isFormModal?: boolean;
-  showBottomTool?: boolean;
-  bottomToolbarChild?: React.ReactNode;
+  className?: string
+  size?: string
+  title: string
+  children: React.ReactNode
+  opened: boolean
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>
+  positiveLabel?: string
+  negativeLabel?: string
+  disableSubmit?: boolean
+  positiveCallback?: () => void
+  negativeCallback?: () => void
+  onClose?: () => void
+  isFormModal?: boolean
+  showBottomTool?: boolean
+  bottomToolbarChild?: React.ReactNode
 }
 
 const Dialog = ({
@@ -28,8 +28,8 @@ const Dialog = ({
   setOpened,
   title,
   children,
-  positiveLabel = "save",
-  negativeLabel = "cancel",
+  positiveLabel = 'save',
+  negativeLabel = 'cancel',
   disableSubmit = false,
   isFormModal = false,
   positiveCallback,
@@ -41,19 +41,19 @@ const Dialog = ({
   return (
     <Modal
       padding={0}
-      size={size ? size : "50%"}
+      size={size ? size : '50%'}
       centered
       withCloseButton={false}
       opened={opened}
       onClose={() => {
-        onClose && onClose();
-        setOpened(false);
+        onClose && onClose()
+        setOpened(false)
       }}
       scrollAreaComponent={ScrollArea.Autosize}
       transitionProps={{
-        transition: "fade",
+        transition: 'fade',
         duration: 600,
-        timingFunction: "ease",
+        timingFunction: 'ease',
       }}
       zIndex={100}
     >
@@ -63,8 +63,8 @@ const Dialog = ({
             <div className=" font-medium">{title}</div>
             <div
               onClick={() => {
-                onClose && onClose();
-                setOpened(false);
+                onClose && onClose()
+                setOpened(false)
               }}
               className="ml-auto hover:bg-onHoverBg duration-200 rounded-full p-2 cursor-pointer"
             >
@@ -74,12 +74,12 @@ const Dialog = ({
           <hr className=" w-full" />
         </div>
 
-        <div className={twMerge("p-4 flex flex-col", className)}>
+        <div className={twMerge('p-4 flex flex-col', className)}>
           <div className="">{children}</div>
         </div>
         <div
           className={`${
-            !showBottomTool && "hidden"
+            !showBottomTool && 'hidden'
           } flex ml-auto gap-x-4 mt-4 sticky bottom-0 px-4 py-2 z-[2] bg-surface  w-full items-center`}
         >
           {bottomToolbarChild}
@@ -87,8 +87,8 @@ const Dialog = ({
             {negativeLabel.length > 0 && (
               <button
                 onClick={() => {
-                  negativeCallback && negativeCallback();
-                  setOpened(false);
+                  negativeCallback && negativeCallback()
+                  setOpened(false)
                 }}
                 className="bg-surface font-sfProTextMedium px-5 py-1 rounded hover:bg-onHoverBg active:bg-onSecondary duration-200 capitalize"
               >
@@ -100,9 +100,9 @@ const Dialog = ({
               <button
                 disabled={disableSubmit}
                 onClick={() => {
-                  positiveCallback && positiveCallback();
+                  positiveCallback && positiveCallback()
                   if (!isFormModal) {
-                    setOpened(false);
+                    setOpened(false)
                   }
                 }}
                 type="button"
@@ -115,7 +115,7 @@ const Dialog = ({
         </div>
       </div>
     </Modal>
-  );
-};
+  )
+}
 
-export default Dialog;
+export default Dialog

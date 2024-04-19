@@ -1,14 +1,14 @@
-import { Path, UseFormRegister } from "react-hook-form";
+import { Path, UseFormRegister } from 'react-hook-form'
 
 interface InputRadioProps<FormFields extends Record<string, unknown>> {
-  label?: string;
-  value?: string | number;
-  checked?: boolean;
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
-  type?: "radio" | "checkbox";
-  disabled?: boolean;
-  register?: UseFormRegister<FormFields>;
-  name?: Path<FormFields>;
+  label?: string
+  value?: string | number
+  checked?: boolean
+  onChange?: React.ChangeEventHandler<HTMLInputElement>
+  type?: 'radio' | 'checkbox'
+  disabled?: boolean
+  register?: UseFormRegister<FormFields>
+  name?: Path<FormFields>
 }
 
 const InputRadio = <FormFields extends Record<string, unknown>>({
@@ -16,7 +16,7 @@ const InputRadio = <FormFields extends Record<string, unknown>>({
   value,
   checked,
   onChange,
-  type = "radio",
+  type = 'radio',
   disabled = false,
   register,
   name,
@@ -28,7 +28,7 @@ const InputRadio = <FormFields extends Record<string, unknown>>({
           type={type}
           {...register(name)}
           className="cursor-pointer "
-          style={{ scale: "1.4", marginLeft: "3px" }}
+          style={{ scale: '1.4', marginLeft: '3px' }}
           disabled={checked ? false : disabled}
         />
       ) : (
@@ -38,7 +38,7 @@ const InputRadio = <FormFields extends Record<string, unknown>>({
           onChange={onChange}
           checked={checked}
           className="cursor-pointer "
-          style={{ scale: "1.4", marginLeft: "3px" }}
+          style={{ scale: '1.4', marginLeft: '3px' }}
           disabled={checked ? false : disabled}
         />
       )}
@@ -49,7 +49,7 @@ const InputRadio = <FormFields extends Record<string, unknown>>({
         <span className="text-lg mt-[2px]">&nbsp;</span>
       )}
     </label>
-  );
-};
+  )
+}
 
-export default InputRadio;
+export default InputRadio

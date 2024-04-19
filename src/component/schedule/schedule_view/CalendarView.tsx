@@ -1,47 +1,47 @@
-import { useQuery } from "@tanstack/react-query";
-import dayjs from "dayjs";
-import { useEffect, useState } from "react";
-import empDefaultPlaceHolder from "../../../../public/assets/avatar.png";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { REACT_QUERY_KEYS } from "../../../@types/enum";
+import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import empDefaultPlaceHolder from '../../../../public/assets/avatar.png'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+import { REACT_QUERY_KEYS } from '../../../@types/enum'
 import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
-} from "../../../firebase_configs/DB/DbSchedule";
+} from '../../../firebase_configs/DB/DbSchedule'
 import {
   formatDate,
   getHoursDiffInTwoTimeString,
   toDate,
-} from "../../../utilities/misc";
-import { Draggable, DropPoint } from "../../../utilities/DragAndDropHelper";
+} from '../../../utilities/misc'
+import { Draggable, DropPoint } from '../../../utilities/DragAndDropHelper'
 import {
   IEmployeesCollection,
   IShiftsCollection,
-} from "../../../@types/database";
+} from '../../../@types/database'
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from "../../../utilities/TsxUtils";
-import { errorHandler } from "../../../utilities/CustomError";
-import { useAuthState } from "../../../store";
-import AssignShiftModal from "../modal/AssignShiftModal";
-import SelectBranch from "../../../common/SelectBranch";
-import { Accordion } from "@mantine/core";
-import { sendEmail } from "../../../API/SendEmail";
+} from '../../../utilities/TsxUtils'
+import { errorHandler } from '../../../utilities/CustomError'
+import { useAuthState } from '../../../store'
+import AssignShiftModal from '../modal/AssignShiftModal'
+import SelectBranch from '../../../common/SelectBranch'
+import { Accordion } from '@mantine/core'
+import { sendEmail } from '../../../API/SendEmail'
 //import { Accordion } from "@mantine/core";
 
 interface CalendarViewProps {
-  datesArray: Date[];
+  datesArray: Date[]
 }
 
 const CalendarView = ({ datesArray }: CalendarViewProps) => {
-  const [schedules, setSchedules] = useState<ISchedule[]>([]);
+  const [schedules, setSchedules] = useState<ISchedule[]>([])
 
-  const { company, empRoles } = useAuthState();
+  const { company, empRoles } = useAuthState()
 
-  const [branch, setBranch] = useState("");
+  const [branch, setBranch] = useState('')
 
   const { data, error } = useQuery({
     queryKey: [
@@ -56,118 +56,116 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
         datesArray[datesArray.length - 1],
         company!.CompanyId,
         branch
-      );
-      return data;
+      )
+      return data
     },
-  });
+  })
 
   useEffect(() => {
-    console.log(error);
-    setSchedules(data || []);
-  }, [data, error]);
+    console.log(error)
+    setSchedules(data || [])
+  }, [data, error])
 
   const getScheduleForDay = (date: Date, schedules?: ISchedule[]) => {
-    if (!schedules) return [];
+    if (!schedules) return []
     return schedules.filter((schedule) =>
-      dayjs(toDate(schedule.shift.ShiftDate)).isSame(date, "date")
-    );
-  };
+      dayjs(toDate(schedule.shift.ShiftDate)).isSame(date, 'date')
+    )
+  }
 
   const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(
     null
-  );
+  )
 
   const [empAvailableForShift, setEmpAvailableForShift] = useState<
     IEmpScheduleForWeek[]
-  >([]);
+  >([])
 
-  const [isEmpLoading, setIsEmpLoading] = useState(false);
+  const [isEmpLoading, setIsEmpLoading] = useState(false)
 
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   useEffect(() => {
     const fetchEmpSchedule = async () => {
-      if (!selectedDate || !company) return;
+      if (!selectedDate || !company) return
       try {
-        setIsEmpLoading(true);
+        setIsEmpLoading(true)
         const data = await DbSchedule.getEmployeesSchedule({
-          startDate: dayjs(selectedDate).startOf("week").toDate(),
-          endDate: dayjs(selectedDate).endOf("week").toDate(),
+          startDate: dayjs(selectedDate).startOf('week').toDate(),
+          endDate: dayjs(selectedDate).endOf('week').toDate(),
           currentDate: toDate(selectedDate),
           cmpId: company.CompanyId,
           cmpBranchId: branch,
-        });
+        })
         if (data) {
-          setEmpAvailableForShift(data);
+          setEmpAvailableForShift(data)
         }
-        setIsEmpLoading(false);
+        setIsEmpLoading(false)
       } catch (error) {
-        errorHandler(error);
-        setIsEmpLoading(false);
-        console.log(error, "error");
+        errorHandler(error)
+        setIsEmpLoading(false)
+        console.log(error, 'error')
       }
-    };
-    fetchEmpSchedule();
+    }
+    fetchEmpSchedule()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDate]);
+  }, [selectedDate])
 
   const [resultToBePublished, setResultToBePublished] = useState<
     {
-      shift: IShiftsCollection;
-      emp: IEmpScheduleForWeek;
+      shift: IShiftsCollection
+      emp: IEmpScheduleForWeek
     }[]
-  >([]);
+  >([])
 
   const dropResult = (draggableId: string, dropPointId: string) => {
     const selectedEmp = empAvailableForShift.find(
       (emp) => emp.EmpId === draggableId
-    );
-    const selectedShift = schedules.find(
-      (s) => s.shift.ShiftId === dropPointId
-    );
+    )
+    const selectedShift = schedules.find((s) => s.shift.ShiftId === dropPointId)
 
     if (selectedShift?.shift && selectedShift.shift.ShiftRequiredEmp > 1) {
       showSnackbar({
         message:
-          "This shift requires more than 1 employee, click on the shift to assign multiple employees to it",
-        type: "error",
-      });
-      return;
+          'This shift requires more than 1 employee, click on the shift to assign multiple employees to it',
+        type: 'error',
+      })
+      return
     }
 
     if (selectedShift?.employee && selectedShift.employee.length > 0) {
       showSnackbar({
-        message: "This shift already have assigned employees",
-        type: "error",
-      });
-      return;
+        message: 'This shift already have assigned employees',
+        type: 'error',
+      })
+      return
     }
 
-    if (!selectedEmp || !selectedShift) return;
+    if (!selectedEmp || !selectedShift) return
 
     const shiftHours = getHoursDiffInTwoTimeString(
       selectedShift.shift.ShiftStartTime,
       selectedShift.shift.ShiftEndTime
-    );
+    )
 
     const totalEmpWeekHoursAfterAssignation =
-      shiftHours + selectedEmp.EmpWeekHours;
+      shiftHours + selectedEmp.EmpWeekHours
 
     if (totalEmpWeekHoursAfterAssignation > selectedEmp.EmpMaxWeekHours) {
       showSnackbar({
-        message: "Employee maximum hours per week exceeded",
-        type: "info",
-      });
+        message: 'Employee maximum hours per week exceeded',
+        type: 'info',
+      })
     }
 
     setResultToBePublished((prev) => [
       ...prev,
       { emp: selectedEmp, shift: selectedShift.shift },
-    ]);
+    ])
 
     setEmpAvailableForShift((prev) =>
       prev.filter((e) => e.EmpId !== selectedEmp?.EmpId)
-    );
+    )
 
     setSchedules((prev) => {
       const updatedSchedules = prev.map((schedule) => {
@@ -176,51 +174,50 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
           const updatedEmp: Partial<IEmployeesCollection> = {
             EmployeeId: selectedEmp?.EmpId,
             EmployeeName: selectedEmp?.EmpName,
-          };
+          }
           return {
             ...schedule,
             employee: [updatedEmp],
-          };
+          }
         }
-        return schedule;
-      });
+        return schedule
+      })
 
-      return updatedSchedules as ISchedule[];
-    });
-  };
+      return updatedSchedules as ISchedule[]
+    })
+  }
 
   const onPublish = async () => {
     try {
-      showModalLoader({});
+      showModalLoader({})
 
       const shiftAssignPromise = resultToBePublished.map(async (result) => {
         return DbSchedule.assignShiftToEmp(result.shift.ShiftId, [
           result.emp.EmpId,
-        ]);
-      });
+        ])
+      })
 
-      await Promise.all(shiftAssignPromise);
+      await Promise.all(shiftAssignPromise)
 
       const aggregatedEmails: {
-        empEmail: string;
-        empName: string;
-        message: string;
-      }[] = [];
+        empEmail: string
+        empName: string
+        message: string
+      }[] = []
 
       resultToBePublished.forEach((data) => {
-        const { emp, shift } = data;
+        const { emp, shift } = data
         const isExistIndex = aggregatedEmails.findIndex(
           (d) => d.empEmail === emp.EmpEmail
-        );
+        )
         if (isExistIndex !== -1) {
-          const prevMessage = aggregatedEmails[isExistIndex].message;
-          aggregatedEmails[
-            isExistIndex
-          ].message = `${prevMessage}\n\nShift Name: ${
-            shift.ShiftName
-          } \n Date: ${formatDate(shift.ShiftDate)} \nTiming: ${
-            shift.ShiftStartTime
-          }-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
+          const prevMessage = aggregatedEmails[isExistIndex].message
+          aggregatedEmails[isExistIndex].message =
+            `${prevMessage}\n\nShift Name: ${
+              shift.ShiftName
+            } \n Date: ${formatDate(shift.ShiftDate)} \nTiming: ${
+              shift.ShiftStartTime
+            }-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`
         } else {
           aggregatedEmails.push({
             empEmail: emp.EmpEmail,
@@ -230,50 +227,50 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
             } \n Date: ${formatDate(shift.ShiftDate)} \n Timing: ${
               shift.ShiftStartTime
             }-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
-          });
+          })
         }
-      });
+      })
 
       await Promise.all(
         aggregatedEmails.map(async (res) => {
-          console.log(res, "res");
+          console.log(res, 'res')
           return sendEmail({
             to_email: res.empEmail,
             text: res.message,
-            subject: "Your schedule update",
+            subject: 'Your schedule update',
             from_name: company!.CompanyName,
-          });
+          })
         })
-      );
+      )
 
-      setResultToBePublished([]);
+      setResultToBePublished([])
 
       showSnackbar({
-        message: "Schedule published successfully",
-        type: "success",
-      });
-      closeModalLoader();
+        message: 'Schedule published successfully',
+        type: 'success',
+      })
+      closeModalLoader()
     } catch (error) {
-      closeModalLoader();
-      errorHandler(error);
-      console.log(error);
+      closeModalLoader()
+      errorHandler(error)
+      console.log(error)
     }
-  };
+  }
 
   const onUndo = () => {
-    if (resultToBePublished.length === 0) return;
-    const lastResultIndex = resultToBePublished.length - 1;
+    if (resultToBePublished.length === 0) return
+    const lastResultIndex = resultToBePublished.length - 1
 
-    const resultToBeUndo = resultToBePublished[lastResultIndex];
+    const resultToBeUndo = resultToBePublished[lastResultIndex]
 
-    setSelectedDate(toDate(resultToBeUndo.shift.ShiftDate));
+    setSelectedDate(toDate(resultToBeUndo.shift.ShiftDate))
 
-    const { emp, shift } = resultToBeUndo;
+    const { emp, shift } = resultToBeUndo
 
-    setResultToBePublished((prev) => prev.slice(0, -1));
+    setResultToBePublished((prev) => prev.slice(0, -1))
 
     if (!empAvailableForShift.find((e) => e.EmpId === emp.EmpId)) {
-      setEmpAvailableForShift((prev) => [...prev, emp]);
+      setEmpAvailableForShift((prev) => [...prev, emp])
     }
 
     setSchedules((prev) => {
@@ -282,18 +279,18 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
           return {
             ...schedule,
             employee: [],
-          };
+          }
         }
-        return schedule;
-      });
+        return schedule
+      })
 
-      return updatedSchedules as ISchedule[];
-    });
-  };
+      return updatedSchedules as ISchedule[]
+    })
+  }
 
   /****************For multiple employee assignation to single shift****************/
 
-  const [assignMultipleEmpModal, setAssignMultipleEmpModal] = useState(false);
+  const [assignMultipleEmpModal, setAssignMultipleEmpModal] = useState(false)
 
   return (
     <>
@@ -334,7 +331,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                       onClick={() => setSelectedDate(date)}
                       className="font-semibold cursor-pointer text-textPrimaryBlue"
                     >
-                      {dayjs(date).format("ddd MMM-DD")}
+                      {dayjs(date).format('ddd MMM-DD')}
                     </div>
 
                     {getScheduleForDay(datesArray[index], schedules).length >
@@ -352,15 +349,15 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                             >
                               <div
                                 onClick={() => {
-                                  setSelectedSchedule(data);
+                                  setSelectedSchedule(data)
                                   if (data.shift.ShiftRequiredEmp > 1) {
-                                    setAssignMultipleEmpModal(true);
+                                    setAssignMultipleEmpModal(true)
                                   }
                                 }}
                                 key={data.shift.ShiftId + idx}
                                 className={`flex flex-col p-2 ${
                                   data.shift.ShiftRequiredEmp > 1 &&
-                                  "cursor-pointer"
+                                  'cursor-pointer'
                                 }`}
                               >
                                 <div className="h-[30px] bg-gray-200 py-1 text-sm font-semibold ">
@@ -379,7 +376,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                     <div className=" py-[2px] rounded w-full text-center line-clamp-1">
                                       {data.employee
                                         .map((emp) => emp?.EmployeeName)
-                                        .join(",")}
+                                        .join(',')}
                                     </div>
                                   ) : (
                                     <div className="bg-[#ffff64] py-[2px] rounded w-full text-center">
@@ -389,7 +386,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                 </div>
                               </div>
                             </DropPoint>
-                          );
+                          )
                         }
                       )
                     ) : (
@@ -398,13 +395,13 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                       </div>
                     )}
                   </div>
-                );
+                )
               })}
             </div>
             {selectedDate && (
               <div className="flex flex-col gap-4 p-4 bg-onHoverBg rounded shadow w-[30%]">
                 <div className="font-semibold">
-                  Available Employees ({dayjs(selectedDate).format("ddd MMM-D")}
+                  Available Employees ({dayjs(selectedDate).format('ddd MMM-D')}
                   )
                 </div>
                 <Accordion variant="contained">
@@ -444,8 +441,8 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                         <div
                                           className={`flex items-center gap-2  p-2 rounded text-sm  ${
                                             data.EmpIsAvailable
-                                              ? "bg-primaryGold text-surface"
-                                              : "bg-gray-200 cursor-not-allowed"
+                                              ? 'bg-primaryGold text-surface'
+                                              : 'bg-gray-200 cursor-not-allowed'
                                           }`}
                                         >
                                           <img
@@ -461,27 +458,27 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                             className="flex flex-col "
                                           >
                                             <div className="flex items-center gap-2">
-                                              Name:{" "}
+                                              Name:{' '}
                                               <span className="font-semibold">
                                                 {data.EmpName}
-                                              </span>{" "}
+                                              </span>{' '}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                              Week shifts:{" "}
+                                              Week shifts:{' '}
                                               <span className="font-semibold">
                                                 {data.EmpWeekShifts}
-                                              </span>{" "}
+                                              </span>{' '}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                              Week hours:{" "}
+                                              Week hours:{' '}
                                               <span className="font-semibold">
                                                 {data.EmpWeekHours.toFixed(1)}
-                                              </span>{" "}
+                                              </span>{' '}
                                             </div>
                                           </div>
                                         </div>
                                       </Draggable>
-                                    );
+                                    )
                                   })
                               ) : isEmpLoading ? (
                                 Array.from({ length: 5 }).map((_, idx) => {
@@ -490,18 +487,18 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                       key={idx}
                                       className="bg-shimmerColor animate-pulse w-[150px] h-[80px]"
                                     ></div>
-                                  );
+                                  )
                                 })
                               ) : (
                                 <div className="bg-primaryGold font-bold py-1 px-2 rounded">
-                                  No {role.EmployeeRoleName} available for{" "}
-                                  {dayjs(selectedDate).format("ddd MMM-DD")}
+                                  No {role.EmployeeRoleName} available for{' '}
+                                  {dayjs(selectedDate).format('ddd MMM-DD')}
                                 </div>
                               )}
                             </div>
                           </Accordion.Panel>
                         </Accordion.Item>
-                      );
+                      )
                     })}
                 </Accordion>
               </div>
@@ -518,7 +515,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
         </div>
       </DndProvider>
     </>
-  );
-};
+  )
+}
 
-export default CalendarView;
+export default CalendarView

@@ -2,12 +2,12 @@ import {
   CloudStoragePaths,
   CollectionName,
   ImageResolution,
-} from "../../@types/enum";
+} from '../../@types/enum'
 import CloudStorageImageHandler, {
   CloudStorageFileHandler,
   getNewDocId,
-} from "./utils";
-import { db } from "../config";
+} from './utils'
+import { db } from '../config'
 import {
   IAdminsCollection,
   ICompaniesCollection,
@@ -17,7 +17,7 @@ import {
   ILocationsCollection,
   IReportCategoriesCollection,
   ISettingsCollection,
-} from "../../@types/database";
+} from '../../@types/database'
 import {
   doc,
   serverTimestamp,
@@ -36,39 +36,39 @@ import {
   startAfter,
   DocumentData,
   runTransaction,
-} from "@firebase/firestore";
-import { fullTextSearchIndex } from "../../utilities/misc";
+} from '@firebase/firestore'
+import { fullTextSearchIndex } from '../../utilities/misc'
 import {
   AdminUpdateFormFields,
   CompanyBranchFormFields,
   CompanyCreateFormFields,
   SettingsFormFields,
-} from "../../utilities/zod/schema";
-import CustomError from "../../utilities/CustomError";
+} from '../../utilities/zod/schema'
+import CustomError from '../../utilities/CustomError'
 
 class DbCompany {
   static createCompany = async (
     data: CompanyCreateFormFields,
     logoBase64: string
   ) => {
-    const companyId = getNewDocId(CollectionName.companies);
-    const companyRef = doc(db, CollectionName.companies, companyId);
+    const companyId = getNewDocId(CollectionName.companies)
+    const companyRef = doc(db, CollectionName.companies, companyId)
 
     const logoImg = [
       {
         base64: logoBase64,
         path:
           CloudStoragePaths.COMPANIES_LOGOS +
-          "/" +
-          CloudStorageImageHandler.generateImageName(companyId, "logo"),
+          '/' +
+          CloudStorageImageHandler.generateImageName(companyId, 'logo'),
       },
-    ];
+    ]
 
     const logoImgUrl = await CloudStorageImageHandler.getImageDownloadUrls(
       logoImg,
       ImageResolution.COMPANY_LOGO_HEIGHT,
       ImageResolution.COMPANY_LOGO_WIDTH
-    );
+    )
 
     const newCompany: ICompaniesCollection = {
       CompanyId: companyId,
@@ -79,43 +79,43 @@ class DbCompany {
       CompanyEmail: data.CompanyEmail,
       CompanyCreatedAt: serverTimestamp(),
       CompanyModifiedAt: serverTimestamp(),
-    };
+    }
 
-    return setDoc(companyRef, newCompany);
-  };
+    return setDoc(companyRef, newCompany)
+  }
 
   static updateCompany = async ({
     cmpId,
     data,
     logoBase64,
   }: {
-    data: CompanyCreateFormFields;
-    cmpId: string;
-    logoBase64: string;
+    data: CompanyCreateFormFields
+    cmpId: string
+    logoBase64: string
   }) => {
     await runTransaction(db, async (transaction) => {
-      const companyRef = doc(db, CollectionName.companies, cmpId);
+      const companyRef = doc(db, CollectionName.companies, cmpId)
 
-      let logoImageUrl = logoBase64;
+      let logoImageUrl = logoBase64
 
-      if (!logoImageUrl.startsWith("https")) {
+      if (!logoImageUrl.startsWith('https')) {
         const imageEmployee = [
           {
             base64: logoBase64,
             path:
               CloudStoragePaths.COMPANIES_LOGOS +
-              "/" +
-              CloudStorageImageHandler.generateImageName(cmpId, "logo"),
+              '/' +
+              CloudStorageImageHandler.generateImageName(cmpId, 'logo'),
           },
-        ];
+        ]
 
         const imageUrl = await CloudStorageImageHandler.getImageDownloadUrls(
           imageEmployee,
           ImageResolution.EMP_IMAGE_HEIGHT,
           ImageResolution.EMP_IMAGE_WIDTH
-        );
+        )
 
-        logoImageUrl = imageUrl[0];
+        logoImageUrl = imageUrl[0]
       }
 
       const updatedCompany: Partial<ICompaniesCollection> = {
@@ -125,31 +125,31 @@ class DbCompany {
         CompanyPhone: data.CompanyPhone,
         CompanyEmail: data.CompanyEmail,
         CompanyModifiedAt: serverTimestamp(),
-      };
+      }
 
-      transaction.update(companyRef, updatedCompany);
-    });
-  };
+      transaction.update(companyRef, updatedCompany)
+    })
+  }
 
   static getCompanyBranches = (cmpId: string) => {
-    const cmpBranchRef = collection(db, CollectionName.companyBranch);
-    const cmpBranchQuery = query(cmpBranchRef, where("CompanyId", "==", cmpId));
-    return getDocs(cmpBranchQuery);
-  };
+    const cmpBranchRef = collection(db, CollectionName.companyBranch)
+    const cmpBranchQuery = query(cmpBranchRef, where('CompanyId', '==', cmpId))
+    return getDocs(cmpBranchQuery)
+  }
 
   static createCompanyBranch = async (
     cmpId: string,
     data: CompanyBranchFormFields
   ) => {
-    const cpmBranchId = getNewDocId(CollectionName.companyBranch);
-    const cmpBranchRef = doc(db, CollectionName.companyBranch, cpmBranchId);
+    const cpmBranchId = getNewDocId(CollectionName.companyBranch)
+    const cmpBranchRef = doc(db, CollectionName.companyBranch, cpmBranchId)
 
     const {
       CompanyBranchAddress,
       CompanyBranchEmail,
       CompanyBranchName,
       CompanyBranchPhone,
-    } = data;
+    } = data
 
     const newCmpBranch: ICompanyBranchesCollection = {
       CompanyBranchId: cpmBranchId,
@@ -160,30 +160,30 @@ class DbCompany {
       CompanyBranchAddress,
       CompanyBranchCreatedAt: serverTimestamp(),
       CompanyBranchModifiedAt: serverTimestamp(),
-    };
+    }
 
-    await setDoc(cmpBranchRef, newCmpBranch);
+    await setDoc(cmpBranchRef, newCmpBranch)
 
-    return newCmpBranch;
-  };
+    return newCmpBranch
+  }
 
   static updateCompanyBranch = async ({
     cmpId,
     cmpBranchId,
     data,
   }: {
-    cmpId: string;
-    cmpBranchId: string;
-    data: CompanyBranchFormFields;
+    cmpId: string
+    cmpBranchId: string
+    data: CompanyBranchFormFields
   }) => {
-    const cmpBranchRef = doc(db, CollectionName.companyBranch, cmpBranchId);
+    const cmpBranchRef = doc(db, CollectionName.companyBranch, cmpBranchId)
 
     const {
       CompanyBranchAddress,
       CompanyBranchEmail,
       CompanyBranchName,
       CompanyBranchPhone,
-    } = data;
+    } = data
 
     const updatedCmpBranch: Partial<ICompanyBranchesCollection> = {
       CompanyBranchId: cmpBranchId,
@@ -193,111 +193,111 @@ class DbCompany {
       CompanyBranchPhone,
       CompanyBranchAddress,
       CompanyBranchModifiedAt: serverTimestamp(),
-    };
+    }
 
-    await updateDoc(cmpBranchRef, updatedCmpBranch);
+    await updateDoc(cmpBranchRef, updatedCmpBranch)
 
-    return updatedCmpBranch;
-  };
+    return updatedCmpBranch
+  }
 
   static deleteCompanyBranch = async (cmpBranchId: string) => {
     //*Check if branch is used somewhere before deleting
 
     //Check if employee exist in this branch
-    const empDocRef = collection(db, CollectionName.employees);
+    const empDocRef = collection(db, CollectionName.employees)
     const empQuery = query(
       empDocRef,
-      where("EmployeeCompanyBranchId", "==", cmpBranchId)
-    );
-    const empTask = getDocs(empQuery);
+      where('EmployeeCompanyBranchId', '==', cmpBranchId)
+    )
+    const empTask = getDocs(empQuery)
 
     //Check if shifts exist in this branch
-    const shiftDocRef = collection(db, CollectionName.shifts);
+    const shiftDocRef = collection(db, CollectionName.shifts)
     const shiftQuery = query(
       shiftDocRef,
-      where("ShiftCompanyBranchId", "==", cmpBranchId)
-    );
-    const shiftTask = getDocs(shiftQuery);
+      where('ShiftCompanyBranchId', '==', cmpBranchId)
+    )
+    const shiftTask = getDocs(shiftQuery)
 
-    const querySnapshots = await Promise.all([empTask, shiftTask]);
+    const querySnapshots = await Promise.all([empTask, shiftTask])
 
     const branchAlreadyUsed = querySnapshots.some(
       (snapshot) => snapshot.size > 0
-    );
+    )
 
     if (branchAlreadyUsed) {
-      throw new CustomError("This branch is already in use");
+      throw new CustomError('This branch is already in use')
     }
 
-    const docRef = doc(db, CollectionName.companyBranch, cmpBranchId);
+    const docRef = doc(db, CollectionName.companyBranch, cmpBranchId)
 
-    return deleteDoc(docRef);
-  };
+    return deleteDoc(docRef)
+  }
 
   static createAdmin = (companyId: string) => {
-    const adminId = getNewDocId(CollectionName.admins);
-    const adminRef = doc(db, CollectionName.admins, adminId);
+    const adminId = getNewDocId(CollectionName.admins)
+    const adminRef = doc(db, CollectionName.admins, adminId)
 
     const newAdmin: IAdminsCollection = {
       AdminId: adminId,
-      AdminName: "Jhon Doe",
-      AdminEmail: "sapp69750@gmail.com",
-      AdminPhone: "+918624016814",
+      AdminName: 'Jhon Doe',
+      AdminEmail: 'sapp69750@gmail.com',
+      AdminPhone: '+918624016814',
       AdminCompanyId: companyId,
       AdminCreatedAt: serverTimestamp(),
       AdminModifiedAt: serverTimestamp(),
-    };
+    }
 
-    return setDoc(adminRef, newAdmin);
-  };
+    return setDoc(adminRef, newAdmin)
+  }
 
   static updateAdmin = (adminId: string, data: AdminUpdateFormFields) => {
-    const adminRef = doc(db, CollectionName.admins, adminId);
+    const adminRef = doc(db, CollectionName.admins, adminId)
 
     const newAdmin: Partial<IAdminsCollection> = {
       AdminName: data.AdminName,
       AdminPhone: data.AdminPhone,
       AdminModifiedAt: serverTimestamp(),
-    };
+    }
 
-    return updateDoc(adminRef, newAdmin);
-  };
+    return updateDoc(adminRef, newAdmin)
+  }
 
   static updateAdminEmail = (adminId: string, email: string) => {
-    const adminRef = doc(db, CollectionName.admins, adminId);
+    const adminRef = doc(db, CollectionName.admins, adminId)
 
     const newAdmin: Partial<IAdminsCollection> = {
       AdminEmail: email,
       AdminModifiedAt: serverTimestamp(),
-    };
+    }
 
-    return updateDoc(adminRef, newAdmin);
-  };
+    return updateDoc(adminRef, newAdmin)
+  }
 
   static getAdminById = (adminId: string) => {
-    const adminRef = doc(db, CollectionName.admins, adminId);
-    return getDoc(adminRef);
-  };
+    const adminRef = doc(db, CollectionName.admins, adminId)
+    return getDoc(adminRef)
+  }
 
   static getCompanyById = (cmpId: string) => {
-    const cmpRef = doc(db, CollectionName.companies, cmpId);
-    return getDoc(cmpRef);
-  };
+    const cmpRef = doc(db, CollectionName.companies, cmpId)
+    return getDoc(cmpRef)
+  }
 
   static getSettingsByCmpId = (cmpId: string) => {
-    const settingRef = collection(db, CollectionName.settings);
+    const settingRef = collection(db, CollectionName.settings)
     const settingQuery = query(
       settingRef,
-      where("SettingCompanyId", "==", cmpId),
+      where('SettingCompanyId', '==', cmpId),
       limit(1)
-    );
-    return getDocs(settingQuery);
-  };
+    )
+    return getDocs(settingQuery)
+  }
 
   static updateSetting = (settingId: string, data: SettingsFormFields) => {
-    const settingRef = doc(db, CollectionName.settings, settingId);
-    return updateDoc(settingRef, data);
-  };
+    const settingRef = doc(db, CollectionName.settings, settingId)
+    return updateDoc(settingRef, data)
+  }
 
   static getUserLoggedInData = async (
     uId: string,
@@ -305,24 +305,24 @@ class DbCompany {
     loggedInCrypt: string,
     isLoggedIn: boolean
   ) => {
-    const loggedInRef = collection(db, CollectionName.loggedInUsers);
+    const loggedInRef = collection(db, CollectionName.loggedInUsers)
 
     const loggedInQuery = query(
       loggedInRef,
-      where("LoggedInId", "==", loggedInId),
-      where("LoggedInCrypt", "==", loggedInCrypt),
-      where("LoggedInUserId", "==", uId),
-      where("IsLoggedIn", "==", isLoggedIn),
+      where('LoggedInId', '==', loggedInId),
+      where('LoggedInCrypt', '==', loggedInCrypt),
+      where('LoggedInUserId', '==', uId),
+      where('IsLoggedIn', '==', isLoggedIn),
       limit(1)
-    );
+    )
 
-    return getDocs(loggedInQuery);
-  };
+    return getDocs(loggedInQuery)
+  }
 
   static deleteUserLoggedInDoc = async (loggedInId: string) => {
-    const loggedInRef = doc(db, CollectionName.loggedInUsers, loggedInId);
-    await deleteDoc(loggedInRef);
-  };
+    const loggedInRef = doc(db, CollectionName.loggedInUsers, loggedInId)
+    await deleteDoc(loggedInRef)
+  }
 
   static addLocation = (
     cmpId: string,
@@ -330,12 +330,12 @@ class DbCompany {
     locationAddress: string,
     locationCoordinates: { lat: number | null; lng: number | null }
   ) => {
-    const locationId = getNewDocId(CollectionName.locations);
-    const locationRef = doc(db, CollectionName.locations, locationId);
+    const locationId = getNewDocId(CollectionName.locations)
+    const locationRef = doc(db, CollectionName.locations, locationId)
 
     const nameSearchIndex = fullTextSearchIndex(
       locationName.trim().toLowerCase()
-    );
+    )
 
     const newLocation: ILocationsCollection = {
       LocationId: locationId,
@@ -348,10 +348,10 @@ class DbCompany {
         locationCoordinates.lng || 0
       ),
       LocationCreatedAt: serverTimestamp(),
-    };
+    }
 
-    return setDoc(locationRef, newLocation);
-  };
+    return setDoc(locationRef, newLocation)
+  }
 
   static updateLocation = (
     locationId: string,
@@ -359,11 +359,11 @@ class DbCompany {
     locationAddress: string,
     locationCoordinates: { lat: number | null; lng: number | null }
   ) => {
-    const locationRef = doc(db, CollectionName.locations, locationId);
+    const locationRef = doc(db, CollectionName.locations, locationId)
 
     const nameSearchIndex = fullTextSearchIndex(
       locationName.trim().toLowerCase()
-    );
+    )
 
     const newLocation: Partial<ILocationsCollection> = {
       LocationName: locationName,
@@ -374,41 +374,41 @@ class DbCompany {
         locationCoordinates.lng || 0
       ),
       LocationCreatedAt: serverTimestamp(),
-    };
+    }
 
-    return updateDoc(locationRef, newLocation);
-  };
+    return updateDoc(locationRef, newLocation)
+  }
 
   static deleteLocation = async (locationId: string) => {
     //*Check if shift exist with this location
-    const shiftDocRef = collection(db, CollectionName.shifts);
+    const shiftDocRef = collection(db, CollectionName.shifts)
     const shiftQuery = query(
       shiftDocRef,
-      where("ShiftLocationId", "==", locationId),
+      where('ShiftLocationId', '==', locationId),
       limit(1)
-    );
-    const shiftTask = getDocs(shiftQuery);
+    )
+    const shiftTask = getDocs(shiftQuery)
 
     //*Check if patrol exist with this location
-    const patrolDocRef = collection(db, CollectionName.patrols);
+    const patrolDocRef = collection(db, CollectionName.patrols)
     const patrolQuery = query(
       patrolDocRef,
-      where("ShiftLocationPatrolLocationIdId", "==", locationId),
+      where('ShiftLocationPatrolLocationIdId', '==', locationId),
       limit(1)
-    );
-    const patrolTask = getDocs(patrolQuery);
+    )
+    const patrolTask = getDocs(patrolQuery)
 
-    const querySnapshots = await Promise.all([shiftTask, patrolTask]);
+    const querySnapshots = await Promise.all([shiftTask, patrolTask])
 
-    const isLocationUsed = querySnapshots.some((snapshot) => snapshot.size > 0);
+    const isLocationUsed = querySnapshots.some((snapshot) => snapshot.size > 0)
 
     if (isLocationUsed) {
-      throw new CustomError("This location is already used");
+      throw new CustomError('This location is already used')
     }
 
-    const locationRef = doc(db, CollectionName.locations, locationId);
-    return deleteDoc(locationRef);
-  };
+    const locationRef = doc(db, CollectionName.locations, locationId)
+    return deleteDoc(locationRef)
+  }
 
   static getLocations = ({
     lmt,
@@ -416,41 +416,41 @@ class DbCompany {
     searchQuery,
     cmpId,
   }: {
-    lmt: number;
-    lastDoc?: DocumentData | null;
-    searchQuery?: string;
-    cmpId: string;
+    lmt: number
+    lastDoc?: DocumentData | null
+    searchQuery?: string
+    cmpId: string
   }) => {
-    const locationRef = collection(db, CollectionName.locations);
+    const locationRef = collection(db, CollectionName.locations)
 
     let queryParams: QueryConstraint[] = [
-      where("LocationCompanyId", "==", cmpId),
-      orderBy("LocationCreatedAt", "desc"),
-    ];
+      where('LocationCompanyId', '==', cmpId),
+      orderBy('LocationCreatedAt', 'desc'),
+    ]
 
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [
         ...queryParams,
         where(
-          "LocationSearchIndex",
-          "array-contains",
+          'LocationSearchIndex',
+          'array-contains',
           searchQuery.toLocaleLowerCase()
         ),
-      ];
+      ]
     }
 
     if (lastDoc) {
-      queryParams = [...queryParams, startAfter(lastDoc)];
+      queryParams = [...queryParams, startAfter(lastDoc)]
     }
 
     if (lmt) {
-      queryParams = [...queryParams, limit(lmt)];
+      queryParams = [...queryParams, limit(lmt)]
     }
 
-    const locationQuery = query(locationRef, ...queryParams);
+    const locationQuery = query(locationRef, ...queryParams)
 
-    return getDocs(locationQuery);
-  };
+    return getDocs(locationQuery)
+  }
 
   static getReports = ({
     cmpId,
@@ -462,128 +462,128 @@ class DbCompany {
     startDate,
     categoryId,
   }: {
-    cmpId: string;
-    branchId?: string;
-    lastDoc?: DocumentData | null;
-    lmt?: number;
-    startDate?: Date | string | null;
-    endDate?: Date | string | null;
-    isLifeTime?: boolean;
-    categoryId?: string | null;
+    cmpId: string
+    branchId?: string
+    lastDoc?: DocumentData | null
+    lmt?: number
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    isLifeTime?: boolean
+    categoryId?: string | null
   }) => {
-    const reportRef = collection(db, CollectionName.reports);
+    const reportRef = collection(db, CollectionName.reports)
 
     let queryParams: QueryConstraint[] = [
-      where("ReportCompanyId", "==", cmpId),
-      orderBy("ReportCreatedAt", "desc"),
-    ];
+      where('ReportCompanyId', '==', cmpId),
+      orderBy('ReportCreatedAt', 'desc'),
+    ]
 
     if (branchId) {
       queryParams = [
         ...queryParams,
-        where("ReportCompanyBranchId", "==", branchId),
-      ];
+        where('ReportCompanyBranchId', '==', branchId),
+      ]
     }
 
     if (categoryId) {
       queryParams = [
         ...queryParams,
-        where("ReportCategoryId", "==", categoryId),
-      ];
+        where('ReportCategoryId', '==', categoryId),
+      ]
     }
 
     if (!isLifeTime) {
       queryParams = [
         ...queryParams,
-        where("ReportCreatedAt", ">=", startDate),
-        where("ReportCreatedAt", "<=", endDate),
-      ];
+        where('ReportCreatedAt', '>=', startDate),
+        where('ReportCreatedAt', '<=', endDate),
+      ]
     }
 
     if (lastDoc) {
-      queryParams = [...queryParams, startAfter(lastDoc)];
+      queryParams = [...queryParams, startAfter(lastDoc)]
     }
 
     if (lmt) {
-      queryParams = [...queryParams, limit(lmt)];
+      queryParams = [...queryParams, limit(lmt)]
     }
 
-    const empQuery = query(reportRef, ...queryParams);
+    const empQuery = query(reportRef, ...queryParams)
 
-    return getDocs(empQuery);
-  };
+    return getDocs(empQuery)
+  }
 
   static getReportById = (reportId: string) => {
-    const reportDocRef = doc(db, CollectionName.reports, reportId);
-    return getDoc(reportDocRef);
-  };
+    const reportDocRef = doc(db, CollectionName.reports, reportId)
+    return getDoc(reportDocRef)
+  }
 
   static createSettings = (cmpId: string) => {
-    const settingId = getNewDocId(CollectionName.settings);
-    const settingRef = doc(db, CollectionName.settings, settingId);
+    const settingId = getNewDocId(CollectionName.settings)
+    const settingRef = doc(db, CollectionName.settings, settingId)
 
     const newSetting: ISettingsCollection = {
       SettingId: settingId,
       SettingCompanyId: cmpId,
       SettingEmpWellnessIntervalInMins: 60,
-    };
+    }
 
-    return setDoc(settingRef, newSetting);
-  };
+    return setDoc(settingRef, newSetting)
+  }
 
   static addReportCategory = (catName: string, cmpId: string) => {
-    const catId = getNewDocId(CollectionName.reportCategories);
-    const catRef = doc(db, CollectionName.reportCategories, catId);
+    const catId = getNewDocId(CollectionName.reportCategories)
+    const catRef = doc(db, CollectionName.reportCategories, catId)
 
     const newCat: IReportCategoriesCollection = {
       ReportCategoryId: catId,
       ReportCompanyId: cmpId,
       ReportCategoryName: catName,
       ReportCategoryCreatedAt: serverTimestamp(),
-    };
+    }
 
-    return setDoc(catRef, newCat);
-  };
+    return setDoc(catRef, newCat)
+  }
 
   static deleteReportCategory = (catId: string) => {
-    const catRef = doc(db, CollectionName.reportCategories, catId);
-    return deleteDoc(catRef);
-  };
+    const catRef = doc(db, CollectionName.reportCategories, catId)
+    return deleteDoc(catRef)
+  }
 
   static getReportCategories = (cmpId: string) => {
-    const catRef = collection(db, CollectionName.reportCategories);
-    const catQuery = query(catRef, where("ReportCompanyId", "==", cmpId));
-    return getDocs(catQuery);
-  };
+    const catRef = collection(db, CollectionName.reportCategories)
+    const catQuery = query(catRef, where('ReportCompanyId', '==', cmpId))
+    return getDocs(catQuery)
+  }
 
   //*For document categories
   static addDocumentCategory = (catName: string, cmpId: string) => {
-    const catId = getNewDocId(CollectionName.documentCategories);
-    const catRef = doc(db, CollectionName.documentCategories, catId);
+    const catId = getNewDocId(CollectionName.documentCategories)
+    const catRef = doc(db, CollectionName.documentCategories, catId)
 
     const newCat: IDocumentCategories = {
       DocumentCategoryId: catId,
       DocumentCategoryCompanyId: cmpId,
       DocumentCategoryName: catName,
       DocumentCategoryCreatedAt: serverTimestamp(),
-    };
+    }
 
-    return setDoc(catRef, newCat);
-  };
+    return setDoc(catRef, newCat)
+  }
 
   static deleteDocumentCategory = (catId: string) => {
-    const catRef = doc(db, CollectionName.documentCategories, catId);
-    return deleteDoc(catRef);
-  };
+    const catRef = doc(db, CollectionName.documentCategories, catId)
+    return deleteDoc(catRef)
+  }
 
   static getDocumentCategories = (cmpId: string) => {
-    const catRef = collection(db, CollectionName.documentCategories);
+    const catRef = collection(db, CollectionName.documentCategories)
     const catQuery = query(
       catRef,
-      where("DocumentCategoryCompanyId", "==", cmpId)
-    );
-    return getDocs(catQuery);
-  };
+      where('DocumentCategoryCompanyId', '==', cmpId)
+    )
+    return getDocs(catQuery)
+  }
 
   //*For document repository
 
@@ -591,28 +591,28 @@ class DbCompany {
     cmpId,
     data,
   }: {
-    cmpId: string;
+    cmpId: string
     data: {
-      documentName: string;
-      categoryName: string;
-      categoryId: string;
-      document: File;
-    };
+      documentName: string
+      categoryName: string
+      categoryId: string
+      document: File
+    }
   }) => {
-    const { categoryId, categoryName, document, documentName } = data;
+    const { categoryId, categoryName, document, documentName } = data
 
-    const documentId = getNewDocId(CollectionName.documents);
-    const documentRef = doc(db, CollectionName.documents, documentId);
+    const documentId = getNewDocId(CollectionName.documents)
+    const documentRef = doc(db, CollectionName.documents, documentId)
 
     const fileName = CloudStorageFileHandler.generateFileNameWithRandom(
       documentId,
       0
-    );
+    )
 
     const fileUrl = await CloudStorageFileHandler.uploadFile(
       document,
-      CloudStoragePaths.DOCUMENTS + `/${categoryName}` + "/" + fileName
-    );
+      CloudStoragePaths.DOCUMENTS + `/${categoryName}` + '/' + fileName
+    )
 
     try {
       const newDocument: IDocumentsCollection = {
@@ -627,51 +627,51 @@ class DbCompany {
         DocumentUrl: fileUrl,
         DocumentCreatedAt: serverTimestamp(),
         DocumentModifiedAt: serverTimestamp(),
-      };
+      }
 
-      await setDoc(documentRef, newDocument);
+      await setDoc(documentRef, newDocument)
     } catch (error) {
-      console.log(error);
-      await CloudStorageFileHandler.deleteFileByUrl(fileUrl);
-      throw error;
+      console.log(error)
+      await CloudStorageFileHandler.deleteFileByUrl(fileUrl)
+      throw error
     }
-  };
+  }
 
   static updateDocument = async ({
     data,
     documentId,
   }: {
-    documentId: string;
+    documentId: string
     data: {
-      documentName: string;
-      categoryName: string;
-      categoryId: string;
-      document: File | string;
-    };
+      documentName: string
+      categoryName: string
+      categoryId: string
+      document: File | string
+    }
   }) => {
-    const { categoryId, categoryName, document, documentName } = data;
+    const { categoryId, categoryName, document, documentName } = data
 
     try {
       await runTransaction(db, async (transaction) => {
-        const documentRef = doc(db, CollectionName.documents, documentId);
-        const docSnap = await transaction.get(documentRef);
-        const oldDocData = docSnap.data() as IDocumentsCollection;
+        const documentRef = doc(db, CollectionName.documents, documentId)
+        const docSnap = await transaction.get(documentRef)
+        const oldDocData = docSnap.data() as IDocumentsCollection
 
-        let fileUrl = oldDocData.DocumentUrl;
-        let fileToBeDeleted: string | null = null;
+        let fileUrl = oldDocData.DocumentUrl
+        let fileToBeDeleted: string | null = null
 
-        if (typeof document !== "string") {
+        if (typeof document !== 'string') {
           const fileName = CloudStorageFileHandler.generateFileNameWithRandom(
             documentId,
             0
-          );
+          )
 
           fileUrl = await CloudStorageFileHandler.uploadFile(
             document,
-            CloudStoragePaths.DOCUMENTS + `/${categoryName}` + "/" + fileName
-          );
+            CloudStoragePaths.DOCUMENTS + `/${categoryName}` + '/' + fileName
+          )
 
-          fileToBeDeleted = oldDocData.DocumentUrl;
+          fileToBeDeleted = oldDocData.DocumentUrl
         }
 
         const newDocument: Partial<IDocumentsCollection> = {
@@ -683,36 +683,36 @@ class DbCompany {
           DocumentCategoryName: categoryName,
           DocumentUrl: fileUrl,
           DocumentModifiedAt: serverTimestamp(),
-        };
+        }
 
-        transaction.update(documentRef, newDocument);
+        transaction.update(documentRef, newDocument)
 
         if (fileToBeDeleted) {
-          await CloudStorageFileHandler.deleteFileByUrl(fileToBeDeleted);
+          await CloudStorageFileHandler.deleteFileByUrl(fileToBeDeleted)
         }
-      });
+      })
     } catch (error) {
-      console.log(error);
-      throw error;
+      console.log(error)
+      throw error
     }
-  };
+  }
 
   static deleteDocument = async (documentId: string) => {
     try {
       await runTransaction(db, async (transaction) => {
-        const documentRef = doc(db, CollectionName.documents, documentId);
-        const docSnap = await transaction.get(documentRef);
-        const docData = docSnap.data() as IDocumentsCollection;
+        const documentRef = doc(db, CollectionName.documents, documentId)
+        const docSnap = await transaction.get(documentRef)
+        const docData = docSnap.data() as IDocumentsCollection
 
-        transaction.delete(documentRef);
+        transaction.delete(documentRef)
 
-        await CloudStorageFileHandler.deleteFileByUrl(docData.DocumentUrl);
-      });
+        await CloudStorageFileHandler.deleteFileByUrl(docData.DocumentUrl)
+      })
     } catch (error) {
-      console.log(error);
-      throw error;
+      console.log(error)
+      throw error
     }
-  };
+  }
 
   static getDocuments = ({
     lmt,
@@ -721,49 +721,49 @@ class DbCompany {
     cmpId,
     categoryId,
   }: {
-    lmt?: number;
-    lastDoc?: DocumentData | null;
-    searchQuery?: string;
-    cmpId: string;
-    categoryId?: string | null;
+    lmt?: number
+    lastDoc?: DocumentData | null
+    searchQuery?: string
+    cmpId: string
+    categoryId?: string | null
   }) => {
-    const docRef = collection(db, CollectionName.documents);
+    const docRef = collection(db, CollectionName.documents)
 
     let queryParams: QueryConstraint[] = [
-      where("DocumentCompanyId", "==", cmpId),
-      orderBy("DocumentCreatedAt", "desc"),
-    ];
+      where('DocumentCompanyId', '==', cmpId),
+      orderBy('DocumentCreatedAt', 'desc'),
+    ]
 
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [
         ...queryParams,
         where(
-          "DocumentNameSearchIndex",
-          "array-contains",
+          'DocumentNameSearchIndex',
+          'array-contains',
           searchQuery.toLocaleLowerCase()
         ),
-      ];
+      ]
     }
 
     if (categoryId) {
       queryParams = [
         ...queryParams,
-        where("DocumentCategoryId", "==", categoryId),
-      ];
+        where('DocumentCategoryId', '==', categoryId),
+      ]
     }
 
     if (lastDoc) {
-      queryParams = [...queryParams, startAfter(lastDoc)];
+      queryParams = [...queryParams, startAfter(lastDoc)]
     }
 
     if (lmt) {
-      queryParams = [...queryParams, limit(lmt)];
+      queryParams = [...queryParams, limit(lmt)]
     }
 
-    const docQuery = query(docRef, ...queryParams);
+    const docQuery = query(docRef, ...queryParams)
 
-    return getDocs(docQuery);
-  };
+    return getDocs(docQuery)
+  }
 }
 
-export default DbCompany;
+export default DbCompany

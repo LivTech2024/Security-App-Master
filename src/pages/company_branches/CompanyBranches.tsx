@@ -1,15 +1,15 @@
-import { useState } from "react";
-import Button from "../../common/button/Button";
-import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
-import { useAuthState, useEditFormStore } from "../../store";
-import NoSearchResult from "../../common/NoSearchResult";
-import { CompanyBranches as ICompanyBranches } from "../../store/slice/auth.slice";
+import { useState } from 'react'
+import Button from '../../common/button/Button'
+import AddBranchModal from '../../component/company_branches/modal/AddBranchModal'
+import { useAuthState, useEditFormStore } from '../../store'
+import NoSearchResult from '../../common/NoSearchResult'
+import { CompanyBranches as ICompanyBranches } from '../../store/slice/auth.slice'
 
 const CompanyBranches = () => {
-  const [addBranchModal, setAddBranchModal] = useState(false);
+  const [addBranchModal, setAddBranchModal] = useState(false)
 
-  const { companyBranches } = useAuthState();
-  const { setCompanyBranchEditData } = useEditFormStore();
+  const { companyBranches } = useAuthState()
+  const { setCompanyBranchEditData } = useEditFormStore()
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -20,8 +20,8 @@ const CompanyBranches = () => {
             type="black"
             label="Create New Branch"
             onClick={() => {
-              setCompanyBranchEditData(null);
-              setAddBranchModal(true);
+              setCompanyBranchEditData(null)
+              setAddBranchModal(true)
             }}
             className="px-4 py-2"
           />
@@ -59,8 +59,8 @@ const CompanyBranches = () => {
                   onClick={() => {
                     setCompanyBranchEditData(
                       branch as unknown as ICompanyBranches
-                    );
-                    setAddBranchModal(true);
+                    )
+                    setAddBranchModal(true)
                   }}
                   key={branch.CompanyBranchId}
                   className="cursor-pointer"
@@ -80,13 +80,13 @@ const CompanyBranches = () => {
                     </span>
                   </td>
                 </tr>
-              );
+              )
             })
           )}
         </tbody>
       </table>
     </div>
-  );
-};
+  )
+}
 
-export default CompanyBranches;
+export default CompanyBranches

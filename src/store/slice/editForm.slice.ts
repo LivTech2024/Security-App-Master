@@ -1,4 +1,4 @@
-import { StateCreator } from "zustand";
+import { StateCreator } from 'zustand'
 import {
   IClientsCollection,
   IDocumentsCollection,
@@ -8,98 +8,98 @@ import {
   ILocationsCollection,
   IPatrolsCollection,
   IShiftsCollection,
-} from "../../@types/database";
-import { CompanyBranches } from "./auth.slice";
+} from '../../@types/database'
+import { CompanyBranches } from './auth.slice'
 
 export interface Employee
   extends Omit<
     IEmployeesCollection,
-    "EmployeeCreatedAt" | "EmployeeModifiedAt"
+    'EmployeeCreatedAt' | 'EmployeeModifiedAt'
   > {
-  EmployeeCreatedAt: string;
-  EmployeeModifiedAt: string;
+  EmployeeCreatedAt: string
+  EmployeeModifiedAt: string
 }
 
 export interface Shift
   extends Omit<
     IShiftsCollection,
-    "ShiftDate" | "ShiftCreatedAt" | "ShiftModifiedAt"
+    'ShiftDate' | 'ShiftCreatedAt' | 'ShiftModifiedAt'
   > {
-  ShiftDate: string;
-  ShiftCreatedAt: string;
-  ShiftModifiedAt: string;
+  ShiftDate: string
+  ShiftCreatedAt: string
+  ShiftModifiedAt: string
 }
 
 export interface Location
-  extends Omit<ILocationsCollection, "LocationCreatedAt"> {
-  LocationCreatedAt: string;
+  extends Omit<ILocationsCollection, 'LocationCreatedAt'> {
+  LocationCreatedAt: string
 }
 
 export interface Client
-  extends Omit<IClientsCollection, "ClientCreatedAt" | "ClientModifiedAt"> {
-  ClientCreatedAt: string;
-  ClientModifiedAt: string;
+  extends Omit<IClientsCollection, 'ClientCreatedAt' | 'ClientModifiedAt'> {
+  ClientCreatedAt: string
+  ClientModifiedAt: string
 }
 
 export interface IDocument
   extends Omit<
     IDocumentsCollection,
-    "DocumentCreatedAt" | "DocumentModifiedAt"
+    'DocumentCreatedAt' | 'DocumentModifiedAt'
   > {
-  DocumentCreatedAt: string;
-  DocumentModifiedAt: string;
+  DocumentCreatedAt: string
+  DocumentModifiedAt: string
 }
 
 export interface Equipment
   extends Omit<
     IEquipmentsCollection,
-    "EquipmentCreatedAt" | "EquipmentModifiedAt"
+    'EquipmentCreatedAt' | 'EquipmentModifiedAt'
   > {
-  EquipmentCreatedAt: string;
-  EquipmentModifiedAt: string;
+  EquipmentCreatedAt: string
+  EquipmentModifiedAt: string
 }
 
 export interface EquipmentAllocation
   extends Omit<
     IEquipmentAllocations,
-    | "EquipmentAllocationDate"
-    | "EquipmentAllocationStartDate"
-    | "EquipmentAllocationEndDate"
-    | "EquipmentAllocationCreatedAt"
+    | 'EquipmentAllocationDate'
+    | 'EquipmentAllocationStartDate'
+    | 'EquipmentAllocationEndDate'
+    | 'EquipmentAllocationCreatedAt'
   > {
-  EquipmentAllocationDate: string;
-  EquipmentAllocationStartDate: string;
-  EquipmentAllocationEndDate: string;
-  EquipmentAllocationCreatedAt: string;
+  EquipmentAllocationDate: string
+  EquipmentAllocationStartDate: string
+  EquipmentAllocationEndDate: string
+  EquipmentAllocationCreatedAt: string
 }
 
 interface EditFormState {
-  employeeEditData: Employee | null;
-  setEmployeeEditData: (emp: Employee | null) => void;
+  employeeEditData: Employee | null
+  setEmployeeEditData: (emp: Employee | null) => void
 
-  shiftEditData: Shift | null;
-  setShiftEditData: (shift: Shift | null) => void;
+  shiftEditData: Shift | null
+  setShiftEditData: (shift: Shift | null) => void
 
-  patrolEditData: IPatrolsCollection | null;
-  setPatrolEditData: (patrol: IPatrolsCollection | null) => void;
+  patrolEditData: IPatrolsCollection | null
+  setPatrolEditData: (patrol: IPatrolsCollection | null) => void
 
-  locationEditData: Location | null;
-  setLocationEditData: (loc: Location | null) => void;
+  locationEditData: Location | null
+  setLocationEditData: (loc: Location | null) => void
 
-  companyBranchEditData: CompanyBranches | null;
-  setCompanyBranchEditData: (branch: CompanyBranches | null) => void;
+  companyBranchEditData: CompanyBranches | null
+  setCompanyBranchEditData: (branch: CompanyBranches | null) => void
 
-  clientEditData: Client | null;
-  setClientEditData: (client: Client | null) => void;
+  clientEditData: Client | null
+  setClientEditData: (client: Client | null) => void
 
-  documentEditData: IDocument | null;
-  setDocumentEditData: (doc: IDocument | null) => void;
+  documentEditData: IDocument | null
+  setDocumentEditData: (doc: IDocument | null) => void
 
-  equipmentEditData: Equipment | null;
-  setEquipmentEditData: (equip: Equipment | null) => void;
+  equipmentEditData: Equipment | null
+  setEquipmentEditData: (equip: Equipment | null) => void
 
-  equipAllocationEditData: EquipmentAllocation | null;
-  setEquipAllocationEditData: (equipAlloc: EquipmentAllocation | null) => void;
+  equipAllocationEditData: EquipmentAllocation | null
+  setEquipAllocationEditData: (equipAlloc: EquipmentAllocation | null) => void
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -147,4 +147,4 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   equipAllocationEditData: null,
   setEquipAllocationEditData: (equipAlloc) =>
     set((state) => ({ ...state, equipAllocationEditData: equipAlloc })),
-});
+})

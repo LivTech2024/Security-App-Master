@@ -1,39 +1,39 @@
-import { useInView } from "react-intersection-observer";
-import SelectBranch from "../../common/SelectBranch";
-import Button from "../../common/button/Button";
-import SearchBar from "../../common/inputs/SearchBar";
-import { useEffect, useState } from "react";
-import { IEquipmentsCollection } from "../../@types/database";
+import { useInView } from 'react-intersection-observer'
+import SelectBranch from '../../common/SelectBranch'
+import Button from '../../common/button/Button'
+import SearchBar from '../../common/inputs/SearchBar'
+import { useEffect, useState } from 'react'
+import { IEquipmentsCollection } from '../../@types/database'
 import {
   DisplayCount,
   MinimumQueryCharacter,
   PageRoutes,
   REACT_QUERY_KEYS,
-} from "../../@types/enum";
-import { DocumentData } from "firebase/firestore";
-import DbEquipment from "../../firebase_configs/DB/DbEquipment";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useDebouncedValue } from "@mantine/hooks";
-import { useAuthState, useEditFormStore } from "../../store";
-import NoSearchResult from "../../common/NoSearchResult";
-import TableShimmer from "../../common/shimmer/TableShimmer";
-import AddEquipmentModal from "../../component/equipment_management/modal/AddEquipmentModal";
-import EquipAllocationModal from "../../component/equipment_management/modal/EquipAllocationModal";
-import { numberFormatter } from "../../utilities/NumberFormater";
-import { useNavigate } from "react-router-dom";
+} from '../../@types/enum'
+import { DocumentData } from 'firebase/firestore'
+import DbEquipment from '../../firebase_configs/DB/DbEquipment'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useDebouncedValue } from '@mantine/hooks'
+import { useAuthState, useEditFormStore } from '../../store'
+import NoSearchResult from '../../common/NoSearchResult'
+import TableShimmer from '../../common/shimmer/TableShimmer'
+import AddEquipmentModal from '../../component/equipment_management/modal/AddEquipmentModal'
+import EquipAllocationModal from '../../component/equipment_management/modal/EquipAllocationModal'
+import { numberFormatter } from '../../utilities/NumberFormater'
+import { useNavigate } from 'react-router-dom'
 
 const EquipmentList = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { company } = useAuthState();
+  const { company } = useAuthState()
 
-  const { setEquipmentEditData } = useEditFormStore();
+  const { setEquipmentEditData } = useEditFormStore()
 
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('')
 
-  const [branchId, setBranchId] = useState("");
+  const [branchId, setBranchId] = useState('')
 
-  const [debouncedQuery] = useDebouncedValue(query, 200);
+  const [debouncedQuery] = useDebouncedValue(query, 200)
 
   const {
     data: snapshotData,
@@ -57,17 +57,17 @@ const EquipmentList = () => {
         searchQuery: debouncedQuery,
         cmpId: company!.CompanyId,
         branchId,
-      });
-      return snapshot.docs;
+      })
+      return snapshot.docs
     },
     getNextPageParam: (lastPage) => {
       if (lastPage?.length === 0) {
-        return null;
+        return null
       }
       if (lastPage?.length === DisplayCount.EQUIPMENT_LIST) {
-        return lastPage.at(-1);
+        return lastPage.at(-1)
       }
-      return null;
+      return null
     },
     initialPageParam: null as null | DocumentData,
     enabled:
@@ -75,48 +75,48 @@ const EquipmentList = () => {
       debouncedQuery.trim().length < MinimumQueryCharacter.EQUIPMENT
         ? false
         : true,
-  });
+  })
 
   const [data, setData] = useState<IEquipmentsCollection[]>(() => {
     if (snapshotData) {
       return snapshotData.pages.flatMap((page) =>
         page.map((doc) => doc.data() as IEquipmentsCollection)
-      );
+      )
     }
-    return [];
-  });
+    return []
+  })
 
   useEffect(() => {
-    console.log(error, "error");
-  }, [error]);
+    console.log(error, 'error')
+  }, [error])
 
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
     if (snapshotData) {
-      const docData: IEquipmentsCollection[] = [];
+      const docData: IEquipmentsCollection[] = []
       snapshotData.pages?.forEach((page) => {
         page?.forEach((doc) => {
-          const data = doc.data() as IEquipmentsCollection;
-          docData.push(data);
-        });
-      });
-      setData(docData);
+          const data = doc.data() as IEquipmentsCollection
+          docData.push(data)
+        })
+      })
+      setData(docData)
     }
-  }, [snapshotData]);
+  }, [snapshotData])
 
   // hook for pagination
-  const { ref, inView } = useInView();
+  const { ref, inView } = useInView()
 
   // this is for pagination
   useEffect(() => {
     if (inView && hasNextPage && !isFetching) {
-      fetchNextPage();
+      fetchNextPage()
     }
-  }, [fetchNextPage, inView, hasNextPage, isFetching]);
+  }, [fetchNextPage, inView, hasNextPage, isFetching])
 
   //*Modal states
-  const [addEquipmentModal, setAddEquipmentModal] = useState(false);
-  const [equipAllocationModal, setEquipAllocationModal] = useState(false);
+  const [addEquipmentModal, setAddEquipmentModal] = useState(false)
+  const [equipAllocationModal, setEquipAllocationModal] = useState(false)
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -126,7 +126,7 @@ const EquipmentList = () => {
           <Button
             label="Allot Equipment"
             onClick={() => {
-              setEquipAllocationModal(true);
+              setEquipAllocationModal(true)
             }}
             type="blue"
             className="px-6"
@@ -134,8 +134,8 @@ const EquipmentList = () => {
           <Button
             label="Create New Equipment"
             onClick={() => {
-              setEquipmentEditData(null);
-              setAddEquipmentModal(true);
+              setEquipmentEditData(null)
+              setAddEquipmentModal(true)
             }}
             type="black"
           />
@@ -206,7 +206,7 @@ const EquipmentList = () => {
                   </td>
                   <td className="align-top px-4 py-2 text-start">
                     <span className="line-clamp-2">
-                      {eqp.EquipmentDescription || "N/A"}
+                      {eqp.EquipmentDescription || 'N/A'}
                     </span>
                   </td>
                   <td className="align-top px-4 py-2 text-end">
@@ -223,7 +223,7 @@ const EquipmentList = () => {
                     )}
                   </td>
                 </tr>
-              );
+              )
             })
           )}
           <tr ref={ref}>
@@ -237,7 +237,7 @@ const EquipmentList = () => {
         </tbody>
       </table>
     </div>
-  );
-};
+  )
+}
 
-export default EquipmentList;
+export default EquipmentList

@@ -1,15 +1,15 @@
-import noResultFoundImg from "../../public/assets/no_result.svg";
+import noResultFoundImg from '../../public/assets/no_result.svg'
 
 interface NoSearchResultProps {
-  imgWidth?: string;
-  textSize?: string;
-  text?: string;
+  imgWidth?: string
+  textSize?: string
+  text?: string
 }
 
 const NoSearchResult = ({
-  imgWidth = "120px",
-  textSize = "18px",
-  text = "No result found",
+  imgWidth = '120px',
+  textSize = '18px',
+  text = 'No result found',
 }: NoSearchResultProps) => {
   return (
     <div className="flex flex-col w-full  gap-4 items-center justify-center h-full p-8 min-h-full">
@@ -27,7 +27,7 @@ const NoSearchResult = ({
         {text}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default NoSearchResult;
+export default NoSearchResult

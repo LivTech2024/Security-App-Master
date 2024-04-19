@@ -1,12 +1,12 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
 import {
   CACHE_SIZE_UNLIMITED,
   initializeFirestore,
   persistentLocalCache,
   persistentSingleTabManager,
-} from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+} from 'firebase/firestore'
+import { getStorage } from 'firebase/storage'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,19 +16,19 @@ const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-};
+}
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig)
 
 const firestore = initializeFirestore(app, {
   localCache: persistentLocalCache({
     tabManager: persistentSingleTabManager({ forceOwnership: true }),
     cacheSizeBytes: CACHE_SIZE_UNLIMITED,
   }),
-});
+})
 
-export const db = firestore;
+export const db = firestore
 
-export const auth = getAuth();
+export const auth = getAuth()
 
-export const storage = getStorage();
+export const storage = getStorage()

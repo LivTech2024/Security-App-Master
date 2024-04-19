@@ -1,46 +1,46 @@
-import { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import TopSection from "../../component/schedule/TopSection";
-import { ScheduleView } from "../../@types/enum";
-import ByEmployeeView from "../../component/schedule/schedule_view/ByEmployeeView";
-import CalendarView from "../../component/schedule/schedule_view/CalendarView";
-import StatisticsView from "../../component/schedule/schedule_view/StatisticsView";
+import { useEffect, useState } from 'react'
+import dayjs from 'dayjs'
+import TopSection from '../../component/schedule/TopSection'
+import { ScheduleView } from '../../@types/enum'
+import ByEmployeeView from '../../component/schedule/schedule_view/ByEmployeeView'
+import CalendarView from '../../component/schedule/schedule_view/CalendarView'
+import StatisticsView from '../../component/schedule/schedule_view/StatisticsView'
 
 const Schedule = () => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
 
-  const [datesArray, setDatesArray] = useState<Date[]>([]);
+  const [datesArray, setDatesArray] = useState<Date[]>([])
 
-  const [selectedTenure, setSelectedTenure] = useState<"weekly" | "monthly">(
-    "weekly"
-  );
+  const [selectedTenure, setSelectedTenure] = useState<'weekly' | 'monthly'>(
+    'weekly'
+  )
   const [selectedView, setSelectedView] = useState<ScheduleView>(
     ScheduleView.CALENDAR_VIEW
-  );
+  )
 
   useEffect(() => {
-    if (selectedTenure === "weekly") {
-      setDatesArray([]);
+    if (selectedTenure === 'weekly') {
+      setDatesArray([])
 
       for (
-        let i = dayjs(selectedDate).startOf("week");
-        i.isBefore(dayjs(selectedDate).endOf("week"));
-        i = dayjs(i).add(1, "day")
+        let i = dayjs(selectedDate).startOf('week');
+        i.isBefore(dayjs(selectedDate).endOf('week'));
+        i = dayjs(i).add(1, 'day')
       ) {
-        setDatesArray((prev) => [...prev, i.toDate()]);
+        setDatesArray((prev) => [...prev, i.toDate()])
       }
-    } else if (selectedTenure === "monthly") {
-      setDatesArray([]);
+    } else if (selectedTenure === 'monthly') {
+      setDatesArray([])
 
       for (
-        let i = dayjs(selectedDate).startOf("month");
-        i.isBefore(dayjs(selectedDate).endOf("month"));
-        i = dayjs(i).add(1, "day")
+        let i = dayjs(selectedDate).startOf('month');
+        i.isBefore(dayjs(selectedDate).endOf('month'));
+        i = dayjs(i).add(1, 'day')
       ) {
-        setDatesArray((prev) => [...prev, i.toDate()]);
+        setDatesArray((prev) => [...prev, i.toDate()])
       }
     }
-  }, [selectedDate, selectedTenure]);
+  }, [selectedDate, selectedTenure])
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -61,7 +61,7 @@ const Schedule = () => {
         <StatisticsView datesArray={datesArray} />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Schedule;
+export default Schedule

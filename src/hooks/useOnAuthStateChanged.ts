@@ -1,13 +1,13 @@
-import { useEffect } from "react";
-import * as storage from "../utilities/Storage";
+import { useEffect } from 'react'
+import * as storage from '../utilities/Storage'
 import {
   IUserType,
   LocalStorageKey,
   LocalStorageLoggedInUserData,
   PageRoutes,
-} from "../@types/enum";
-import DbCompany from "../firebase_configs/DB/DbCompany";
-import { firebaseDataToObject } from "../utilities/misc";
+} from '../@types/enum'
+import DbCompany from '../firebase_configs/DB/DbCompany'
+import { firebaseDataToObject } from '../utilities/misc'
 import {
   IAdminsCollection,
   IClientsCollection,
@@ -17,21 +17,21 @@ import {
   ILoggedInUsersCollection,
   ISettingsCollection,
   ISuperAdminCollection,
-} from "../@types/database";
-import { useAuthState } from "../store";
+} from '../@types/database'
+import { useAuthState } from '../store'
 import {
   Admin,
   Company,
   CompanyBranches,
   EmployeeRoles,
-} from "../store/slice/auth.slice";
-import DbEmployee from "../firebase_configs/DB/DbEmployee";
-import DbSuperAdmin from "../firebase_configs/DB/DbSuperAdmin";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase_configs/config";
-import DbClient from "../firebase_configs/DB/DbClient";
-import { Client } from "../store/slice/editForm.slice";
-import { useLocation, useNavigate } from "react-router-dom";
+} from '../store/slice/auth.slice'
+import DbEmployee from '../firebase_configs/DB/DbEmployee'
+import DbSuperAdmin from '../firebase_configs/DB/DbSuperAdmin'
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from '../firebase_configs/config'
+import DbClient from '../firebase_configs/DB/DbClient'
+import { Client } from '../store/slice/editForm.slice'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const useOnAuthStateChanged = () => {
   const {
@@ -43,34 +43,34 @@ const useOnAuthStateChanged = () => {
     setSuperAdmin,
     setClient,
     setSettings,
-  } = useAuthState();
+  } = useAuthState()
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
       try {
-        setLoading(true);
+        setLoading(true)
         if (!userAuth) {
-          console.log("userAuth not found -> signing out");
-          setLoading(false);
-          return;
+          console.log('userAuth not found -> signing out')
+          setLoading(false)
+          return
         }
         const loggedInUser = storage.getJson<LocalStorageLoggedInUserData>(
           LocalStorageKey.LOGGEDIN_USER
-        );
+        )
         if (!loggedInUser) {
-          setLoading(false);
-          return;
+          setLoading(false)
+          return
         }
 
-        const { LoggedInId, LoggedInCrypt, LoggedInUserId } = loggedInUser;
+        const { LoggedInId, LoggedInCrypt, LoggedInUserId } = loggedInUser
 
         if (!LoggedInId || !LoggedInCrypt) {
-          console.log("LoggedInId, LoggedInCrypt not found -> signing out");
-          setLoading(false);
-          return;
+          console.log('LoggedInId, LoggedInCrypt not found -> signing out')
+          setLoading(false)
+          return
         }
 
         // query loggedin user
@@ -79,102 +79,100 @@ const useOnAuthStateChanged = () => {
           LoggedInId,
           LoggedInCrypt,
           true
-        );
+        )
 
         if (!loggedInUserDoc || loggedInUserDoc.docs.length === 0) {
-          console.log("loggedInUserDoc not found -> signing out");
-          setLoading(false);
-          return;
+          console.log('loggedInUserDoc not found -> signing out')
+          setLoading(false)
+          return
         }
 
-        const loggedInUserData = loggedInUserDoc.docs[0].data();
+        const loggedInUserData = loggedInUserDoc.docs[0].data()
 
         const _loggedInUser = firebaseDataToObject(
           loggedInUserData
-        ) as unknown as ILoggedInUsersCollection;
+        ) as unknown as ILoggedInUsersCollection
 
         if (_loggedInUser.LoggedInUserType === IUserType.ADMIN) {
           //* Fetch admin and store in zustand
           const adminSnapshot = await DbCompany.getAdminById(
             _loggedInUser.LoggedInUserId
-          );
-          const admin = adminSnapshot.data() as IAdminsCollection;
+          )
+          const admin = adminSnapshot.data() as IAdminsCollection
           const _admin = firebaseDataToObject(
             admin as unknown as Record<string, unknown>
-          ) as unknown as Admin;
-          setAdmin(_admin);
+          ) as unknown as Admin
+          setAdmin(_admin)
 
           if (_admin.AdminCompanyId) {
             //*Fetch company and store in zustand;
             const cmpSnapshot = await DbCompany.getCompanyById(
               _admin.AdminCompanyId
-            );
-            const company = cmpSnapshot.data() as ICompaniesCollection;
+            )
+            const company = cmpSnapshot.data() as ICompaniesCollection
             const _company = firebaseDataToObject(
               company as unknown as Record<string, unknown>
-            ) as unknown as Company;
-            setCompany(_company);
+            ) as unknown as Company
+            setCompany(_company)
 
             //*Fetch employee roles
             const empRolesSnapshot = await DbEmployee.getEmpRoles({
               cmpId: _admin.AdminCompanyId,
-            });
+            })
             const empRoles = empRolesSnapshot.docs.map(
               (doc) => doc.data() as IEmployeeRolesCollection
-            );
+            )
 
-            setEmpRoles(empRoles as unknown as EmployeeRoles[]);
+            setEmpRoles(empRoles as unknown as EmployeeRoles[])
 
             //*Fetch company branches
             const cmpBranchSnapshot = await DbCompany.getCompanyBranches(
               admin.AdminCompanyId
-            );
+            )
             const cmpBranches = cmpBranchSnapshot.docs.map(
               (doc) => doc.data() as ICompanyBranchesCollection
-            );
+            )
 
-            setCompanyBranches(cmpBranches as unknown as CompanyBranches[]);
+            setCompanyBranches(cmpBranches as unknown as CompanyBranches[])
 
             //*Fetch company settings
             const settingSnapshot = await DbCompany.getSettingsByCmpId(
               admin.AdminCompanyId
-            );
+            )
             const settings =
-              settingSnapshot?.docs[0]?.data() as ISettingsCollection;
-            setSettings(settings);
+              settingSnapshot?.docs[0]?.data() as ISettingsCollection
+            setSettings(settings)
           }
-        } else if(_loggedInUser.LoggedInUserType === IUserType.SUPER_ADMIN) {
+        } else if (_loggedInUser.LoggedInUserType === IUserType.SUPER_ADMIN) {
           //* Fetch super admin and store in zustand
           const superAdminSnapshot = await DbSuperAdmin.getSuperAdminById(
             _loggedInUser.LoggedInUserId
-          );
-          const superAdmin = superAdminSnapshot.data() as ISuperAdminCollection;
-          setSuperAdmin(superAdmin);
-        }
-        else if(_loggedInUser.LoggedInUserType === IUserType.CLIENT) {
+          )
+          const superAdmin = superAdminSnapshot.data() as ISuperAdminCollection
+          setSuperAdmin(superAdmin)
+        } else if (_loggedInUser.LoggedInUserType === IUserType.CLIENT) {
           //* Fetch clientand store in zustand
           const superAdminSnapshot = await DbClient.getClientById(
             _loggedInUser.LoggedInUserId
-          );
-          const client = superAdminSnapshot.data() as IClientsCollection;
-          setClient(client as unknown as Client);
-          if(!location.pathname.includes("/client_portal")){
+          )
+          const client = superAdminSnapshot.data() as IClientsCollection
+          setClient(client as unknown as Client)
+          if (!location.pathname.includes('/client_portal')) {
             navigate(PageRoutes.CLIENT_PORTAL_HOME)
           }
-          
         }
 
-        setLoading(false);
+        setLoading(false)
       } catch (error) {
-        setLoading(false);
-        console.log(error);
+        setLoading(false)
+        console.log(error)
       }
-    });
+    })
 
     return () => {
-      unsubscribe();
-    };
-  }, []);
-};
+      unsubscribe()
+    }
+  }, [])
+}
 
-export default useOnAuthStateChanged;
+export default useOnAuthStateChanged

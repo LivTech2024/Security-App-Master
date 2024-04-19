@@ -1,18 +1,18 @@
-import { DateInput, DatePickerInput } from "@mantine/dates";
-import React from "react";
-import { MdCalendarToday } from "react-icons/md";
+import { DateInput, DatePickerInput } from '@mantine/dates'
+import React from 'react'
+import { MdCalendarToday } from 'react-icons/md'
 
 interface InputDateProps {
-  value?: Date | null;
-  setValue?: React.Dispatch<React.SetStateAction<Date | null>>;
-  rangeValue?: [Date | null, Date | null];
+  value?: Date | null
+  setValue?: React.Dispatch<React.SetStateAction<Date | null>>
+  rangeValue?: [Date | null, Date | null]
   rangeOnChange?: React.Dispatch<
     React.SetStateAction<[Date | null, Date | null]>
-  >;
-  label?: string;
-  error?: string;
-  id?: string;
-  type?: "default" | "range";
+  >
+  label?: string
+  error?: string
+  id?: string
+  type?: 'default' | 'range'
 }
 
 const InputDate = ({
@@ -21,7 +21,7 @@ const InputDate = ({
   value,
   error,
   id,
-  type = "default",
+  type = 'default',
   rangeOnChange,
   rangeValue,
 }: InputDateProps) => {
@@ -33,7 +33,7 @@ const InputDate = ({
         </div>
       ) : null}
 
-      {type === "default" ? (
+      {type === 'default' ? (
         <DateInput
           valueFormat="DD/MM/YYYY"
           rightSection={
@@ -50,31 +50,31 @@ const InputDate = ({
               dropdown: {
                 backgroundColor: `#FFFFFF`,
                 zIndex: 300,
-                boxShadow: "0 1px 2px rgba(0, 0, 0, 0.4)",
-                position: "absolute",
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
+                position: 'absolute',
               },
             },
           }}
           styles={{
             input: {
               border: `1px solid #0000001A`,
-              fontWeight: "normal",
-              fontSize: "18px",
-              borderRadius: "4px",
-              background: "#FFFFFF",
-              color: "#000000",
-              padding: "22px 8px",
+              fontWeight: 'normal',
+              fontSize: '18px',
+              borderRadius: '4px',
+              background: '#FFFFFF',
+              color: '#000000',
+              padding: '22px 8px',
             },
             day: {
               color: `#000000`,
-              ":hover": {
-                color: "#000000",
+              ':hover': {
+                color: '#000000',
               },
             },
           }}
         />
       ) : (
-        type === "range" && (
+        type === 'range' && (
           <DatePickerInput
             type="range"
             dropdownType="modal"
@@ -86,25 +86,25 @@ const InputDate = ({
                 dropdown: {
                   backgroundColor: `#FFFFFF`,
                   zIndex: 300,
-                  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.4)",
-                  position: "absolute",
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
+                  position: 'absolute',
                 },
               },
             }}
             styles={{
               input: {
                 border: `1px solid #0000001A`,
-                fontWeight: "normal",
-                fontSize: "18px",
-                borderRadius: "4px",
-                background: "#FFFFFF",
-                color: "#000000",
-                padding: "8px 8px",
+                fontWeight: 'normal',
+                fontSize: '18px',
+                borderRadius: '4px',
+                background: '#FFFFFF',
+                color: '#000000',
+                padding: '8px 8px',
               },
               day: {
                 color: `#000000`,
-                ":hover": {
-                  color: "#000000",
+                ':hover': {
+                  color: '#000000',
                 },
               },
             }}
@@ -115,7 +115,7 @@ const InputDate = ({
         <small className="text-red-600 text-xs px-1 text-start">{error}</small>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default InputDate;
+export default InputDate

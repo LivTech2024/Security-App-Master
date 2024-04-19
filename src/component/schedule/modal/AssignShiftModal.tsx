@@ -1,25 +1,25 @@
-import { useEffect, useState } from "react";
-import Dialog from "../../../common/Dialog";
+import { useEffect, useState } from 'react'
+import Dialog from '../../../common/Dialog'
 import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
-} from "../../../firebase_configs/DB/DbSchedule";
-import dayjs from "dayjs";
-import { formatDate, splitName, toDate } from "../../../utilities/misc";
-import { TiTick } from "react-icons/ti";
-import { RxCross1 } from "react-icons/rx";
+} from '../../../firebase_configs/DB/DbSchedule'
+import dayjs from 'dayjs'
+import { formatDate, splitName, toDate } from '../../../utilities/misc'
+import { TiTick } from 'react-icons/ti'
+import { RxCross1 } from 'react-icons/rx'
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from "../../../utilities/TsxUtils";
-import { errorHandler } from "../../../utilities/CustomError";
-import { useQueryClient } from "@tanstack/react-query";
-import { REACT_QUERY_KEYS } from "../../../@types/enum";
-import { IEmployeesCollection } from "../../../@types/database";
-import { useAuthState } from "../../../store";
-import { sendShiftDetailsEmail } from "../../../utilities/scheduleHelper";
-import empDefaultPlaceHolder from "../../../../public/assets/avatar.png";
+} from '../../../utilities/TsxUtils'
+import { errorHandler } from '../../../utilities/CustomError'
+import { useQueryClient } from '@tanstack/react-query'
+import { REACT_QUERY_KEYS } from '../../../@types/enum'
+import { IEmployeesCollection } from '../../../@types/database'
+import { useAuthState } from '../../../store'
+import { sendShiftDetailsEmail } from '../../../utilities/scheduleHelper'
+import empDefaultPlaceHolder from '../../../../public/assets/avatar.png'
 
 const AssignShiftModal = ({
   opened,
@@ -27,96 +27,96 @@ const AssignShiftModal = ({
   schedule,
   setSelectedSchedule,
 }: {
-  opened: boolean;
-  setOpened: React.Dispatch<React.SetStateAction<boolean>>;
-  schedule: ISchedule | null;
-  setSelectedSchedule: React.Dispatch<React.SetStateAction<ISchedule | null>>;
+  opened: boolean
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>
+  schedule: ISchedule | null
+  setSelectedSchedule: React.Dispatch<React.SetStateAction<ISchedule | null>>
 }) => {
-  const [selectedEmps, setSelectedEmps] = useState<IEmployeesCollection[]>([]);
+  const [selectedEmps, setSelectedEmps] = useState<IEmployeesCollection[]>([])
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const [empSchedulesForWeek, setEmpSchedulesForWeek] = useState<
     IEmpScheduleForWeek[]
-  >([]);
+  >([])
 
-  const { company } = useAuthState();
+  const { company } = useAuthState()
 
   useEffect(() => {
     const fetchEmpSchedule = async () => {
-      if (!schedule || !company) return;
+      if (!schedule || !company) return
       try {
         const data = await DbSchedule.getEmployeesSchedule({
           startDate: dayjs(toDate(schedule.shift.ShiftDate))
-            .startOf("week")
+            .startOf('week')
             .toDate(),
           endDate: dayjs(toDate(schedule.shift.ShiftDate))
-            .endOf("week")
+            .endOf('week')
             .toDate(),
           currentDate: toDate(schedule?.shift.ShiftDate),
           empRole: schedule.shift.ShiftPosition,
           cmpId: company.CompanyId,
           cmpBranchId: schedule.shift.ShiftCompanyBranchId,
-        });
+        })
         if (data) {
-          setEmpSchedulesForWeek(data);
+          setEmpSchedulesForWeek(data)
         }
       } catch (error) {
-        console.log(error, "error");
+        console.log(error, 'error')
       }
-    };
-    fetchEmpSchedule();
-  }, [opened, schedule, company]);
+    }
+    fetchEmpSchedule()
+  }, [opened, schedule, company])
 
   const onSubmit = async () => {
     if (!schedule || selectedEmps.length === 0 || !company) {
-      return;
+      return
     }
     if (schedule.shift.ShiftRequiredEmp !== selectedEmps.length) {
       showSnackbar({
         message: `This shift requires ${
           schedule?.shift.ShiftRequiredEmp
         } ${schedule?.shift.ShiftPosition.toUpperCase()}s`,
-        type: "error",
-      });
-      return;
+        type: 'error',
+      })
+      return
     }
     try {
-      showModalLoader({});
+      showModalLoader({})
 
       await DbSchedule.assignShiftToEmp(
         schedule.shift.ShiftId,
         selectedEmps.map((emp) => emp.EmployeeId)
-      );
+      )
 
-      const { shift } = schedule;
+      const { shift } = schedule
 
       const sendEmailPromise = selectedEmps.map(async (emp) => {
         return sendShiftDetailsEmail({
           companyName: company!.CompanyName,
           empEmail: emp.EmployeeEmail,
-          shiftAddress: shift.ShiftLocationAddress || "N/A",
+          shiftAddress: shift.ShiftLocationAddress || 'N/A',
           shiftDate: formatDate(shift.ShiftDate),
           shiftEndTime: shift.ShiftEndTime,
           shiftName: shift.ShiftName,
           shiftStartTime: shift.ShiftStartTime,
-        });
-      });
+        })
+      })
 
-      await Promise.all(sendEmailPromise);
+      await Promise.all(sendEmailPromise)
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.SCHEDULES],
-      });
-      showSnackbar({ message: "Shift assigned successfully", type: "success" });
-      closeModalLoader();
-      setOpened(false);
+      })
+      showSnackbar({ message: 'Shift assigned successfully', type: 'success' })
+      closeModalLoader()
+      setOpened(false)
     } catch (error) {
-      errorHandler(error);
-      closeModalLoader();
-      console.log(error);
+      errorHandler(error)
+      closeModalLoader()
+      console.log(error)
     }
-  };
+  }
 
   const handleRowClicked = (data: IEmpScheduleForWeek) => {
     if (
@@ -124,30 +124,30 @@ const AssignShiftModal = ({
       (schedule?.shift?.ShiftAssignedUserId &&
         schedule?.shift?.ShiftAssignedUserId.length > 0)
     )
-      return;
+      return
     const emp: Partial<IEmployeesCollection> = {
       EmployeeId: data.EmpId,
       EmployeeEmail: data.EmpEmail,
       EmployeeName: data.EmpName,
-    };
+    }
 
     setSelectedEmps((prev) => {
       if (prev.find((e) => e.EmployeeId === emp.EmployeeId)) {
-        return prev.filter((e) => e.EmployeeId !== emp.EmployeeId);
+        return prev.filter((e) => e.EmployeeId !== emp.EmployeeId)
       } else {
         if (selectedEmps.length === schedule?.shift.ShiftRequiredEmp) {
           showSnackbar({
             message: `This shift requires only ${
               schedule?.shift.ShiftRequiredEmp
             } ${schedule?.shift.ShiftPosition.toUpperCase()}s`,
-            type: "error",
-          });
-          return prev;
+            type: 'error',
+          })
+          return prev
         }
-        return [...prev, emp as IEmployeesCollection];
+        return [...prev, emp as IEmployeesCollection]
       }
-    });
-  };
+    })
+  }
 
   return (
     <Dialog
@@ -168,12 +168,12 @@ const AssignShiftModal = ({
     >
       <div className="flex flex-col bg-gray-100 rounded-md p-4">
         <div className="font-semibold text-lg">
-          Assign shift to {schedule?.shift.ShiftRequiredEmp} available{" "}
+          Assign shift to {schedule?.shift.ShiftRequiredEmp} available{' '}
           {schedule?.shift.ShiftPosition.toUpperCase()}s
           <span className="ml-2 font-medium text-sm">
             {schedule?.shift.ShiftName} (
             {schedule?.shift.ShiftDate &&
-              dayjs(toDate(schedule?.shift.ShiftDate)).format("dddd MMM-DD")}
+              dayjs(toDate(schedule?.shift.ShiftDate)).format('dddd MMM-DD')}
             )
           </span>
         </div>
@@ -197,14 +197,14 @@ const AssignShiftModal = ({
           <tbody>
             {empSchedulesForWeek.length > 0 ? (
               empSchedulesForWeek.map((data) => {
-                const { firstName, lastName } = splitName(data.EmpName);
+                const { firstName, lastName } = splitName(data.EmpName)
                 return (
                   <tr
                     onClick={() => handleRowClicked(data)}
                     className={`${
                       selectedEmps?.find((emp) => emp.EmployeeId === data.EmpId)
-                        ? "bg-blue-500 text-surface"
-                        : "bg-surface"
+                        ? 'bg-blue-500 text-surface'
+                        : 'bg-surface'
                     } cursor-pointer`}
                   >
                     <td className="text-start px-4 py-2">
@@ -230,7 +230,7 @@ const AssignShiftModal = ({
                           (emp) => emp.EmployeeId === data.EmpId
                         ) ? (
                           <span className="font-semibold">
-                            Currently assigned{" "}
+                            Currently assigned{' '}
                           </span>
                         ) : data.EmpIsAvailable ? (
                           <TiTick className="text-textPrimaryGreen text-xl" />
@@ -240,7 +240,7 @@ const AssignShiftModal = ({
                       </div>
                     </td>
                   </tr>
-                );
+                )
               })
             ) : (
               <tr>
@@ -255,7 +255,7 @@ const AssignShiftModal = ({
         </table>
       </div>
     </Dialog>
-  );
-};
+  )
+}
 
-export default AssignShiftModal;
+export default AssignShiftModal

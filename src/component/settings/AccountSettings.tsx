@@ -1,19 +1,19 @@
-import { FormProvider, useForm } from "react-hook-form";
-import { SettingsFormFields, settingsSchema } from "../../utilities/zod/schema";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { FormProvider, useForm } from 'react-hook-form'
+import { SettingsFormFields, settingsSchema } from '../../utilities/zod/schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from "../../utilities/TsxUtils";
-import { useAuthState } from "../../store";
-import DbCompany from "../../firebase_configs/DB/DbCompany";
-import { errorHandler } from "../../utilities/CustomError";
-import Button from "../../common/button/Button";
-import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
+} from '../../utilities/TsxUtils'
+import { useAuthState } from '../../store'
+import DbCompany from '../../firebase_configs/DB/DbCompany'
+import { errorHandler } from '../../utilities/CustomError'
+import Button from '../../common/button/Button'
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
 
 const AccountSettings = () => {
-  const { settings, setSettings } = useAuthState();
+  const { settings, setSettings } = useAuthState()
 
   const methods = useForm<SettingsFormFields>({
     resolver: zodResolver(settingsSchema),
@@ -21,32 +21,32 @@ const AccountSettings = () => {
       SettingEmpWellnessIntervalInMins:
         settings?.SettingEmpWellnessIntervalInMins || 10,
     },
-  });
+  })
 
   const onSubmit = async (data: SettingsFormFields) => {
-    if (!settings) return;
+    if (!settings) return
     try {
-      showModalLoader({});
+      showModalLoader({})
 
-      await DbCompany.updateSetting(settings.SettingId, data);
+      await DbCompany.updateSetting(settings.SettingId, data)
 
       setSettings({
         ...settings,
         SettingEmpWellnessIntervalInMins: data.SettingEmpWellnessIntervalInMins,
-      });
+      })
 
       showSnackbar({
-        message: "Settings updated successfully",
-        type: "success",
-      });
+        message: 'Settings updated successfully',
+        type: 'success',
+      })
 
-      closeModalLoader();
+      closeModalLoader()
     } catch (error) {
-      console.log(error);
-      errorHandler(error);
-      closeModalLoader();
+      console.log(error)
+      errorHandler(error)
+      closeModalLoader()
     }
-  };
+  }
   return (
     <FormProvider {...methods}>
       <form
@@ -74,7 +74,7 @@ const AccountSettings = () => {
         />
       </form>
     </FormProvider>
-  );
-};
+  )
+}
 
-export default AccountSettings;
+export default AccountSettings

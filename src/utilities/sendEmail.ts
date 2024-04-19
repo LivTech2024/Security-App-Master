@@ -1,11 +1,11 @@
-import emailjs from "emailjs-com";
+import emailjs from 'emailjs-com'
 
 interface sendEmailArgs {
-  to_email: string;
-  to_name: string;
-  subject: string;
-  message: string;
-  from_name: string;
+  to_email: string
+  to_name: string
+  subject: string
+  message: string
+  from_name: string
 }
 
 export const sendEmail = async ({
@@ -26,6 +26,6 @@ export const sendEmail = async ({
       message,
     },
     import.meta.env.VITE_EMAIL_JS_USER_ID
-  );
-  return response;
-};
+  )
+  return response
+}

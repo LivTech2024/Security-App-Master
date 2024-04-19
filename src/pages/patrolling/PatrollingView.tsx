@@ -1,51 +1,51 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
-import PatrolViewCard from "../../component/patrolling/PatrolViewCard";
-import { useEffect, useState } from "react";
-import DbPatrol from "../../firebase_configs/DB/DbPatrol";
-import { IPatrolsCollection } from "../../@types/database";
-import NoSearchResult from "../../common/NoSearchResult";
-import { PageRoutes } from "../../@types/enum";
-import Button from "../../common/button/Button";
-import { useEditFormStore } from "../../store";
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import PatrolViewCard from '../../component/patrolling/PatrolViewCard'
+import { useEffect, useState } from 'react'
+import DbPatrol from '../../firebase_configs/DB/DbPatrol'
+import { IPatrolsCollection } from '../../@types/database'
+import NoSearchResult from '../../common/NoSearchResult'
+import { PageRoutes } from '../../@types/enum'
+import Button from '../../common/button/Button'
+import { useEditFormStore } from '../../store'
 
 const PatrollingView = () => {
-  const { setPatrolEditData } = useEditFormStore();
+  const { setPatrolEditData } = useEditFormStore()
 
-  const [searchParam] = useSearchParams();
+  const [searchParam] = useSearchParams()
 
-  const patrolId = searchParam.get("id");
+  const patrolId = searchParam.get('id')
 
-  const [isPatrolLoading, setIsPatrolLoading] = useState(true);
+  const [isPatrolLoading, setIsPatrolLoading] = useState(true)
 
-  const [data, setData] = useState<IPatrolsCollection | null>(null);
+  const [data, setData] = useState<IPatrolsCollection | null>(null)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchPatrolData = async () => {
-      if (!patrolId) return;
+      if (!patrolId) return
       try {
-        const patrolSnapshot = await DbPatrol.getPatrolById(patrolId);
-        const patrolData = patrolSnapshot.data() as IPatrolsCollection;
+        const patrolSnapshot = await DbPatrol.getPatrolById(patrolId)
+        const patrolData = patrolSnapshot.data() as IPatrolsCollection
 
-        setData(patrolData);
+        setData(patrolData)
 
-        setIsPatrolLoading(false);
+        setIsPatrolLoading(false)
       } catch (error) {
-        console.log(error);
-        setIsPatrolLoading(false);
+        console.log(error)
+        setIsPatrolLoading(false)
       }
-    };
+    }
 
-    fetchPatrolData();
-  }, [patrolId]);
+    fetchPatrolData()
+  }, [patrolId])
 
   if (!data && !isPatrolLoading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <NoSearchResult />
       </div>
-    );
+    )
   }
 
   if (isPatrolLoading) {
@@ -56,7 +56,7 @@ const PatrollingView = () => {
         </div>
         <div className="h-[40vh] bg-shimmerColor w-full"></div>
       </div>
-    );
+    )
   }
 
   if (data) {
@@ -69,8 +69,8 @@ const PatrollingView = () => {
             <Button
               label="Edit"
               onClick={() => {
-                setPatrolEditData(data);
-                navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT);
+                setPatrolEditData(data)
+                navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT)
               }}
               type="black"
               className="px-12 py-2 "
@@ -79,8 +79,8 @@ const PatrollingView = () => {
         </div>
         <PatrolViewCard patrolData={data} />
       </div>
-    );
+    )
   }
-};
+}
 
-export default PatrollingView;
+export default PatrollingView

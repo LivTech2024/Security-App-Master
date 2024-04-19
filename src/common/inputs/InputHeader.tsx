@@ -1,27 +1,27 @@
-import { twMerge } from "tailwind-merge";
+import { twMerge } from 'tailwind-merge'
 
 interface IInputHeaderProps {
-  title: string;
-  className?: string;
-  fontClassName?: string;
+  title: string
+  className?: string
+  fontClassName?: string
 }
 const InputHeader = ({
   title,
-  className = "w-full",
+  className = 'w-full',
   fontClassName,
 }: IInputHeaderProps) => {
   return (
     <div className={`flex ${className}`}>
       <span
         className={` ${twMerge(
-          "text-sm line-clamp-1 font-sfProTextMedium font-medium",
+          'text-sm line-clamp-1 font-sfProTextMedium font-medium',
           fontClassName
         )}`}
       >
         {title}
       </span>
     </div>
-  );
-};
+  )
+}
 
-export default InputHeader;
+export default InputHeader

@@ -1,82 +1,82 @@
-import { useState } from "react";
-import Dialog from "../../../common/Dialog";
-import useFetchEmployees from "../../../hooks/fetch/useFetchEmployees";
-import InputAutoComplete from "../../../common/inputs/InputAutocomplete";
-import InputDate from "../../../common/inputs/InputDate";
+import { useState } from 'react'
+import Dialog from '../../../common/Dialog'
+import useFetchEmployees from '../../../hooks/fetch/useFetchEmployees'
+import InputAutoComplete from '../../../common/inputs/InputAutocomplete'
+import InputDate from '../../../common/inputs/InputDate'
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from "../../../utilities/TsxUtils";
-import { getPaystubHtml } from "../../../utilities/getPaystubHtml";
-import { useAuthState } from "../../../store";
-import dayjs from "dayjs";
-import { errorHandler } from "../../../utilities/CustomError";
-import { htmlStringToPdf } from "../../../utilities/htmlStringToPdf";
+} from '../../../utilities/TsxUtils'
+import { getPaystubHtml } from '../../../utilities/getPaystubHtml'
+import { useAuthState } from '../../../store'
+import dayjs from 'dayjs'
+import { errorHandler } from '../../../utilities/CustomError'
+import { htmlStringToPdf } from '../../../utilities/htmlStringToPdf'
 
 const GeneratePaystubModal = ({
   opened,
   setOpened,
 }: {
-  opened: boolean;
-  setOpened: React.Dispatch<React.SetStateAction<boolean>>;
+  opened: boolean
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
   const [selectedEmp, setSelectedEmp] = useState<string | null | undefined>(
     null
-  );
+  )
 
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null)
+  const [endDate, setEndDate] = useState<Date | null>(null)
 
   const { data: employees } = useFetchEmployees({
     limit: 5,
     searchQuery: selectedEmp,
-  });
+  })
 
-  const { company } = useAuthState();
+  const { company } = useAuthState()
 
   const onSubmit = async () => {
-    if (!company) return;
+    if (!company) return
     if (!startDate) {
       showSnackbar({
-        message: "Please enter pay period start date",
-        type: "error",
-      });
-      return;
+        message: 'Please enter pay period start date',
+        type: 'error',
+      })
+      return
     }
     if (!endDate) {
       showSnackbar({
-        message: "Please enter pay period end date",
-        type: "error",
-      });
-      return;
+        message: 'Please enter pay period end date',
+        type: 'error',
+      })
+      return
     }
-    const employee = employees.find((e) => e.EmployeeName === selectedEmp);
+    const employee = employees.find((e) => e.EmployeeName === selectedEmp)
 
-    if (!employee) return;
+    if (!employee) return
 
     const html = getPaystubHtml({
       companyName: company.CompanyName,
       empHourlyRate: employee.EmployeePayRate,
       empName: employee.EmployeeName,
       empWorkedHours: 25,
-      endDate: dayjs(endDate).format("MMMM DD,YYYY"),
-      startDate: dayjs(startDate).format("MMMM DD,YYYY"),
-    });
+      endDate: dayjs(endDate).format('MMMM DD,YYYY'),
+      startDate: dayjs(startDate).format('MMMM DD,YYYY'),
+    })
 
     try {
-      showModalLoader({});
+      showModalLoader({})
 
-      await htmlStringToPdf(`${employee.EmployeeName}_paystub.pdf`, html);
+      await htmlStringToPdf(`${employee.EmployeeName}_paystub.pdf`, html)
 
-      closeModalLoader();
-      setOpened(false);
+      closeModalLoader()
+      setOpened(false)
     } catch (error) {
-      console.log(error);
-      errorHandler(error);
-      closeModalLoader();
+      console.log(error)
+      errorHandler(error)
+      closeModalLoader()
     }
-  };
+  }
 
   return (
     <Dialog
@@ -106,12 +106,12 @@ const GeneratePaystubModal = ({
           value={selectedEmp}
           label="Select employee"
           data={employees.map((res) => {
-            return { label: res.EmployeeName, value: res.EmployeeName };
+            return { label: res.EmployeeName, value: res.EmployeeName }
           })}
         />
       </div>
     </Dialog>
-  );
-};
+  )
+}
 
-export default GeneratePaystubModal;
+export default GeneratePaystubModal

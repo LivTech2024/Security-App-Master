@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import Dialog from "../../../common/Dialog";
-import InputWithTopHeader from "../../../common/inputs/InputWithTopHeader";
-import Button from "../../../common/button/Button";
-import { useAuthState } from "../../../store";
-import DbCompany from "../../../firebase_configs/DB/DbCompany";
-import { closeModalLoader, showModalLoader } from "../../../utilities/TsxUtils";
-import { errorHandler } from "../../../utilities/CustomError";
-import { IReportCategoriesCollection } from "../../../@types/database";
-import { FaRegTrashAlt } from "react-icons/fa";
-import { openContextModal } from "@mantine/modals";
-import TableShimmer from "../../../common/shimmer/TableShimmer";
-import { useQueryClient } from "@tanstack/react-query";
-import { REACT_QUERY_KEYS } from "../../../@types/enum";
+import React, { useEffect, useState } from 'react'
+import Dialog from '../../../common/Dialog'
+import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader'
+import Button from '../../../common/button/Button'
+import { useAuthState } from '../../../store'
+import DbCompany from '../../../firebase_configs/DB/DbCompany'
+import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils'
+import { errorHandler } from '../../../utilities/CustomError'
+import { IReportCategoriesCollection } from '../../../@types/database'
+import { FaRegTrashAlt } from 'react-icons/fa'
+import { openContextModal } from '@mantine/modals'
+import TableShimmer from '../../../common/shimmer/TableShimmer'
+import { useQueryClient } from '@tanstack/react-query'
+import { REACT_QUERY_KEYS } from '../../../@types/enum'
 
 const ReportCategoriesModal = ({
   opened,
@@ -19,65 +19,65 @@ const ReportCategoriesModal = ({
   categories,
   isCategoriesLoading,
 }: {
-  opened: boolean;
-  setOpened: React.Dispatch<React.SetStateAction<boolean>>;
-  categories: IReportCategoriesCollection[];
-  isCategoriesLoading: boolean;
+  opened: boolean
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>
+  categories: IReportCategoriesCollection[]
+  isCategoriesLoading: boolean
 }) => {
-  const { company } = useAuthState();
+  const { company } = useAuthState()
 
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState('')
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const onSave = async () => {
-    if (!company || !category) return;
+    if (!company || !category) return
     try {
-      setLoading(true);
+      setLoading(true)
 
-      await DbCompany.addReportCategory(category, company.CompanyId);
+      await DbCompany.addReportCategory(category, company.CompanyId)
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.REPORT_CATEGORIES],
-      });
+      })
 
-      setLoading(false);
-      setCategory("");
+      setLoading(false)
+      setCategory('')
     } catch (error) {
-      errorHandler(error);
-      setLoading(false);
-      console.log(error);
+      errorHandler(error)
+      setLoading(false)
+      console.log(error)
     }
-  };
+  }
 
   const onDelete = async (catId: string) => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      await DbCompany.deleteReportCategory(catId);
+      await DbCompany.deleteReportCategory(catId)
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.REPORT_CATEGORIES],
-      });
+      })
 
-      setLoading(false);
+      setLoading(false)
     } catch (error) {
-      errorHandler(error);
-      setLoading(false);
-      console.log(error);
+      errorHandler(error)
+      setLoading(false)
+      console.log(error)
     }
-  };
+  }
 
   useEffect(() => {
     if (loading) {
-      showModalLoader({});
+      showModalLoader({})
     } else {
-      closeModalLoader();
+      closeModalLoader()
     }
-    return () => closeModalLoader();
-  }, [loading]);
+    return () => closeModalLoader()
+  }, [loading])
 
   return (
     <Dialog
@@ -121,21 +121,21 @@ const ReportCategoriesModal = ({
                       <FaRegTrashAlt
                         onClick={() =>
                           openContextModal({
-                            modal: "confirmModal",
+                            modal: 'confirmModal',
                             withCloseButton: false,
                             centered: true,
                             closeOnClickOutside: true,
                             innerProps: {
-                              title: "Confirm",
-                              body: "Are you sure to delete this category",
+                              title: 'Confirm',
+                              body: 'Are you sure to delete this category',
                               onConfirm: () => onDelete(cat.ReportCategoryId),
                               onCancel: () => {
-                                setOpened(true);
+                                setOpened(true)
                               },
                             },
-                            size: "30%",
+                            size: '30%',
                             styles: {
-                              body: { padding: "0px" },
+                              body: { padding: '0px' },
                             },
                           })
                         }
@@ -143,7 +143,7 @@ const ReportCategoriesModal = ({
                       />
                     </td>
                   </tr>
-                );
+                )
               })
             ) : (
               <tr>
@@ -158,7 +158,7 @@ const ReportCategoriesModal = ({
         </table>
       </div>
     </Dialog>
-  );
-};
+  )
+}
 
-export default ReportCategoriesModal;
+export default ReportCategoriesModal

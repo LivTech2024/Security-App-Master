@@ -1,27 +1,27 @@
-import { TagsInput } from "@mantine/core";
-import Button from "../../common/button/Button";
-import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
+import { TagsInput } from '@mantine/core'
+import Button from '../../common/button/Button'
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
 
-import InputSelect from "../../common/inputs/InputSelect";
-import { MdClose } from "react-icons/md";
+import InputSelect from '../../common/inputs/InputSelect'
+import { MdClose } from 'react-icons/md'
 
 interface CheckPointInputProps {
   checkpoints: {
-    checkPointId: string | null;
-    checkPointName: string;
-    checkPointCategory: string | null;
-    checkPointHint: string | null;
-  }[];
+    checkPointId: string | null
+    checkPointName: string
+    checkPointCategory: string | null
+    checkPointHint: string | null
+  }[]
   setCheckpoints: (
     checkpoints: {
-      checkPointId: string | null;
-      checkPointName: string;
-      checkPointCategory: string | null;
-      checkPointHint: string | null;
+      checkPointId: string | null
+      checkPointName: string
+      checkPointCategory: string | null
+      checkPointHint: string | null
     }[]
-  ) => void;
-  checkpointCategories: string[];
-  setCheckpointCategories: React.Dispatch<React.SetStateAction<string[]>>;
+  ) => void
+  checkpointCategories: string[]
+  setCheckpointCategories: React.Dispatch<React.SetStateAction<string[]>>
 }
 
 const CheckpointForm = ({
@@ -34,28 +34,28 @@ const CheckpointForm = ({
     setCheckpoints([
       ...checkpoints,
       {
-        checkPointName: "",
+        checkPointName: '',
         checkPointCategory: null,
         checkPointHint: null,
         checkPointId: null,
       },
-    ]);
-  };
+    ])
+  }
 
   const handleRemoveCheckpoint = (index: number) => {
-    if (checkpoints.length === 1) return;
-    setCheckpoints(checkpoints.filter((_, i) => i !== index));
-  };
+    if (checkpoints.length === 1) return
+    setCheckpoints(checkpoints.filter((_, i) => i !== index))
+  }
 
   const handleChange = (
     index: number,
-    key: "checkPointName" | "checkPointCategory" | "checkPointHint",
+    key: 'checkPointName' | 'checkPointCategory' | 'checkPointHint',
     value: string
   ) => {
-    const updatedCheckpoints = [...checkpoints];
-    updatedCheckpoints[index][key] = value;
-    setCheckpoints(updatedCheckpoints);
-  };
+    const updatedCheckpoints = [...checkpoints]
+    updatedCheckpoints[index][key] = value
+    setCheckpoints(updatedCheckpoints)
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -68,12 +68,12 @@ const CheckpointForm = ({
         styles={{
           input: {
             border: `1px solid #0000001A`,
-            fontWeight: "normal",
-            fontSize: "18px",
-            borderRadius: "4px",
-            background: "#FFFFFF",
-            color: "#000000",
-            padding: "8px 8px",
+            fontWeight: 'normal',
+            fontSize: '18px',
+            borderRadius: '4px',
+            background: '#FFFFFF',
+            color: '#000000',
+            padding: '8px 8px',
           },
         }}
       />
@@ -91,30 +91,30 @@ const CheckpointForm = ({
             <div className="flex items-center gap-4">
               <InputWithTopHeader
                 className={`mx-0 ${
-                  checkpointCategories.length === 0 && "w-full"
+                  checkpointCategories.length === 0 && 'w-full'
                 }`}
                 placeholder="Checkpoint Name"
                 value={checkpoint.checkPointName}
                 onChange={(e) =>
-                  handleChange(index, "checkPointName", e.target.value)
+                  handleChange(index, 'checkPointName', e.target.value)
                 }
               />
               <InputWithTopHeader
                 className={`mx-0 `}
                 placeholder="Hint"
-                value={checkpoint.checkPointHint || ""}
+                value={checkpoint.checkPointHint || ''}
                 onChange={(e) =>
-                  handleChange(index, "checkPointHint", e.target.value)
+                  handleChange(index, 'checkPointHint', e.target.value)
                 }
               />
               {checkpointCategories.length > 0 && (
                 <InputSelect
                   placeholder="Select category"
                   data={checkpointCategories}
-                  value={checkpoint.checkPointCategory || ""}
+                  value={checkpoint.checkPointCategory || ''}
                   className="w-full"
                   onChange={(e) =>
-                    handleChange(index, "checkPointCategory", e as string)
+                    handleChange(index, 'checkPointCategory', e as string)
                   }
                 />
               )}
@@ -134,7 +134,7 @@ const CheckpointForm = ({
         label="Add new"
       />
     </div>
-  );
-};
+  )
+}
 
-export default CheckpointForm;
+export default CheckpointForm

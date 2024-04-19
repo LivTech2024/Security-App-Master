@@ -1,9 +1,9 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { PageRoutes } from "../@types/enum";
-import { useAuthState } from "../store";
-import { openContextModal } from "@mantine/modals";
-import PopupMenu from "../common/PopupMenu";
-import { useState } from "react";
+import { useLocation, useNavigate } from 'react-router-dom'
+import { PageRoutes } from '../@types/enum'
+import { useAuthState } from '../store'
+import { openContextModal } from '@mantine/modals'
+import PopupMenu from '../common/PopupMenu'
+import { useState } from 'react'
 
 const NavItem = ({
   name,
@@ -12,16 +12,16 @@ const NavItem = ({
   dropdownChildren,
   isDropdownReq,
 }: {
-  name: string;
-  path?: string;
-  callback?: () => void;
-  isDropdownReq?: boolean;
-  dropdownChildren?: { name: string; path: string }[];
+  name: string
+  path?: string
+  callback?: () => void
+  isDropdownReq?: boolean
+  dropdownChildren?: { name: string; path: string }[]
 }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const [isDropDownOpened, setIsDropDownOpened] = useState(false);
+  const [isDropDownOpened, setIsDropDownOpened] = useState(false)
 
   if (isDropdownReq) {
     return (
@@ -34,11 +34,11 @@ const NavItem = ({
           opened={isDropDownOpened}
           setOpened={setIsDropDownOpened}
           position="bottom-start"
-          dropdownStyles={{ marginTop: "-8px", padding: 0, borderRadius: 0 }}
+          dropdownStyles={{ marginTop: '-8px', padding: 0, borderRadius: 0 }}
           target={
             <div
               className={`${
-                isDropDownOpened && "bg-onHoverBg text-textPrimary"
+                isDropDownOpened && 'bg-onHoverBg text-textPrimary'
               } uppercase cursor-pointer p-2 duration-200 `}
             >
               {name}
@@ -55,12 +55,12 @@ const NavItem = ({
                 >
                   {res.name}
                 </div>
-              );
+              )
             })}
           </div>
         </PopupMenu>
       </div>
-    );
+    )
   }
   return (
     <div
@@ -68,29 +68,29 @@ const NavItem = ({
       className={`uppercase cursor-pointer p-2 duration-200 ${
         location.pathname === path ||
         location.pathname.includes(`/${name.toLowerCase()}`)
-          ? "bg-surface text-textPrimary"
-          : "hover:bg-onHoverBg hover:text-textPrimary"
+          ? 'bg-surface text-textPrimary'
+          : 'hover:bg-onHoverBg hover:text-textPrimary'
       }`}
     >
       {name}
     </div>
-  );
-};
+  )
+}
 
 const Nav = ({
   userType,
 }: {
-  userType: "admin" | "client" | "super_admin";
+  userType: 'admin' | 'client' | 'super_admin'
 }) => {
-  const { userSignOut } = useAuthState();
-  const navigate = useNavigate();
+  const { userSignOut } = useAuthState()
+  const navigate = useNavigate()
   return (
     <div
       className={`flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1 ${
-        userType === "admin" && "justify-between"
+        userType === 'admin' && 'justify-between'
       }`}
     >
-      {userType === "admin" && (
+      {userType === 'admin' && (
         <>
           <NavItem path={PageRoutes.HOME} name="Home" />
           <NavItem path={PageRoutes.SCHEDULES} name="Schedules" />
@@ -101,9 +101,9 @@ const Nav = ({
             name="Company"
             isDropdownReq
             dropdownChildren={[
-              { name: "Company Branches", path: PageRoutes.COMPANY_BRANCHES },
-              { name: "Manage Locations", path: PageRoutes.LOCATIONS },
-              { name: "Manage Clients", path: PageRoutes.CLIENTS },
+              { name: 'Company Branches', path: PageRoutes.COMPANY_BRANCHES },
+              { name: 'Manage Locations', path: PageRoutes.LOCATIONS },
+              { name: 'Manage Clients', path: PageRoutes.CLIENTS },
             ]}
           />
           <NavItem path="#" name="Notifications" />
@@ -116,7 +116,7 @@ const Nav = ({
         </>
       )}
 
-      {userType === "client" && (
+      {userType === 'client' && (
         <>
           <NavItem path={PageRoutes.CLIENT_PORTAL_HOME} name="Home" />
           <NavItem path={PageRoutes.CLIENT_PORTAL_PATROLS} name="Patrols" />
@@ -127,27 +127,27 @@ const Nav = ({
         name="Sign out"
         callback={() => {
           openContextModal({
-            modal: "confirmModal",
+            modal: 'confirmModal',
             withCloseButton: false,
             centered: true,
             closeOnClickOutside: true,
             innerProps: {
-              title: "Confirm",
-              body: "Are you sure to sign out",
+              title: 'Confirm',
+              body: 'Are you sure to sign out',
               onConfirm: () => {
-                navigate(PageRoutes.HOME);
-                userSignOut();
+                navigate(PageRoutes.HOME)
+                userSignOut()
               },
             },
-            size: "30%",
+            size: '30%',
             styles: {
-              body: { padding: "0px" },
+              body: { padding: '0px' },
             },
-          });
+          })
         }}
       />
     </div>
-  );
-};
+  )
+}
 
-export default Nav;
+export default Nav

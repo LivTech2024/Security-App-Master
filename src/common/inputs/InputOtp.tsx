@@ -1,15 +1,15 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 
 /* import { useTypedDispatch } from '@/hooks/useTypedDispatch';
 import { setSnackbar } from '@/store/slices/UI.slice'; */
 interface InputOtpProps {
-  title: string;
-  setOtp: React.Dispatch<React.SetStateAction<string>>;
-  setShow: React.Dispatch<React.SetStateAction<boolean>>;
-  resendOtp: () => void;
-  isResendOtpDisabled: boolean;
-  isChangeReq?: boolean;
-  loading: boolean;
+  title: string
+  setOtp: React.Dispatch<React.SetStateAction<string>>
+  setShow: React.Dispatch<React.SetStateAction<boolean>>
+  resendOtp: () => void
+  isResendOtpDisabled: boolean
+  isChangeReq?: boolean
+  loading: boolean
 }
 
 const InputOtp = ({
@@ -30,29 +30,29 @@ const InputOtp = ({
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
-  ];
+  ]
 
-  const [seconds, setSeconds] = useState(30);
+  const [seconds, setSeconds] = useState(30)
 
-  const attemptsLeftRef = useRef(3);
+  const attemptsLeftRef = useRef(3)
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+    let interval: NodeJS.Timeout | null = null
     if (seconds > 0) {
       interval = setInterval(() => {
-        setSeconds((seconds) => seconds - 1);
-      }, 1000);
+        setSeconds((seconds) => seconds - 1)
+      }, 1000)
     } else if (interval) {
-      clearInterval(interval);
+      clearInterval(interval)
     }
-    return () => clearInterval(interval ?? 0);
-  }, [seconds]);
+    return () => clearInterval(interval ?? 0)
+  }, [seconds])
 
   const handleResendOTP = () => {
     if (attemptsLeftRef.current > 0 && !isResendOtpDisabled) {
-      attemptsLeftRef.current -= 1;
-      resendOtp();
-      setSeconds(30);
+      attemptsLeftRef.current -= 1
+      resendOtp()
+      setSeconds(30)
       /* dispatch(
         setSnackbar({
           open: true,
@@ -69,34 +69,34 @@ const InputOtp = ({
         })
       ); */
     }
-  };
+  }
 
   function handleInputChange(e: ChangeEvent<HTMLInputElement>, index: number) {
-    const value = e.target.value;
+    const value = e.target.value
 
     if (
       value.length === 1 &&
       index < inputRefs.length - 1 &&
       inputRefs[index + 1].current
     ) {
-      inputRefs[index + 1].current?.focus();
+      inputRefs[index + 1].current?.focus()
     }
-    const otpArray = inputRefs.map((ref) => ref.current?.value);
-    setOtp(otpArray.join(""));
+    const otpArray = inputRefs.map((ref) => ref.current?.value)
+    setOtp(otpArray.join(''))
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function handleInputKeyDown(e: any, index: number) {
-    if (e.key === "Backspace" && !e.target.value && index > 0) {
-      inputRefs[index - 1].current?.focus();
+    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+      inputRefs[index - 1].current?.focus()
     }
   }
 
   function handleInput(e: React.FormEvent<HTMLInputElement>) {
-    const pattern = /^[\d\b]+$/;
-    const inputVal = e.currentTarget.value;
+    const pattern = /^[\d\b]+$/
+    const inputVal = e.currentTarget.value
     if (!pattern.test(inputVal)) {
-      e.currentTarget.value = inputVal.replace(/\D/g, "");
+      e.currentTarget.value = inputVal.replace(/\D/g, '')
     }
   }
 
@@ -107,8 +107,8 @@ const InputOtp = ({
         {isChangeReq && (
           <span
             onClick={() => {
-              if (loading) return;
-              setShow(false);
+              if (loading) return
+              setShow(false)
             }}
             className="text-textPrimaryBlue uppercase font-semibold  hover:underline text-[0.66rem] cursor-pointer mt-[2px]"
           >
@@ -145,22 +145,22 @@ const InputOtp = ({
           <span
             onClick={() => {
               if (!isResendOtpDisabled && attemptsLeftRef.current > 0) {
-                handleResendOTP();
+                handleResendOTP()
               } else if (attemptsLeftRef.current === 0) {
-                console.log("No attempts left");
+                console.log('No attempts left')
               }
             }}
             role="button"
             className={`${
               (attemptsLeftRef.current === 0 || isResendOtpDisabled) &&
-              "text-switchSecondaryBlueBg"
+              'text-switchSecondaryBlueBg'
             } text-textPrimaryBlue cursor-pointer text-start`}
           >
             Resend otp
           </span>
         ))}
     </div>
-  );
-};
+  )
+}
 
-export default InputOtp;
+export default InputOtp

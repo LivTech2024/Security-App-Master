@@ -1,45 +1,45 @@
-import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useEffect, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import {
   AddEmployeeFormField,
   addEmployeeFormSchema,
-} from "../../utilities/zod/schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuthState, useEditFormStore } from "../../store";
-import { useQueryClient } from "@tanstack/react-query";
+} from '../../utilities/zod/schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useAuthState, useEditFormStore } from '../../store'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from "../../utilities/TsxUtils";
-import DbEmployee from "../../firebase_configs/DB/DbEmployee";
-import { PageRoutes, REACT_QUERY_KEYS } from "../../@types/enum";
-import { useNavigate } from "react-router-dom";
-import { errorHandler } from "../../utilities/CustomError";
-import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
-import InputAutoComplete from "../../common/inputs/InputAutocomplete";
-import { AiOutlinePlus } from "react-icons/ai";
-import AddEmpRoleModal from "../../component/employees/modal/AddEmpRoleModal";
-import { IoArrowBackCircle } from "react-icons/io5";
-import Button from "../../common/button/Button";
-import { openContextModal } from "@mantine/modals";
-import AddBranchModal from "../../component/company_branches/modal/AddBranchModal";
-import { splitName, toDate } from "../../utilities/misc";
-import useFetchEmployees from "../../hooks/fetch/useFetchEmployees";
-import EmpUploadImgCard from "../../component/employees/EmpUploadImgCard";
+} from '../../utilities/TsxUtils'
+import DbEmployee from '../../firebase_configs/DB/DbEmployee'
+import { PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum'
+import { useNavigate } from 'react-router-dom'
+import { errorHandler } from '../../utilities/CustomError'
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
+import InputAutoComplete from '../../common/inputs/InputAutocomplete'
+import { AiOutlinePlus } from 'react-icons/ai'
+import AddEmpRoleModal from '../../component/employees/modal/AddEmpRoleModal'
+import { IoArrowBackCircle } from 'react-icons/io5'
+import Button from '../../common/button/Button'
+import { openContextModal } from '@mantine/modals'
+import AddBranchModal from '../../component/company_branches/modal/AddBranchModal'
+import { splitName, toDate } from '../../utilities/misc'
+import useFetchEmployees from '../../hooks/fetch/useFetchEmployees'
+import EmpUploadImgCard from '../../component/employees/EmpUploadImgCard'
 import EmployeeOtherDetails, {
   EmpLicenseDetails,
-} from "../../component/employees/EmployeeOtherDetails";
-import SwitchWithSideHeader from "../../common/switch/SwitchWithSideHeader";
-import { IEmpBankDetails } from "../../@types/database";
-import { EmpCertificates } from "../../component/employees/EmpCertificateDetails";
-import InputHeader from "../../common/inputs/InputHeader";
-import { MultiSelect } from "@mantine/core";
+} from '../../component/employees/EmployeeOtherDetails'
+import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader'
+import { IEmpBankDetails } from '../../@types/database'
+import { EmpCertificates } from '../../component/employees/EmpCertificateDetails'
+import InputHeader from '../../common/inputs/InputHeader'
+import { MultiSelect } from '@mantine/core'
 
 const EmployeeCreateOrEdit = () => {
-  const { employeeEditData } = useEditFormStore();
+  const { employeeEditData } = useEditFormStore()
 
-  const isEdit = !!employeeEditData;
+  const isEdit = !!employeeEditData
 
   const methods = useForm<AddEmployeeFormField>({
     resolver: zodResolver(addEmployeeFormSchema),
@@ -68,112 +68,112 @@ const EmployeeCreateOrEdit = () => {
           EmployeeProvince: employeeEditData.EmployeeProvince,
         }
       : { EmployeeMaxHrsPerWeek: String(45) as unknown as number },
-  });
+  })
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { company, empRoles, companyBranches } = useAuthState();
+  const { company, empRoles, companyBranches } = useAuthState()
 
   const [employeeRole, setEmployeeRole] = useState<string | null | undefined>(
-    ""
-  );
+    ''
+  )
 
   const [companyBranch, setCompanyBranch] = useState<string | null | undefined>(
     null
-  );
+  )
 
-  const [addEmpRoleModal, setAddEmpRoleModal] = useState(false);
+  const [addEmpRoleModal, setAddEmpRoleModal] = useState(false)
 
-  const [addCmpBranchModal, setAddCmpBranchModal] = useState(false);
+  const [addCmpBranchModal, setAddCmpBranchModal] = useState(false)
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   useEffect(() => {
-    methods.setValue("EmployeeRole", employeeRole || "");
+    methods.setValue('EmployeeRole', employeeRole || '')
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [employeeRole]);
+  }, [employeeRole])
 
   useEffect(() => {
     const branchId = companyBranches.find(
       (b) => b.CompanyBranchName === companyBranch
-    )?.CompanyBranchId;
-    methods.setValue("EmployeeCompanyBranchId", branchId || null);
+    )?.CompanyBranchId
+    methods.setValue('EmployeeCompanyBranchId', branchId || null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyBranch]);
+  }, [companyBranch])
 
   useEffect(() => {
     if (isEdit) {
-      setEmployeeRole(employeeEditData.EmployeeRole);
-      setEmpImageBase64(employeeEditData.EmployeeImg);
+      setEmployeeRole(employeeEditData.EmployeeRole)
+      setEmpImageBase64(employeeEditData.EmployeeImg)
       if (employeeEditData.EmployeeCompanyBranchId) {
         const branchName = companyBranches.find(
           (b) => b.CompanyBranchId === employeeEditData.EmployeeCompanyBranchId
-        )?.CompanyBranchName;
-        setCompanyBranch(branchName || null);
+        )?.CompanyBranchName
+        setCompanyBranch(branchName || null)
       }
       if (employeeEditData.EmployeeLicenses) {
         setEmpLicenseDetails(
           employeeEditData?.EmployeeLicenses?.map((l) => {
-            return { ...l, LicenseExpDate: toDate(l.LicenseExpDate) };
+            return { ...l, LicenseExpDate: toDate(l.LicenseExpDate) }
           })
-        );
+        )
       }
       if (employeeEditData.EmployeeBankDetails) {
-        setEmpBankDetails(employeeEditData.EmployeeBankDetails);
+        setEmpBankDetails(employeeEditData.EmployeeBankDetails)
       }
       if (employeeEditData.EmployeeCertificates) {
-        setEmpCertificates(employeeEditData.EmployeeCertificates);
+        setEmpCertificates(employeeEditData.EmployeeCertificates)
       }
     } else {
-      setEmployeeRole("");
-      setEmpImageBase64("");
-      setCompanyBranch(null);
-      setEmpLicenseDetails([]);
+      setEmployeeRole('')
+      setEmpImageBase64('')
+      setCompanyBranch(null)
+      setEmpLicenseDetails([])
       setEmpBankDetails({
-        BankAccNumber: "",
-        BankInstitutionNumber: "",
-        BankTransitNumber: "",
-        BankVoidCheckImg: "",
-      });
+        BankAccNumber: '',
+        BankInstitutionNumber: '',
+        BankTransitNumber: '',
+        BankVoidCheckImg: '',
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdit, employeeEditData]);
+  }, [isEdit, employeeEditData])
 
   const { data: supervisors } = useFetchEmployees({
     limit: 100,
-    empRole: "SUPERVISOR",
-  });
+    empRole: 'SUPERVISOR',
+  })
 
-  const [empImageBase64, setEmpImageBase64] = useState<string | null>(null);
+  const [empImageBase64, setEmpImageBase64] = useState<string | null>(null)
 
   const [empLicenseDetails, setEmpLicenseDetails] = useState<
     EmpLicenseDetails[]
-  >([]);
+  >([])
 
   const [empBankDetails, setEmpBankDetails] = useState<IEmpBankDetails>({
-    BankAccNumber: "",
-    BankInstitutionNumber: "",
-    BankTransitNumber: "",
-    BankVoidCheckImg: "",
-  });
+    BankAccNumber: '',
+    BankInstitutionNumber: '',
+    BankTransitNumber: '',
+    BankVoidCheckImg: '',
+  })
 
-  const [empCertificates, setEmpCertificates] = useState<EmpCertificates[]>([]);
+  const [empCertificates, setEmpCertificates] = useState<EmpCertificates[]>([])
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (loading) {
-      showModalLoader({});
+      showModalLoader({})
     } else {
-      closeModalLoader();
+      closeModalLoader()
     }
-    return () => closeModalLoader();
-  }, [loading]);
+    return () => closeModalLoader()
+  }, [loading])
 
   const onSubmit = async (data: AddEmployeeFormField) => {
-    if (!company) return;
+    if (!company) return
     try {
-      setLoading(true);
+      setLoading(true)
 
       if (isEdit) {
         await DbEmployee.updateEmployee({
@@ -186,7 +186,7 @@ const EmployeeCreateOrEdit = () => {
           certificates: empCertificates.filter(
             (c) => c.CertificateName && c.CertificateDoc
           ),
-        });
+        })
       } else {
         await DbEmployee.addEmployee({
           empData: data,
@@ -197,52 +197,52 @@ const EmployeeCreateOrEdit = () => {
           certificates: empCertificates.filter(
             (c) => c.CertificateName && c.CertificateDoc
           ),
-        });
+        })
       }
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.EMPLOYEE_LIST],
-      });
+      })
 
-      setLoading(false);
-      navigate(PageRoutes.EMPLOYEE_LIST);
+      setLoading(false)
+      navigate(PageRoutes.EMPLOYEE_LIST)
       showSnackbar({
-        message: "Employee created successfully",
-        type: "success",
-      });
-      methods.reset();
+        message: 'Employee created successfully',
+        type: 'success',
+      })
+      methods.reset()
     } catch (error) {
-      console.log(error);
-      setLoading(false);
-      errorHandler(error);
+      console.log(error)
+      setLoading(false)
+      errorHandler(error)
     }
-  };
+  }
 
   const onDelete = async () => {
-    if (!isEdit) return;
+    if (!isEdit) return
     try {
-      setLoading(true);
+      setLoading(true)
 
-      await DbEmployee.deleteEmployee(employeeEditData.EmployeeId);
+      await DbEmployee.deleteEmployee(employeeEditData.EmployeeId)
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.EMPLOYEE_LIST],
-      });
+      })
 
       showSnackbar({
-        message: "Employee deleted successfully",
-        type: "success",
-      });
+        message: 'Employee deleted successfully',
+        type: 'success',
+      })
 
-      setLoading(false);
-      methods.reset();
-      navigate(PageRoutes.EMPLOYEE_LIST);
+      setLoading(false)
+      methods.reset()
+      navigate(PageRoutes.EMPLOYEE_LIST)
     } catch (error) {
-      console.log(error);
-      setLoading(false);
-      errorHandler(error);
+      console.log(error)
+      setLoading(false)
+      errorHandler(error)
     }
-  };
+  }
   return (
     <div className="flex flex-col gap-4 p-6">
       <div className="flex items-center justify-between w-full bg-primaryGold rounded p-4 shadow">
@@ -262,20 +262,20 @@ const EmployeeCreateOrEdit = () => {
               type="white"
               onClick={() =>
                 openContextModal({
-                  modal: "confirmModal",
+                  modal: 'confirmModal',
                   withCloseButton: false,
                   centered: true,
                   closeOnClickOutside: true,
                   innerProps: {
-                    title: "Confirm",
-                    body: "Are you sure to delete this employee",
+                    title: 'Confirm',
+                    body: 'Are you sure to delete this employee',
                     onConfirm: () => {
-                      onDelete();
+                      onDelete()
                     },
                   },
-                  size: "30%",
+                  size: '30%',
                   styles: {
-                    body: { padding: "0px" },
+                    body: { padding: '0px' },
                   },
                 })
               }
@@ -360,13 +360,13 @@ const EmployeeCreateOrEdit = () => {
                   return {
                     label: role.EmployeeRoleName,
                     value: role.EmployeeRoleName,
-                  };
+                  }
                 })}
                 dropDownHeader={
                   <div
                     onClick={() => {
-                      navigate(PageRoutes.EMPLOYEE_LIST);
-                      setAddEmpRoleModal(true);
+                      navigate(PageRoutes.EMPLOYEE_LIST)
+                      setAddEmpRoleModal(true)
                     }}
                     className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                   >
@@ -397,7 +397,7 @@ const EmployeeCreateOrEdit = () => {
                 decimalCount={2}
               />
 
-              {employeeRole === "GUARD" && (
+              {employeeRole === 'GUARD' && (
                 <div className="flex flex-col gap-1 col-span-2">
                   <InputHeader title="Supervisor" />
                   <MultiSelect
@@ -406,20 +406,20 @@ const EmployeeCreateOrEdit = () => {
                       return {
                         label: branch.EmployeeName,
                         value: branch.EmployeeId,
-                      };
+                      }
                     })}
-                    value={methods.watch("EmployeeSupervisorId") || []}
+                    value={methods.watch('EmployeeSupervisorId') || []}
                     onChange={(e) =>
-                      methods.setValue("EmployeeSupervisorId", e)
+                      methods.setValue('EmployeeSupervisorId', e)
                     }
                     nothingFoundMessage={
                       <div
                         onClick={() => {
-                          navigate(PageRoutes.EMPLOYEE_LIST);
+                          navigate(PageRoutes.EMPLOYEE_LIST)
                           setTimeout(
                             () => navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT),
                             50
-                          );
+                          )
                         }}
                         className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                       >
@@ -435,12 +435,12 @@ const EmployeeCreateOrEdit = () => {
                     styles={{
                       input: {
                         border: `1px solid #0000001A`,
-                        fontWeight: "normal",
-                        fontSize: "18px",
-                        borderRadius: "4px",
-                        background: "#FFFFFF",
-                        color: "#000000",
-                        padding: "8px 8px",
+                        fontWeight: 'normal',
+                        fontSize: '18px',
+                        borderRadius: '4px',
+                        background: '#FFFFFF',
+                        color: '#000000',
+                        padding: '8px 8px',
                       },
                     }}
                   />
@@ -458,13 +458,13 @@ const EmployeeCreateOrEdit = () => {
                     return {
                       label: branch.CompanyBranchName,
                       value: branch.CompanyBranchName,
-                    };
+                    }
                   })}
                   dropDownHeader={
                     <div
                       onClick={() => {
-                        navigate(PageRoutes.COMPANY_BRANCHES);
-                        setAddCmpBranchModal(true);
+                        navigate(PageRoutes.COMPANY_BRANCHES)
+                        setAddCmpBranchModal(true)
                       }}
                       className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                     >
@@ -496,7 +496,7 @@ const EmployeeCreateOrEdit = () => {
         setOpened={setAddCmpBranchModal}
       />
     </div>
-  );
-};
+  )
+}
 
-export default EmployeeCreateOrEdit;
+export default EmployeeCreateOrEdit

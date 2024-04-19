@@ -1,5 +1,5 @@
 const ClientReports = () => {
-  return <div>ClientReports</div>;
-};
+  return <div>ClientReports</div>
+}
 
-export default ClientReports;
+export default ClientReports

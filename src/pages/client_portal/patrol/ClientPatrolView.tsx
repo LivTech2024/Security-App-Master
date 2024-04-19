@@ -1,47 +1,47 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
-import NoSearchResult from "../../../common/NoSearchResult";
-import PatrolViewCard from "../../../component/patrolling/PatrolViewCard";
-import { useEffect, useState } from "react";
-import DbPatrol from "../../../firebase_configs/DB/DbPatrol";
-import { IPatrolsCollection } from "../../../@types/database";
-import { IoArrowBackCircle } from "react-icons/io5";
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import NoSearchResult from '../../../common/NoSearchResult'
+import PatrolViewCard from '../../../component/patrolling/PatrolViewCard'
+import { useEffect, useState } from 'react'
+import DbPatrol from '../../../firebase_configs/DB/DbPatrol'
+import { IPatrolsCollection } from '../../../@types/database'
+import { IoArrowBackCircle } from 'react-icons/io5'
 
 const ClientPatrolView = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [searchParam] = useSearchParams();
+  const [searchParam] = useSearchParams()
 
-  const patrolId = searchParam.get("id");
+  const patrolId = searchParam.get('id')
 
-  const [isPatrolLoading, setIsPatrolLoading] = useState(true);
+  const [isPatrolLoading, setIsPatrolLoading] = useState(true)
 
-  const [data, setData] = useState<IPatrolsCollection | null>(null);
+  const [data, setData] = useState<IPatrolsCollection | null>(null)
 
   useEffect(() => {
     const fetchPatrolData = async () => {
-      if (!patrolId) return;
+      if (!patrolId) return
       try {
-        const patrolSnapshot = await DbPatrol.getPatrolById(patrolId);
-        const patrolData = patrolSnapshot.data() as IPatrolsCollection;
+        const patrolSnapshot = await DbPatrol.getPatrolById(patrolId)
+        const patrolData = patrolSnapshot.data() as IPatrolsCollection
 
-        setData(patrolData);
+        setData(patrolData)
 
-        setIsPatrolLoading(false);
+        setIsPatrolLoading(false)
       } catch (error) {
-        console.log(error);
-        setIsPatrolLoading(false);
+        console.log(error)
+        setIsPatrolLoading(false)
       }
-    };
+    }
 
-    fetchPatrolData();
-  }, [patrolId]);
+    fetchPatrolData()
+  }, [patrolId])
 
   if (!data && !isPatrolLoading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <NoSearchResult />
       </div>
-    );
+    )
   }
 
   if (isPatrolLoading) {
@@ -52,7 +52,7 @@ const ClientPatrolView = () => {
         </div>
         <div className="h-[40vh] bg-shimmerColor w-full"></div>
       </div>
-    );
+    )
   }
 
   if (data) {
@@ -71,8 +71,8 @@ const ClientPatrolView = () => {
         </div>
         <PatrolViewCard patrolData={data} />
       </div>
-    );
+    )
   }
-};
+}
 
-export default ClientPatrolView;
+export default ClientPatrolView

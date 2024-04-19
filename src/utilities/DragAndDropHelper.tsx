@@ -1,11 +1,11 @@
-import { useDrag, useDrop } from "react-dnd";
+import { useDrag, useDrop } from 'react-dnd'
 
 interface DraggableProps {
-  children: React.ReactNode;
-  draggableId: string;
-  type: string;
-  canDrag?: boolean;
-  callback: (draggableId: string, dropPointId: string) => void;
+  children: React.ReactNode
+  draggableId: string
+  type: string
+  canDrag?: boolean
+  callback: (draggableId: string, dropPointId: string) => void
 }
 
 export const Draggable = ({
@@ -20,10 +20,10 @@ export const Draggable = ({
       type,
       item: { children, draggableId },
       end: (item, monitor) => {
-        const dropResult = monitor.getDropResult<{ id: string }>();
+        const dropResult = monitor.getDropResult<{ id: string }>()
         if (item && dropResult) {
-          callback(item.draggableId, dropResult.id);
-          console.log(`You dropped ${item.draggableId} into ${dropResult.id}`);
+          callback(item.draggableId, dropResult.id)
+          console.log(`You dropped ${item.draggableId} into ${dropResult.id}`)
         }
       },
       canDrag,
@@ -33,27 +33,27 @@ export const Draggable = ({
       }),
     }),
     [draggableId, children]
-  );
+  )
 
   return (
     <div
       ref={drag}
       style={{
         opacity: isDragging ? 0.5 : 1,
-        cursor: "move",
+        cursor: 'move',
       }}
     >
       {children}
     </div>
-  );
-};
+  )
+}
 
 interface DropPointProps {
-  accept: string;
-  className: string;
-  id: string;
-  children?: React.ReactNode;
-  activeClassName?: string;
+  accept: string
+  className: string
+  id: string
+  children?: React.ReactNode
+  activeClassName?: string
 }
 
 export const DropPoint = ({
@@ -73,9 +73,9 @@ export const DropPoint = ({
       }),
     }),
     [id, children]
-  );
+  )
 
-  const isActive = canDrop && isOver;
+  const isActive = canDrop && isOver
 
   if (children) {
     return (
@@ -83,21 +83,21 @@ export const DropPoint = ({
         ref={drop}
         data-testid={id}
         className={`${
-          isActive && (activeClassName ?? "bg-gray-200")
+          isActive && (activeClassName ?? 'bg-gray-200')
         } ${className} `}
       >
         {children}
       </div>
-    );
+    )
   }
 
   return (
     <div
       ref={drop}
       data-testid={id}
-      className={`${isActive && "bg-gray-200"} ${className} `}
+      className={`${isActive && 'bg-gray-200'} ${className} `}
     >
       &nbsp;
     </div>
-  );
-};
+  )
+}

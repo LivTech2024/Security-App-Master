@@ -1,39 +1,39 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { IReportsCollection } from "../../@types/database";
-import DbCompany from "../../firebase_configs/DB/DbCompany";
-import NoSearchResult from "../../common/NoSearchResult";
-import { IoArrowBackCircle } from "react-icons/io5";
-import { formatDate } from "../../utilities/misc";
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { IReportsCollection } from '../../@types/database'
+import DbCompany from '../../firebase_configs/DB/DbCompany'
+import NoSearchResult from '../../common/NoSearchResult'
+import { IoArrowBackCircle } from 'react-icons/io5'
+import { formatDate } from '../../utilities/misc'
 
 const ReportView = () => {
-  const [searchParam] = useSearchParams();
+  const [searchParam] = useSearchParams()
 
-  const reportId = searchParam.get("id");
+  const reportId = searchParam.get('id')
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true)
 
-  const [data, setData] = useState<IReportsCollection | null>(null);
+  const [data, setData] = useState<IReportsCollection | null>(null)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
-    if (!reportId) return;
+    if (!reportId) return
     DbCompany?.getReportById(reportId).then((snapshot) => {
-      const reportData = snapshot.data() as IReportsCollection;
+      const reportData = snapshot.data() as IReportsCollection
       if (reportData) {
-        setData(reportData);
+        setData(reportData)
       }
-      setLoading(false);
-    });
-  }, [reportId]);
+      setLoading(false)
+    })
+  }, [reportId])
 
   if (!data && !loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <NoSearchResult />
       </div>
-    );
+    )
   }
 
   if (loading) {
@@ -52,7 +52,7 @@ const ReportView = () => {
         </div>
         <div className="h-[40vh] bg-shimmerColor w-full"></div>
       </div>
-    );
+    )
   }
 
   if (data)
@@ -74,23 +74,23 @@ const ReportView = () => {
           <div className="grid grid-cols-2 gap-4 text-lg">
             <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2">Report Name:</p>
-              <p>{data?.ReportName || "N/A"}</p>
+              <p>{data?.ReportName || 'N/A'}</p>
             </div>
             <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2">Report Status:</p>
-              <p>{data?.ReportStatus || "N/A"}</p>
+              <p>{data?.ReportStatus || 'N/A'}</p>
             </div>
             <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2">Report Category:</p>
-              <p>{data?.ReportCategoryName || "N/A"}</p>
+              <p>{data?.ReportCategoryName || 'N/A'}</p>
             </div>
             <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2">Employee Name:</p>
-              <p>{data?.ReportEmployeeName || "N/A"}</p>
+              <p>{data?.ReportEmployeeName || 'N/A'}</p>
             </div>
             <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2">Report Created At:</p>
-              <p>{formatDate(data.ReportCreatedAt, "DD MMM-YY hh:mm A")}</p>
+              <p>{formatDate(data.ReportCreatedAt, 'DD MMM-YY hh:mm A')}</p>
             </div>
             <div className="flex items-start gap-4 col-span-2">
               <p className="font-semibold flex gap-2">Report Data:</p>
@@ -106,9 +106,9 @@ const ReportView = () => {
                         <a href={img} target="_blank">
                           {img}
                         </a>
-                      );
+                      )
                     })
-                  : "N/A"}
+                  : 'N/A'}
               </div>
             </div>
 
@@ -125,15 +125,15 @@ const ReportView = () => {
                         >
                           {src}
                         </a>
-                      );
+                      )
                     })
-                  : "N/A"}
+                  : 'N/A'}
               </div>
             </div>
           </div>
         </div>
       </div>
-    );
-};
+    )
+}
 
-export default ReportView;
+export default ReportView

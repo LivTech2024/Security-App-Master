@@ -1,45 +1,45 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { IShiftsCollection } from "../../@types/database";
-import { useEditFormStore } from "../../store";
-import { firebaseDataToObject, formatDate } from "../../utilities/misc";
-import { Shift } from "../../store/slice/editForm.slice";
-import DbShift from "../../firebase_configs/DB/DbShift";
-import NoSearchResult from "../../common/NoSearchResult";
-import { PageRoutes } from "../../@types/enum";
-import { IoArrowBackCircle } from "react-icons/io5";
-import Button from "../../common/button/Button";
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { IShiftsCollection } from '../../@types/database'
+import { useEditFormStore } from '../../store'
+import { firebaseDataToObject, formatDate } from '../../utilities/misc'
+import { Shift } from '../../store/slice/editForm.slice'
+import DbShift from '../../firebase_configs/DB/DbShift'
+import NoSearchResult from '../../common/NoSearchResult'
+import { PageRoutes } from '../../@types/enum'
+import { IoArrowBackCircle } from 'react-icons/io5'
+import Button from '../../common/button/Button'
 
 const ShiftView = () => {
-  const { setShiftEditData } = useEditFormStore();
+  const { setShiftEditData } = useEditFormStore()
 
-  const [searchParam] = useSearchParams();
+  const [searchParam] = useSearchParams()
 
-  const shiftId = searchParam.get("id");
+  const shiftId = searchParam.get('id')
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true)
 
-  const [data, setData] = useState<IShiftsCollection | null>(null);
+  const [data, setData] = useState<IShiftsCollection | null>(null)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
-    if (!shiftId) return;
+    if (!shiftId) return
     DbShift?.getShiftById(shiftId).then((snapshot) => {
-      const shiftData = snapshot.data() as IShiftsCollection;
+      const shiftData = snapshot.data() as IShiftsCollection
       if (shiftData) {
-        setData(shiftData);
+        setData(shiftData)
       }
-      setLoading(false);
-    });
-  }, [shiftId]);
+      setLoading(false)
+    })
+  }, [shiftId])
 
   if (!data && !loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <NoSearchResult />
       </div>
-    );
+    )
   }
 
   if (loading) {
@@ -58,7 +58,7 @@ const ShiftView = () => {
         </div>
         <div className="h-[40vh] bg-shimmerColor w-full"></div>
       </div>
-    );
+    )
   }
 
   if (data)
@@ -81,8 +81,8 @@ const ShiftView = () => {
                 firebaseDataToObject(
                   data as unknown as Record<string, unknown>
                 ) as unknown as Shift
-              );
-              navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
+              )
+              navigate(PageRoutes.SHIFT_CREATE_OR_EDIT)
             }}
             className="bg-primary text-surface px-4 py-2 rounded"
             label="Edit Shift"
@@ -93,27 +93,27 @@ const ShiftView = () => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="font-semibold">Shift Name:</p>
-              <p>{data?.ShiftName || "N/A"}</p>
+              <p>{data?.ShiftName || 'N/A'}</p>
             </div>
             <div>
               <p className="font-semibold">Shift Position:</p>
-              <p>{data?.ShiftPosition || "N/A"}</p>
+              <p>{data?.ShiftPosition || 'N/A'}</p>
             </div>
             <div>
               <p className="font-semibold">Shift Date:</p>
-              <p>{data?.ShiftDate ? formatDate(data?.ShiftDate) : "N/A"}</p>
+              <p>{data?.ShiftDate ? formatDate(data?.ShiftDate) : 'N/A'}</p>
             </div>
             <div>
               <p className="font-semibold">Shift Start Time:</p>
-              <p>{data?.ShiftStartTime || "N/A"}</p>
+              <p>{data?.ShiftStartTime || 'N/A'}</p>
             </div>
             <div>
               <p className="font-semibold">Shift End Time:</p>
-              <p>{data?.ShiftEndTime || "N/A"}</p>
+              <p>{data?.ShiftEndTime || 'N/A'}</p>
             </div>
             <div>
               <p className="font-semibold">Shift Location:</p>
-              <p>{data?.ShiftLocationName || "N/A"}</p>
+              <p>{data?.ShiftLocationName || 'N/A'}</p>
               {data?.ShiftLocationAddress && (
                 <p>{data?.ShiftLocationAddress}</p>
               )}
@@ -123,12 +123,12 @@ const ShiftView = () => {
               <p>
                 {data?.ShiftEnableRestrictedRadius
                   ? `${data?.ShiftRestrictedRadius} meters`
-                  : "Not enabled"}
+                  : 'Not enabled'}
               </p>
             </div>
             <div>
               <p className="font-semibold">Shift Description:</p>
-              <p>{data?.ShiftDescription || "N/A"}</p>
+              <p>{data?.ShiftDescription || 'N/A'}</p>
             </div>
             <div>
               <p className="font-semibold">Shift Assigned Users:</p>
@@ -148,7 +148,7 @@ const ShiftView = () => {
                       <li key={idx} className="capitalize list-decimal">
                         {data.Status} by {data.StatusReportedByName}
                       </li>
-                    );
+                    )
                   })
                 ) : (
                   <li className="capitalize list-decimal">Pending</li>
@@ -167,7 +167,7 @@ const ShiftView = () => {
                     key={idx}
                     className="w-[100px] object-cover"
                   />
-                );
+                )
               })}
           </div>
 
@@ -190,10 +190,10 @@ const ShiftView = () => {
                               </span>
                               <span>Employee: {s.TaskCompletedByName}</span>
                               <span>
-                                Completion Time:{" "}
+                                Completion Time:{' '}
                                 {formatDate(
                                   s.TaskCompletionTime,
-                                  "DD MMM-YY hh-mm A"
+                                  'DD MMM-YY hh-mm A'
                                 )}
                               </span>
                               <span>Images: </span>
@@ -207,17 +207,17 @@ const ShiftView = () => {
                                   >
                                     {idx + 1}. {img.slice(0, 30)}...
                                   </a>
-                                );
+                                )
                               })}
                             </div>
-                          );
+                          )
                         })}
                       </div>
                     ) : (
                       <span className="pl-4">Status: Pending</span>
                     )}
                   </div>
-                );
+                )
               })}
             </div>
           </div>
@@ -234,10 +234,10 @@ const ShiftView = () => {
                         )}
                         {res.WellnessReportedAt && (
                           <div>
-                            Reported At:{" "}
+                            Reported At:{' '}
                             {formatDate(
                               res?.WellnessReportedAt,
-                              "DD MMM-YY hh:mm A"
+                              'DD MMM-YY hh:mm A'
                             )}
                           </div>
                         )}
@@ -246,24 +246,24 @@ const ShiftView = () => {
                         )}
                         {res.WellnessImg && (
                           <div>
-                            Image:{" "}
+                            Image:{' '}
                             <a
                               href={res?.WellnessImg}
                               className="text-textPrimaryBlue cursor-pointer"
                             >
                               {res?.WellnessImg?.slice(0, 30)}...
-                            </a>{" "}
+                            </a>{' '}
                           </div>
                         )}
                       </div>
-                    );
+                    )
                   })
-                : "N/A"}
+                : 'N/A'}
             </div>
           </div>
         </div>
       </div>
-    );
-};
+    )
+}
 
-export default ShiftView;
+export default ShiftView

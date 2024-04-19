@@ -1,4 +1,4 @@
-import { formatDate } from "./misc";
+import { formatDate } from './misc'
 
 export const generateStatsViewHtml = (
   shiftsSummary: JSX.Element,
@@ -27,7 +27,7 @@ export const generateStatsViewHtml = (
           <span style="font-weight:600;font-size:20px;">${companyName}</span>
           <span style="margin:16px 0px;">Week of ${formatDate(
             date,
-            "D MMM, YYYY"
+            'D MMM, YYYY'
           )}</span>
         </div>
         <div>
@@ -38,5 +38,5 @@ export const generateStatsViewHtml = (
           </div>
         </body>
       </html>
-    `;
-};
+    `
+}

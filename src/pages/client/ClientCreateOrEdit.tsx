@@ -1,33 +1,33 @@
-import Button from "../../common/button/Button";
-import { IoArrowBackCircle } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
-import { ClientFormFields, clientSchema } from "../../utilities/zod/schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FormProvider, useForm } from "react-hook-form";
-import { useAuthState, useEditFormStore } from "../../store";
-import { useQueryClient } from "@tanstack/react-query";
+import Button from '../../common/button/Button'
+import { IoArrowBackCircle } from 'react-icons/io5'
+import { useNavigate } from 'react-router-dom'
+import { ClientFormFields, clientSchema } from '../../utilities/zod/schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useAuthState, useEditFormStore } from '../../store'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from "../../utilities/TsxUtils";
-import DbClient from "../../firebase_configs/DB/DbClient";
-import { REACT_QUERY_KEYS } from "../../@types/enum";
-import { errorHandler } from "../../utilities/CustomError";
-import { openContextModal } from "@mantine/modals";
-import TextareaWithTopHeader from "../../common/inputs/TextareaWithTopHeader";
-import InputWithTopHeader from "../../common/inputs/InputWithTopHeader";
-import { useEffect, useState } from "react";
-import InputDate from "../../common/inputs/InputDate";
-import { removeTimeFromDate, toDate } from "../../utilities/misc";
-import dayjs from "dayjs";
+} from '../../utilities/TsxUtils'
+import DbClient from '../../firebase_configs/DB/DbClient'
+import { REACT_QUERY_KEYS } from '../../@types/enum'
+import { errorHandler } from '../../utilities/CustomError'
+import { openContextModal } from '@mantine/modals'
+import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader'
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
+import { useEffect, useState } from 'react'
+import InputDate from '../../common/inputs/InputDate'
+import { removeTimeFromDate, toDate } from '../../utilities/misc'
+import dayjs from 'dayjs'
 
 const ClientCreateOrEdit = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { clientEditData } = useEditFormStore();
+  const { clientEditData } = useEditFormStore()
 
-  const isEdit = !!clientEditData;
+  const isEdit = !!clientEditData
 
   const methods = useForm<ClientFormFields>({
     resolver: zodResolver(clientSchema),
@@ -42,110 +42,110 @@ const ClientCreateOrEdit = () => {
           ClientPhone: clientEditData.ClientPhone,
         }
       : undefined,
-  });
+  })
 
-  const { company } = useAuthState();
+  const { company } = useAuthState()
 
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const [contractStartDate, setContractStartDate] = useState<Date | null>(
     new Date()
-  );
+  )
   const [contractEndDate, setContractEndDate] = useState<Date | null>(
-    dayjs().add(1, "month").toDate()
-  );
+    dayjs().add(1, 'month').toDate()
+  )
 
   useEffect(() => {
-    console.log(methods.formState.errors);
-  }, [methods.formState.errors]);
+    console.log(methods.formState.errors)
+  }, [methods.formState.errors])
 
   useEffect(() => {
     if (isEdit) {
-      setContractStartDate(toDate(clientEditData.ClientContractStartDate));
-      setContractEndDate(toDate(clientEditData.ClientContractEndDate));
+      setContractStartDate(toDate(clientEditData.ClientContractStartDate))
+      setContractEndDate(toDate(clientEditData.ClientContractEndDate))
     }
-  }, [isEdit]);
+  }, [isEdit])
 
   useEffect(() => {
-    if (!contractStartDate) return;
+    if (!contractStartDate) return
     methods.setValue(
-      "ClientContractStartDate",
+      'ClientContractStartDate',
       removeTimeFromDate(contractStartDate)
-    );
-  }, [contractStartDate]);
+    )
+  }, [contractStartDate])
 
   useEffect(() => {
-    if (!contractEndDate) return;
+    if (!contractEndDate) return
     methods.setValue(
-      "ClientContractEndDate",
+      'ClientContractEndDate',
       removeTimeFromDate(contractEndDate)
-    );
-  }, [contractEndDate]);
+    )
+  }, [contractEndDate])
 
   const onSubmit = async (data: ClientFormFields) => {
-    if (!company) return;
+    if (!company) return
 
     try {
-      showModalLoader({});
+      showModalLoader({})
 
       if (isEdit) {
         await DbClient.updateClient({
           cmpId: company.CompanyId,
           clientId: clientEditData.ClientId,
           data,
-        });
+        })
         showSnackbar({
-          message: "Client updated successfully",
-          type: "success",
-        });
+          message: 'Client updated successfully',
+          type: 'success',
+        })
       } else {
-        await DbClient.createClient({ cmpId: company.CompanyId, data });
+        await DbClient.createClient({ cmpId: company.CompanyId, data })
         showSnackbar({
-          message: "Client created successfully",
-          type: "success",
-        });
+          message: 'Client created successfully',
+          type: 'success',
+        })
       }
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.CLIENT_LIST],
-      });
+      })
 
-      methods.reset();
-      closeModalLoader();
-      navigate(-1);
+      methods.reset()
+      closeModalLoader()
+      navigate(-1)
     } catch (error) {
-      console.log(error);
-      errorHandler(error);
-      closeModalLoader();
+      console.log(error)
+      errorHandler(error)
+      closeModalLoader()
     }
-  };
+  }
 
   const onDelete = async () => {
-    if (!company || !isEdit) return;
+    if (!company || !isEdit) return
     try {
-      showModalLoader({});
+      showModalLoader({})
 
-      await DbClient.deleteClient(clientEditData.ClientId);
+      await DbClient.deleteClient(clientEditData.ClientId)
 
       showSnackbar({
-        message: "Client deleted successfully",
-        type: "success",
-      });
+        message: 'Client deleted successfully',
+        type: 'success',
+      })
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.CLIENT_LIST],
-      });
+      })
 
-      methods.reset();
+      methods.reset()
 
-      navigate(-1);
-      closeModalLoader();
+      navigate(-1)
+      closeModalLoader()
     } catch (error) {
-      console.log(error);
-      errorHandler(error);
-      closeModalLoader();
+      console.log(error)
+      errorHandler(error)
+      closeModalLoader()
     }
-  };
+  }
   return (
     <div className="flex flex-col gap-4 p-6">
       <div className="flex items-center justify-between w-full bg-primaryGold rounded p-4 shadow">
@@ -165,20 +165,20 @@ const ClientCreateOrEdit = () => {
               type="white"
               onClick={() =>
                 openContextModal({
-                  modal: "confirmModal",
+                  modal: 'confirmModal',
                   withCloseButton: false,
                   centered: true,
                   closeOnClickOutside: true,
                   innerProps: {
-                    title: "Confirm",
-                    body: "Are you sure to delete this client",
+                    title: 'Confirm',
+                    body: 'Are you sure to delete this client',
                     onConfirm: () => {
-                      onDelete();
+                      onDelete()
                     },
                   },
-                  size: "30%",
+                  size: '30%',
                   styles: {
-                    body: { padding: "0px" },
+                    body: { padding: '0px' },
                   },
                 })
               }
@@ -275,7 +275,7 @@ const ClientCreateOrEdit = () => {
         </FormProvider>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ClientCreateOrEdit;
+export default ClientCreateOrEdit
