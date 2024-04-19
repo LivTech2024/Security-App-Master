@@ -1,6 +1,6 @@
-import { IPatrolsCollection } from '../../@types/database'
-import TimelineVertical from '../../common/TimelineVertical'
-import { formatDate } from '../../utilities/misc'
+import { IPatrolsCollection } from '../../@types/database';
+import TimelineVertical from '../../common/TimelineVertical';
+import { formatDate } from '../../utilities/misc';
 
 const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
   return (
@@ -48,7 +48,7 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                     {data?.StatusReportedByName ?? 'No guards assigned'}
                   </div>
                 </div>
-              )
+              );
             })
           ) : (
             <div>No assigned guards</div>
@@ -143,7 +143,7 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                                         />
                                       </a>
                                     </div>
-                                  )
+                                  );
                                 })}
                               </span>
                             ) : null}
@@ -181,11 +181,11 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                             )}
                           </div>
                         ),
-                      }
+                      };
                     })}
                   />
                 </div>
-              )
+              );
             })
           ) : (
             <TimelineVertical
@@ -204,7 +204,7 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
                       </span>
                     </div>
                   ),
-                }
+                };
               })}
             />
           )}
@@ -216,7 +216,7 @@ const PatrolViewCard = ({ patrolData }: { patrolData: IPatrolsCollection }) => {
         {formatDate(patrolData.PatrolModifiedAt, 'DD MMM-YY hh:mm A')}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PatrolViewCard
+export default PatrolViewCard;

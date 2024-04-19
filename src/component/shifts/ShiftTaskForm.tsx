@@ -1,17 +1,17 @@
-import React from 'react'
-import Button from '../../common/button/Button'
-import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
-import InputRadio from '../../common/inputs/InputRadio'
+import React from 'react';
+import Button from '../../common/button/Button';
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
+import InputRadio from '../../common/inputs/InputRadio';
 
 export interface ShiftTask {
-  TaskName: string
-  TaskQrCodeRequired: boolean
-  TaskReturnReq: boolean
+  TaskName: string;
+  TaskQrCodeRequired: boolean;
+  TaskReturnReq: boolean;
 }
 
 interface Props {
-  tasks: ShiftTask[]
-  setTasks: React.Dispatch<React.SetStateAction<ShiftTask[]>>
+  tasks: ShiftTask[];
+  setTasks: React.Dispatch<React.SetStateAction<ShiftTask[]>>;
 }
 
 const ShiftTaskForm: React.FC<Props> = ({ tasks, setTasks }) => {
@@ -23,29 +23,29 @@ const ShiftTaskForm: React.FC<Props> = ({ tasks, setTasks }) => {
         TaskQrCodeRequired: false,
         TaskReturnReq: false,
       },
-    ])
-  }
+    ]);
+  };
 
   const handleRemoveTask = (index: number) => {
-    setTasks(tasks.filter((_, i) => i !== index))
-  }
+    setTasks(tasks.filter((_, i) => i !== index));
+  };
 
   const handleChange = <T extends keyof ShiftTask>(
     index: number,
     field: T,
     value: ShiftTask[T]
   ) => {
-    const updatedTasks = [...tasks]
-    updatedTasks[index][field] = value
-    setTasks(updatedTasks)
-  }
+    const updatedTasks = [...tasks];
+    updatedTasks[index][field] = value;
+    setTasks(updatedTasks);
+  };
 
   const canAddTask = () => {
     if (tasks.length === 0) {
-      return true
+      return true;
     }
-    return !tasks.some((task) => !task.TaskName)
-  }
+    return !tasks.some((task) => !task.TaskName);
+  };
 
   return (
     <div className="space-y-4">
@@ -98,7 +98,7 @@ const ShiftTaskForm: React.FC<Props> = ({ tasks, setTasks }) => {
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ShiftTaskForm
+export default ShiftTaskForm;

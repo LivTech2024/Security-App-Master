@@ -1,37 +1,37 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import {
   formatDate,
   getHoursDiffInTwoTimeString,
   toDate,
-} from '../../../utilities/misc'
-import DbSchedule, { ISchedule } from '../../../firebase_configs/DB/DbSchedule'
-import { REACT_QUERY_KEYS } from '../../../@types/enum'
-import { useQuery } from '@tanstack/react-query'
-import { useAuthState } from '../../../store'
-import SelectBranch from '../../../common/SelectBranch'
-import dayjs from 'dayjs'
-import { numberFormatter } from '../../../utilities/NumberFormater'
-import Button from '../../../common/button/Button'
-import { generateStatsViewHtml } from '../../../utilities/genrateStatsViewHtml'
-import { htmlStringToPdf } from '../../../utilities/htmlStringToPdf'
+} from '../../../utilities/misc';
+import DbSchedule, { ISchedule } from '../../../firebase_configs/DB/DbSchedule';
+import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { useQuery } from '@tanstack/react-query';
+import { useAuthState } from '../../../store';
+import SelectBranch from '../../../common/SelectBranch';
+import dayjs from 'dayjs';
+import { numberFormatter } from '../../../utilities/NumberFormater';
+import Button from '../../../common/button/Button';
+import { generateStatsViewHtml } from '../../../utilities/genrateStatsViewHtml';
+import { htmlStringToPdf } from '../../../utilities/htmlStringToPdf';
 
 const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
-  const [schedules, setSchedules] = useState<ISchedule[]>([])
+  const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
   const [empHavingShifts, setEmpHavingShifts] = useState<
     {
-      empId: string
-      empName: string
-      empShifts: number
-      empHours: number
-      empPayRate: number
-      empApproxCost: number
+      empId: string;
+      empName: string;
+      empShifts: number;
+      empHours: number;
+      empPayRate: number;
+      empApproxCost: number;
     }[]
-  >([])
+  >([]);
 
-  const { company } = useAuthState()
+  const { company } = useAuthState();
 
-  const [branch, setBranch] = useState('')
+  const [branch, setBranch] = useState('');
 
   const { data, error } = useQuery({
     queryKey: [
@@ -46,88 +46,88 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
         datesArray[datesArray.length - 1],
         company!.CompanyId,
         branch
-      )
-      return data
+      );
+      return data;
     },
-  })
+  });
 
   useEffect(() => {
-    console.log(error)
-    setSchedules(data || [])
-  }, [data, error])
+    console.log(error);
+    setSchedules(data || []);
+  }, [data, error]);
 
   const getUnassignedShiftForDay = (date: Date) => {
     return schedules.filter(
       (s) =>
         dayjs(toDate(s.shift.ShiftDate)).isSame(date, 'date') &&
         s.shift.ShiftAssignedUserId.length === 0
-    )
-  }
+    );
+  };
 
   const getAssignedShiftForDay = (date: Date) => {
     return schedules.filter(
       (s) =>
         dayjs(toDate(s.shift.ShiftDate)).isSame(date, 'date') &&
         s.shift.ShiftAssignedUserId.length > 0
-    )
-  }
+    );
+  };
 
   const getShiftsCost = (schedule: ISchedule[]) => {
-    if (schedule.length === 0) return 0
+    if (schedule.length === 0) return 0;
 
-    let allShiftsCost = 0
+    let allShiftsCost = 0;
 
     schedule.forEach((sch) => {
-      const { employee, shift } = sch
+      const { employee, shift } = sch;
 
       const shiftHours = getHoursDiffInTwoTimeString(
         shift.ShiftStartTime,
         shift.ShiftEndTime
-      )
+      );
 
       allShiftsCost += employee.reduce((acc, obj) => {
-        return acc + obj.EmployeePayRate * shiftHours
-      }, 0)
-    })
+        return acc + obj.EmployeePayRate * shiftHours;
+      }, 0);
+    });
 
-    return allShiftsCost
-  }
+    return allShiftsCost;
+  };
 
   const getTotals = () => {
     let unAssignedShiftTotal = 0,
       unAssignedShiftHours = 0,
       assignedShiftTotal = 0,
       assignedShiftHours = 0,
-      totalCost = 0
+      totalCost = 0;
 
     datesArray.forEach((date) => {
-      const unAssigned = getUnassignedShiftForDay(date)
-      const assigned = getAssignedShiftForDay(date)
+      const unAssigned = getUnassignedShiftForDay(date);
+      const assigned = getAssignedShiftForDay(date);
 
-      unAssignedShiftTotal += unAssigned.length
+      unAssignedShiftTotal += unAssigned.length;
 
       unAssignedShiftHours += unAssigned.reduce((acc, obj) => {
         const shiftHours = getHoursDiffInTwoTimeString(
           obj.shift.ShiftStartTime,
           obj.shift.ShiftEndTime
-        )
+        );
 
-        return acc + shiftHours
-      }, 0)
+        return acc + shiftHours;
+      }, 0);
 
-      assignedShiftTotal += assigned.length
+      assignedShiftTotal += assigned.length;
 
       assignedShiftHours += assigned.reduce((acc, obj) => {
         const shiftHours = getHoursDiffInTwoTimeString(
           obj.shift.ShiftStartTime,
           obj.shift.ShiftEndTime
-        )
+        );
 
-        return acc + shiftHours
-      }, 0)
+        return acc + shiftHours;
+      }, 0);
 
-      totalCost += getShiftsCost(assigned)
-    })
+      totalCost += getShiftsCost(assigned);
+    });
 
     return {
       unAssignedShiftHours,
@@ -135,33 +135,33 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
       assignedShiftHours,
       assignedShiftTotal,
       totalCost,
-    }
-  }
+    };
+  };
 
   //*Populate emps and his shifts
 
   useEffect(() => {
     const updatedEmpHavingShifts: {
-      empId: string
-      empName: string
-      empShifts: number
-      empHours: number
-      empPayRate: number
-      empApproxCost: number
-    }[] = []
+      empId: string;
+      empName: string;
+      empShifts: number;
+      empHours: number;
+      empPayRate: number;
+      empApproxCost: number;
+    }[] = [];
 
     schedules?.forEach((schedule) => {
       if (schedule?.employee?.length > 0) {
-        const { employee, shift } = schedule
+        const { employee, shift } = schedule;
         const shiftHours = getHoursDiffInTwoTimeString(
           shift.ShiftStartTime,
           shift.ShiftEndTime
-        )
+        );
 
         employee.forEach((emp) => {
           const existingEmpIndex = updatedEmpHavingShifts.findIndex(
             (e) => e.empId === emp.EmployeeId
-          )
+          );
           if (existingEmpIndex !== -1) {
             updatedEmpHavingShifts[existingEmpIndex] = {
               ...updatedEmpHavingShifts[existingEmpIndex],
@@ -172,7 +172,7 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
                 updatedEmpHavingShifts[existingEmpIndex].empApproxCost +
                 shiftHours *
                   updatedEmpHavingShifts[existingEmpIndex].empPayRate,
-            }
+            };
           } else {
             updatedEmpHavingShifts.push({
               empId: emp.EmployeeId,
@@ -181,14 +181,14 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
               empHours: shiftHours,
               empPayRate: emp.EmployeePayRate,
               empShifts: 1,
-            })
+            });
           }
-        })
+        });
       }
-    })
+    });
 
-    setEmpHavingShifts(updatedEmpHavingShifts) // Update state with the accumulated changes
-  }, [schedules])
+    setEmpHavingShifts(updatedEmpHavingShifts); // Update state with the accumulated changes
+  }, [schedules]);
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -198,17 +198,17 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
           label="Print"
           onClick={async () => {
             const shiftsSummaryHtml =
-              document.getElementById('shiftsSummary')?.outerHTML || ''
+              document.getElementById('shiftsSummary')?.outerHTML || '';
             const employeesScheduledHtml =
-              document.getElementById('employeesScheduled')?.outerHTML || ''
+              document.getElementById('employeesScheduled')?.outerHTML || '';
 
             const pdfHtml = generateStatsViewHtml(
               shiftsSummaryHtml as unknown as JSX.Element,
               employeesScheduledHtml as unknown as JSX.Element,
               company!.CompanyName,
               datesArray[0]
-            )
-            await htmlStringToPdf('test.pdf', pdfHtml)
+            );
+            await htmlStringToPdf('test.pdf', pdfHtml);
           }}
           type="black"
           className="px-12 py-2"
@@ -247,8 +247,8 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
             </thead>
             <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
               {datesArray.map((date, idx) => {
-                const unAssigned = getUnassignedShiftForDay(date)
-                const assigned = getAssignedShiftForDay(date)
+                const unAssigned = getUnassignedShiftForDay(date);
+                const assigned = getAssignedShiftForDay(date);
                 return (
                   <tr key={idx}>
                     <td className="px-2 py-2">{formatDate(date, 'dddd')}</td>
@@ -261,9 +261,9 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
                           const shiftHours = getHoursDiffInTwoTimeString(
                             obj.shift.ShiftStartTime,
                             obj.shift.ShiftEndTime
-                          )
+                          );
 
-                          return acc + shiftHours
+                          return acc + shiftHours;
                         }, 0)
                         .toFixed(2)}
                     </td>
@@ -276,9 +276,9 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
                           const shiftHours = getHoursDiffInTwoTimeString(
                             obj.shift.ShiftStartTime,
                             obj.shift.ShiftEndTime
-                          )
+                          );
 
-                          return acc + shiftHours
+                          return acc + shiftHours;
                         }, 0)
                         .toFixed(2)}
                     </td>
@@ -286,7 +286,7 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
                       {numberFormatter(getShiftsCost(assigned), true)}
                     </td>
                   </tr>
-                )
+                );
               })}
             </tbody>
             <tfoot>
@@ -345,7 +345,7 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
                       {numberFormatter(data.empApproxCost, true)}
                     </td>
                   </tr>
-                )
+                );
               })}
             </tbody>
             <tfoot>
@@ -375,7 +375,7 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default StatisticsView
+export default StatisticsView;

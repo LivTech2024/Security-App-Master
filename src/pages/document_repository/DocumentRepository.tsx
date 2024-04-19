@@ -1,39 +1,39 @@
-import { useEffect, useState } from 'react'
-import Button from '../../common/button/Button'
-import { useAuthState, useEditFormStore } from '../../store'
-import { useDebouncedValue } from '@mantine/hooks'
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react';
+import Button from '../../common/button/Button';
+import { useAuthState, useEditFormStore } from '../../store';
+import { useDebouncedValue } from '@mantine/hooks';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
   DisplayCount,
   MinimumQueryCharacter,
   REACT_QUERY_KEYS,
-} from '../../@types/enum'
-import DbCompany from '../../firebase_configs/DB/DbCompany'
-import { DocumentData } from 'firebase/firestore'
+} from '../../@types/enum';
+import DbCompany from '../../firebase_configs/DB/DbCompany';
+import { DocumentData } from 'firebase/firestore';
 import {
   IDocumentCategories,
   IDocumentsCollection,
-} from '../../@types/database'
-import { useInView } from 'react-intersection-observer'
-import NoSearchResult from '../../common/NoSearchResult'
-import TableShimmer from '../../common/shimmer/TableShimmer'
-import { formatDate } from '../../utilities/misc'
-import SearchBar from '../../common/inputs/SearchBar'
-import DocumentCategoriesModal from '../../component/document_repository/modal/DocumentCategoriesModal'
-import InputSelect from '../../common/inputs/InputSelect'
-import AddDocumentModal from '../../component/document_repository/modal/AddDocumentModal'
-import { IDocument } from '../../store/slice/editForm.slice'
+} from '../../@types/database';
+import { useInView } from 'react-intersection-observer';
+import NoSearchResult from '../../common/NoSearchResult';
+import TableShimmer from '../../common/shimmer/TableShimmer';
+import { formatDate } from '../../utilities/misc';
+import SearchBar from '../../common/inputs/SearchBar';
+import DocumentCategoriesModal from '../../component/document_repository/modal/DocumentCategoriesModal';
+import InputSelect from '../../common/inputs/InputSelect';
+import AddDocumentModal from '../../component/document_repository/modal/AddDocumentModal';
+import { IDocument } from '../../store/slice/editForm.slice';
 
 const DocumentRepository = () => {
-  const { company } = useAuthState()
+  const { company } = useAuthState();
 
-  const { setDocumentEditData } = useEditFormStore()
+  const { setDocumentEditData } = useEditFormStore();
 
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState('');
 
-  const [debouncedQuery] = useDebouncedValue(query, 200)
+  const [debouncedQuery] = useDebouncedValue(query, 200);
 
-  const [categoryId, setCategoryId] = useState('')
+  const [categoryId, setCategoryId] = useState('');
 
   const {
     data: snapshotData,
@@ -56,17 +56,17 @@ const DocumentRepository = () => {
         lastDoc: pageParam,
         searchQuery: debouncedQuery,
         cmpId: company!.CompanyId,
-      })
-      return snapshot.docs
+      });
+      return snapshot.docs;
     },
     getNextPageParam: (lastPage) => {
       if (lastPage?.length === 0) {
-        return null
+        return null;
       }
       if (lastPage?.length === DisplayCount.DOCUMENT_LIST) {
-        return lastPage.at(-1)
+        return lastPage.at(-1);
       }
-      return null
+      return null;
     },
     initialPageParam: null as null | DocumentData,
     enabled:
@@ -74,44 +74,44 @@ const DocumentRepository = () => {
       debouncedQuery.trim().length < MinimumQueryCharacter.DOCUMENT
         ? false
         : true,
-  })
+  });
 
   const [data, setData] = useState<IDocumentsCollection[]>(() => {
     if (snapshotData) {
       return snapshotData.pages.flatMap((page) =>
         page.map((doc) => doc.data() as IDocumentsCollection)
-      )
+      );
     }
-    return []
-  })
+    return [];
+  });
 
   useEffect(() => {
-    console.log(error, 'error')
-  }, [error])
+    console.log(error, 'error');
+  }, [error]);
 
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
     if (snapshotData) {
-      const docData: IDocumentsCollection[] = []
+      const docData: IDocumentsCollection[] = [];
       snapshotData.pages?.forEach((page) => {
         page?.forEach((doc) => {
-          const data = doc.data() as IDocumentsCollection
-          docData.push(data)
-        })
-      })
-      setData(docData)
+          const data = doc.data() as IDocumentsCollection;
+          docData.push(data);
+        });
+      });
+      setData(docData);
     }
-  }, [snapshotData])
+  }, [snapshotData]);
 
   // hook for pagination
-  const { ref, inView } = useInView()
+  const { ref, inView } = useInView();
 
   // this is for pagination
   useEffect(() => {
     if (inView && hasNextPage && !isFetching) {
-      fetchNextPage()
+      fetchNextPage();
     }
-  }, [fetchNextPage, inView, hasNextPage, isFetching])
+  }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
   //* Fetch document categories
   const { data: categoriesSnapshot, isLoading: isCategoriesLoading } = useQuery(
@@ -120,31 +120,31 @@ const DocumentRepository = () => {
       queryFn: async () => {
         const snapshot = await DbCompany.getDocumentCategories(
           company!.CompanyId
-        )
-        return snapshot.docs
+        );
+        return snapshot.docs;
       },
     }
-  )
+  );
 
   const [categories, setCategories] = useState<IDocumentCategories[]>(() => {
     if (categoriesSnapshot) {
-      return categoriesSnapshot.map((doc) => doc.data() as IDocumentCategories)
+      return categoriesSnapshot.map((doc) => doc.data() as IDocumentCategories);
     }
-    return []
-  })
+    return [];
+  });
 
   useEffect(() => {
     if (categoriesSnapshot) {
       const docData = categoriesSnapshot.map(
         (doc) => doc.data() as IDocumentCategories
-      )
-      setCategories(docData)
+      );
+      setCategories(docData);
     }
-  }, [categoriesSnapshot])
+  }, [categoriesSnapshot]);
 
-  const [documentCategoriesModal, setDocumentCategoriesModal] = useState(false)
+  const [documentCategoriesModal, setDocumentCategoriesModal] = useState(false);
 
-  const [addDocumentModal, setAddDocumentModal] = useState(false)
+  const [addDocumentModal, setAddDocumentModal] = useState(false);
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -159,8 +159,8 @@ const DocumentRepository = () => {
           <Button
             label="Add New Document"
             onClick={() => {
-              setDocumentEditData(null)
-              setAddDocumentModal(true)
+              setDocumentEditData(null);
+              setAddDocumentModal(true);
             }}
             type="black"
           />
@@ -194,7 +194,7 @@ const DocumentRepository = () => {
             return {
               label: cat.DocumentCategoryName,
               value: cat.DocumentCategoryId,
-            }
+            };
           })}
           value={categoryId}
           onChange={(e) => setCategoryId(e as string)}
@@ -225,8 +225,8 @@ const DocumentRepository = () => {
                 <tr key={doc.DocumentId} className="cursor-pointer">
                   <td
                     onClick={() => {
-                      setDocumentEditData(doc as unknown as IDocument)
-                      setAddDocumentModal(true)
+                      setDocumentEditData(doc as unknown as IDocument);
+                      setAddDocumentModal(true);
                     }}
                     className="align-top px-4 py-2 text-start"
                   >
@@ -244,8 +244,8 @@ const DocumentRepository = () => {
                   </td>
                   <td
                     onClick={() => {
-                      setDocumentEditData(doc as unknown as IDocument)
-                      setAddDocumentModal(true)
+                      setDocumentEditData(doc as unknown as IDocument);
+                      setAddDocumentModal(true);
                     }}
                     className="align-top px-4 py-2 text-end"
                   >
@@ -256,8 +256,8 @@ const DocumentRepository = () => {
                   </td>
                   <td
                     onClick={() => {
-                      setDocumentEditData(doc as unknown as IDocument)
-                      setAddDocumentModal(true)
+                      setDocumentEditData(doc as unknown as IDocument);
+                      setAddDocumentModal(true);
                     }}
                     className="align-top px-4 py-2 text-end"
                   >
@@ -266,7 +266,7 @@ const DocumentRepository = () => {
                     </span>
                   </td>
                 </tr>
-              )
+              );
             })
           )}
           <tr ref={ref}>
@@ -280,7 +280,7 @@ const DocumentRepository = () => {
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
-export default DocumentRepository
+export default DocumentRepository;

@@ -1,39 +1,39 @@
-import React from 'react'
-import { IEmpCertificatesDetails } from '../../@types/database'
-import { MdClose } from 'react-icons/md'
-import { showSnackbar } from '../../utilities/TsxUtils'
-import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
+import React from 'react';
+import { IEmpCertificatesDetails } from '../../@types/database';
+import { MdClose } from 'react-icons/md';
+import { showSnackbar } from '../../utilities/TsxUtils';
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
 
 export interface EmpCertificates
   extends Omit<IEmpCertificatesDetails, 'CertificateDoc'> {
-  CertificateDoc: File | string
+  CertificateDoc: File | string;
 }
 
 const EmpCertificateDetails = ({
   certificates,
   setCertificates,
 }: {
-  certificates: EmpCertificates[]
-  setCertificates: React.Dispatch<React.SetStateAction<EmpCertificates[]>>
+  certificates: EmpCertificates[];
+  setCertificates: React.Dispatch<React.SetStateAction<EmpCertificates[]>>;
 }) => {
   const handleNameChange = (index: number, value: string) => {
-    const updatedCertificates = [...certificates]
-    updatedCertificates[index].CertificateName = value
-    setCertificates(updatedCertificates)
-  }
+    const updatedCertificates = [...certificates];
+    updatedCertificates[index].CertificateName = value;
+    setCertificates(updatedCertificates);
+  };
 
   const handlePdfChange = (index: number, file: File) => {
     if (file.size > 200000) {
       showSnackbar({
         message: 'File size must be less than 200kb',
         type: 'error',
-      })
-      return
+      });
+      return;
     }
-    const updatedCertificates = [...certificates]
-    updatedCertificates[index].CertificateDoc = file
-    setCertificates(updatedCertificates)
-  }
+    const updatedCertificates = [...certificates];
+    updatedCertificates[index].CertificateDoc = file;
+    setCertificates(updatedCertificates);
+  };
 
   const handleAddMore = () => {
     // Check if any of the existing certificates are incomplete
@@ -46,19 +46,19 @@ const EmpCertificateDetails = ({
       showSnackbar({
         message: 'Please complete all certificates before adding more',
         type: 'error',
-      })
-      return
+      });
+      return;
     }
     setCertificates([
       ...certificates,
       { CertificateName: '', CertificateDoc: '' },
-    ])
-  }
+    ]);
+  };
 
   const handleRemove = (index: number) => {
-    const updatedCertificates = certificates.filter((_, i) => i !== index)
-    setCertificates(updatedCertificates)
-  }
+    const updatedCertificates = certificates.filter((_, i) => i !== index);
+    setCertificates(updatedCertificates);
+  };
   return (
     <div className="space-y-4">
       {certificates.map((certificate, index) => (
@@ -123,7 +123,7 @@ const EmpCertificateDetails = ({
         Add {certificates.length > 0 ? 'More' : 'New'}
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default EmpCertificateDetails
+export default EmpCertificateDetails;

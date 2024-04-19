@@ -1,12 +1,12 @@
-import { IInvoicesCollection } from '../@types/database'
-import { Company } from '../store/slice/auth.slice'
-import { numberFormatter } from './NumberFormater'
-import { formatDate } from './misc'
+import { IInvoicesCollection } from '../@types/database';
+import { Company } from '../store/slice/auth.slice';
+import { numberFormatter } from './NumberFormater';
+import { formatDate } from './misc';
 
 interface GenerateInvoiceHTMLArgs {
-  invoiceData: IInvoicesCollection
-  companyDetails: Company
-  clientBalance: number
+  invoiceData: IInvoicesCollection;
+  companyDetails: Company;
+  clientBalance: number;
 }
 
 export async function generateInvoiceHTML({
@@ -14,7 +14,7 @@ export async function generateInvoiceHTML({
   invoiceData,
   clientBalance,
 }: GenerateInvoiceHTMLArgs) {
-  const { InvoiceItems, InvoiceTaxList } = invoiceData
+  const { InvoiceItems, InvoiceTaxList } = invoiceData;
 
   const itemsHTML = InvoiceItems.map(
     (item) => `
@@ -25,7 +25,7 @@ export async function generateInvoiceHTML({
       <td>${numberFormatter(item.ItemTotal, true)}</td>
     </tr>
   `
-  ).join('')
+  ).join('');
 
   const taxesHTML = InvoiceTaxList.map(
     (tax) => `
@@ -34,7 +34,7 @@ export async function generateInvoiceHTML({
       <td>${numberFormatter(tax.TaxAmount, true)}</td>
     </tr>
   `
-  ).join('')
+  ).join('');
 
   return `
   <!DOCTYPE html>
@@ -145,5 +145,5 @@ export async function generateInvoiceHTML({
         </div>
       </body>
     </html>
-  `
+  `;
 }

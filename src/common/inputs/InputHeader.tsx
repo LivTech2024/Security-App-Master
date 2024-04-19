@@ -1,9 +1,9 @@
-import { twMerge } from 'tailwind-merge'
+import { twMerge } from 'tailwind-merge';
 
 interface IInputHeaderProps {
-  title: string
-  className?: string
-  fontClassName?: string
+  title: string;
+  className?: string;
+  fontClassName?: string;
 }
 const InputHeader = ({
   title,
@@ -21,7 +21,7 @@ const InputHeader = ({
         {title}
       </span>
     </div>
-  )
-}
+  );
+};
 
-export default InputHeader
+export default InputHeader;

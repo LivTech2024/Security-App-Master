@@ -1,7 +1,7 @@
-import notFoundSvg from '../../public/assets/not_found.svg'
+import notFoundSvg from '../../public/assets/not_found.svg';
 
 interface NotFoundProps {
-  title?: string
+  title?: string;
 }
 
 const NotFound = ({ title = 'No item' }: NotFoundProps) => {
@@ -16,7 +16,7 @@ const NotFound = ({ title = 'No item' }: NotFoundProps) => {
       </div>
       <div className="font-semibold  text-lg text-textTertiary">{title}</div>
     </div>
-  )
-}
+  );
+};
 
-export default NotFound
+export default NotFound;

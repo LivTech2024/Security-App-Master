@@ -1,15 +1,15 @@
-import { closeAllModals, ContextModalProps } from '@mantine/modals'
-import { MdOutlineClose } from 'react-icons/md'
+import { closeAllModals, ContextModalProps } from '@mantine/modals';
+import { MdOutlineClose } from 'react-icons/md';
 
 export const ContextConfirmModal = ({
   innerProps,
 }: ContextModalProps<{
-  title: string
-  body: string
-  negativeLabel?: string
-  positiveLabel?: string
-  onConfirm: () => void
-  onCancel?: () => void
+  title: string;
+  body: string;
+  negativeLabel?: string;
+  positiveLabel?: string;
+  onConfirm: () => void;
+  onCancel?: () => void;
 }>) => {
   return (
     <div className="flex flex-col remove-horizontal-scrollbar">
@@ -18,8 +18,8 @@ export const ContextConfirmModal = ({
           <div className="font-semibold text-lg">{innerProps.title}</div>
           <div
             onClick={() => {
-              innerProps.onCancel && innerProps.onCancel()
-              closeAllModals()
+              innerProps.onCancel && innerProps.onCancel();
+              closeAllModals();
             }}
             className="ml-auto hover:bg-onHoverBg  duration-200 rounded-full p-2 cursor-pointer"
           >
@@ -35,8 +35,8 @@ export const ContextConfirmModal = ({
         <div className="flex ml-auto gap-x-4 mb-2 ">
           <button
             onClick={() => {
-              innerProps.onCancel && innerProps.onCancel()
-              closeAllModals()
+              innerProps.onCancel && innerProps.onCancel();
+              closeAllModals();
             }}
             className="bg-surface font-medium px-5 py-1 rounded hover:bg-onHoverBgLight active:bg-onSecondary duration-200 dark:text-textPrimaryLight"
           >
@@ -45,8 +45,8 @@ export const ContextConfirmModal = ({
 
           <button
             onClick={() => {
-              innerProps.onConfirm && innerProps.onConfirm()
-              closeAllModals()
+              innerProps.onConfirm && innerProps.onConfirm();
+              closeAllModals();
             }}
             type="button"
             className="font-medium bg-secondary hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg duration-200 px-5 py-1 text-surface rounded"
@@ -56,5 +56,5 @@ export const ContextConfirmModal = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

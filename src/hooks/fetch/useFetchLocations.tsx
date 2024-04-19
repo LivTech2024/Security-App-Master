@@ -1,28 +1,28 @@
-import { useEffect, useState } from 'react'
-import { useAuthState } from '../../store'
-import { ILocationsCollection } from '../../@types/database'
-import { MinimumQueryCharacter } from '../../@types/enum'
-import DbCompany from '../../firebase_configs/DB/DbCompany'
+import { useEffect, useState } from 'react';
+import { useAuthState } from '../../store';
+import { ILocationsCollection } from '../../@types/database';
+import { MinimumQueryCharacter } from '../../@types/enum';
+import DbCompany from '../../firebase_configs/DB/DbCompany';
 
 interface Props {
-  limit: number
-  searchQuery?: string | null
+  limit: number;
+  searchQuery?: string | null;
 }
 
 const useFetchLocations = ({ limit, searchQuery }: Props) => {
-  const [data, setData] = useState<ILocationsCollection[]>([])
+  const [data, setData] = useState<ILocationsCollection[]>([]);
 
-  const { company } = useAuthState()
+  const { company } = useAuthState();
 
   useEffect(() => {
-    if (!company) return
+    if (!company) return;
 
     if (
       searchQuery &&
       searchQuery.trim().length > 0 &&
       searchQuery.trim().length < MinimumQueryCharacter.LOCATION
     ) {
-      return
+      return;
     }
     const fetchInitialLocations = async () => {
       const snapshot = await DbCompany.getLocations({
@@ -34,28 +34,28 @@ const useFetchLocations = ({ limit, searchQuery }: Props) => {
             ? searchQuery.trim()
             : undefined,
         cmpId: company.CompanyId,
-      })
+      });
       return snapshot.docs
         .map((doc) => {
-          const data = doc.data() as ILocationsCollection
+          const data = doc.data() as ILocationsCollection;
           if (data) {
-            return data
+            return data;
           }
-          return null
+          return null;
         })
-        .filter((item) => item !== null) as ILocationsCollection[]
-    }
+        .filter((item) => item !== null) as ILocationsCollection[];
+    };
 
     try {
       fetchInitialLocations().then((arr) => {
-        setData(arr)
-      })
+        setData(arr);
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }, [limit, company, searchQuery])
+  }, [limit, company, searchQuery]);
 
-  return { data }
-}
+  return { data };
+};
 
-export default useFetchLocations
+export default useFetchLocations;

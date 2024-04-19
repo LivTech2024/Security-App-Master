@@ -1,39 +1,39 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { IReportsCollection } from '../../@types/database'
-import DbCompany from '../../firebase_configs/DB/DbCompany'
-import NoSearchResult from '../../common/NoSearchResult'
-import { IoArrowBackCircle } from 'react-icons/io5'
-import { formatDate } from '../../utilities/misc'
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { IReportsCollection } from '../../@types/database';
+import DbCompany from '../../firebase_configs/DB/DbCompany';
+import NoSearchResult from '../../common/NoSearchResult';
+import { IoArrowBackCircle } from 'react-icons/io5';
+import { formatDate } from '../../utilities/misc';
 
 const ReportView = () => {
-  const [searchParam] = useSearchParams()
+  const [searchParam] = useSearchParams();
 
-  const reportId = searchParam.get('id')
+  const reportId = searchParam.get('id');
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
-  const [data, setData] = useState<IReportsCollection | null>(null)
+  const [data, setData] = useState<IReportsCollection | null>(null);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!reportId) return
+    if (!reportId) return;
     DbCompany?.getReportById(reportId).then((snapshot) => {
-      const reportData = snapshot.data() as IReportsCollection
+      const reportData = snapshot.data() as IReportsCollection;
       if (reportData) {
-        setData(reportData)
+        setData(reportData);
       }
-      setLoading(false)
-    })
-  }, [reportId])
+      setLoading(false);
+    });
+  }, [reportId]);
 
   if (!data && !loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <NoSearchResult />
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -52,7 +52,7 @@ const ReportView = () => {
         </div>
         <div className="h-[40vh] bg-shimmerColor w-full"></div>
       </div>
-    )
+    );
   }
 
   if (data)
@@ -106,7 +106,7 @@ const ReportView = () => {
                         <a href={img} target="_blank">
                           {img}
                         </a>
-                      )
+                      );
                     })
                   : 'N/A'}
               </div>
@@ -125,7 +125,7 @@ const ReportView = () => {
                         >
                           {src}
                         </a>
-                      )
+                      );
                     })
                   : 'N/A'}
               </div>
@@ -133,7 +133,7 @@ const ReportView = () => {
           </div>
         </div>
       </div>
-    )
-}
+    );
+};
 
-export default ReportView
+export default ReportView;

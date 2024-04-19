@@ -1,14 +1,14 @@
-import { Path, UseFormRegister } from 'react-hook-form'
+import { Path, UseFormRegister } from 'react-hook-form';
 
 interface InputRadioProps<FormFields extends Record<string, unknown>> {
-  label?: string
-  value?: string | number
-  checked?: boolean
-  onChange?: React.ChangeEventHandler<HTMLInputElement>
-  type?: 'radio' | 'checkbox'
-  disabled?: boolean
-  register?: UseFormRegister<FormFields>
-  name?: Path<FormFields>
+  label?: string;
+  value?: string | number;
+  checked?: boolean;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  type?: 'radio' | 'checkbox';
+  disabled?: boolean;
+  register?: UseFormRegister<FormFields>;
+  name?: Path<FormFields>;
 }
 
 const InputRadio = <FormFields extends Record<string, unknown>>({
@@ -49,7 +49,7 @@ const InputRadio = <FormFields extends Record<string, unknown>>({
         <span className="text-lg mt-[2px]">&nbsp;</span>
       )}
     </label>
-  )
-}
+  );
+};
 
-export default InputRadio
+export default InputRadio;

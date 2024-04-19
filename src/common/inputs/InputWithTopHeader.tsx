@@ -1,31 +1,31 @@
-import { FormEvent, useState } from 'react'
-import { Path, UseFormRegister } from 'react-hook-form'
-import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
-import InputHeader from './InputHeader'
-import InputError from './InputError'
+import { FormEvent, useState } from 'react';
+import { Path, UseFormRegister } from 'react-hook-form';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import InputHeader from './InputHeader';
+import InputError from './InputError';
 
 interface InputWithTopHeaderProps<FormFields extends Record<string, unknown>> {
-  label?: string
-  placeholder?: string
-  className?: string
-  fontClassName?: string
-  leadingIcon?: JSX.Element
-  tailIcon?: JSX.Element
-  onTailIconClick?: () => void
-  register?: UseFormRegister<FormFields>
-  name?: Path<FormFields>
-  error?: string | undefined
-  value?: string | number
-  onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined
-  disabled?: boolean
-  disableReason?: string
-  decimalCount?: number
-  inputRef?: React.LegacyRef<HTMLInputElement> | undefined
-  onFocus?: () => void
-  onBlur?: () => void
-  isUppercase?: boolean
-  inputMaxLength?: number
-  inputType?: 'text' | 'password' | 'date'
+  label?: string;
+  placeholder?: string;
+  className?: string;
+  fontClassName?: string;
+  leadingIcon?: JSX.Element;
+  tailIcon?: JSX.Element;
+  onTailIconClick?: () => void;
+  register?: UseFormRegister<FormFields>;
+  name?: Path<FormFields>;
+  error?: string | undefined;
+  value?: string | number;
+  onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined;
+  disabled?: boolean;
+  disableReason?: string;
+  decimalCount?: number;
+  inputRef?: React.LegacyRef<HTMLInputElement> | undefined;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  isUppercase?: boolean;
+  inputMaxLength?: number;
+  inputType?: 'text' | 'password' | 'date';
   inputMode?:
     | 'text'
     | 'search'
@@ -34,7 +34,7 @@ interface InputWithTopHeaderProps<FormFields extends Record<string, unknown>> {
     | 'url'
     | 'none'
     | 'numeric'
-    | 'decimal'
+    | 'decimal';
 }
 
 const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
@@ -62,33 +62,33 @@ const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
 }: InputWithTopHeaderProps<FormFields>) => {
   const [isInputHidden, setIsInputHidden] = useState(
     inputType === 'password' ? true : false
-  )
+  );
 
   const handleInputChange = (event: FormEvent<HTMLInputElement>) => {
     if (isUppercase) {
-      const input = event.target as HTMLInputElement
-      input.value = input.value.toUpperCase()
+      const input = event.target as HTMLInputElement;
+      input.value = input.value.toUpperCase();
     }
-    const input = event.target as HTMLInputElement
+    const input = event.target as HTMLInputElement;
     if (inputMaxLength && input.value.length > inputMaxLength) {
-      input.value = input.value.slice(0, inputMaxLength)
+      input.value = input.value.slice(0, inputMaxLength);
     }
     if (typeof decimalCount === 'number') {
       if (input.value.includes('.')) {
-        let decimalPart = input.value.split('.')[1]
+        let decimalPart = input.value.split('.')[1];
         if (decimalPart.length > decimalCount) {
-          decimalPart = decimalPart.slice(0, decimalCount)
+          decimalPart = decimalPart.slice(0, decimalCount);
         }
-        input.value = input.value.split('.')[0] + '.' + decimalPart
-        input.value = input.value.replace(/[^\d.]/g, '')
+        input.value = input.value.split('.')[0] + '.' + decimalPart;
+        input.value = input.value.replace(/[^\d.]/g, '');
       } else {
-        input.value = input.value.replace(/[^\d.]/g, '')
+        input.value = input.value.replace(/[^\d.]/g, '');
       }
     } else if (decimalCount === 0) {
-      const input = event.target as HTMLInputElement
-      input.value = input.value.replace(/\D/g, '')
+      const input = event.target as HTMLInputElement;
+      input.value = input.value.replace(/\D/g, '');
     }
-  }
+  };
 
   return (
     <div className={`gap-1 flex flex-col ${className}`}>
@@ -120,7 +120,7 @@ const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
                 : inputType
             }
             onInput={(event) => {
-              handleInputChange(event)
+              handleInputChange(event);
             }}
             onBlur={onBlur}
             className={`w-full text-lg py-2  ${
@@ -145,7 +145,7 @@ const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
                 : inputType
             }
             onInput={(event) => {
-              handleInputChange(event)
+              handleInputChange(event);
             }}
             className={`w-full text-lg py-2 ${
               leadingIcon ? 'pl-0' : 'pl-2'
@@ -184,7 +184,7 @@ const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
       </div>
       {error && <InputError errorMessage={error} />}
     </div>
-  )
-}
+  );
+};
 
-export default InputWithTopHeader
+export default InputWithTopHeader;

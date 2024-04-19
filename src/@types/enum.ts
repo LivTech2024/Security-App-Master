@@ -32,7 +32,7 @@ export const DisplayCount = {
   DOCUMENT_LIST: 20,
   EQUIPMENT_LIST: 20,
   EQUIPMENT_ALLOCATION_LIST: 20,
-} as const
+} as const;
 
 export const REACT_QUERY_KEYS = {
   EMPLOYEE_LIST: 'employee-list',
@@ -48,7 +48,7 @@ export const REACT_QUERY_KEYS = {
   DOCUMENT_CATEGORIES: 'document-categories',
   EQUIPMENT_LIST: 'equipment-list',
   EQUIPMENT_ALLOCATION_LIST: 'equipment-allocation-list',
-} as const
+} as const;
 
 export const MinimumQueryCharacter = {
   EMPLOYEE: 1,
@@ -57,14 +57,14 @@ export const MinimumQueryCharacter = {
   CLIENT: 1,
   DOCUMENT: 1,
   EQUIPMENT: 1,
-} as const
+} as const;
 
 export const CloudStoragePaths = {
   EMPLOYEES_IMAGES: 'employees/images/',
   EMPLOYEES_DOCUMENTS: 'employees/documents',
   COMPANIES_LOGOS: 'companies/logos',
   DOCUMENTS: 'documents',
-}
+};
 
 export const ImageResolution = {
   EMP_IMAGE_WIDTH: 720,
@@ -75,7 +75,7 @@ export const ImageResolution = {
   EMP_VOID_CHECK_HEIGHT: 480,
   COMPANY_LOGO_WIDTH: 1200,
   COMPANY_LOGO_HEIGHT: 1200,
-}
+};
 
 export const PageRoutes = {
   HOME: '/',
@@ -107,12 +107,13 @@ export const PageRoutes = {
   CLIENT_PORTAL_PATROLS: '/client_portal/patrols',
   CLIENT_PORTAL_PATROL_VIEW: '/client_portal/patrol_view',
   CLIENT_PORTAL_REPORTS: '/client_portal/reports',
-}
+  CLIENT_PORTAL_REPORT_VIEW: '/client_portal/report_view',
+};
 
 export const LocalStorageKey = {
   LOGGEDIN_USER: 'loggedInUser',
   SELECTED_BRANCH: 'selectedBranch',
-}
+};
 
 export enum IUserType {
   ADMIN = 'admin',
@@ -121,10 +122,10 @@ export enum IUserType {
 }
 
 export interface LocalStorageLoggedInUserData {
-  LoggedInId: string
-  LoggedInUserId: string
-  LoggedInCrypt: string
-  LoggedInAuthUserType: IUserType
+  LoggedInId: string;
+  LoggedInUserId: string;
+  LoggedInCrypt: string;
+  LoggedInAuthUserType: IUserType;
 }
 
 export enum ScheduleView {

@@ -1,15 +1,15 @@
-import { useNavigate } from 'react-router-dom'
-import { IPatrolsCollection } from '../../@types/database'
-import NoSearchResult from '../../common/NoSearchResult'
-import TableShimmer from '../../common/shimmer/TableShimmer'
-import { PatrolStatus } from './PatrolStatus'
+import { useNavigate } from 'react-router-dom';
+import { IPatrolsCollection } from '../../@types/database';
+import NoSearchResult from '../../common/NoSearchResult';
+import TableShimmer from '../../common/shimmer/TableShimmer';
+import { PatrolStatus } from './PatrolStatus';
 
 interface PatrollingListTableProps {
-  data: IPatrolsCollection[]
-  isLoading: boolean
-  isFetchingNextPage: boolean
-  redirectOnClick: string
-  ref: (node?: Element | null | undefined) => void
+  data: IPatrolsCollection[];
+  isLoading: boolean;
+  isFetchingNextPage: boolean;
+  redirectOnClick: string;
+  ref: (node?: Element | null | undefined) => void;
 }
 
 const PatrolListTable = ({
@@ -19,7 +19,7 @@ const PatrolListTable = ({
   redirectOnClick,
   ref,
 }: PatrollingListTableProps) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <table className="rounded overflow-hidden w-full">
       <thead className="bg-primary text-surface text-sm">
@@ -80,7 +80,7 @@ const PatrolListTable = ({
                   />
                 </td>
               </tr>
-            )
+            );
           })
         )}
         <tr ref={ref}>
@@ -93,7 +93,7 @@ const PatrolListTable = ({
         </tr>
       </tbody>
     </table>
-  )
-}
+  );
+};
 
-export default PatrolListTable
+export default PatrolListTable;

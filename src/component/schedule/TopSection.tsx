@@ -1,13 +1,13 @@
-import React from 'react'
-import { Select } from '@mantine/core'
-import { FaCircleChevronLeft, FaCircleChevronRight } from 'react-icons/fa6'
-import { useEditFormStore } from '../../store'
-import dayjs from 'dayjs'
-import { DatePickerInput } from '@mantine/dates'
-import { MdCalendarToday } from 'react-icons/md'
-import { PageRoutes, ScheduleView } from '../../@types/enum'
-import { useNavigate } from 'react-router-dom'
-import Button from '../../common/button/Button'
+import React from 'react';
+import { Select } from '@mantine/core';
+import { FaCircleChevronLeft, FaCircleChevronRight } from 'react-icons/fa6';
+import { useEditFormStore } from '../../store';
+import dayjs from 'dayjs';
+import { DatePickerInput } from '@mantine/dates';
+import { MdCalendarToday } from 'react-icons/md';
+import { PageRoutes, ScheduleView } from '../../@types/enum';
+import { useNavigate } from 'react-router-dom';
+import Button from '../../common/button/Button';
 
 const TopSection = ({
   selectedDate,
@@ -18,17 +18,17 @@ const TopSection = ({
   setSelectedView,
   isSelectTenureDisabled = false,
 }: {
-  selectedDate: Date
-  setSelectedDate: React.Dispatch<React.SetStateAction<Date>>
-  isSelectTenureDisabled?: boolean
-  selectedTenure: 'weekly' | 'monthly'
-  setSelectedTenure: React.Dispatch<React.SetStateAction<'weekly' | 'monthly'>>
-  selectedView: ScheduleView
-  setSelectedView: React.Dispatch<React.SetStateAction<ScheduleView>>
+  selectedDate: Date;
+  setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
+  isSelectTenureDisabled?: boolean;
+  selectedTenure: 'weekly' | 'monthly';
+  setSelectedTenure: React.Dispatch<React.SetStateAction<'weekly' | 'monthly'>>;
+  selectedView: ScheduleView;
+  setSelectedView: React.Dispatch<React.SetStateAction<ScheduleView>>;
 }) => {
-  const { setShiftEditData } = useEditFormStore()
+  const { setShiftEditData } = useEditFormStore();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col w-full gap-4">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -44,8 +44,8 @@ const TopSection = ({
           <Button
             label="Add new shift"
             onClick={() => {
-              setShiftEditData(null)
-              navigate(PageRoutes.SHIFT_CREATE_OR_EDIT)
+              setShiftEditData(null);
+              navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
             }}
             type="black"
             className="px-4 py-2"
@@ -59,8 +59,8 @@ const TopSection = ({
           allowDeselect={false}
           value={selectedView}
           onChange={(e) => {
-            console.log(e)
-            setSelectedView(e as ScheduleView)
+            console.log(e);
+            setSelectedView(e as ScheduleView);
           }}
           data={[
             { label: 'Calendar view', value: ScheduleView.CALENDAR_VIEW },
@@ -147,7 +147,7 @@ const TopSection = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TopSection
+export default TopSection;

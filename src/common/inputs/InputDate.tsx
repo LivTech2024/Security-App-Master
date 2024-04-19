@@ -1,18 +1,18 @@
-import { DateInput, DatePickerInput } from '@mantine/dates'
-import React from 'react'
-import { MdCalendarToday } from 'react-icons/md'
+import { DateInput, DatePickerInput } from '@mantine/dates';
+import React from 'react';
+import { MdCalendarToday } from 'react-icons/md';
 
 interface InputDateProps {
-  value?: Date | null
-  setValue?: React.Dispatch<React.SetStateAction<Date | null>>
-  rangeValue?: [Date | null, Date | null]
+  value?: Date | null;
+  setValue?: React.Dispatch<React.SetStateAction<Date | null>>;
+  rangeValue?: [Date | null, Date | null];
   rangeOnChange?: React.Dispatch<
     React.SetStateAction<[Date | null, Date | null]>
-  >
-  label?: string
-  error?: string
-  id?: string
-  type?: 'default' | 'range'
+  >;
+  label?: string;
+  error?: string;
+  id?: string;
+  type?: 'default' | 'range';
 }
 
 const InputDate = ({
@@ -115,7 +115,7 @@ const InputDate = ({
         <small className="text-red-600 text-xs px-1 text-start">{error}</small>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default InputDate
+export default InputDate;

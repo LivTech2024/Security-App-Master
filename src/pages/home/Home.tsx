@@ -3,26 +3,26 @@ import {
   MdEmergencyShare,
   MdOutlineSensors,
   MdPeople,
-} from 'react-icons/md'
-import { useAuthState } from '../../store'
-import { useNavigate } from 'react-router-dom'
-import { AiOutlineAudit, AiOutlineSchedule } from 'react-icons/ai'
-import { SiAdguard } from 'react-icons/si'
+} from 'react-icons/md';
+import { useAuthState } from '../../store';
+import { useNavigate } from 'react-router-dom';
+import { AiOutlineAudit, AiOutlineSchedule } from 'react-icons/ai';
+import { SiAdguard } from 'react-icons/si';
 import {
   FaClock,
   FaCommentDots,
   FaExclamationTriangle,
   FaTasks,
   FaToolbox,
-} from 'react-icons/fa'
-import { PageRoutes } from '../../@types/enum'
-import { RiBillLine } from 'react-icons/ri'
-import SelectBranch from '../../common/SelectBranch'
-import { useState } from 'react'
-import { IoMdDocument } from 'react-icons/io'
-import { GrCertificate } from 'react-icons/gr'
-import { FaPeopleGroup } from 'react-icons/fa6'
-import { TbReport } from 'react-icons/tb'
+} from 'react-icons/fa';
+import { PageRoutes } from '../../@types/enum';
+import { RiBillLine } from 'react-icons/ri';
+import SelectBranch from '../../common/SelectBranch';
+import { useState } from 'react';
+import { IoMdDocument } from 'react-icons/io';
+import { GrCertificate } from 'react-icons/gr';
+import { FaPeopleGroup } from 'react-icons/fa6';
+import { TbReport } from 'react-icons/tb';
 
 const HomeItem = ({
   name,
@@ -30,12 +30,12 @@ const HomeItem = ({
   path,
   icon,
 }: {
-  name: string
-  icon?: React.ReactNode
-  path?: string
-  callback?: () => void
+  name: string;
+  icon?: React.ReactNode;
+  path?: string;
+  callback?: () => void;
 }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <div
       onClick={() => (path ? navigate(path) : callback && callback())}
@@ -47,13 +47,13 @@ const HomeItem = ({
 
       <span className={`capitalize ${icon && 'line-clamp-1'}`}>{name}</span>
     </div>
-  )
-}
+  );
+};
 
 const Home = () => {
-  const { company } = useAuthState()
+  const { company } = useAuthState();
 
-  const [selectedBranch, setSelectedBranch] = useState('')
+  const [selectedBranch, setSelectedBranch] = useState('');
 
   return (
     <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center bg-primary">
@@ -166,7 +166,7 @@ const Home = () => {
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

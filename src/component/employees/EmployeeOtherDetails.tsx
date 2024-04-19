@@ -1,29 +1,31 @@
-import { Accordion } from '@mantine/core'
-import EmpCertificateDetails, { EmpCertificates } from './EmpCertificateDetails'
-import EmpLicenses from './EmpLicenses'
-import EmpBankDetails from './EmpBankDetails'
-import { IEmpBankDetails } from '../../@types/database'
-import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
-import { useFormContext } from 'react-hook-form'
-import { AddEmployeeFormField } from '../../utilities/zod/schema'
-import EmpAddressDetails from './EmpAddressDetails'
+import { Accordion } from '@mantine/core';
+import EmpCertificateDetails, {
+  EmpCertificates,
+} from './EmpCertificateDetails';
+import EmpLicenses from './EmpLicenses';
+import EmpBankDetails from './EmpBankDetails';
+import { IEmpBankDetails } from '../../@types/database';
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
+import { useFormContext } from 'react-hook-form';
+import { AddEmployeeFormField } from '../../utilities/zod/schema';
+import EmpAddressDetails from './EmpAddressDetails';
 
 export interface EmpLicenseDetails {
-  LicenseType: 'driving' | 'security'
-  LicenseNumber: string
-  LicenseExpDate: Date | null
-  LicenseImg: string | null
+  LicenseType: 'driving' | 'security';
+  LicenseNumber: string;
+  LicenseExpDate: Date | null;
+  LicenseImg: string | null;
 }
 
 interface EmployeeOtherDetailsProps {
-  empLicenseDetails: EmpLicenseDetails[]
+  empLicenseDetails: EmpLicenseDetails[];
   setEmpLicenseDetails: React.Dispatch<
     React.SetStateAction<EmpLicenseDetails[]>
-  >
-  empBankDetails: IEmpBankDetails
-  setEmpBankDetails: React.Dispatch<React.SetStateAction<IEmpBankDetails>>
-  certificates: EmpCertificates[]
-  setCertificates: React.Dispatch<React.SetStateAction<EmpCertificates[]>>
+  >;
+  empBankDetails: IEmpBankDetails;
+  setEmpBankDetails: React.Dispatch<React.SetStateAction<IEmpBankDetails>>;
+  certificates: EmpCertificates[];
+  setCertificates: React.Dispatch<React.SetStateAction<EmpCertificates[]>>;
 }
 
 const EmployeeOtherDetails = ({
@@ -37,7 +39,7 @@ const EmployeeOtherDetails = ({
   const {
     register,
     formState: { errors },
-  } = useFormContext<AddEmployeeFormField>()
+  } = useFormContext<AddEmployeeFormField>();
 
   return (
     <div className="flex flex-col gap-4 p-4 bg-gray-100 rounded-lg shadow-md w-full">
@@ -104,7 +106,7 @@ const EmployeeOtherDetails = ({
         </Accordion.Item>
       </Accordion>
     </div>
-  )
-}
+  );
+};
 
-export default EmployeeOtherDetails
+export default EmployeeOtherDetails;

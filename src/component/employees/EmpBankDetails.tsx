@@ -1,30 +1,30 @@
-import { FaMoneyBillWave } from 'react-icons/fa'
-import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
-import { IEmpBankDetails } from '../../@types/database'
-import { ChangeEvent } from 'react'
+import { FaMoneyBillWave } from 'react-icons/fa';
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
+import { IEmpBankDetails } from '../../@types/database';
+import { ChangeEvent } from 'react';
 
 const EmpBankDetails = ({
   empBankDetails,
   setEmpBankDetails,
 }: {
-  empBankDetails: IEmpBankDetails
-  setEmpBankDetails: React.Dispatch<React.SetStateAction<IEmpBankDetails>>
+  empBankDetails: IEmpBankDetails;
+  setEmpBankDetails: React.Dispatch<React.SetStateAction<IEmpBankDetails>>;
 }) => {
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
         setEmpBankDetails((prev) => {
           return {
             ...prev,
             BankVoidCheckImg: reader.result as string,
-          } as IEmpBankDetails
-        })
-      }
-      reader.readAsDataURL(file)
+          } as IEmpBankDetails;
+        });
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
   return (
     <div className="flex flex-col gap-4">
       <label
@@ -65,7 +65,7 @@ const EmpBankDetails = ({
               return {
                 ...prev,
                 BankAccNumber: e.target.value,
-              } as IEmpBankDetails
+              } as IEmpBankDetails;
             })
           }
         />
@@ -78,7 +78,7 @@ const EmpBankDetails = ({
               return {
                 ...prev,
                 BankTransitNumber: e.target.value,
-              } as IEmpBankDetails
+              } as IEmpBankDetails;
             })
           }
         />
@@ -91,13 +91,13 @@ const EmpBankDetails = ({
               return {
                 ...prev,
                 BankInstitutionNumber: e.target.value,
-              } as IEmpBankDetails
+              } as IEmpBankDetails;
             })
           }
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default EmpBankDetails
+export default EmpBankDetails;

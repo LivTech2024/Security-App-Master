@@ -1,20 +1,20 @@
-import InputHeader from './InputHeader'
-import { ComboboxData, ComboboxItem, Select } from '@mantine/core'
+import InputHeader from './InputHeader';
+import { ComboboxData, ComboboxItem, Select } from '@mantine/core';
 
 interface InputSelectProps {
-  label?: string
-  placeholder?: string
-  value?: string
-  onChange?: ((value: string | null, option: ComboboxItem) => void) | undefined
-  className?: string
-  fontClassName?: string
-  data: ComboboxData
-  error?: string | null
-  searchValue?: string
-  onSearchChange?: React.Dispatch<React.SetStateAction<string>>
-  searchable?: boolean
-  clearable?: boolean
-  nothingFoundMessage?: React.ReactNode
+  label?: string;
+  placeholder?: string;
+  value?: string;
+  onChange?: ((value: string | null, option: ComboboxItem) => void) | undefined;
+  className?: string;
+  fontClassName?: string;
+  data: ComboboxData;
+  error?: string | null;
+  searchValue?: string;
+  onSearchChange?: React.Dispatch<React.SetStateAction<string>>;
+  searchable?: boolean;
+  clearable?: boolean;
+  nothingFoundMessage?: React.ReactNode;
 }
 
 const InputSelect = ({
@@ -64,7 +64,7 @@ const InputSelect = ({
         nothingFoundMessage={nothingFoundMessage}
       />
     </div>
-  )
-}
+  );
+};
 
-export default InputSelect
+export default InputSelect;

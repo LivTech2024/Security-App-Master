@@ -1,4 +1,4 @@
-import { StateCreator } from 'zustand'
+import { StateCreator } from 'zustand';
 import {
   IAdminsCollection,
   ICompaniesCollection,
@@ -7,27 +7,27 @@ import {
   ILoggedInUsersCollection,
   ISettingsCollection,
   ISuperAdminCollection,
-} from '../../@types/database'
-import * as storage from '../../utilities/Storage'
-import { LocalStorageKey } from '../../@types/enum'
-import DbCompany from '../../firebase_configs/DB/DbCompany'
-import { Client } from './editForm.slice'
+} from '../../@types/database';
+import * as storage from '../../utilities/Storage';
+import { LocalStorageKey } from '../../@types/enum';
+import DbCompany from '../../firebase_configs/DB/DbCompany';
+import { Client } from './editForm.slice';
 
 export interface Company
   extends Omit<ICompaniesCollection, 'CompanyCreatedAt' | 'CompanyModifiedAt'> {
-  CompanyCreatedAt: string
-  CompanyModifiedAt: string
+  CompanyCreatedAt: string;
+  CompanyModifiedAt: string;
 }
 
 export interface Admin
   extends Omit<IAdminsCollection, 'AdminCreatedAt' | 'AdminModifiedAt'> {
-  AdminCreatedAt: string
-  AdminModifiedAt: string
+  AdminCreatedAt: string;
+  AdminModifiedAt: string;
 }
 
 export interface EmployeeRoles
   extends Omit<IEmployeeRolesCollection, 'EmployeeRoleCreatedAt'> {
-  EmployeeRoleCreatedAt: string
+  EmployeeRoleCreatedAt: string;
 }
 
 export interface CompanyBranches
@@ -35,28 +35,28 @@ export interface CompanyBranches
     ICompanyBranchesCollection,
     'CompanyBranchCreatedAt' | 'CompanyBranchModifiedAt'
   > {
-  CompanyBranchCreatedAt: string
-  CompanyBranchModifiedAt: string
+  CompanyBranchCreatedAt: string;
+  CompanyBranchModifiedAt: string;
 }
 
 interface AuthState {
-  superAdmin: ISuperAdminCollection | null
-  setSuperAdmin: (superAdmin: ISuperAdminCollection | null) => void
-  company: Company | null
-  setCompany: (cmp: Company | null) => void
-  admin: Admin | null
-  setAdmin: (admin: Admin | null) => void
-  client: Client | null
-  setClient: (client: Client | null) => void
-  companyBranches: CompanyBranches[]
-  setCompanyBranches: (cmpBranches: CompanyBranches[]) => void
-  empRoles: EmployeeRoles[]
-  setEmpRoles: (empRoles: EmployeeRoles[]) => void
-  settings: ISettingsCollection | null
-  setSettings: (settings: ISettingsCollection | null) => void
-  loading: boolean
-  setLoading: (loading: boolean) => void
-  userSignOut: () => void
+  superAdmin: ISuperAdminCollection | null;
+  setSuperAdmin: (superAdmin: ISuperAdminCollection | null) => void;
+  company: Company | null;
+  setCompany: (cmp: Company | null) => void;
+  admin: Admin | null;
+  setAdmin: (admin: Admin | null) => void;
+  client: Client | null;
+  setClient: (client: Client | null) => void;
+  companyBranches: CompanyBranches[];
+  setCompanyBranches: (cmpBranches: CompanyBranches[]) => void;
+  empRoles: EmployeeRoles[];
+  setEmpRoles: (empRoles: EmployeeRoles[]) => void;
+  settings: ISettingsCollection | null;
+  setSettings: (settings: ISettingsCollection | null) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
+  userSignOut: () => void;
 }
 
 export const createAuthSlice: StateCreator<AuthState> = (set) => ({
@@ -81,7 +81,7 @@ export const createAuthSlice: StateCreator<AuthState> = (set) => ({
   userSignOut: () => {
     const loggedInUser: ILoggedInUsersCollection | null = storage.getJson(
       LocalStorageKey.LOGGEDIN_USER
-    )
+    );
 
     if (loggedInUser) {
       set((state) => ({
@@ -90,14 +90,14 @@ export const createAuthSlice: StateCreator<AuthState> = (set) => ({
         company: null,
         client: null,
         superAdmin: null,
-      }))
+      }));
       DbCompany.deleteUserLoggedInDoc(loggedInUser.LoggedInId)
         .then(() => {
-          storage.clear(LocalStorageKey.LOGGEDIN_USER)
+          storage.clear(LocalStorageKey.LOGGEDIN_USER);
         })
         .catch((error) => {
-          console.log(error)
-        })
+          console.log(error);
+        });
     }
   },
-})
+});

@@ -1,27 +1,27 @@
-import { TagsInput } from '@mantine/core'
-import Button from '../../common/button/Button'
-import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
+import { TagsInput } from '@mantine/core';
+import Button from '../../common/button/Button';
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
 
-import InputSelect from '../../common/inputs/InputSelect'
-import { MdClose } from 'react-icons/md'
+import InputSelect from '../../common/inputs/InputSelect';
+import { MdClose } from 'react-icons/md';
 
 interface CheckPointInputProps {
   checkpoints: {
-    checkPointId: string | null
-    checkPointName: string
-    checkPointCategory: string | null
-    checkPointHint: string | null
-  }[]
+    checkPointId: string | null;
+    checkPointName: string;
+    checkPointCategory: string | null;
+    checkPointHint: string | null;
+  }[];
   setCheckpoints: (
     checkpoints: {
-      checkPointId: string | null
-      checkPointName: string
-      checkPointCategory: string | null
-      checkPointHint: string | null
+      checkPointId: string | null;
+      checkPointName: string;
+      checkPointCategory: string | null;
+      checkPointHint: string | null;
     }[]
-  ) => void
-  checkpointCategories: string[]
-  setCheckpointCategories: React.Dispatch<React.SetStateAction<string[]>>
+  ) => void;
+  checkpointCategories: string[];
+  setCheckpointCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const CheckpointForm = ({
@@ -39,23 +39,23 @@ const CheckpointForm = ({
         checkPointHint: null,
         checkPointId: null,
       },
-    ])
-  }
+    ]);
+  };
 
   const handleRemoveCheckpoint = (index: number) => {
-    if (checkpoints.length === 1) return
-    setCheckpoints(checkpoints.filter((_, i) => i !== index))
-  }
+    if (checkpoints.length === 1) return;
+    setCheckpoints(checkpoints.filter((_, i) => i !== index));
+  };
 
   const handleChange = (
     index: number,
     key: 'checkPointName' | 'checkPointCategory' | 'checkPointHint',
     value: string
   ) => {
-    const updatedCheckpoints = [...checkpoints]
-    updatedCheckpoints[index][key] = value
-    setCheckpoints(updatedCheckpoints)
-  }
+    const updatedCheckpoints = [...checkpoints];
+    updatedCheckpoints[index][key] = value;
+    setCheckpoints(updatedCheckpoints);
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -134,7 +134,7 @@ const CheckpointForm = ({
         label="Add new"
       />
     </div>
-  )
-}
+  );
+};
 
-export default CheckpointForm
+export default CheckpointForm;

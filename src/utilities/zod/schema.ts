@@ -1,6 +1,6 @@
-import { z } from 'zod'
-import { numberString } from './helper'
-import { ConstRegex } from '../../constants/ConstRegex'
+import { z } from 'zod';
+import { numberString } from './helper';
+import { ConstRegex } from '../../constants/ConstRegex';
 
 //*Company  create schema
 export const companyCreateSchema = z.object({
@@ -17,9 +17,9 @@ export const companyCreateSchema = z.object({
   CompanyAddress: z
     .string()
     .min(3, { message: 'Company address should be minimum 3 characters' }),
-})
+});
 
-export type CompanyCreateFormFields = z.infer<typeof companyCreateSchema>
+export type CompanyCreateFormFields = z.infer<typeof companyCreateSchema>;
 
 //*Admin  update schema
 export const adminUpdateSchema = z.object({
@@ -29,9 +29,9 @@ export const adminUpdateSchema = z.object({
   AdminPhone: z
     .string()
     .min(10, { message: 'Company phone with country code is required' }),
-})
+});
 
-export type AdminUpdateFormFields = z.infer<typeof adminUpdateSchema>
+export type AdminUpdateFormFields = z.infer<typeof adminUpdateSchema>;
 
 //*Admin create schema
 export const adminCreateSchema = adminUpdateSchema.extend({
@@ -42,9 +42,9 @@ export const adminCreateSchema = adminUpdateSchema.extend({
   AdminPassword: z
     .string()
     .min(6, { message: 'Password must be minimum six characters' }),
-})
+});
 
-export type AdminCreateFormFields = z.infer<typeof adminCreateSchema>
+export type AdminCreateFormFields = z.infer<typeof adminCreateSchema>;
 
 //*Employee create schema
 export const addEmployeeFormSchema = z
@@ -84,11 +84,11 @@ export const addEmployeeFormSchema = z
         path: ['EmployeeSupervisorId'],
         message: `Please select supervisor for this guard`,
         code: 'custom',
-      })
+      });
     }
-  })
+  });
 
-export type AddEmployeeFormField = z.infer<typeof addEmployeeFormSchema>
+export type AddEmployeeFormField = z.infer<typeof addEmployeeFormSchema>;
 
 //*Shift create schema
 export const addShiftFormSchema = z
@@ -138,7 +138,7 @@ export const addShiftFormSchema = z
           path: ['ShiftRequiredEmp'],
           message: `Required no. of employees must be at least 1`,
           code: 'custom',
-        })
+        });
       }
 
       if (
@@ -149,12 +149,12 @@ export const addShiftFormSchema = z
           path: ['ShiftAssignedUserId'],
           message: `Pleas assign employee to this special shift`,
           code: 'custom',
-        })
+        });
       }
     }
-  )
+  );
 
-export type AddShiftFormFields = z.infer<typeof addShiftFormSchema>
+export type AddShiftFormFields = z.infer<typeof addShiftFormSchema>;
 
 //* Patrolling create Schema
 export const patrollingSchema = z.object({
@@ -186,9 +186,9 @@ export const patrollingSchema = z.object({
       message: 'Patrol reminder in minutes cannot be more than 720',
     }),
   PatrolClientId: z.string().min(3, { message: 'Please select client' }),
-})
+});
 
-export type PatrollingFormFields = z.infer<typeof patrollingSchema>
+export type PatrollingFormFields = z.infer<typeof patrollingSchema>;
 
 //*Company branch create schema
 export const companyBranchSchema = z.object({
@@ -205,9 +205,9 @@ export const companyBranchSchema = z.object({
   CompanyBranchAddress: z
     .string()
     .min(3, { message: 'Branch address should be minimum 3 characters' }),
-})
+});
 
-export type CompanyBranchFormFields = z.infer<typeof companyBranchSchema>
+export type CompanyBranchFormFields = z.infer<typeof companyBranchSchema>;
 
 //*Invoice  create schema
 export const invoiceSchema = z
@@ -245,11 +245,11 @@ export const invoiceSchema = z
         path: ['InvoiceReceivedAmount'],
         message: `Received amount cannot be greater than total amount`,
         code: 'custom',
-      })
+      });
     }
-  })
+  });
 
-export type InvoiceFormFields = z.infer<typeof invoiceSchema>
+export type InvoiceFormFields = z.infer<typeof invoiceSchema>;
 
 //*client  create schema
 export const clientSchema = z.object({
@@ -277,9 +277,9 @@ export const clientSchema = z.object({
   ClientHourlyRate: z.coerce
     .number()
     .min(1, { message: 'Client hourly rate should be at least 1' }),
-})
+});
 
-export type ClientFormFields = z.infer<typeof clientSchema>
+export type ClientFormFields = z.infer<typeof clientSchema>;
 
 //*Equipment Schema
 export const equipmentSchema = z.object({
@@ -291,9 +291,9 @@ export const equipmentSchema = z.object({
   EquipmentTotalQuantity: z.coerce
     .number()
     .min(1, { message: 'Equipment total quantity should be at least 1' }),
-})
+});
 
-export type EquipmentFormFields = z.infer<typeof equipmentSchema>
+export type EquipmentFormFields = z.infer<typeof equipmentSchema>;
 
 //*Equipment Allocation Schema
 export const equipmentAllocationSchema = z.object({
@@ -310,15 +310,15 @@ export const equipmentAllocationSchema = z.object({
     .min(3, { message: 'Please select employee' }),
   EquipmentAllocationStartDate: z.date(),
   EquipmentAllocationEndDate: z.date(),
-})
+});
 
 export type EquipmentAllocationFormFields = z.infer<
   typeof equipmentAllocationSchema
->
+>;
 
 //*Settings Schema
 export const settingsSchema = z.object({
   SettingEmpWellnessIntervalInMins: z.coerce.number().min(1),
-})
+});
 
-export type SettingsFormFields = z.infer<typeof settingsSchema>
+export type SettingsFormFields = z.infer<typeof settingsSchema>;

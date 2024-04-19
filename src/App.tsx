@@ -1,73 +1,74 @@
-import './App.css'
-import Layout from './layout'
-import { Route, Routes, useLocation } from 'react-router-dom'
-import Home from './pages/home/Home'
-import { MantineProvider } from '@mantine/core'
-import { ModalsProvider } from '@mantine/modals'
-import '@mantine/core/styles.css'
-import '@mantine/dates/styles.css'
-import 'react-toastify/dist/ReactToastify.min.css'
-import Schedule from './pages/schedule/Schedule'
-import LoaderModal from './common/modals/LoaderModal'
-import { ContextConfirmModal } from './common/modals/ContextConfirmModal'
-import { ToastContainer } from 'react-toastify'
-import { PageRoutes } from './@types/enum'
-import PatrollingList from './pages/patrolling/PatrollingList'
-import PatrollingCreateOrEdit from './pages/patrolling/PatrollingCreateOrEdit'
-import PatrollingView from './pages/patrolling/PatrollingView'
-import { useEffect } from 'react'
-import { showSnackbar } from './utilities/TsxUtils'
-import { useAuthState } from './store'
-import Login from './pages/login/Login'
-import useOnAuthStateChanged from './hooks/useOnAuthStateChanged'
-import SplashScreen from './component/splash_screen/SplashScreen'
-import Locations from './pages/locations/Locations'
-import CompanyBranches from './pages/company_branches/CompanyBranches'
-import EmployeeList from './pages/employee/EmployeeList'
-import EmployeeCreateOrEdit from './pages/employee/EmployeeCreateOrEdit'
-import ShiftList from './pages/shifts/ShiftList'
-import ShiftCreateOrEdit from './pages/shifts/ShiftCreateOrEdit'
-import Reports from './pages/reports/Reports'
-import Settings from './pages/settings/Settings'
-import useListenNotifications from './hooks/listeners/useListenNotifications'
-import PaymentsAndBilling from './pages/payments_and_billing/PaymentsAndBilling'
-import InvoiceGenerate from './pages/payments_and_billing/invoice/InvoiceGenerate'
-import InvoiceList from './pages/payments_and_billing/invoice/InvoiceList'
-import Clients from './pages/client/Clients'
-import CreateNewCompany from './pages/super_admin/CreateNewCompany'
-import ShiftView from './pages/shifts/ShiftView'
-import ClientCreateOrEdit from './pages/client/ClientCreateOrEdit'
-import ClientView from './pages/client/ClientView'
-import DocumentRepository from './pages/document_repository/DocumentRepository'
-import EquipmentList from './pages/equipment_management/EquipmentList'
-import EquipmentView from './pages/equipment_management/EquipmentView'
-import ReportView from './pages/reports/ReportView'
-import ClientHome from './pages/client_portal/ClientHome'
-import ClientReports from './pages/client_portal/ClientReports'
-import ClientPatrolsList from './pages/client_portal/patrol/ClientPatrolsList'
-import ClientPatrolView from './pages/client_portal/patrol/ClientPatrolView'
+import './App.css';
+import Layout from './layout';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import Home from './pages/home/Home';
+import { MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
+import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
+import 'react-toastify/dist/ReactToastify.min.css';
+import Schedule from './pages/schedule/Schedule';
+import LoaderModal from './common/modals/LoaderModal';
+import { ContextConfirmModal } from './common/modals/ContextConfirmModal';
+import { ToastContainer } from 'react-toastify';
+import { PageRoutes } from './@types/enum';
+import PatrollingList from './pages/patrolling/PatrollingList';
+import PatrollingCreateOrEdit from './pages/patrolling/PatrollingCreateOrEdit';
+import PatrollingView from './pages/patrolling/PatrollingView';
+import { useEffect } from 'react';
+import { showSnackbar } from './utilities/TsxUtils';
+import { useAuthState } from './store';
+import Login from './pages/login/Login';
+import useOnAuthStateChanged from './hooks/useOnAuthStateChanged';
+import SplashScreen from './component/splash_screen/SplashScreen';
+import Locations from './pages/locations/Locations';
+import CompanyBranches from './pages/company_branches/CompanyBranches';
+import EmployeeList from './pages/employee/EmployeeList';
+import EmployeeCreateOrEdit from './pages/employee/EmployeeCreateOrEdit';
+import ShiftList from './pages/shifts/ShiftList';
+import ShiftCreateOrEdit from './pages/shifts/ShiftCreateOrEdit';
+import Reports from './pages/reports/Reports';
+import Settings from './pages/settings/Settings';
+import useListenNotifications from './hooks/listeners/useListenNotifications';
+import PaymentsAndBilling from './pages/payments_and_billing/PaymentsAndBilling';
+import InvoiceGenerate from './pages/payments_and_billing/invoice/InvoiceGenerate';
+import InvoiceList from './pages/payments_and_billing/invoice/InvoiceList';
+import Clients from './pages/client/Clients';
+import CreateNewCompany from './pages/super_admin/CreateNewCompany';
+import ShiftView from './pages/shifts/ShiftView';
+import ClientCreateOrEdit from './pages/client/ClientCreateOrEdit';
+import ClientView from './pages/client/ClientView';
+import DocumentRepository from './pages/document_repository/DocumentRepository';
+import EquipmentList from './pages/equipment_management/EquipmentList';
+import EquipmentView from './pages/equipment_management/EquipmentView';
+import ReportView from './pages/reports/ReportView';
+import ClientHome from './pages/client_portal/ClientHome';
+import ClientReports from './pages/client_portal/report/ClientReports';
+import ClientPatrolsList from './pages/client_portal/patrol/ClientPatrolsList';
+import ClientPatrolView from './pages/client_portal/patrol/ClientPatrolView';
+import ClientReportView from './pages/client_portal/report/ClientReportView';
 
 function App() {
-  useOnAuthStateChanged()
+  useOnAuthStateChanged();
 
-  const { company, admin, loading, superAdmin, client } = useAuthState()
+  const { company, admin, loading, superAdmin, client } = useAuthState();
 
-  const { notification } = useListenNotifications()
+  const { notification } = useListenNotifications();
 
-  const location = useLocation()
+  const location = useLocation();
 
   useEffect(() => {
     if (notification) {
-      const { NotificationTitle } = notification
+      const { NotificationTitle } = notification;
       showSnackbar({
         message: `New notification received \n${NotificationTitle}`,
         type: 'info',
-      })
+      });
     }
-  }, [notification])
+  }, [notification]);
 
   if (loading) {
-    return <SplashScreen />
+    return <SplashScreen />;
   }
 
   if (location.pathname.includes('/client_portal') && client) {
@@ -95,11 +96,15 @@ function App() {
                 path={PageRoutes.CLIENT_PORTAL_REPORTS}
                 Component={ClientReports}
               />
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_REPORT_VIEW}
+                Component={ClientReportView}
+              />
             </Routes>
           </Layout>
         </ModalsProvider>
       </MantineProvider>
-    )
+    );
   }
 
   if (location.pathname.includes('/super_admin') && superAdmin) {
@@ -118,7 +123,7 @@ function App() {
           </Routes>
         </ModalsProvider>
       </MantineProvider>
-    )
+    );
   }
 
   if (
@@ -135,7 +140,7 @@ function App() {
           <ToastContainer /> <Login />
         </ModalsProvider>
       </MantineProvider>
-    )
+    );
   }
 
   return (
@@ -204,7 +209,7 @@ function App() {
         </Layout>
       </ModalsProvider>
     </MantineProvider>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,24 +1,24 @@
-import { FormProvider, useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form';
 import {
   CompanyCreateFormFields,
   companyCreateSchema,
-} from '../../utilities/zod/schema'
-import { zodResolver } from '@hookform/resolvers/zod'
-import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
-import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader'
-import Button from '../../common/button/Button'
-import { useAuthState } from '../../store'
-import { ChangeEvent, useState } from 'react'
-import { errorHandler } from '../../utilities/CustomError'
+} from '../../utilities/zod/schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
+import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
+import Button from '../../common/button/Button';
+import { useAuthState } from '../../store';
+import { ChangeEvent, useState } from 'react';
+import { errorHandler } from '../../utilities/CustomError';
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from '../../utilities/TsxUtils'
-import DbCompany from '../../firebase_configs/DB/DbCompany'
+} from '../../utilities/TsxUtils';
+import DbCompany from '../../firebase_configs/DB/DbCompany';
 
 const CompanyInfo = () => {
-  const { company, setCompany } = useAuthState()
+  const { company, setCompany } = useAuthState();
 
   const methods = useForm<CompanyCreateFormFields>({
     resolver: zodResolver(companyCreateSchema),
@@ -28,36 +28,36 @@ const CompanyInfo = () => {
       CompanyEmail: company?.CompanyEmail,
       CompanyPhone: company?.CompanyPhone,
     },
-  })
+  });
 
-  const [logoImgBase64, setLogoImgBase64] = useState(company?.CompanyLogo)
+  const [logoImgBase64, setLogoImgBase64] = useState(company?.CompanyLogo);
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setLogoImgBase64(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+        setLogoImgBase64(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const onSubmit = async (data: CompanyCreateFormFields) => {
-    if (!company || !logoImgBase64) return
+    if (!company || !logoImgBase64) return;
     try {
-      showModalLoader({})
+      showModalLoader({});
 
       await DbCompany.updateCompany({
         cmpId: company?.CompanyId,
         data,
         logoBase64: logoImgBase64,
-      })
+      });
 
       showSnackbar({
         message: 'Company updated successfully',
         type: 'success',
-      })
+      });
 
       setCompany({
         ...company,
@@ -66,15 +66,15 @@ const CompanyInfo = () => {
         CompanyName: data.CompanyName,
         CompanyPhone: data.CompanyPhone,
         CompanyLogo: logoImgBase64,
-      })
+      });
 
-      closeModalLoader()
+      closeModalLoader();
     } catch (error) {
-      console.log(error)
-      errorHandler(error)
-      closeModalLoader()
+      console.log(error);
+      errorHandler(error);
+      closeModalLoader();
     }
-  }
+  };
   return (
     <FormProvider {...methods}>
       <form
@@ -148,7 +148,7 @@ const CompanyInfo = () => {
         </div>
       </form>
     </FormProvider>
-  )
-}
+  );
+};
 
-export default CompanyInfo
+export default CompanyInfo;

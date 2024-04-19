@@ -1,13 +1,13 @@
-import { useFormContext } from 'react-hook-form'
-import { AddEmployeeFormField } from '../../utilities/zod/schema'
-import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader'
-import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
+import { useFormContext } from 'react-hook-form';
+import { AddEmployeeFormField } from '../../utilities/zod/schema';
+import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
 
 const EmpAddressDetails = () => {
   const {
     register,
     formState: { errors },
-  } = useFormContext<AddEmployeeFormField>()
+  } = useFormContext<AddEmployeeFormField>();
   return (
     <div className="grid grid-cols-2 gap-4">
       <TextareaWithTopHeader
@@ -39,7 +39,7 @@ const EmpAddressDetails = () => {
         error={errors?.EmployeeProvince?.message}
       />
     </div>
-  )
-}
+  );
+};
 
-export default EmpAddressDetails
+export default EmpAddressDetails;

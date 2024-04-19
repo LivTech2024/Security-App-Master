@@ -1,10 +1,10 @@
-import React from 'react'
-import Nav from './Nav'
-import Footer from './Footer'
+import React from 'react';
+import Nav from './Nav';
+import Footer from './Footer';
 
 interface LayoutProps {
-  children: React.ReactNode
-  userType: 'admin' | 'client' | 'super_admin'
+  children: React.ReactNode;
+  userType: 'admin' | 'client' | 'super_admin';
 }
 
 const Layout = ({ children, userType }: LayoutProps) => {
@@ -16,7 +16,7 @@ const Layout = ({ children, userType }: LayoutProps) => {
       </div>
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

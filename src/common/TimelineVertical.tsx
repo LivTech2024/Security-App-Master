@@ -1,12 +1,12 @@
-import React from 'react'
+import React from 'react';
 
 interface TimelineVerticalProps {
   timelineItems: {
-    icon: React.ReactNode
-    text: string
-    isActive: boolean
-    description?: React.ReactNode
-  }[]
+    icon: React.ReactNode;
+    text: string;
+    isActive: boolean;
+    description?: React.ReactNode;
+  }[];
 }
 
 const TimelineVertical = ({ timelineItems }: TimelineVerticalProps) => {
@@ -39,10 +39,10 @@ const TimelineVertical = ({ timelineItems }: TimelineVerticalProps) => {
               {data.description}
             </div>
           </div>
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-export default TimelineVertical
+export default TimelineVertical;

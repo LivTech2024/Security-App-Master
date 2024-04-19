@@ -1,86 +1,86 @@
-import React, { useEffect, useState } from 'react'
-import Dialog from '../../../common/Dialog'
+import React, { useEffect, useState } from 'react';
+import Dialog from '../../../common/Dialog';
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,
-} from 'react-places-autocomplete'
-import InputHeader from '../../../common/inputs/InputHeader'
-import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader'
-import { errorHandler } from '../../../utilities/CustomError'
+} from 'react-places-autocomplete';
+import InputHeader from '../../../common/inputs/InputHeader';
+import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
+import { errorHandler } from '../../../utilities/CustomError';
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from '../../../utilities/TsxUtils'
-import DbCompany from '../../../firebase_configs/DB/DbCompany'
-import { useAuthState, useEditFormStore } from '../../../store'
-import { openContextModal } from '@mantine/modals'
-import { REACT_QUERY_KEYS } from '../../../@types/enum'
-import { useQueryClient } from '@tanstack/react-query'
+} from '../../../utilities/TsxUtils';
+import DbCompany from '../../../firebase_configs/DB/DbCompany';
+import { useAuthState, useEditFormStore } from '../../../store';
+import { openContextModal } from '@mantine/modals';
+import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { useQueryClient } from '@tanstack/react-query';
 
 const AddLocationModal = ({
   opened,
   setOpened,
 }: {
-  opened: boolean
-  setOpened: React.Dispatch<React.SetStateAction<boolean>>
+  opened: boolean;
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const { company } = useAuthState()
+  const { company } = useAuthState();
 
-  const { locationEditData } = useEditFormStore()
+  const { locationEditData } = useEditFormStore();
 
-  const isEdit = !!locationEditData
+  const isEdit = !!locationEditData;
 
-  const [locationName, setLocationName] = useState('')
-  const [address, setAddress] = useState('')
+  const [locationName, setLocationName] = useState('');
+  const [address, setAddress] = useState('');
   const [coordinates, setCoordinates] = useState<{
-    lat: null | number
-    lng: null | number
-  }>({ lat: null, lng: null })
+    lat: null | number;
+    lng: null | number;
+  }>({ lat: null, lng: null });
 
   const handleSelect = async (selectedAddress: string) => {
     try {
-      setAddress(selectedAddress)
-      const results = await geocodeByAddress(selectedAddress)
-      const latLng = await getLatLng(results[0])
-      const { lat, lng } = latLng
-      setCoordinates({ lat, lng })
+      setAddress(selectedAddress);
+      const results = await geocodeByAddress(selectedAddress);
+      const latLng = await getLatLng(results[0]);
+      const { lat, lng } = latLng;
+      setCoordinates({ lat, lng });
     } catch (error) {
-      console.error('Error selecting address', error)
+      console.error('Error selecting address', error);
     }
-  }
+  };
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const resetForm = () => {
-    setAddress('')
-    setLocationName('')
-    setCoordinates({ lat: null, lng: null })
-  }
+    setAddress('');
+    setLocationName('');
+    setCoordinates({ lat: null, lng: null });
+  };
 
   useEffect(() => {
     if (isEdit) {
-      setAddress(locationEditData.LocationAddress)
-      setLocationName(locationEditData.LocationName)
+      setAddress(locationEditData.LocationAddress);
+      setLocationName(locationEditData.LocationName);
       setCoordinates({
         lat: locationEditData.LocationCoordinates.latitude,
         lng: locationEditData.LocationCoordinates.longitude,
-      })
-      return
+      });
+      return;
     }
-    resetForm()
-  }, [opened, isEdit, locationEditData])
+    resetForm();
+  }, [opened, isEdit, locationEditData]);
 
   const onSubmit = async () => {
     if (!locationName) {
-      showSnackbar({ message: 'Please enter location name', type: 'error' })
+      showSnackbar({ message: 'Please enter location name', type: 'error' });
     }
     if (!address) {
-      showSnackbar({ message: 'Please enter address', type: 'error' })
+      showSnackbar({ message: 'Please enter address', type: 'error' });
     }
-    if (!company) return
+    if (!company) return;
     try {
-      showModalLoader({})
+      showModalLoader({});
 
       if (isEdit) {
         await DbCompany.updateLocation(
@@ -88,55 +88,55 @@ const AddLocationModal = ({
           locationName,
           address,
           coordinates
-        )
+        );
       } else {
         await DbCompany.addLocation(
           company.CompanyId,
           locationName,
           address,
           coordinates
-        )
+        );
       }
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.LOCATION_LIST],
-      })
-      closeModalLoader()
-      resetForm()
-      setOpened(false)
+      });
+      closeModalLoader();
+      resetForm();
+      setOpened(false);
 
-      showSnackbar({ message: 'Location added successfully', type: 'success' })
+      showSnackbar({ message: 'Location added successfully', type: 'success' });
     } catch (error) {
-      errorHandler(error)
-      closeModalLoader()
-      console.log(error)
+      errorHandler(error);
+      closeModalLoader();
+      console.log(error);
     }
-  }
+  };
 
   const onDelete = async () => {
-    if (!company || !isEdit) return
+    if (!company || !isEdit) return;
     try {
-      showModalLoader({})
+      showModalLoader({});
 
-      await DbCompany.deleteLocation(locationEditData.LocationId)
+      await DbCompany.deleteLocation(locationEditData.LocationId);
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.LOCATION_LIST],
-      })
+      });
 
-      closeModalLoader()
-      resetForm()
-      setOpened(false)
+      closeModalLoader();
+      resetForm();
+      setOpened(false);
       showSnackbar({
         message: 'Location deleted successfully',
         type: 'success',
-      })
+      });
     } catch (error) {
-      errorHandler(error)
-      closeModalLoader()
-      console.log(error)
+      errorHandler(error);
+      closeModalLoader();
+      console.log(error);
     }
-  }
+  };
   return (
     <Dialog
       opened={opened}
@@ -157,10 +157,10 @@ const AddLocationModal = ({
                 title: 'Confirm',
                 body: 'Are you sure to delete this employee',
                 onConfirm: () => {
-                  onDelete()
+                  onDelete();
                 },
                 onCancel: () => {
-                  setOpened(true)
+                  setOpened(true);
                 },
               },
               size: '30%',
@@ -212,7 +212,7 @@ const AddLocationModal = ({
                     {suggestions.map((suggestion) => {
                       const style = {
                         backgroundColor: suggestion.active ? '#DAC0A3' : '#fff',
-                      }
+                      };
                       return (
                         <div
                           className="cursor-pointer py-2 px-2"
@@ -220,7 +220,7 @@ const AddLocationModal = ({
                         >
                           {suggestion.description}
                         </div>
-                      )
+                      );
                     })}
                   </div>
                 </div>
@@ -244,7 +244,7 @@ const AddLocationModal = ({
         </div>
       </div>
     </Dialog>
-  )
-}
+  );
+};
 
-export default AddLocationModal
+export default AddLocationModal;

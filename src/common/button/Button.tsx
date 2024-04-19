@@ -1,12 +1,12 @@
-import { twMerge } from 'tailwind-merge'
+import { twMerge } from 'tailwind-merge';
 
 interface ButtonProps {
-  label: string
-  onClick: () => void
-  type: 'blue' | 'black' | 'gray' | 'white' | 'green' | 'red'
-  buttonType?: 'submit' | 'reset' | 'button'
-  className?: string
-  disabled?: boolean
+  label: string;
+  onClick: () => void;
+  type: 'blue' | 'black' | 'gray' | 'white' | 'green' | 'red';
+  buttonType?: 'submit' | 'reset' | 'button';
+  className?: string;
+  disabled?: boolean;
 }
 
 const Button = ({
@@ -30,7 +30,7 @@ const Button = ({
       >
         {label}
       </button>
-    )
+    );
   }
   if (type === 'black') {
     return (
@@ -45,7 +45,7 @@ const Button = ({
       >
         {label}
       </button>
-    )
+    );
   }
   if (type === 'gray') {
     return (
@@ -60,7 +60,7 @@ const Button = ({
       >
         {label}
       </button>
-    )
+    );
   }
   if (type === 'white') {
     return (
@@ -75,7 +75,7 @@ const Button = ({
       >
         {label}
       </button>
-    )
+    );
   }
   if (type === 'green') {
     return (
@@ -90,7 +90,7 @@ const Button = ({
       >
         {label}
       </button>
-    )
+    );
   }
   if (type === 'red') {
     return (
@@ -105,8 +105,8 @@ const Button = ({
       >
         {label}
       </button>
-    )
+    );
   }
-}
+};
 
-export default Button
+export default Button;

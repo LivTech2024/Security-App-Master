@@ -1,29 +1,29 @@
-import { useEffect, useState } from 'react'
-import { IoArrowBackCircle } from 'react-icons/io5'
-import Button from '../../common/button/Button'
-import { useEditFormStore } from '../../store'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { IClientsCollection, IShiftsCollection } from '../../@types/database'
-import DbClient from '../../firebase_configs/DB/DbClient'
-import NoSearchResult from '../../common/NoSearchResult'
-import { PageRoutes } from '../../@types/enum'
-import { Client } from '../../store/slice/editForm.slice'
+import { useEffect, useState } from 'react';
+import { IoArrowBackCircle } from 'react-icons/io5';
+import Button from '../../common/button/Button';
+import { useEditFormStore } from '../../store';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { IClientsCollection, IShiftsCollection } from '../../@types/database';
+import DbClient from '../../firebase_configs/DB/DbClient';
+import NoSearchResult from '../../common/NoSearchResult';
+import { PageRoutes } from '../../@types/enum';
+import { Client } from '../../store/slice/editForm.slice';
 import {
   formatDate,
   getHoursDiffInTwoTimeString,
   toDate,
-} from '../../utilities/misc'
-import { numberFormatter } from '../../utilities/NumberFormater'
-import DbEmployee from '../../firebase_configs/DB/DbEmployee'
+} from '../../utilities/misc';
+import { numberFormatter } from '../../utilities/NumberFormater';
+import DbEmployee from '../../firebase_configs/DB/DbEmployee';
 
 const ClientView = () => {
-  const { setClientEditData } = useEditFormStore()
+  const { setClientEditData } = useEditFormStore();
 
-  const [searchParam] = useSearchParams()
+  const [searchParam] = useSearchParams();
 
-  const clientId = searchParam.get('id')
+  const clientId = searchParam.get('id');
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   /* const [startDate, setStartDate] = useState<Date | string | null>(
     dayjs().startOf("M").toDate()
@@ -35,31 +35,31 @@ const ClientView = () => {
 
   const [isLifeTime, setIsLifeTime] = useState(false); */
 
-  const [data, setData] = useState<IClientsCollection | null>(null)
+  const [data, setData] = useState<IClientsCollection | null>(null);
 
-  const [totalClientExpToDate, setTotalClientExpToDate] = useState(0)
+  const [totalClientExpToDate, setTotalClientExpToDate] = useState(0);
 
-  const [totalProfitToDate, setTotalProfitToDate] = useState(0)
+  const [totalProfitToDate, setTotalProfitToDate] = useState(0);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!clientId) return
+    if (!clientId) return;
     DbClient?.getClientById(clientId).then(async (snapshot) => {
-      const clientData = snapshot.data() as IClientsCollection
+      const clientData = snapshot.data() as IClientsCollection;
       if (clientData) {
-        setData(clientData)
+        setData(clientData);
         const shiftSnapshot = await DbClient.getAllShiftsOfClient(
           clientData.ClientId,
           toDate(clientData.ClientContractStartDate),
           toDate(clientData.ClientContractEndDate)
-        )
+        );
         const shifts = shiftSnapshot.docs?.map(
           (doc) => doc.data() as IShiftsCollection
-        )
+        );
 
-        let totalCost = 0
-        let totalCostToClient = 0
+        let totalCost = 0;
+        let totalCostToClient = 0;
 
         await Promise.all(
           shifts?.map(async (shift) => {
@@ -68,7 +68,7 @@ const ClientView = () => {
               ShiftStartTime,
               ShiftEndTime,
               ShiftCurrentStatus,
-            } = shift
+            } = shift;
 
             if (
               ShiftCurrentStatus.some((status) => status.Status === 'completed')
@@ -76,36 +76,36 @@ const ClientView = () => {
               const shiftHours = getHoursDiffInTwoTimeString(
                 ShiftStartTime,
                 ShiftEndTime
-              )
+              );
 
-              totalCostToClient += shiftHours * clientData.ClientHourlyRate
+              totalCostToClient += shiftHours * clientData.ClientHourlyRate;
 
               await Promise.all(
                 ShiftAssignedUserId?.map(async (empId) => {
-                  const empData = await DbEmployee.getEmpById(empId)
+                  const empData = await DbEmployee.getEmpById(empId);
                   if (empData) {
-                    const { EmployeePayRate } = empData
-                    totalCost += EmployeePayRate * shiftHours
+                    const { EmployeePayRate } = empData;
+                    totalCost += EmployeePayRate * shiftHours;
                   }
                 })
-              )
+              );
             }
           })
-        )
+        );
 
-        setTotalClientExpToDate(totalCost)
-        setTotalProfitToDate(totalCostToClient - totalCost)
+        setTotalClientExpToDate(totalCost);
+        setTotalProfitToDate(totalCostToClient - totalCost);
       }
-      setLoading(false)
-    })
-  }, [clientId])
+      setLoading(false);
+    });
+  }, [clientId]);
 
   if (!data && !loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <NoSearchResult />
       </div>
-    )
+    );
   }
 
   if (loading) {
@@ -124,7 +124,7 @@ const ClientView = () => {
         </div>
         <div className="h-[40vh] bg-shimmerColor w-full animate-pulse"></div>
       </div>
-    )
+    );
   }
 
   if (data)
@@ -143,8 +143,8 @@ const ClientView = () => {
           <Button
             type="black"
             onClick={() => {
-              setClientEditData(data as unknown as Client)
-              navigate(PageRoutes.CLIENT_CREATE_OR_EDIT)
+              setClientEditData(data as unknown as Client);
+              navigate(PageRoutes.CLIENT_CREATE_OR_EDIT);
             }}
             className="bg-primary text-surface px-4 py-2 rounded"
             label="Edit Client"
@@ -210,7 +210,7 @@ const ClientView = () => {
           </div>
         </div>
       </div>
-    )
-}
+    );
+};
 
-export default ClientView
+export default ClientView;

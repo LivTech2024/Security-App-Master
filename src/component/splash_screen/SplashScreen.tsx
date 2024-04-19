@@ -1,7 +1,7 @@
-import { useAuthState } from '../../store'
+import { useAuthState } from '../../store';
 
 const SplashScreen = () => {
-  const { company } = useAuthState()
+  const { company } = useAuthState();
   return (
     <div className="flex h-screen items-center justify-center bg-surface dark:bg-surfaceDark ">
       <div className="animate-bounce flex flex-col gap-4 items-center justify-center">
@@ -17,7 +17,7 @@ const SplashScreen = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SplashScreen
+export default SplashScreen;

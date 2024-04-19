@@ -12,35 +12,35 @@ import {
   serverTimestamp,
   startAfter,
   where,
-} from 'firebase/firestore'
-import { db } from '../config'
-import { CollectionName } from '../../@types/enum'
-import { InvoiceFormFields } from '../../utilities/zod/schema'
+} from 'firebase/firestore';
+import { db } from '../config';
+import { CollectionName } from '../../@types/enum';
+import { InvoiceFormFields } from '../../utilities/zod/schema';
 import {
   IClientsCollection,
   IInvoiceItems,
   IInvoiceTaxList,
   IInvoicesCollection,
-} from '../../@types/database'
-import CustomError from '../../utilities/CustomError'
-import { getNewDocId } from './utils'
-import { removeTimeFromDate } from '../../utilities/misc'
+} from '../../@types/database';
+import CustomError from '../../utilities/CustomError';
+import { getNewDocId } from './utils';
+import { removeTimeFromDate } from '../../utilities/misc';
 
 class DbPayment {
   static isInvoiceNumberExist = async (cmpId: string, invoiceNo: string) => {
-    const invoiceRef = collection(db, CollectionName.invoices)
+    const invoiceRef = collection(db, CollectionName.invoices);
 
     const invoiceQuery = query(
       invoiceRef,
       where('InvoiceCompanyId', '==', cmpId),
       where('InvoiceNumber', '==', invoiceNo),
       limit(1)
-    )
+    );
 
-    const snapshot = await getDocs(invoiceQuery)
+    const snapshot = await getDocs(invoiceQuery);
 
-    return !snapshot.empty
-  }
+    return !snapshot.empty;
+  };
 
   static createInvoice = async ({
     cmpId,
@@ -48,24 +48,24 @@ class DbPayment {
     items,
     taxes,
   }: {
-    cmpId: string
-    data: InvoiceFormFields
-    items: IInvoiceItems[]
-    taxes: IInvoiceTaxList[]
+    cmpId: string;
+    data: InvoiceFormFields;
+    items: IInvoiceItems[];
+    taxes: IInvoiceTaxList[];
   }) => {
     const invoiceNoExist = await this.isInvoiceNumberExist(
       cmpId,
       data.InvoiceNumber
-    )
+    );
 
     if (invoiceNoExist) {
-      throw new CustomError('This invoice number already exist')
+      throw new CustomError('This invoice number already exist');
     }
 
     await runTransaction(db, async (transaction) => {
-      const invoiceId = getNewDocId(CollectionName.invoices)
+      const invoiceId = getNewDocId(CollectionName.invoices);
 
-      const invoiceRef = doc(db, CollectionName.invoices, invoiceId)
+      const invoiceRef = doc(db, CollectionName.invoices, invoiceId);
 
       const newInvoice: IInvoicesCollection = {
         InvoiceId: invoiceId,
@@ -90,21 +90,21 @@ class DbPayment {
         InvoiceTerms: data.InvoiceTerms || null,
         InvoiceCreatedAt: serverTimestamp(),
         InvoiceModifiedAt: serverTimestamp(),
-      }
+      };
 
       const balanceAmount =
-        (data.InvoiceTotalAmount || 0) - (data.InvoiceReceivedAmount || 0)
+        (data.InvoiceTotalAmount || 0) - (data.InvoiceReceivedAmount || 0);
 
-      const clientRef = doc(db, CollectionName.clients, data.InvoiceClientId)
-      const snapshot = await transaction.get(clientRef)
-      const client = snapshot.data() as IClientsCollection
+      const clientRef = doc(db, CollectionName.clients, data.InvoiceClientId);
+      const snapshot = await transaction.get(clientRef);
+      const client = snapshot.data() as IClientsCollection;
 
       transaction.update(clientRef, {
         ClientBalance: client.ClientBalance + balanceAmount,
-      })
-      transaction.set(invoiceRef, newInvoice)
-    })
-  }
+      });
+      transaction.set(invoiceRef, newInvoice);
+    });
+  };
 
   static getInvoices = ({
     cmpId,
@@ -114,63 +114,63 @@ class DbPayment {
     isLifeTime,
     startDate,
   }: {
-    cmpId: string
-    lastDoc?: DocumentData | null
-    lmt?: number
-    startDate?: Date | string | null
-    endDate?: Date | string | null
-    isLifeTime?: boolean
+    cmpId: string;
+    lastDoc?: DocumentData | null;
+    lmt?: number;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
   }) => {
-    const invoiceRef = collection(db, CollectionName.invoices)
+    const invoiceRef = collection(db, CollectionName.invoices);
 
     let queryParams: QueryConstraint[] = [
       where('InvoiceCompanyId', '==', cmpId),
       orderBy('InvoiceDate', 'desc'),
-    ]
+    ];
 
     if (!isLifeTime) {
       queryParams = [
         ...queryParams,
         where('InvoiceDate', '>=', startDate),
         where('InvoiceDate', '<=', endDate),
-      ]
+      ];
     }
 
     if (lastDoc) {
-      queryParams = [...queryParams, startAfter(lastDoc)]
+      queryParams = [...queryParams, startAfter(lastDoc)];
     }
 
     if (lmt) {
-      queryParams = [...queryParams, limit(lmt)]
+      queryParams = [...queryParams, limit(lmt)];
     }
 
-    const invoiceQuery = query(invoiceRef, ...queryParams)
+    const invoiceQuery = query(invoiceRef, ...queryParams);
 
-    return getDocs(invoiceQuery)
-  }
+    return getDocs(invoiceQuery);
+  };
 
   static deleteInvoice = async (invoiceId: string) => {
     await runTransaction(db, async (transaction) => {
-      const invoiceRef = doc(db, CollectionName.invoices, invoiceId)
-      const invoiceSnapshot = await transaction.get(invoiceRef)
-      const invoiceData = invoiceSnapshot.data() as IInvoicesCollection
+      const invoiceRef = doc(db, CollectionName.invoices, invoiceId);
+      const invoiceSnapshot = await transaction.get(invoiceRef);
+      const invoiceData = invoiceSnapshot.data() as IInvoicesCollection;
 
       const { InvoiceTotalAmount, InvoiceReceivedAmount, InvoiceClientId } =
-        invoiceData
+        invoiceData;
 
-      const clientRef = doc(db, CollectionName.clients, InvoiceClientId)
-      const clientSnapshot = await transaction.get(clientRef)
-      const clientData = clientSnapshot.data() as IClientsCollection
+      const clientRef = doc(db, CollectionName.clients, InvoiceClientId);
+      const clientSnapshot = await transaction.get(clientRef);
+      const clientData = clientSnapshot.data() as IClientsCollection;
 
-      const balanceAmount = InvoiceTotalAmount - InvoiceReceivedAmount
+      const balanceAmount = InvoiceTotalAmount - InvoiceReceivedAmount;
 
-      transaction.delete(invoiceRef)
+      transaction.delete(invoiceRef);
 
       transaction.update(clientRef, {
         ClientBalance: clientData.ClientBalance - balanceAmount,
-      })
-    })
-  }
+      });
+    });
+  };
 }
 
-export default DbPayment
+export default DbPayment;

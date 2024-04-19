@@ -1,93 +1,96 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from 'react'
-import { IoIosCloseCircleOutline } from 'react-icons/io'
-import { IInvoiceItems, IInvoiceTaxList } from '../../../@types/database'
-import { InvoiceFormFields, invoiceSchema } from '../../../utilities/zod/schema'
-import { FormProvider, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader'
-import TextareaWithTopHeader from '../../../common/inputs/TextareaWithTopHeader'
-import InputDate from '../../../common/inputs/InputDate'
-import Button from '../../../common/button/Button'
-import CustomError, { errorHandler } from '../../../utilities/CustomError'
+import { useEffect, useState } from 'react';
+import { IoIosCloseCircleOutline } from 'react-icons/io';
+import { IInvoiceItems, IInvoiceTaxList } from '../../../@types/database';
+import {
+  InvoiceFormFields,
+  invoiceSchema,
+} from '../../../utilities/zod/schema';
+import { FormProvider, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
+import TextareaWithTopHeader from '../../../common/inputs/TextareaWithTopHeader';
+import InputDate from '../../../common/inputs/InputDate';
+import Button from '../../../common/button/Button';
+import CustomError, { errorHandler } from '../../../utilities/CustomError';
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from '../../../utilities/TsxUtils'
-import { FaRegTrashAlt } from 'react-icons/fa'
-import { useAuthState } from '../../../store'
-import DbPayment from '../../../firebase_configs/DB/DbPayment'
-import { useNavigate } from 'react-router-dom'
-import { PageRoutes } from '../../../@types/enum'
-import useFetchClients from '../../../hooks/fetch/useFetchClients'
-import InputAutoComplete from '../../../common/inputs/InputAutocomplete'
+} from '../../../utilities/TsxUtils';
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { useAuthState } from '../../../store';
+import DbPayment from '../../../firebase_configs/DB/DbPayment';
+import { useNavigate } from 'react-router-dom';
+import { PageRoutes } from '../../../@types/enum';
+import useFetchClients from '../../../hooks/fetch/useFetchClients';
+import InputAutoComplete from '../../../common/inputs/InputAutocomplete';
 
 const numberToString = (value: number) => {
-  return String(value) as unknown as number
-}
+  return String(value) as unknown as number;
+};
 
 const InvoiceGenerate = () => {
-  const { company } = useAuthState()
+  const { company } = useAuthState();
 
   const methods = useForm<InvoiceFormFields>({
     resolver: zodResolver(invoiceSchema),
-  })
+  });
 
   const [invoiceItems, setInvoiceItems] = useState<IInvoiceItems[]>([
     { ItemDescription: '', ItemPrice: 0, ItemQuantity: 1, ItemTotal: 0 },
-  ])
+  ]);
 
-  const [invoiceTaxList, setInvoiceTaxList] = useState<IInvoiceTaxList[]>([])
+  const [invoiceTaxList, setInvoiceTaxList] = useState<IInvoiceTaxList[]>([]);
 
-  const [invoiceDate, setInvoiceDate] = useState<Date | null>(null)
+  const [invoiceDate, setInvoiceDate] = useState<Date | null>(null);
 
-  const [invoiceDueDate, setInvoiceDueDate] = useState<Date | null>(null)
+  const [invoiceDueDate, setInvoiceDueDate] = useState<Date | null>(null);
 
   const [clientSearchQuery, setClientSearchQuery] = useState<
     string | null | undefined
-  >('')
+  >('');
 
   const { data: clients } = useFetchClients({
     limit: 5,
     searchQuery: clientSearchQuery,
-  })
+  });
 
   useEffect(() => {
     const selectedClient = clients.find(
       (c) => c.ClientName === clientSearchQuery
-    )
+    );
 
     if (selectedClient) {
-      methods.setValue('InvoiceClientName', selectedClient.ClientName)
-      methods.setValue('InvoiceClientId', selectedClient.ClientId)
-      methods.setValue('InvoiceClientAddress', selectedClient.ClientAddress)
-      methods.setValue('InvoiceClientPhone', selectedClient.ClientPhone)
+      methods.setValue('InvoiceClientName', selectedClient.ClientName);
+      methods.setValue('InvoiceClientId', selectedClient.ClientId);
+      methods.setValue('InvoiceClientAddress', selectedClient.ClientAddress);
+      methods.setValue('InvoiceClientPhone', selectedClient.ClientPhone);
     } else {
-      methods.setValue('InvoiceClientName', '')
-      methods.setValue('InvoiceClientId', '')
-      methods.setValue('InvoiceClientAddress', '')
-      methods.setValue('InvoiceClientPhone', '')
+      methods.setValue('InvoiceClientName', '');
+      methods.setValue('InvoiceClientId', '');
+      methods.setValue('InvoiceClientAddress', '');
+      methods.setValue('InvoiceClientPhone', '');
     }
-  }, [clientSearchQuery])
+  }, [clientSearchQuery]);
 
   useEffect(() => {
-    console.log(methods.formState.errors)
-  }, [methods.formState.errors])
+    console.log(methods.formState.errors);
+  }, [methods.formState.errors]);
 
   useEffect(() => {
     if (invoiceDate) {
-      methods.setValue('InvoiceDate', invoiceDate)
+      methods.setValue('InvoiceDate', invoiceDate);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [invoiceDate])
+  }, [invoiceDate]);
 
   useEffect(() => {
     if (invoiceDueDate) {
-      methods.setValue('InvoiceDueDate', invoiceDueDate)
+      methods.setValue('InvoiceDueDate', invoiceDueDate);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [invoiceDueDate])
+  }, [invoiceDueDate]);
 
   const handleItemChange = (
     index: number,
@@ -95,15 +98,15 @@ const InvoiceGenerate = () => {
     value: string | number
   ) => {
     setInvoiceItems((prevItems) => {
-      const updatedItems = [...prevItems]
-      ;(updatedItems[index] as any)[field] = value
+      const updatedItems = [...prevItems];
+      (updatedItems[index] as any)[field] = value;
       updatedItems[index].ItemTotal =
         Number(updatedItems[index].ItemQuantity) *
-        Number(updatedItems[index].ItemPrice)
+        Number(updatedItems[index].ItemPrice);
 
-      return updatedItems
-    })
-  }
+      return updatedItems;
+    });
+  };
 
   const handleTaxChange = (
     index: number,
@@ -111,93 +114,93 @@ const InvoiceGenerate = () => {
     value: string | number
   ) => {
     setInvoiceTaxList((prevTaxList) => {
-      const updatedTaxList = [...prevTaxList]
-      ;(updatedTaxList[index] as any)[field] = value
+      const updatedTaxList = [...prevTaxList];
+      (updatedTaxList[index] as any)[field] = value;
 
-      return updatedTaxList
-    })
-  }
+      return updatedTaxList;
+    });
+  };
 
   const handleAddItem = () => {
     if (
       invoiceItems.some((item) => {
         if (!item.ItemDescription || !item.ItemPrice || !item.ItemQuantity) {
-          return true
+          return true;
         }
       })
     ) {
       showSnackbar({
         message: 'Please fill the empty row to add new',
         type: 'error',
-      })
-      return
+      });
+      return;
     }
     setInvoiceItems((prev) => [
       ...prev,
       { ItemDescription: '', ItemPrice: 0, ItemQuantity: 1, ItemTotal: 0 },
-    ])
-  }
+    ]);
+  };
 
   const handleAddTax = () => {
-    setInvoiceTaxList((prev) => [...prev, { TaxName: '', TaxAmount: 0 }])
-  }
+    setInvoiceTaxList((prev) => [...prev, { TaxName: '', TaxAmount: 0 }]);
+  };
 
   useEffect(() => {
     const subTotal = invoiceItems.reduce(
       (acc, obj) => acc + Number(obj.ItemTotal),
       0
-    )
+    );
 
     const totalTaxAmt =
-      invoiceTaxList.reduce((acc, obj) => acc + Number(obj.TaxAmount), 0) || 0
+      invoiceTaxList.reduce((acc, obj) => acc + Number(obj.TaxAmount), 0) || 0;
 
-    methods.setValue('InvoiceSubtotal', numberToString(subTotal))
+    methods.setValue('InvoiceSubtotal', numberToString(subTotal));
 
     methods.setValue(
       'InvoiceTotalAmount',
       numberToString(subTotal + totalTaxAmt)
-    )
-  }, [invoiceItems, invoiceTaxList])
+    );
+  }, [invoiceItems, invoiceTaxList]);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const onSubmit = async (data: InvoiceFormFields) => {
-    if (!company) return
-    console.log(data, 'data', invoiceItems, invoiceTaxList)
+    if (!company) return;
+    console.log(data, 'data', invoiceItems, invoiceTaxList);
     try {
       if (
         invoiceItems.length === 0 ||
         invoiceItems.some((item) => {
           if (!item.ItemDescription || !item.ItemPrice || !item.ItemQuantity) {
-            return true
+            return true;
           }
         })
       ) {
-        throw new CustomError('Please add items to generate invoice')
+        throw new CustomError('Please add items to generate invoice');
       }
 
-      showModalLoader({})
+      showModalLoader({});
 
       await DbPayment.createInvoice({
         cmpId: company.CompanyId,
         data,
         items: invoiceItems,
         taxes: invoiceTaxList,
-      })
+      });
 
       showSnackbar({
         message: 'Invoice created successfully',
         type: 'success',
-      })
-      closeModalLoader()
+      });
+      closeModalLoader();
 
-      navigate(PageRoutes.INVOICE_LIST)
+      navigate(PageRoutes.INVOICE_LIST);
     } catch (error) {
-      console.log(error)
-      errorHandler(error)
-      closeModalLoader()
+      console.log(error);
+      errorHandler(error);
+      closeModalLoader();
     }
-  }
+  };
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -224,7 +227,7 @@ const InvoiceGenerate = () => {
                 value={clientSearchQuery}
                 onChange={setClientSearchQuery}
                 data={clients.map((data) => {
-                  return { label: data.ClientName, value: data.ClientName }
+                  return { label: data.ClientName, value: data.ClientName };
                 })}
               />
             </div>
@@ -270,10 +273,10 @@ const InvoiceGenerate = () => {
                 <div className="flex items-center gap-2 w-full">
                   <FaRegTrashAlt
                     onClick={() => {
-                      if (invoiceItems.length <= 1) return
+                      if (invoiceItems.length <= 1) return;
                       setInvoiceItems((prev) =>
                         prev.filter((_, idx) => idx !== index)
-                      )
+                      );
                     }}
                     className="cursor-pointer text-lg hover:scale-105"
                   />
@@ -415,7 +418,7 @@ const InvoiceGenerate = () => {
         </form>
       </FormProvider>
     </div>
-  )
-}
+  );
+};
 
-export default InvoiceGenerate
+export default InvoiceGenerate;

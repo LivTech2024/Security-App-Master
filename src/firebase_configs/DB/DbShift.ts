@@ -17,15 +17,15 @@ import {
   startAfter,
   updateDoc,
   where,
-} from 'firebase/firestore'
-import { CollectionName } from '../../@types/enum'
-import { db } from '../config'
-import { getNewDocId } from './utils'
-import { IShiftTasksChild, IShiftsCollection } from '../../@types/database'
-import { removeTimeFromDate } from '../../utilities/misc'
-import { AddShiftFormFields } from '../../utilities/zod/schema'
-import { ShiftTask } from '../../component/shifts/ShiftTaskForm'
-import { generateBarcodesAndDownloadPDF } from '../../utilities/generateBarcodesAndDownloadPdf'
+} from 'firebase/firestore';
+import { CollectionName } from '../../@types/enum';
+import { db } from '../config';
+import { getNewDocId } from './utils';
+import { IShiftTasksChild, IShiftsCollection } from '../../@types/database';
+import { removeTimeFromDate } from '../../utilities/misc';
+import { AddShiftFormFields } from '../../utilities/zod/schema';
+import { ShiftTask } from '../../component/shifts/ShiftTaskForm';
+import { generateBarcodesAndDownloadPDF } from '../../utilities/generateBarcodesAndDownloadPdf';
 
 class DbShift {
   static addShift = async (
@@ -34,12 +34,12 @@ class DbShift {
     tasks: ShiftTask[],
     selectedDays: Date[]
   ) => {
-    let shiftTasks: IShiftTasksChild[] = []
+    let shiftTasks: IShiftTasksChild[] = [];
 
     const shiftCreatePromise = selectedDays.map(async (day) => {
-      const shiftId = getNewDocId(CollectionName.shifts)
-      const shiftDocRef = doc(db, CollectionName.shifts, shiftId)
-      shiftTasks = []
+      const shiftId = getNewDocId(CollectionName.shifts);
+      const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
+      shiftTasks = [];
       tasks.map((task, idx) => {
         if (task.TaskName && task.TaskName.length > 0) {
           shiftTasks.push({
@@ -48,9 +48,9 @@ class DbShift {
             ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
             ShiftTaskReturnReq: task.TaskReturnReq,
             ShiftTaskStatus: [],
-          })
+          });
         }
-      })
+      });
 
       const newShift: IShiftsCollection = {
         ShiftId: shiftId,
@@ -86,24 +86,26 @@ class DbShift {
         ShiftIsSpecialShift: shiftData.ShiftIsSpecialShift,
         ShiftCreatedAt: serverTimestamp(),
         ShiftModifiedAt: serverTimestamp(),
-      }
+      };
 
-      return setDoc(shiftDocRef, newShift)
-    })
+      return setDoc(shiftDocRef, newShift);
+    });
 
-    await Promise.all(shiftCreatePromise)
+    await Promise.all(shiftCreatePromise);
 
-    const barcodesToBeGenerated = shiftTasks.filter((t) => t.ShiftTaskQrCodeReq)
+    const barcodesToBeGenerated = shiftTasks.filter(
+      (t) => t.ShiftTaskQrCodeReq
+    );
 
     if (barcodesToBeGenerated.length > 0) {
       await generateBarcodesAndDownloadPDF(
         shiftData.ShiftName,
         barcodesToBeGenerated.map((task) => {
-          return { code: task.ShiftTaskId, label: task.ShiftTask }
+          return { code: task.ShiftTaskId, label: task.ShiftTask };
         })
-      )
+      );
     }
-  }
+  };
 
   static updateShift = async (
     shiftData: AddShiftFormFields,
@@ -113,7 +115,7 @@ class DbShift {
     shiftDate: Date
   ) => {
     await runTransaction(db, async (transaction) => {
-      const shiftDocRef = doc(db, CollectionName.shifts, shiftId)
+      const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
       /*const shiftSnapshot = await transaction.get(shiftDocRef);
       const oldShiftData = shiftSnapshot.data() as IShiftsCollection;
 
@@ -123,7 +125,7 @@ class DbShift {
         );
       } */
 
-      const shiftTasks: IShiftTasksChild[] = []
+      const shiftTasks: IShiftTasksChild[] = [];
 
       tasks.map((task, idx) => {
         if (task.TaskName && task.TaskName.length > 0) {
@@ -133,9 +135,9 @@ class DbShift {
             ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
             ShiftTaskReturnReq: task.TaskReturnReq,
             ShiftTaskStatus: [],
-          })
+          });
         }
-      })
+      });
 
       const newShift: Partial<IShiftsCollection> = {
         ShiftName: shiftData.ShiftName,
@@ -165,68 +167,68 @@ class DbShift {
         ShiftAssignedUserId: shiftData.ShiftAssignedUserId,
         ShiftIsSpecialShift: shiftData.ShiftIsSpecialShift,
         ShiftModifiedAt: serverTimestamp(),
-      }
+      };
 
-      transaction.update(shiftDocRef, newShift)
+      transaction.update(shiftDocRef, newShift);
 
       const barcodesToBeGenerated = shiftTasks.filter(
         (t) => t.ShiftTaskQrCodeReq
-      )
+      );
 
       if (barcodesToBeGenerated.length > 0) {
         await generateBarcodesAndDownloadPDF(
           shiftData.ShiftName,
           barcodesToBeGenerated.map((task) => {
-            return { code: task.ShiftTaskId, label: task.ShiftTask }
+            return { code: task.ShiftTaskId, label: task.ShiftTask };
           })
-        )
+        );
       }
-    })
-  }
+    });
+  };
 
   static deleteShift = (shiftId: string) => {
-    const shiftRef = doc(db, CollectionName.shifts, shiftId)
-    return deleteDoc(shiftRef)
-  }
+    const shiftRef = doc(db, CollectionName.shifts, shiftId);
+    return deleteDoc(shiftRef);
+  };
 
   static getShifts = ({
     lmt,
     lastDoc,
     cmpId,
   }: {
-    lmt: number
-    lastDoc?: DocumentData | null
-    cmpId: string
+    lmt: number;
+    lastDoc?: DocumentData | null;
+    cmpId: string;
   }) => {
-    const shiftRef = collection(db, CollectionName.shifts)
+    const shiftRef = collection(db, CollectionName.shifts);
 
     let queryParams: QueryConstraint[] = [
       where('ShiftCompanyId', '==', cmpId),
       orderBy('ShiftDate', 'desc'),
-    ]
+    ];
     if (lmt) {
-      queryParams = [...queryParams, limit(lmt)]
+      queryParams = [...queryParams, limit(lmt)];
     }
 
     if (lastDoc) {
-      queryParams = [...queryParams, startAfter(lastDoc)]
+      queryParams = [...queryParams, startAfter(lastDoc)];
     }
 
-    const shiftQuery = query(shiftRef, ...queryParams)
+    const shiftQuery = query(shiftRef, ...queryParams);
 
-    return getDocs(shiftQuery)
-  }
+    return getDocs(shiftQuery);
+  };
 
   static getShiftById = (shiftId: string) => {
-    const shiftRef = doc(db, CollectionName.shifts, shiftId)
-    return getDoc(shiftRef)
-  }
+    const shiftRef = doc(db, CollectionName.shifts, shiftId);
+    return getDoc(shiftRef);
+  };
 
   static changeShiftDate = (shiftId: string, newDate: Date) => {
-    const docRef = doc(db, CollectionName.shifts, shiftId)
+    const docRef = doc(db, CollectionName.shifts, shiftId);
 
-    return updateDoc(docRef, { ShiftDate: newDate as unknown as Timestamp })
-  }
+    return updateDoc(docRef, { ShiftDate: newDate as unknown as Timestamp });
+  };
 }
 
-export default DbShift
+export default DbShift;

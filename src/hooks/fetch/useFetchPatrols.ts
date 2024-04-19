@@ -1,29 +1,29 @@
-import { useEffect, useState } from 'react'
-import { useAuthState } from '../../store'
-import { MinimumQueryCharacter } from '../../@types/enum'
-import { IPatrolsCollection } from '../../@types/database'
-import DbPatrol from '../../firebase_configs/DB/DbPatrol'
+import { useEffect, useState } from 'react';
+import { useAuthState } from '../../store';
+import { MinimumQueryCharacter } from '../../@types/enum';
+import { IPatrolsCollection } from '../../@types/database';
+import DbPatrol from '../../firebase_configs/DB/DbPatrol';
 
 interface Props {
-  limit?: number
-  searchQuery?: string | null
-  locationId?: string | null
+  limit?: number;
+  searchQuery?: string | null;
+  locationId?: string | null;
 }
 
 const useFetchPatrols = ({ limit, searchQuery, locationId }: Props) => {
-  const [data, setData] = useState<IPatrolsCollection[]>([])
+  const [data, setData] = useState<IPatrolsCollection[]>([]);
 
-  const { company } = useAuthState()
+  const { company } = useAuthState();
 
   useEffect(() => {
-    if (!company) return
+    if (!company) return;
 
     if (
       searchQuery &&
       searchQuery.trim().length > 0 &&
       searchQuery.trim().length < MinimumQueryCharacter.LOCATION
     ) {
-      return
+      return;
     }
     const fetchInitialClients = async () => {
       const snapshot = await DbPatrol.getPatrols({
@@ -36,28 +36,28 @@ const useFetchPatrols = ({ limit, searchQuery, locationId }: Props) => {
             : undefined,
         cmpId: company.CompanyId,
         locationId,
-      })
+      });
       return snapshot.docs
         .map((doc) => {
-          const data = doc.data() as IPatrolsCollection
+          const data = doc.data() as IPatrolsCollection;
           if (data) {
-            return data
+            return data;
           }
-          return null
+          return null;
         })
-        .filter((item) => item !== null) as IPatrolsCollection[]
-    }
+        .filter((item) => item !== null) as IPatrolsCollection[];
+    };
 
     try {
       fetchInitialClients().then((arr) => {
-        setData(arr)
-      })
+        setData(arr);
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }, [limit, company, searchQuery, locationId])
+  }, [limit, company, searchQuery, locationId]);
 
-  return { data }
-}
+  return { data };
+};
 
-export default useFetchPatrols
+export default useFetchPatrols;

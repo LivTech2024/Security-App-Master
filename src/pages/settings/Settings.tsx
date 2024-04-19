@@ -1,7 +1,7 @@
-import { Tabs } from '@mantine/core'
-import CompanyInfo from '../../component/settings/CompanyInfo'
-import AdminInfo from '../../component/settings/AdminInfo'
-import AccountSettings from '../../component/settings/AccountSettings'
+import { Tabs } from '@mantine/core';
+import CompanyInfo from '../../component/settings/CompanyInfo';
+import AdminInfo from '../../component/settings/AdminInfo';
+import AccountSettings from '../../component/settings/AccountSettings';
 
 const account_settings = () => {
   return (
@@ -50,7 +50,7 @@ const account_settings = () => {
         </Tabs.Panel>
       </Tabs>
     </div>
-  )
-}
+  );
+};
 
-export default account_settings
+export default account_settings;

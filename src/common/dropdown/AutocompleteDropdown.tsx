@@ -1,15 +1,15 @@
-import { Popover } from '@mantine/core'
-import { FloatingPosition } from '@mantine/core'
-import React from 'react'
+import { Popover } from '@mantine/core';
+import { FloatingPosition } from '@mantine/core';
+import React from 'react';
 
 interface AutocompleteDropdownProps {
-  opened: boolean
-  setOpened?: React.Dispatch<React.SetStateAction<boolean>>
-  target: React.ReactNode
-  children: React.ReactNode
-  position?: FloatingPosition | undefined
-  width?: string
-  withArrow?: boolean
+  opened: boolean;
+  setOpened?: React.Dispatch<React.SetStateAction<boolean>>;
+  target: React.ReactNode;
+  children: React.ReactNode;
+  position?: FloatingPosition | undefined;
+  width?: string;
+  withArrow?: boolean;
 }
 
 const AutocompleteDropdown = ({
@@ -47,7 +47,7 @@ const AutocompleteDropdown = ({
       <Popover.Target>{target}</Popover.Target>
       <Popover.Dropdown>{children}</Popover.Dropdown>
     </Popover>
-  )
-}
+  );
+};
 
-export default AutocompleteDropdown
+export default AutocompleteDropdown;

@@ -1,23 +1,23 @@
-import React, { ChangeEvent } from 'react'
-import empDefaultPlaceHolder from '../../../public/assets/avatar.png'
+import React, { ChangeEvent } from 'react';
+import empDefaultPlaceHolder from '../../../public/assets/avatar.png';
 
 const EmpUploadImgCard = ({
   empImageBase64,
   setEmpImageBase64,
 }: {
-  empImageBase64: string | null
-  setEmpImageBase64: React.Dispatch<React.SetStateAction<string | null>>
+  empImageBase64: string | null;
+  setEmpImageBase64: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setEmpImageBase64(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+        setEmpImageBase64(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   return (
     <div className="p-4 bg-gray-100 rounded-lg shadow-md">
@@ -59,7 +59,7 @@ const EmpUploadImgCard = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default EmpUploadImgCard
+export default EmpUploadImgCard;

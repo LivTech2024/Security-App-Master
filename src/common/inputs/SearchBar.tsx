@@ -1,13 +1,13 @@
-import { MdOutlineSearch } from 'react-icons/md'
+import { MdOutlineSearch } from 'react-icons/md';
 
 interface SearchBarProps {
-  placeholder?: string
-  icon?: JSX.Element
-  className?: string
-  parentClassName?: string
-  value: string
-  setValue: React.Dispatch<React.SetStateAction<string>>
-  shouldChangeBgOnFocus?: boolean
+  placeholder?: string;
+  icon?: JSX.Element;
+  className?: string;
+  parentClassName?: string;
+  value: string;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
+  shouldChangeBgOnFocus?: boolean;
 }
 
 const SearchBar = ({
@@ -45,7 +45,7 @@ const SearchBar = ({
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SearchBar
+export default SearchBar;

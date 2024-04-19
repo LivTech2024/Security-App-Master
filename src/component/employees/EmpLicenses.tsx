@@ -1,16 +1,16 @@
-import React, { ChangeEvent } from 'react'
-import { EmpLicenseDetails } from './EmployeeOtherDetails'
-import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
-import InputDate from '../../common/inputs/InputDate'
+import React, { ChangeEvent } from 'react';
+import { EmpLicenseDetails } from './EmployeeOtherDetails';
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
+import InputDate from '../../common/inputs/InputDate';
 
 const EmpLicenses = ({
   empLicenseDetails,
   setEmpLicenseDetails,
 }: {
-  empLicenseDetails: EmpLicenseDetails[]
+  empLicenseDetails: EmpLicenseDetails[];
   setEmpLicenseDetails: React.Dispatch<
     React.SetStateAction<EmpLicenseDetails[]>
-  >
+  >;
 }) => {
   const handleChangeLicenseNumber = (
     licenseType: 'driving' | 'security',
@@ -19,15 +19,15 @@ const EmpLicenses = ({
     setEmpLicenseDetails((prev) => {
       const existingLicense = prev.find(
         (detail) => detail.LicenseType === licenseType
-      )
+      );
       if (existingLicense) {
         const updatedLicenseDetails = prev.map((detail) => {
           if (detail.LicenseType === licenseType) {
-            return { ...detail, LicenseNumber: newLicenseNumber }
+            return { ...detail, LicenseNumber: newLicenseNumber };
           }
-          return detail
-        })
-        return updatedLicenseDetails
+          return detail;
+        });
+        return updatedLicenseDetails;
       } else {
         return [
           ...prev,
@@ -37,10 +37,10 @@ const EmpLicenses = ({
             LicenseExpDate: null,
             LicenseImg: null,
           },
-        ]
+        ];
       }
-    })
-  }
+    });
+  };
 
   const handleChangeExpDate = (
     licenseType: 'driving' | 'security',
@@ -49,18 +49,18 @@ const EmpLicenses = ({
     setEmpLicenseDetails((prev) => {
       const existingLicense = prev.find(
         (detail) => detail.LicenseType === licenseType
-      )
+      );
       if (existingLicense) {
         const updatedLicenseDetails = prev.map((detail) => {
           if (detail.LicenseType === licenseType) {
             return {
               ...detail,
               LicenseExpDate: newExpDate,
-            }
+            };
           }
-          return detail
-        })
-        return updatedLicenseDetails
+          return detail;
+        });
+        return updatedLicenseDetails;
       } else {
         return [
           ...prev,
@@ -70,34 +70,34 @@ const EmpLicenses = ({
             LicenseExpDate: newExpDate,
             LicenseImg: null,
           },
-        ]
+        ];
       }
-    })
-  }
+    });
+  };
 
   const handleChangeImg = (
     licenseType: 'driving' | 'security',
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
         setEmpLicenseDetails((prev) => {
           const existingLicense = prev.find(
             (detail) => detail.LicenseType === licenseType
-          )
+          );
           if (existingLicense) {
             const updatedLicenseDetails = prev.map((detail) => {
               if (detail.LicenseType === licenseType) {
                 return {
                   ...detail,
                   LicenseImg: reader.result as string,
-                }
+                };
               }
-              return detail
-            })
-            return updatedLicenseDetails
+              return detail;
+            });
+            return updatedLicenseDetails;
           } else {
             return [
               ...prev,
@@ -107,13 +107,13 @@ const EmpLicenses = ({
                 LicenseExpDate: null,
                 LicenseImg: reader.result as string,
               },
-            ]
+            ];
           }
-        })
-      }
-      reader.readAsDataURL(file)
+        });
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4">
@@ -231,7 +231,7 @@ const EmpLicenses = ({
         </label>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default EmpLicenses
+export default EmpLicenses;

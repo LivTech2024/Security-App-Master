@@ -1,7 +1,7 @@
 export const PatrolStatus = ({
   status,
 }: {
-  status: 'pending' | 'started' | 'completed'
+  status: 'pending' | 'started' | 'completed';
 }) => {
   return (
     <div className="flex justify-end">
@@ -22,5 +22,5 @@ export const PatrolStatus = ({
         <span className="capitalize font-medium">{status}</span>
       </div>
     </div>
-  )
-}
+  );
+};

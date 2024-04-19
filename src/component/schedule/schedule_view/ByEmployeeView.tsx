@@ -1,43 +1,43 @@
-import { useEffect, useState } from 'react'
-import { useAuthState } from '../../../store'
-import DbSchedule, { ISchedule } from '../../../firebase_configs/DB/DbSchedule'
-import { useQuery } from '@tanstack/react-query'
-import { REACT_QUERY_KEYS } from '../../../@types/enum'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-import dayjs from 'dayjs'
+import { useEffect, useState } from 'react';
+import { useAuthState } from '../../../store';
+import DbSchedule, { ISchedule } from '../../../firebase_configs/DB/DbSchedule';
+import { useQuery } from '@tanstack/react-query';
+import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import dayjs from 'dayjs';
 import {
   formatDate,
   getHoursDiffInTwoTimeString,
   toDate,
-} from '../../../utilities/misc'
-import { Draggable, DropPoint } from '../../../utilities/DragAndDropHelper'
-import DbEmployee from '../../../firebase_configs/DB/DbEmployee'
+} from '../../../utilities/misc';
+import { Draggable, DropPoint } from '../../../utilities/DragAndDropHelper';
+import DbEmployee from '../../../firebase_configs/DB/DbEmployee';
 import {
   IEmployeesCollection,
   IShiftsCollection,
-} from '../../../@types/database'
+} from '../../../@types/database';
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from '../../../utilities/TsxUtils'
-import { errorHandler } from '../../../utilities/CustomError'
-import SelectBranch from '../../../common/SelectBranch'
-import { sendEmail } from '../../../API/SendEmail'
+} from '../../../utilities/TsxUtils';
+import { errorHandler } from '../../../utilities/CustomError';
+import SelectBranch from '../../../common/SelectBranch';
+import { sendEmail } from '../../../API/SendEmail';
 
 interface ByEmployeeViewProps {
-  datesArray: Date[]
+  datesArray: Date[];
 }
 
 const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
-  const { company } = useAuthState()
+  const { company } = useAuthState();
 
-  const [branchId, setBranchId] = useState('')
+  const [branchId, setBranchId] = useState('');
 
   //*Fetch all the schedule for the week
 
-  const [schedules, setSchedules] = useState<ISchedule[]>([])
+  const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
   const { data, error } = useQuery({
     queryKey: [
@@ -52,19 +52,19 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
         datesArray[datesArray.length - 1],
         company!.CompanyId,
         branchId
-      )
-      return data
+      );
+      return data;
     },
-  })
+  });
 
   useEffect(() => {
-    console.log(error)
-    setSchedules(data || [])
-  }, [data, error])
+    console.log(error);
+    setSchedules(data || []);
+  }, [data, error]);
 
   //*Fetch all the employees
 
-  const [employees, setEmployees] = useState<IEmployeesCollection[]>([])
+  const [employees, setEmployees] = useState<IEmployeesCollection[]>([]);
 
   const { data: snapshotData, error: empError } = useQuery({
     queryKey: [REACT_QUERY_KEYS.EMPLOYEE_LIST, company!.CompanyId, branchId],
@@ -72,59 +72,61 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
       const snapshot = await DbEmployee.getEmployees({
         cmpId: company!.CompanyId,
         branch: branchId,
-      })
-      return snapshot.docs
+      });
+      return snapshot.docs;
     },
-  })
+  });
 
   useEffect(() => {
-    console.log(empError)
+    console.log(empError);
     if (snapshotData) {
       setEmployees(
         snapshotData.map((doc) => doc.data() as IEmployeesCollection)
-      )
+      );
     }
-  }, [snapshotData, empError])
+  }, [snapshotData, empError]);
 
   const getUnassignedShiftForDay = (date: Date) => {
-    if (!schedules) return []
+    if (!schedules) return [];
     return schedules.filter(
       (schedule) =>
         schedule.employee.length === 0 &&
         dayjs(toDate(schedule.shift.ShiftDate)).isSame(date, 'date')
-    )
-  }
+    );
+  };
 
   const getEmpShiftForDay = (empId: string, date: Date) => {
     const empScheduleForDay = schedules.find(
       (schedule) =>
         schedule.employee.find((emp) => emp.EmployeeId === empId) &&
         dayjs(toDate(schedule.shift.ShiftDate)).isSame(date, 'date')
-    )
+    );
 
-    return empScheduleForDay?.shift || null
-  }
+    return empScheduleForDay?.shift || null;
+  };
 
   const getEmpShiftForWeek = (empId: string) => {
     const empScheduleForDay = schedules.filter((schedule) =>
       schedule?.employee?.find((emp) => emp.EmployeeId === empId)
-    )
+    );
 
-    return empScheduleForDay.map((s) => s.shift)
-  }
+    return empScheduleForDay.map((s) => s.shift);
+  };
 
   const [resultToBePublished, setResultToBePublished] = useState<
     {
-      shift: IShiftsCollection
-      emp: IEmployeesCollection
+      shift: IShiftsCollection;
+      emp: IEmployeesCollection;
     }[]
-  >([])
+  >([]);
 
   const dropResult = (draggableId: string, dropPointId: string) => {
-    const selectedEmp = employees.find((emp) => emp.EmployeeId === dropPointId)
-    const selectedShift = schedules.find((s) => s.shift.ShiftId === draggableId)
+    const selectedEmp = employees.find((emp) => emp.EmployeeId === dropPointId);
+    const selectedShift = schedules.find(
+      (s) => s.shift.ShiftId === draggableId
+    );
 
-    if (!selectedEmp || !selectedShift) return
+    if (!selectedEmp || !selectedShift) return;
 
     if (selectedEmp.EmployeeIsAvailable !== 'available') {
       showSnackbar({
@@ -135,8 +137,8 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
               'Out of reach'
         }`,
         type: 'error',
-      })
-      return
+      });
+      return;
     }
 
     if (selectedShift?.shift && selectedShift.shift.ShiftRequiredEmp > 1) {
@@ -144,36 +146,36 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
         message:
           'This shift requires more than 1 employee, use calendar view for assigning single shift to multiple employees',
         type: 'error',
-      })
-      return
+      });
+      return;
     }
 
     const shiftHours = getHoursDiffInTwoTimeString(
       selectedShift.shift.ShiftStartTime,
       selectedShift.shift.ShiftEndTime
-    )
+    );
 
-    const empShifts = getEmpShiftForWeek(selectedEmp.EmployeeId)
+    const empShifts = getEmpShiftForWeek(selectedEmp.EmployeeId);
 
     const empWeekHours = empShifts.reduce((acc, shift) => {
       const shiftHours = getHoursDiffInTwoTimeString(
         shift.ShiftStartTime,
         shift.ShiftEndTime
-      )
-      return acc + shiftHours
-    }, 0)
+      );
+      return acc + shiftHours;
+    }, 0);
 
     if (empWeekHours + shiftHours > selectedEmp.EmployeeMaxHrsPerWeek) {
       showSnackbar({
         message: 'Employee maximum hours per week exceeded',
         type: 'info',
-      })
+      });
     }
 
     setResultToBePublished((prev) => [
       ...prev,
       { emp: selectedEmp, shift: selectedShift.shift },
-    ])
+    ]);
 
     setSchedules((prev) => {
       const updatedSchedules = prev.map((schedule) => {
@@ -182,50 +184,50 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
           const updatedEmp: Partial<IEmployeesCollection> = {
             EmployeeId: selectedEmp?.EmployeeId,
             EmployeeName: selectedEmp?.EmployeeName,
-          }
+          };
           return {
             ...schedule,
             employee: [updatedEmp],
-          }
+          };
         }
-        return schedule
-      })
+        return schedule;
+      });
 
-      return updatedSchedules as ISchedule[]
-    })
-  }
+      return updatedSchedules as ISchedule[];
+    });
+  };
 
   const onPublish = async () => {
     try {
-      showModalLoader({})
+      showModalLoader({});
 
       const shiftAssignPromise = resultToBePublished.map(async (result) => {
         return DbSchedule.assignShiftToEmp(result.shift.ShiftId, [
           result.emp.EmployeeId,
-        ])
-      })
+        ]);
+      });
 
-      await Promise.all(shiftAssignPromise)
+      await Promise.all(shiftAssignPromise);
 
       const aggregatedEmails: {
-        empEmail: string
-        empName: string
-        message: string
-      }[] = []
+        empEmail: string;
+        empName: string;
+        message: string;
+      }[] = [];
 
       resultToBePublished.forEach((data) => {
-        const { emp, shift } = data
+        const { emp, shift } = data;
         const isExistIndex = aggregatedEmails.findIndex(
           (d) => d.empEmail === emp.EmployeeEmail
-        )
+        );
         if (isExistIndex !== -1) {
-          const prevMessage = aggregatedEmails[isExistIndex].message
+          const prevMessage = aggregatedEmails[isExistIndex].message;
           aggregatedEmails[isExistIndex].message =
             `${prevMessage}\n\nShift Name: ${
               shift.ShiftName
             }\nDate: ${formatDate(shift.ShiftDate)} \nTiming: ${
               shift.ShiftStartTime
-            }-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`
+            }-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
         } else {
           aggregatedEmails.push({
             empEmail: emp.EmployeeEmail,
@@ -235,9 +237,9 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
             } \n Date: ${formatDate(shift.ShiftDate)} \n Timing: ${
               shift.ShiftStartTime
             }-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
-          })
+          });
         }
-      })
+      });
 
       const sendEmailPromise = aggregatedEmails.map(async (res) => {
         return sendEmail({
@@ -245,34 +247,34 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
           text: res.message,
           subject: 'Your schedule update',
           from_name: company!.CompanyName,
-        })
-      })
+        });
+      });
 
-      await Promise.all(sendEmailPromise)
+      await Promise.all(sendEmailPromise);
 
-      setResultToBePublished([])
+      setResultToBePublished([]);
 
       showSnackbar({
         message: 'Schedule published successfully',
         type: 'success',
-      })
-      closeModalLoader()
+      });
+      closeModalLoader();
     } catch (error) {
-      closeModalLoader()
-      errorHandler(error)
-      console.log(error)
+      closeModalLoader();
+      errorHandler(error);
+      console.log(error);
     }
-  }
+  };
 
   const onUndo = () => {
-    if (resultToBePublished.length === 0) return
-    const lastResultIndex = resultToBePublished.length - 1
+    if (resultToBePublished.length === 0) return;
+    const lastResultIndex = resultToBePublished.length - 1;
 
-    const resultToBeUndo = resultToBePublished[lastResultIndex]
+    const resultToBeUndo = resultToBePublished[lastResultIndex];
 
-    const { shift } = resultToBeUndo
+    const { shift } = resultToBeUndo;
 
-    setResultToBePublished((prev) => prev.slice(0, -1))
+    setResultToBePublished((prev) => prev.slice(0, -1));
 
     setSchedules((prev) => {
       const updatedSchedules = prev.map((schedule) => {
@@ -280,14 +282,14 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
           return {
             ...schedule,
             employee: [],
-          }
+          };
         }
-        return schedule
-      })
+        return schedule;
+      });
 
-      return updatedSchedules as ISchedule[]
-    })
-  }
+      return updatedSchedules as ISchedule[];
+    });
+  };
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -328,13 +330,13 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                         {dayjs(date).format('ddd MMM-DD')}
                       </span>
                     </th>
-                  )
+                  );
                 })}
               </tr>
             </thead>
             <tbody>
               {employees.map((emp) => {
-                const empShifts = getEmpShiftForWeek(emp.EmployeeId)
+                const empShifts = getEmpShiftForWeek(emp.EmployeeId);
                 return (
                   <tr className="border-b border-gray-400">
                     <td className="py-4 px-2 border-l border-gray-400">
@@ -349,8 +351,8 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                                 const shiftHours = getHoursDiffInTwoTimeString(
                                   shift.ShiftStartTime,
                                   shift.ShiftEndTime
-                                )
-                                return acc + shiftHours
+                                );
+                                return acc + shiftHours;
                               }, 0)}
                               {' hours'}
                             </div>
@@ -370,7 +372,7 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                       </div>
                     </td>
                     {datesArray.map((date, idx) => {
-                      const shift = getEmpShiftForDay(emp.EmployeeId, date)
+                      const shift = getEmpShiftForDay(emp.EmployeeId, date);
                       return (
                         <td
                           className={`text-center px-2 border-l ${
@@ -395,17 +397,17 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                             </DropPoint>
                           )}
                         </td>
-                      )
+                      );
                     })}
                   </tr>
-                )
+                );
               })}
             </tbody>
           </table>
           <div className="flex flex-col gap-1 p-4 bg-gray-200 rounded w-[18%] max-h-[80vh] overflow-scroll remove-vertical-scrollbar">
             <div className="font-semibold text-lg">Unassigned shifts</div>
             {datesArray.map((date) => {
-              const unUnassignedShifts = getUnassignedShiftForDay(date)
+              const unUnassignedShifts = getUnassignedShiftForDay(date);
               return (
                 <div className={`flex flex-col gap-2`}>
                   {unUnassignedShifts.length > 0 && (
@@ -430,16 +432,16 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                           <span>{res.shift.ShiftPosition}</span>
                         </div>
                       </Draggable>
-                    )
+                    );
                   })}
                 </div>
-              )
+              );
             })}
           </div>
         </div>
       </div>
     </DndProvider>
-  )
-}
+  );
+};
 
-export default ByEmployeeView
+export default ByEmployeeView;

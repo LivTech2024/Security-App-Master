@@ -1,9 +1,9 @@
-import { useLocation, useNavigate } from 'react-router-dom'
-import { PageRoutes } from '../@types/enum'
-import { useAuthState } from '../store'
-import { openContextModal } from '@mantine/modals'
-import PopupMenu from '../common/PopupMenu'
-import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom';
+import { PageRoutes } from '../@types/enum';
+import { useAuthState } from '../store';
+import { openContextModal } from '@mantine/modals';
+import PopupMenu from '../common/PopupMenu';
+import { useState } from 'react';
 
 const NavItem = ({
   name,
@@ -12,16 +12,16 @@ const NavItem = ({
   dropdownChildren,
   isDropdownReq,
 }: {
-  name: string
-  path?: string
-  callback?: () => void
-  isDropdownReq?: boolean
-  dropdownChildren?: { name: string; path: string }[]
+  name: string;
+  path?: string;
+  callback?: () => void;
+  isDropdownReq?: boolean;
+  dropdownChildren?: { name: string; path: string }[];
 }) => {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [isDropDownOpened, setIsDropDownOpened] = useState(false)
+  const [isDropDownOpened, setIsDropDownOpened] = useState(false);
 
   if (isDropdownReq) {
     return (
@@ -55,12 +55,12 @@ const NavItem = ({
                 >
                   {res.name}
                 </div>
-              )
+              );
             })}
           </div>
         </PopupMenu>
       </div>
-    )
+    );
   }
   return (
     <div
@@ -74,16 +74,16 @@ const NavItem = ({
     >
       {name}
     </div>
-  )
-}
+  );
+};
 
 const Nav = ({
   userType,
 }: {
-  userType: 'admin' | 'client' | 'super_admin'
+  userType: 'admin' | 'client' | 'super_admin';
 }) => {
-  const { userSignOut } = useAuthState()
-  const navigate = useNavigate()
+  const { userSignOut } = useAuthState();
+  const navigate = useNavigate();
   return (
     <div
       className={`flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1 ${
@@ -135,19 +135,19 @@ const Nav = ({
               title: 'Confirm',
               body: 'Are you sure to sign out',
               onConfirm: () => {
-                navigate(PageRoutes.HOME)
-                userSignOut()
+                navigate(PageRoutes.HOME);
+                userSignOut();
               },
             },
             size: '30%',
             styles: {
               body: { padding: '0px' },
             },
-          })
+          });
         }}
       />
     </div>
-  )
-}
+  );
+};
 
-export default Nav
+export default Nav;

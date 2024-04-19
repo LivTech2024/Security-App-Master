@@ -1,24 +1,24 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { FormProvider, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FormProvider, useForm } from 'react-hook-form';
 import {
   AdminUpdateFormFields,
   adminUpdateSchema,
-} from '../../utilities/zod/schema'
-import { useAuthState } from '../../store'
-import Button from '../../common/button/Button'
-import InputWithTopHeader from '../../common/inputs/InputWithTopHeader'
-import DbCompany from '../../firebase_configs/DB/DbCompany'
+} from '../../utilities/zod/schema';
+import { useAuthState } from '../../store';
+import Button from '../../common/button/Button';
+import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
+import DbCompany from '../../firebase_configs/DB/DbCompany';
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from '../../utilities/TsxUtils'
-import { errorHandler } from '../../utilities/CustomError'
-import { useState } from 'react'
-import UpdateAdminCredModal from './modal/UpdateAdminCredModal'
+} from '../../utilities/TsxUtils';
+import { errorHandler } from '../../utilities/CustomError';
+import { useState } from 'react';
+import UpdateAdminCredModal from './modal/UpdateAdminCredModal';
 
 const AdminInfo = () => {
-  const { admin, setAdmin } = useAuthState()
+  const { admin, setAdmin } = useAuthState();
 
   const methods = useForm<AdminUpdateFormFields>({
     resolver: zodResolver(adminUpdateSchema),
@@ -26,35 +26,35 @@ const AdminInfo = () => {
       AdminName: admin?.AdminName,
       AdminPhone: admin?.AdminPhone,
     },
-  })
+  });
 
   const onSubmit = async (data: AdminUpdateFormFields) => {
-    if (!admin) return
+    if (!admin) return;
     try {
-      showModalLoader({})
+      showModalLoader({});
 
-      await DbCompany.updateAdmin(admin.AdminId, data)
+      await DbCompany.updateAdmin(admin.AdminId, data);
 
       showSnackbar({
         message: 'Admin updated successfully',
         type: 'success',
-      })
+      });
 
       setAdmin({
         ...admin,
         AdminName: data.AdminName,
         AdminPhone: data.AdminPhone,
-      })
+      });
 
-      closeModalLoader()
+      closeModalLoader();
     } catch (error) {
-      console.log(error)
-      errorHandler(error)
-      closeModalLoader()
+      console.log(error);
+      errorHandler(error);
+      closeModalLoader();
     }
-  }
+  };
 
-  const [updateAdminCredModal, setUpdateAdminCredModal] = useState(false)
+  const [updateAdminCredModal, setUpdateAdminCredModal] = useState(false);
   return (
     <FormProvider {...methods}>
       <form
@@ -101,7 +101,7 @@ const AdminInfo = () => {
         </div>
       </form>
     </FormProvider>
-  )
-}
+  );
+};
 
-export default AdminInfo
+export default AdminInfo;

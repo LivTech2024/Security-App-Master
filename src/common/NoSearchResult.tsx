@@ -1,9 +1,9 @@
-import noResultFoundImg from '../../public/assets/no_result.svg'
+import noResultFoundImg from '../../public/assets/no_result.svg';
 
 interface NoSearchResultProps {
-  imgWidth?: string
-  textSize?: string
-  text?: string
+  imgWidth?: string;
+  textSize?: string;
+  text?: string;
 }
 
 const NoSearchResult = ({
@@ -27,7 +27,7 @@ const NoSearchResult = ({
         {text}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NoSearchResult
+export default NoSearchResult;

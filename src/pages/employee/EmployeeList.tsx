@@ -1,42 +1,42 @@
-import { useEffect, useState } from 'react'
-import { useDebouncedValue } from '@mantine/hooks'
-import { useInfiniteQuery } from '@tanstack/react-query'
-import { useInView } from 'react-intersection-observer'
+import { useEffect, useState } from 'react';
+import { useDebouncedValue } from '@mantine/hooks';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInView } from 'react-intersection-observer';
 import {
   DisplayCount,
   MinimumQueryCharacter,
   PageRoutes,
   REACT_QUERY_KEYS,
-} from '../../@types/enum'
-import DbEmployee from '../../firebase_configs/DB/DbEmployee'
-import { DocumentData } from 'firebase/firestore'
-import { IEmployeesCollection } from '../../@types/database'
-import NoSearchResult from '../../common/NoSearchResult'
-import TableShimmer from '../../common/shimmer/TableShimmer'
-import { useAuthState, useEditFormStore } from '../../store'
-import { firebaseDataToObject, splitName } from '../../utilities/misc'
-import { Employee } from '../../store/slice/editForm.slice'
-import Button from '../../common/button/Button'
-import AddEmpRoleModal from '../../component/employees/modal/AddEmpRoleModal'
-import { useNavigate } from 'react-router-dom'
-import SearchBar from '../../common/inputs/SearchBar'
-import SelectBranch from '../../common/SelectBranch'
-import empDefaultPlaceHolder from '../../../public/assets/avatar.png'
+} from '../../@types/enum';
+import DbEmployee from '../../firebase_configs/DB/DbEmployee';
+import { DocumentData } from 'firebase/firestore';
+import { IEmployeesCollection } from '../../@types/database';
+import NoSearchResult from '../../common/NoSearchResult';
+import TableShimmer from '../../common/shimmer/TableShimmer';
+import { useAuthState, useEditFormStore } from '../../store';
+import { firebaseDataToObject, splitName } from '../../utilities/misc';
+import { Employee } from '../../store/slice/editForm.slice';
+import Button from '../../common/button/Button';
+import AddEmpRoleModal from '../../component/employees/modal/AddEmpRoleModal';
+import { useNavigate } from 'react-router-dom';
+import SearchBar from '../../common/inputs/SearchBar';
+import SelectBranch from '../../common/SelectBranch';
+import empDefaultPlaceHolder from '../../../public/assets/avatar.png';
 
 const EmployeeList = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [addEmployeeRoleModal, setAddEmployeeRoleModal] = useState(false)
+  const [addEmployeeRoleModal, setAddEmployeeRoleModal] = useState(false);
 
-  const { setEmployeeEditData } = useEditFormStore()
+  const { setEmployeeEditData } = useEditFormStore();
 
-  const { company } = useAuthState()
+  const { company } = useAuthState();
 
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState('');
 
-  const [branch, setBranch] = useState('')
+  const [branch, setBranch] = useState('');
 
-  const [debouncedQuery] = useDebouncedValue(query, 200)
+  const [debouncedQuery] = useDebouncedValue(query, 200);
 
   const {
     data: snapshotData,
@@ -60,17 +60,17 @@ const EmployeeList = () => {
         searchQuery: debouncedQuery,
         cmpId: company!.CompanyId,
         branch,
-      })
-      return snapshot.docs
+      });
+      return snapshot.docs;
     },
     getNextPageParam: (lastPage) => {
       if (lastPage?.length === 0) {
-        return null
+        return null;
       }
       if (lastPage?.length === DisplayCount.EMPLOYEE_LIST) {
-        return lastPage.at(-1)
+        return lastPage.at(-1);
       }
-      return null
+      return null;
     },
     initialPageParam: null as null | DocumentData,
     enabled:
@@ -78,44 +78,44 @@ const EmployeeList = () => {
       debouncedQuery.trim().length < MinimumQueryCharacter.EMPLOYEE
         ? false
         : true,
-  })
+  });
 
   const [data, setData] = useState<IEmployeesCollection[]>(() => {
     if (snapshotData) {
       return snapshotData.pages.flatMap((page) =>
         page.map((doc) => doc.data() as IEmployeesCollection)
-      )
+      );
     }
-    return []
-  })
+    return [];
+  });
 
   useEffect(() => {
-    console.log(error, 'error')
-  }, [error])
+    console.log(error, 'error');
+  }, [error]);
 
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
     if (snapshotData) {
-      const docData: IEmployeesCollection[] = []
+      const docData: IEmployeesCollection[] = [];
       snapshotData.pages?.forEach((page) => {
         page?.forEach((doc) => {
-          const data = doc.data() as IEmployeesCollection
-          docData.push(data)
-        })
-      })
-      setData(docData)
+          const data = doc.data() as IEmployeesCollection;
+          docData.push(data);
+        });
+      });
+      setData(docData);
     }
-  }, [snapshotData])
+  }, [snapshotData]);
 
   // hook for pagination
-  const { ref, inView } = useInView()
+  const { ref, inView } = useInView();
 
   // this is for pagination
   useEffect(() => {
     if (inView && hasNextPage && !isFetching) {
-      fetchNextPage()
+      fetchNextPage();
     }
-  }, [fetchNextPage, inView, hasNextPage, isFetching])
+  }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -131,8 +131,8 @@ const EmployeeList = () => {
           />
           <button
             onClick={() => {
-              setEmployeeEditData(null)
-              navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT)
+              setEmployeeEditData(null);
+              navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT);
             }}
             className="bg-primary text-surface px-4 py-2 rounded"
           >
@@ -181,7 +181,7 @@ const EmployeeList = () => {
             </tr>
           ) : (
             data.map((emp) => {
-              const { firstName, lastName } = splitName(emp.EmployeeName)
+              const { firstName, lastName } = splitName(emp.EmployeeName);
               return (
                 <tr
                   key={emp.EmployeeId}
@@ -190,8 +190,8 @@ const EmployeeList = () => {
                       firebaseDataToObject(
                         emp as unknown as Record<string, unknown>
                       ) as unknown as Employee
-                    )
-                    navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT)
+                    );
+                    navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT);
                   }}
                   className="cursor-pointer"
                 >
@@ -210,7 +210,7 @@ const EmployeeList = () => {
                     {emp.EmployeeRole}
                   </td>
                 </tr>
-              )
+              );
             })
           )}
           <tr ref={ref}>
@@ -224,7 +224,7 @@ const EmployeeList = () => {
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
-export default EmployeeList
+export default EmployeeList;

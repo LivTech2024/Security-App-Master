@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import payStubReceiptImg from '../../../public/assets/pay_stub_receipt.svg'
-import printingInvoiceImg from '../../../public/assets/printing_invoice.svg'
-import Button from '../../common/button/Button'
-import GeneratePaystubModal from '../../component/payments_and_billing/modal/GeneratePaystubModal'
-import { useNavigate } from 'react-router-dom'
-import { PageRoutes } from '../../@types/enum'
+import { useState } from 'react';
+import payStubReceiptImg from '../../../public/assets/pay_stub_receipt.svg';
+import printingInvoiceImg from '../../../public/assets/printing_invoice.svg';
+import Button from '../../common/button/Button';
+import GeneratePaystubModal from '../../component/payments_and_billing/modal/GeneratePaystubModal';
+import { useNavigate } from 'react-router-dom';
+import { PageRoutes } from '../../@types/enum';
 
 const PaymentsAndBilling = () => {
-  const [generatePaystubModal, setGeneratePaystubModal] = useState(false)
+  const [generatePaystubModal, setGeneratePaystubModal] = useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -48,7 +48,7 @@ const PaymentsAndBilling = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PaymentsAndBilling
+export default PaymentsAndBilling;

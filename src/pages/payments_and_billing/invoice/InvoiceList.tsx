@@ -1,47 +1,47 @@
-import { useEffect, useState } from 'react'
-import { useAuthState } from '../../../store'
-import dayjs from 'dayjs'
-import DateFilterDropdown from '../../../common/dropdown/DateFilterDropdown'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react';
+import { useAuthState } from '../../../store';
+import dayjs from 'dayjs';
+import DateFilterDropdown from '../../../common/dropdown/DateFilterDropdown';
+import { useNavigate } from 'react-router-dom';
 import {
   DisplayCount,
   PageRoutes,
   REACT_QUERY_KEYS,
-} from '../../../@types/enum'
-import Button from '../../../common/button/Button'
-import { useInfiniteQuery } from '@tanstack/react-query'
-import DbPayment from '../../../firebase_configs/DB/DbPayment'
-import { DocumentData } from 'firebase/firestore'
+} from '../../../@types/enum';
+import Button from '../../../common/button/Button';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import DbPayment from '../../../firebase_configs/DB/DbPayment';
+import { DocumentData } from 'firebase/firestore';
 import {
   IClientsCollection,
   IInvoicesCollection,
-} from '../../../@types/database'
-import { useInView } from 'react-intersection-observer'
-import TableShimmer from '../../../common/shimmer/TableShimmer'
-import NoSearchResult from '../../../common/NoSearchResult'
-import { formatDate } from '../../../utilities/misc'
-import { numberFormatter } from '../../../utilities/NumberFormater'
-import { MdOutlinePrint } from 'react-icons/md'
-import { errorHandler } from '../../../utilities/CustomError'
-import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils'
-import { htmlStringToPdf } from '../../../utilities/htmlStringToPdf'
-import { generateInvoiceHTML } from '../../../utilities/generateInvoiceHtml'
-import DbClient from '../../../firebase_configs/DB/DbClient'
+} from '../../../@types/database';
+import { useInView } from 'react-intersection-observer';
+import TableShimmer from '../../../common/shimmer/TableShimmer';
+import NoSearchResult from '../../../common/NoSearchResult';
+import { formatDate } from '../../../utilities/misc';
+import { numberFormatter } from '../../../utilities/NumberFormater';
+import { MdOutlinePrint } from 'react-icons/md';
+import { errorHandler } from '../../../utilities/CustomError';
+import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils';
+import { htmlStringToPdf } from '../../../utilities/htmlStringToPdf';
+import { generateInvoiceHTML } from '../../../utilities/generateInvoiceHtml';
+import DbClient from '../../../firebase_configs/DB/DbClient';
 
 const InvoiceList = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [startDate, setStartDate] = useState<Date | string | null>(
     dayjs().startOf('M').toDate()
-  )
+  );
 
   const [endDate, setEndDate] = useState<Date | string | null>(
     dayjs().endOf('M').toDate()
-  )
+  );
 
-  const [isLifeTime, setIsLifeTime] = useState(false)
+  const [isLifeTime, setIsLifeTime] = useState(false);
 
-  const { company } = useAuthState()
+  const { company } = useAuthState();
 
   const {
     data: snapshotData,
@@ -67,83 +67,83 @@ const InvoiceList = () => {
         isLifeTime,
         startDate,
         endDate,
-      })
-      return snapshot.docs
+      });
+      return snapshot.docs;
     },
     getNextPageParam: (lastPage) => {
       if (lastPage?.length === 0) {
-        return null
+        return null;
       }
       if (lastPage?.length === DisplayCount.EMPLOYEE_LIST) {
-        return lastPage.at(-1)
+        return lastPage.at(-1);
       }
-      return null
+      return null;
     },
     initialPageParam: null as null | DocumentData,
-  })
+  });
 
   const [data, setData] = useState<IInvoicesCollection[]>(() => {
     if (snapshotData) {
       return snapshotData.pages.flatMap((page) =>
         page.map((doc) => doc.data() as IInvoicesCollection)
-      )
+      );
     }
-    return []
-  })
+    return [];
+  });
 
   useEffect(() => {
-    console.log(error, 'error')
-  }, [error])
+    console.log(error, 'error');
+  }, [error]);
 
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
     if (snapshotData) {
-      const docData: IInvoicesCollection[] = []
+      const docData: IInvoicesCollection[] = [];
       snapshotData.pages?.forEach((page) => {
         page?.forEach((doc) => {
-          const data = doc.data() as IInvoicesCollection
-          docData.push(data)
-        })
-      })
-      setData(docData)
+          const data = doc.data() as IInvoicesCollection;
+          docData.push(data);
+        });
+      });
+      setData(docData);
     }
-  }, [snapshotData])
+  }, [snapshotData]);
 
   // hook for pagination
-  const { ref, inView } = useInView()
+  const { ref, inView } = useInView();
 
   // this is for pagination
   useEffect(() => {
     if (inView && hasNextPage && !isFetching) {
-      fetchNextPage()
+      fetchNextPage();
     }
-  }, [fetchNextPage, inView, hasNextPage, isFetching])
+  }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
   const downloadInvoice = async (invoiceData: IInvoicesCollection) => {
-    if (!company) return
+    if (!company) return;
     try {
-      showModalLoader({})
+      showModalLoader({});
 
       const clientSnapshot = await DbClient.getClientById(
         invoiceData.InvoiceClientId
-      )
-      const clientData = clientSnapshot.data() as IClientsCollection
+      );
+      const clientData = clientSnapshot.data() as IClientsCollection;
 
       const html = await generateInvoiceHTML({
         companyDetails: company,
         invoiceData,
         clientBalance: clientData.ClientBalance,
-      })
+      });
 
-      await htmlStringToPdf('invoice.pdf', html)
+      await htmlStringToPdf('invoice.pdf', html);
 
-      closeModalLoader()
+      closeModalLoader();
     } catch (error) {
-      console.log(error)
-      errorHandler(error)
-      closeModalLoader()
+      console.log(error);
+      errorHandler(error);
+      closeModalLoader();
     }
-  }
+  };
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -225,7 +225,7 @@ const InvoiceList = () => {
                     <MdOutlinePrint />
                   </td>
                 </tr>
-              )
+              );
             })
           )}
           <tr ref={ref}>
@@ -239,7 +239,7 @@ const InvoiceList = () => {
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
-export default InvoiceList
+export default InvoiceList;

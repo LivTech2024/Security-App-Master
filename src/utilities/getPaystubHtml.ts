@@ -2,34 +2,34 @@
 function calculateFederalIncomeTax(grossPay: number): number {
   // Calculate federal income tax based on the gross pay
   // This calculation is simplified and should be adjusted based on the actual tax rates and brackets
-  return grossPay * 0.15 // Placeholder calculation
+  return grossPay * 0.15; // Placeholder calculation
 }
 
 function calculateProvincialIncomeTax(grossPay: number): number {
   // Calculate provincial income tax based on the gross pay
   // This calculation is simplified and should be adjusted based on the actual tax rates and brackets for Alberta
-  return grossPay * 0.1 // Placeholder calculation
+  return grossPay * 0.1; // Placeholder calculation
 }
 
 function calculateCPPContributions(grossPay: number): number {
   // Calculate CPP contributions based on the gross pay
   // This calculation is simplified and should be adjusted based on the actual CPP contribution rates
-  return grossPay * 0.05 // Placeholder calculation
+  return grossPay * 0.05; // Placeholder calculation
 }
 
 function calculateEIContributions(grossPay: number): number {
   // Calculate EI contributions based on the gross pay
   // This calculation is simplified and should be adjusted based on the actual EI contribution rates
-  return grossPay * 0.033 // Placeholder calculation
+  return grossPay * 0.033; // Placeholder calculation
 }
 
 interface GetPaystubHtmlArgs {
-  startDate: string
-  endDate: string
-  empName: string
-  empHourlyRate: number
-  empWorkedHours: number
-  companyName: string
+  startDate: string;
+  endDate: string;
+  empName: string;
+  empHourlyRate: number;
+  empWorkedHours: number;
+  companyName: string;
 }
 
 export const getPaystubHtml = ({
@@ -40,13 +40,13 @@ export const getPaystubHtml = ({
   startDate,
   companyName,
 }: GetPaystubHtmlArgs) => {
-  const grossPay = empHourlyRate * empWorkedHours
+  const grossPay = empHourlyRate * empWorkedHours;
 
   const totalDeduction =
     calculateCPPContributions(grossPay) +
     calculateEIContributions(grossPay) +
     calculateFederalIncomeTax(grossPay) +
-    calculateProvincialIncomeTax(grossPay)
+    calculateProvincialIncomeTax(grossPay);
 
   const html =
     `<!DOCTYPE html>` +
@@ -128,7 +128,7 @@ export const getPaystubHtml = ({
     )}</p>` +
     `<p><strong>Employer:</strong> ${companyName}</p>` +
     `</body>` +
-    `</html>`
+    `</html>`;
 
-  return html
-}
+  return html;
+};
