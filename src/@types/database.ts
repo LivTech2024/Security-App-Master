@@ -253,15 +253,14 @@ export interface IDocumentsCollection {
   DocumentModifiedAt: Timestamp | FieldValue;
 }
 
-export interface INotificationsCollection {
-  NotificationId: string;
-  NotificationCompanyId: string;
-  NotificationBranchId?: string;
-  NotificationCreatedBy: 'admin' | 'employee';
-  NotificationCreatorId: string;
-  NotificationTitle: string;
-  NotificationData: string;
-  NotificationCreatedAt: Timestamp | FieldValue;
+export interface IMessagesCollection {
+  MessageId: string;
+  MessageCompanyId: string;
+  MessageData: string;
+  MessageCreatedById: string;
+  MessageCreatedByName: string;
+  MessageReceiversId: string[];
+  MessageCreatedAt: Timestamp | FieldValue;
 }
 
 export interface ILocationsCollection {

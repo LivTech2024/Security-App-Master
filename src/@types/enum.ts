@@ -6,7 +6,7 @@ export enum CollectionName {
   employees = 'Employees',
   shifts = 'Shifts',
   patrols = 'Patrols',
-  notifications = 'Notifications',
+  messages = 'Messages',
   loggedInUsers = 'LoggedInUsers',
   locations = 'Locations',
   reportCategories = 'ReportCategories',

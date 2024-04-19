@@ -29,7 +29,6 @@ import ShiftList from './pages/shifts/ShiftList';
 import ShiftCreateOrEdit from './pages/shifts/ShiftCreateOrEdit';
 import Reports from './pages/reports/Reports';
 import Settings from './pages/settings/Settings';
-import useListenNotifications from './hooks/listeners/useListenNotifications';
 import PaymentsAndBilling from './pages/payments_and_billing/PaymentsAndBilling';
 import InvoiceGenerate from './pages/payments_and_billing/invoice/InvoiceGenerate';
 import InvoiceList from './pages/payments_and_billing/invoice/InvoiceList';
@@ -49,25 +48,26 @@ import ClientPatrolView from './pages/client_portal/patrol/ClientPatrolView';
 import ClientReportView from './pages/client_portal/report/ClientReportView';
 import ClientShifts from './pages/client_portal/shift/ClientShifts';
 import ClientShiftView from './pages/client_portal/shift/ClientShiftView';
+import useListenMessage from './hooks/listeners/useListenMessage';
 
 function App() {
   useOnAuthStateChanged();
 
   const { company, admin, loading, superAdmin, client } = useAuthState();
 
-  const { notification } = useListenNotifications();
+  const { message } = useListenMessage();
 
   const location = useLocation();
 
   useEffect(() => {
-    if (notification) {
-      const { NotificationTitle } = notification;
+    if (message) {
+      const { MessageData } = message;
       showSnackbar({
-        message: `New notification received \n${NotificationTitle}`,
+        message: MessageData,
         type: 'info',
       });
     }
-  }, [notification]);
+  }, [message]);
 
   if (loading) {
     return <SplashScreen />;
