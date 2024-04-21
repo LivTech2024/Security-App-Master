@@ -13,6 +13,8 @@ import InputSelect from '../../../common/inputs/InputSelect';
 import useFetchEmployees from '../../../hooks/fetch/useFetchEmployees';
 import useFetchClients from '../../../hooks/fetch/useFetchClients';
 import { MdClose } from 'react-icons/md';
+import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { useQueryClient } from '@tanstack/react-query';
 
 const SendMessageModal = ({
   opened,
@@ -21,6 +23,8 @@ const SendMessageModal = ({
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const queryClient = useQueryClient();
+
   const [loading, setLoading] = useState(false);
 
   const { company } = useAuthState();
@@ -91,6 +95,10 @@ const SendMessageModal = ({
         receiversId: receivers.map((rec) => rec.id),
         senderId: company!.CompanyId,
         senderName: 'Admin',
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.MESSAGE_SENT_LIST],
       });
 
       showSnackbar({ message: 'Message sent successfully', type: 'success' });

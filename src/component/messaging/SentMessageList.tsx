@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { IMessagesCollection } from '../../@types/database';
+import { IClientsCollection, IMessagesCollection } from '../../@types/database';
 import { DocumentData } from 'firebase/firestore';
 import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
 import DbMessaging from '../../firebase_configs/DB/DbMessaging';
@@ -8,6 +8,13 @@ import { useAuthState } from '../../store';
 import { useInView } from 'react-intersection-observer';
 import { formatDate } from '../../utilities/misc';
 import NoSearchResult from '../../common/NoSearchResult';
+import DbEmployee from '../../firebase_configs/DB/DbEmployee';
+import DbClient from '../../firebase_configs/DB/DbClient';
+
+export interface ISentMessagesCollection
+  extends Omit<IMessagesCollection, 'MessageReceiversId'> {
+  MessageReceiversId: { id: string; name: string }[];
+}
 
 const SentMessageList = () => {
   const { company } = useAuthState();
@@ -42,10 +49,10 @@ const SentMessageList = () => {
     initialPageParam: null as null | DocumentData,
   });
 
-  const [data, setData] = useState<IMessagesCollection[]>(() => {
+  const [data, setData] = useState<ISentMessagesCollection[]>(() => {
     if (snapshotData) {
       return snapshotData.pages.flatMap((page) =>
-        page.map((doc) => doc.data() as IMessagesCollection)
+        page.map((doc) => doc.data() as ISentMessagesCollection)
       );
     }
     return [];
@@ -58,14 +65,32 @@ const SentMessageList = () => {
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
     if (snapshotData) {
-      const docData: IMessagesCollection[] = [];
+      const docData: ISentMessagesCollection[] = [];
       snapshotData.pages?.forEach((page) => {
-        page?.forEach((doc) => {
-          const data = doc.data() as IMessagesCollection;
-          docData.push(data);
-        });
+        Promise.all(
+          page?.map(async (doc) => {
+            const data = doc.data() as IMessagesCollection;
+            const { MessageReceiversId } = data;
+            const newRecList: { id: string; name: string }[] = [];
+            await Promise.all(
+              MessageReceiversId.map(async (id) => {
+                const emp = await DbEmployee.getEmpById(id);
+                if (emp) {
+                  newRecList.push({ id, name: emp.EmployeeName });
+                } else {
+                  const clientSnapshot = await DbClient.getClientById(id);
+                  const clientData =
+                    clientSnapshot?.data() as IClientsCollection;
+                  if (clientData) {
+                    newRecList.push({ id, name: clientData.ClientName });
+                  }
+                }
+              })
+            );
+            docData.push({ ...data, MessageReceiversId: newRecList });
+          })
+        ).then(() => setData(docData));
       });
-      setData(docData);
     }
   }, [snapshotData]);
 
@@ -98,7 +123,7 @@ const SentMessageList = () => {
                 <div>
                   To:{' '}
                   <span className="font-semibold">
-                    {msg.MessageReceiversId.join(' , ')}
+                    {msg.MessageReceiversId.map((rec) => rec.name).join(' , ')}
                   </span>
                 </div>
 

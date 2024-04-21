@@ -11,7 +11,7 @@ import Schedule from './pages/schedule/Schedule';
 import LoaderModal from './common/modals/LoaderModal';
 import { ContextConfirmModal } from './common/modals/ContextConfirmModal';
 import { ToastContainer } from 'react-toastify';
-import { PageRoutes } from './@types/enum';
+import { PageRoutes, REACT_QUERY_KEYS } from './@types/enum';
 import PatrollingList from './pages/patrolling/PatrollingList';
 import PatrollingCreateOrEdit from './pages/patrolling/PatrollingCreateOrEdit';
 import PatrollingView from './pages/patrolling/PatrollingView';
@@ -50,6 +50,7 @@ import ClientShifts from './pages/client_portal/shift/ClientShifts';
 import ClientShiftView from './pages/client_portal/shift/ClientShiftView';
 import useListenMessage from './hooks/listeners/useListenMessage';
 import Messaging from './pages/messaging/Messaging';
+import { useQueryClient } from '@tanstack/react-query';
 
 function App() {
   useOnAuthStateChanged();
@@ -60,6 +61,8 @@ function App() {
 
   const location = useLocation();
 
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     if (message) {
       const { MessageData } = message;
@@ -67,6 +70,11 @@ function App() {
         message: MessageData,
         type: 'info',
       });
+      queryClient
+        .invalidateQueries({
+          queryKey: [REACT_QUERY_KEYS.MESSAGE_RECEIVED_LIST],
+        })
+        .then(() => console.log('new message updated'));
     }
   }, [message]);
 
