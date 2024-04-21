@@ -1,14 +1,14 @@
 import { useState } from 'react';
+import { useAuthState } from '../../store';
 import Button from '../../common/button/Button';
 import ReceivedMessageList from '../../component/messaging/ReceivedMessageList';
 import SentMessageList from '../../component/messaging/SentMessageList';
-import SendMessageModal from '../../component/messaging/modal/SendMessageModal';
-import { useAuthState } from '../../store';
+import SendMessageModal from '../../component/client_portal/modal/SendMessageModal';
 
-const Messaging = () => {
+const ClientMessaging = () => {
   const [sendMessageModal, setSendMessageModal] = useState(false);
 
-  const { company } = useAuthState();
+  const { client } = useAuthState();
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
@@ -26,11 +26,11 @@ const Messaging = () => {
         setOpened={setSendMessageModal}
       />
       <div className="grid grid-cols-2 gap-4">
-        <ReceivedMessageList receiverId={company!.CompanyId} />
-        <SentMessageList senderId={company!.CompanyId} />
+        <ReceivedMessageList receiverId={client!.ClientId} />
+        <SentMessageList senderId={client!.ClientId} />
       </div>
     </div>
   );
 };
 
-export default Messaging;
+export default ClientMessaging;

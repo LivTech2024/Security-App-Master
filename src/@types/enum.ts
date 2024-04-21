@@ -115,6 +115,7 @@ export const PageRoutes = {
   CLIENT_PORTAL_REPORT_VIEW: '/client_portal/report_view',
   CLIENT_PORTAL_SHIFTS: '/client_portal/shifts',
   CLIENT_PORTAL_SHIFT_VIEW: '/client_portal/shift_view',
+  CLIENT_PORTAL_MESSAGING: '/client_portal/messaging',
 };
 
 export const LocalStorageKey = {

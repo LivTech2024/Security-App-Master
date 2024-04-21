@@ -4,14 +4,11 @@ import { DocumentData } from 'firebase/firestore';
 import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
 import DbMessaging from '../../firebase_configs/DB/DbMessaging';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useAuthState } from '../../store';
 import { useInView } from 'react-intersection-observer';
 import { formatDate } from '../../utilities/misc';
 import NoSearchResult from '../../common/NoSearchResult';
 
-const ReceivedMessageList = () => {
-  const { company } = useAuthState();
-
+const ReceivedMessageList = ({ receiverId }: { receiverId: string }) => {
   const {
     data: snapshotData,
     fetchNextPage,
@@ -21,12 +18,12 @@ const ReceivedMessageList = () => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.MESSAGE_RECEIVED_LIST, company!.CompanyId],
+    queryKey: [REACT_QUERY_KEYS.MESSAGE_RECEIVED_LIST, receiverId],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbMessaging.getReceivedMessages({
         lmt: DisplayCount.MESSAGE_RECEIVED_LIST,
         lastDoc: pageParam,
-        receiverId: company!.CompanyId,
+        receiverId: receiverId,
       });
       return snapshot.docs;
     },

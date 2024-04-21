@@ -122,6 +122,7 @@ const Nav = ({
           <NavItem path={PageRoutes.CLIENT_PORTAL_PATROLS} name="Patrols" />
           <NavItem path={PageRoutes.CLIENT_PORTAL_SHIFTS} name="Shifts" />
           <NavItem path={PageRoutes.CLIENT_PORTAL_REPORTS} name="Reports" />
+          <NavItem path={PageRoutes.CLIENT_PORTAL_MESSAGING} name="Messaging" />
         </>
       )}
       <NavItem

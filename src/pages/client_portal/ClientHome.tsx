@@ -55,7 +55,7 @@ const ClientHome = () => {
           name="Reports"
         />
         <HomeItem
-          path={PageRoutes.CLIENT_PORTAL_HOME}
+          path={PageRoutes.CLIENT_PORTAL_MESSAGING}
           name="Message"
           icon={<FaCommentDots className="text-2xl text-primaryGold" />}
         />

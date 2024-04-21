@@ -51,6 +51,7 @@ import ClientShiftView from './pages/client_portal/shift/ClientShiftView';
 import useListenMessage from './hooks/listeners/useListenMessage';
 import Messaging from './pages/messaging/Messaging';
 import { useQueryClient } from '@tanstack/react-query';
+import ClientMessaging from './pages/client_portal/ClientMessaging';
 
 function App() {
   useOnAuthStateChanged();
@@ -118,6 +119,10 @@ function App() {
               <Route
                 path={PageRoutes.CLIENT_PORTAL_SHIFT_VIEW}
                 Component={ClientShiftView}
+              />
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_MESSAGING}
+                Component={ClientMessaging}
               />
             </Routes>
           </Layout>

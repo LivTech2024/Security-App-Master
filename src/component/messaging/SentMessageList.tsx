@@ -4,7 +4,6 @@ import { DocumentData } from 'firebase/firestore';
 import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
 import DbMessaging from '../../firebase_configs/DB/DbMessaging';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { useAuthState } from '../../store';
 import { useInView } from 'react-intersection-observer';
 import { formatDate } from '../../utilities/misc';
 import NoSearchResult from '../../common/NoSearchResult';
@@ -24,9 +23,7 @@ export interface ISentMessagesCollection
   MessageReceiversId: { id: string; name: string }[];
 }
 
-const SentMessageList = () => {
-  const { company } = useAuthState();
-
+const SentMessageList = ({ senderId }: { senderId: string }) => {
   const {
     data: snapshotData,
     fetchNextPage,
@@ -36,12 +33,12 @@ const SentMessageList = () => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.MESSAGE_SENT_LIST, company!.CompanyId],
+    queryKey: [REACT_QUERY_KEYS.MESSAGE_SENT_LIST, senderId],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbMessaging.getSentMessages({
         lmt: DisplayCount.MESSAGE_SENT_LIST,
         lastDoc: pageParam,
-        senderId: company!.CompanyId,
+        senderId: senderId,
       });
       return snapshot.docs;
     },
