@@ -33,7 +33,7 @@ const InputSelect = ({
   nothingFoundMessage,
 }: InputSelectProps) => {
   return (
-    <div className={` gap-1 flex flex-col `}>
+    <div className={` gap-1 flex flex-col w-full`}>
       {label ? (
         <InputHeader title={label} fontClassName={fontClassName} />
       ) : null}
