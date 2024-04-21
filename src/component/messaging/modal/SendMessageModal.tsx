@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Dialog from '../../../common/Dialog';
-import { errorHandler } from '../../../utilities/CustomError';
+import CustomError, { errorHandler } from '../../../utilities/CustomError';
 import {
   closeModalLoader,
   showModalLoader,
@@ -87,6 +87,12 @@ const SendMessageModal = ({
 
   const onSubmit = async () => {
     try {
+      if (receivers.length === 0) {
+        throw new CustomError('Please select at least one receiver');
+      }
+      if (!data) {
+        throw new CustomError('Please enter message');
+      }
       setLoading(true);
 
       await DbMessaging.createMessage({

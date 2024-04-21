@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Dialog from '../../../common/Dialog';
-import { errorHandler } from '../../../utilities/CustomError';
+import CustomError, { errorHandler } from '../../../utilities/CustomError';
 import {
   closeModalLoader,
   showModalLoader,
@@ -10,11 +10,11 @@ import DbMessaging from '../../../firebase_configs/DB/DbMessaging';
 import { useAuthState } from '../../../store';
 import TextareaWithTopHeader from '../../../common/inputs/TextareaWithTopHeader';
 import InputSelect from '../../../common/inputs/InputSelect';
-import useFetchEmployees from '../../../hooks/fetch/useFetchEmployees';
 import { MdClose } from 'react-icons/md';
 import { REACT_QUERY_KEYS } from '../../../@types/enum';
 import { useQueryClient } from '@tanstack/react-query';
 import SwitchWithSideHeader from '../../../common/switch/SwitchWithSideHeader';
+import useFetchClientEmployees from '../../../hooks/fetch/useFetchClientEmployees';
 
 const SendMessageModal = ({
   opened,
@@ -39,10 +39,7 @@ const SendMessageModal = ({
 
   const [selectedEmployee, setSelectedEmployee] = useState('');
 
-  const { data: employees } = useFetchEmployees({
-    limit: 5,
-    searchQuery: empSearchQuery,
-  });
+  const { data: employees } = useFetchClientEmployees();
 
   useEffect(() => {
     if (selectedEmployee && selectedEmployee.length > 0) {
@@ -63,6 +60,13 @@ const SendMessageModal = ({
   const onSubmit = async () => {
     if (!client) return;
     try {
+      if (receivers.length === 0) {
+        throw new CustomError('Please select at least one receiver');
+      }
+      if (!data) {
+        throw new CustomError('Please enter message');
+      }
+
       setLoading(true);
 
       await DbMessaging.createMessage({

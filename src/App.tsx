@@ -65,7 +65,7 @@ function App() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (message) {
+    if (message && (client || (admin && company))) {
       const { MessageData } = message;
       showSnackbar({
         message: MessageData,

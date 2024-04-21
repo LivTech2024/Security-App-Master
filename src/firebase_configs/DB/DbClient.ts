@@ -19,7 +19,11 @@ import {
 import { db } from '../config';
 import { CollectionName } from '../../@types/enum';
 import { ClientFormFields } from '../../utilities/zod/schema';
-import { IClientsCollection } from '../../@types/database';
+import {
+  IClientsCollection,
+  IEmployeesCollection,
+  IShiftsCollection,
+} from '../../@types/database';
 import CustomError from '../../utilities/CustomError';
 import { getNewDocId } from './utils';
 import { fullTextSearchIndex, removeTimeFromDate } from '../../utilities/misc';
@@ -29,6 +33,7 @@ import {
   updateAuthUser,
 } from '../../API/AuthUser';
 import dayjs from 'dayjs';
+import DbEmployee from './DbEmployee';
 
 class DbClient {
   static isClientExist = async (
@@ -407,6 +412,51 @@ class DbClient {
     const shiftQuery = query(shiftRef, ...queryParams);
 
     return getDocs(shiftQuery);
+  };
+
+  static getClientEmployees = async (clientId: string) => {
+    const shiftRef = collection(db, CollectionName.shifts);
+    const shiftQuery = query(
+      shiftRef,
+      where('ShiftClientId', '==', clientId),
+      where(
+        'ShiftDate',
+        '>=',
+        dayjs(new Date()).subtract(1, 'day').startOf('day').toDate()
+      ),
+      where(
+        'ShiftDate',
+        '<=',
+        dayjs(new Date()).add(1, 'day').endOf('day').toDate()
+      )
+    );
+
+    const shiftSnapshot = await getDocs(shiftQuery);
+
+    const employees: IEmployeesCollection[] = [];
+
+    const shiftData = shiftSnapshot.docs.map(
+      (doc) => doc.data() as IShiftsCollection
+    );
+
+    await Promise.all(
+      shiftData.map(async (shift) => {
+        const { ShiftAssignedUserId } = shift;
+        await Promise.all(
+          ShiftAssignedUserId.map(async (id) => {
+            const empData = await DbEmployee.getEmpById(id);
+
+            if (
+              !employees.find((emp) => emp.EmployeeId === empData.EmployeeId)
+            ) {
+              employees.push(empData);
+            }
+          })
+        );
+      })
+    );
+
+    return employees;
   };
 }
 
