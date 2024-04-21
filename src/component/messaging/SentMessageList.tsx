@@ -3,13 +3,21 @@ import { IClientsCollection, IMessagesCollection } from '../../@types/database';
 import { DocumentData } from 'firebase/firestore';
 import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
 import DbMessaging from '../../firebase_configs/DB/DbMessaging';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthState } from '../../store';
 import { useInView } from 'react-intersection-observer';
 import { formatDate } from '../../utilities/misc';
 import NoSearchResult from '../../common/NoSearchResult';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
 import DbClient from '../../firebase_configs/DB/DbClient';
+import { FaRegTrashAlt } from 'react-icons/fa';
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from '../../utilities/TsxUtils';
+import { openContextModal } from '@mantine/modals';
+import { errorHandler } from '../../utilities/CustomError';
 
 export interface ISentMessagesCollection
   extends Omit<IMessagesCollection, 'MessageReceiversId'> {
@@ -104,6 +112,42 @@ const SentMessageList = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const queryClient = useQueryClient();
+
+  const [loading, setLoading] = useState(false);
+
+  const onMessageDelete = async (id: string) => {
+    try {
+      setLoading(true);
+
+      await DbMessaging.deleteMessage(id);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.MESSAGE_SENT_LIST],
+      });
+
+      showSnackbar({
+        message: 'Message deleted successfully',
+        type: 'success',
+      });
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      errorHandler(error);
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
+
   return (
     <div className="bg-surface p-4 rounded shadow-md flex flex-col gap-6">
       <div className="font-semibold text-lg">Sent</div>
@@ -120,11 +164,37 @@ const SentMessageList = () => {
                 key={msg.MessageId}
                 className="flex flex-col bg-onHoverBg p-4 rounded w-full gap-2"
               >
-                <div>
-                  To:{' '}
-                  <span className="font-semibold">
-                    {msg.MessageReceiversId.map((rec) => rec.name).join(' , ')}
-                  </span>
+                <div className="flex items-center justify-between w-full gap-4">
+                  <div className="w-[80%]">
+                    To:{' '}
+                    <span className="font-semibold">
+                      {msg.MessageReceiversId.map((rec) => rec.name).join(
+                        ' , '
+                      )}
+                    </span>
+                  </div>
+                  <FaRegTrashAlt
+                    onClick={() => {
+                      openContextModal({
+                        modal: 'confirmModal',
+                        withCloseButton: false,
+                        centered: true,
+                        closeOnClickOutside: true,
+                        innerProps: {
+                          title: 'Confirm',
+                          body: 'Are you sure to delete this message',
+                          onConfirm: () => {
+                            onMessageDelete(msg.MessageId);
+                          },
+                        },
+                        size: '30%',
+                        styles: {
+                          body: { padding: '0px' },
+                        },
+                      });
+                    }}
+                    className="text-textPrimaryRed cursor-pointer text-lg"
+                  />
                 </div>
 
                 <span>{msg.MessageData}</span>

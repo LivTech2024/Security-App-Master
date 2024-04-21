@@ -154,6 +154,7 @@ const SendMessageModal = ({
 
         <div className="flex items-center gap-4 w-full">
           <InputSelect
+            className="mx-0 w-full"
             label="Select employee"
             data={employees.map((res) => {
               return { label: res.EmployeeName, value: res.EmployeeId };
@@ -165,6 +166,7 @@ const SendMessageModal = ({
             searchable
           />
           <InputSelect
+            className="mx-0 w-full"
             label="Select client"
             data={clients.map((res) => {
               return { label: res.ClientName, value: res.ClientId };
