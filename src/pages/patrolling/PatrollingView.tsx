@@ -1,34 +1,39 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import PatrolViewCard from '../../component/patrolling/PatrolViewCard';
 import { useEffect, useState } from 'react';
 import DbPatrol from '../../firebase_configs/DB/DbPatrol';
-import { IPatrolsCollection } from '../../@types/database';
 import NoSearchResult from '../../common/NoSearchResult';
-import { PageRoutes } from '../../@types/enum';
-import Button from '../../common/button/Button';
-import { useEditFormStore } from '../../store';
+import {
+  IPatrolLogsCollection,
+  IPatrolsCollection,
+} from '../../@types/database';
 
 const PatrollingView = () => {
-  const { setPatrolEditData } = useEditFormStore();
-
   const [searchParam] = useSearchParams();
 
-  const patrolId = searchParam.get('id');
+  const patrolLogId = searchParam.get('id');
 
   const [isPatrolLoading, setIsPatrolLoading] = useState(true);
 
-  const [data, setData] = useState<IPatrolsCollection | null>(null);
+  const [logData, setLogData] = useState<IPatrolLogsCollection | null>(null);
 
-  const navigate = useNavigate();
+  const [patrolData, setPatrolData] = useState<IPatrolsCollection | null>(null);
 
   useEffect(() => {
-    const fetchPatrolData = async () => {
-      if (!patrolId) return;
+    const fetchPatrolLogData = async () => {
+      if (!patrolLogId) return;
       try {
-        const patrolSnapshot = await DbPatrol.getPatrolById(patrolId);
-        const patrolData = patrolSnapshot.data() as IPatrolsCollection;
+        const patrolLogSnapshot = await DbPatrol.getPatrolLogById(patrolLogId);
+        const patrolLogData = patrolLogSnapshot.data() as IPatrolLogsCollection;
 
-        setData(patrolData);
+        const { PatrolId } = patrolLogData;
+        if (PatrolId) {
+          const patrolSnapshot = await DbPatrol.getPatrolById(PatrolId);
+          const patrolData = patrolSnapshot.data() as IPatrolsCollection;
+          setPatrolData(patrolData);
+        }
+
+        setLogData(patrolLogData);
 
         setIsPatrolLoading(false);
       } catch (error) {
@@ -37,10 +42,10 @@ const PatrollingView = () => {
       }
     };
 
-    fetchPatrolData();
-  }, [patrolId]);
+    fetchPatrolLogData();
+  }, [patrolLogId]);
 
-  if (!data && !isPatrolLoading) {
+  if (!logData && !isPatrolLoading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <NoSearchResult />
@@ -59,25 +64,13 @@ const PatrollingView = () => {
     );
   }
 
-  if (data) {
+  if (logData && patrolData) {
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
         <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-          <span className="font-semibold text-xl">Patrolling data</span>
-
-          <div className="flex items-center gap-4">
-            <Button
-              label="Edit"
-              onClick={() => {
-                setPatrolEditData(data);
-                navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT);
-              }}
-              type="black"
-              className="px-12 py-2 "
-            />
-          </div>
+          <span className="font-semibold text-xl">Patrol log data</span>
         </div>
-        <PatrolViewCard patrolData={data} />
+        <PatrolViewCard patrolLogData={logData} patrolData={patrolData} />
       </div>
     );
   }

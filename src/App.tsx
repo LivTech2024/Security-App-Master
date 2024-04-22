@@ -52,6 +52,7 @@ import useListenMessage from './hooks/listeners/useListenMessage';
 import Messaging from './pages/messaging/Messaging';
 import { useQueryClient } from '@tanstack/react-query';
 import ClientMessaging from './pages/client_portal/ClientMessaging';
+import PatrolLogs from './pages/patrolling/PatrolLogs';
 
 function App() {
   useOnAuthStateChanged();
@@ -192,6 +193,7 @@ function App() {
               path={PageRoutes.PATROLLING_LIST}
               Component={PatrollingList}
             />
+            <Route path={PageRoutes.PATROLLING_LOGS} Component={PatrolLogs} />
             <Route
               path={PageRoutes.PATROLLING_CREATE_OR_EDIT}
               Component={PatrollingCreateOrEdit}

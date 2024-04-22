@@ -149,7 +149,7 @@ const PatrollingList = () => {
         data={data}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
-        redirectOnClick={PageRoutes.PATROLLING_VIEW}
+        redirectOnClick={PageRoutes.PATROLLING_LOGS}
         ref={ref}
       />
     </div>

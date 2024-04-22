@@ -203,6 +203,7 @@ export interface IPatrolLogsCollection {
     CheckPointComment?: string | null;
     CheckPointImage?: string[];
   }[];
+  PatrolLogFeedbackComment?: string | null;
   PatrolLogStatus: 'started' | 'completed';
   PatrolLogEndedAt: Timestamp | FieldValue;
   PatrolLogCreatedAt: Timestamp;

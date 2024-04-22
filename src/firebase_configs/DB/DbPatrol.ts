@@ -251,6 +251,54 @@ class DbPatrol {
 
     return getDocs(shiftQuery);
   };
+
+  static getPatrolLogs = async ({
+    lmt,
+    lastDoc,
+    patrolId,
+    endDate,
+    isLifeTime,
+    startDate,
+  }: {
+    lmt?: number;
+    lastDoc?: DocumentData | null;
+    patrolId: string;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+  }) => {
+    const patrolLogRef = collection(db, CollectionName.patrolLogs);
+
+    let queryParams: QueryConstraint[] = [
+      where('PatrolId', '==', patrolId),
+      orderBy('PatrolLogCreatedAt', 'desc'),
+    ];
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('PatrolDate', '>=', startDate),
+        where('PatrolDate', '<=', endDate),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const patrolLogQuery = query(patrolLogRef, ...queryParams);
+
+    return getDocs(patrolLogQuery);
+  };
+
+  static getPatrolLogById = (patrolLogId: string) => {
+    const patrolRef = doc(db, CollectionName.patrolLogs, patrolLogId);
+    return getDoc(patrolRef);
+  };
 }
 
 export default DbPatrol;
