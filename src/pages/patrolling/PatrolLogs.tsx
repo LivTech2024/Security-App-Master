@@ -15,8 +15,11 @@ import NoSearchResult from '../../common/NoSearchResult';
 import { formatDate } from '../../utilities/misc';
 import { PatrolStatus } from '../../component/patrolling/PatrolStatus';
 import TableShimmer from '../../common/shimmer/TableShimmer';
+import { useAuthState } from '../../store';
 
 const PatrolLogs = () => {
+  const { company, admin } = useAuthState();
+
   const [searchParam] = useSearchParams();
 
   const patrolId = searchParam.get('id');
@@ -177,11 +180,18 @@ const PatrolLogs = () => {
               return (
                 <tr
                   key={patrol.PatrolLogId}
-                  onClick={() =>
-                    navigate(
-                      PageRoutes.PATROLLING_VIEW + `?id=${patrol.PatrolLogId}`
-                    )
-                  }
+                  onClick={() => {
+                    if (admin && company) {
+                      navigate(
+                        PageRoutes.PATROLLING_VIEW + `?id=${patrol.PatrolLogId}`
+                      );
+                    } else {
+                      navigate(
+                        PageRoutes.CLIENT_PORTAL_PATROL_VIEW +
+                          `?id=${patrol.PatrolLogId}`
+                      );
+                    }
+                  }}
                   className="cursor-pointer"
                 >
                   <td className="px-4 py-2 text-start align-top">

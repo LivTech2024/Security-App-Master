@@ -53,6 +53,7 @@ import Messaging from './pages/messaging/Messaging';
 import { useQueryClient } from '@tanstack/react-query';
 import ClientMessaging from './pages/client_portal/ClientMessaging';
 import PatrolLogs from './pages/patrolling/PatrolLogs';
+import ClientPatrolLog from './pages/client_portal/patrol/ClientPatrolLog';
 
 function App() {
   useOnAuthStateChanged();
@@ -100,6 +101,10 @@ function App() {
               <Route
                 path={PageRoutes.CLIENT_PORTAL_PATROLS}
                 Component={ClientPatrolsList}
+              />
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_PATROL_LOGS}
+                Component={ClientPatrolLog}
               />
               <Route
                 path={PageRoutes.CLIENT_PORTAL_PATROL_VIEW}

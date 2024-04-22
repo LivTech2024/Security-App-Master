@@ -103,7 +103,7 @@ const ClientPatrolsList = () => {
         data={data}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
-        redirectOnClick={PageRoutes.CLIENT_PORTAL_PATROL_VIEW}
+        redirectOnClick={PageRoutes.CLIENT_PORTAL_PATROL_LOGS}
         ref={ref}
       />
     </div>
