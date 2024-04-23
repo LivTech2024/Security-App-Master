@@ -339,7 +339,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                 return (
                   <div
                     key={index}
-                    className="flex flex-col min-w-[180px] w-[14.23%] text-center"
+                    className="flex flex-col h-full justify-start min-w-[180px] w-[14.23%] text-center"
                   >
                     <div
                       onClick={() => setSelectedDate(date)}
