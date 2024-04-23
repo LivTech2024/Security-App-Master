@@ -183,7 +183,6 @@ class DbEquipment {
     const {
       EquipmentAllocationDate,
       EquipmentAllocationEmpId,
-      EquipmentAllocationEmpName,
       EquipmentAllocationEndDate,
       EquipmentAllocationEquipId,
       EquipmentAllocationEquipQty,
@@ -198,7 +197,6 @@ class DbEquipment {
         EquipmentAllocationDate
       ) as unknown as Timestamp,
       EquipmentAllocationEmpId,
-      EquipmentAllocationEmpName,
       EquipmentAllocationStartDate: removeTimeFromDate(
         EquipmentAllocationStartDate
       ) as unknown as Timestamp,
@@ -242,7 +240,6 @@ class DbEquipment {
     const {
       EquipmentAllocationDate,
       EquipmentAllocationEmpId,
-      EquipmentAllocationEmpName,
       EquipmentAllocationEndDate,
       EquipmentAllocationEquipId,
       EquipmentAllocationEquipQty,
@@ -256,7 +253,6 @@ class DbEquipment {
         EquipmentAllocationDate
       ) as unknown as Timestamp,
       EquipmentAllocationEmpId,
-      EquipmentAllocationEmpName,
       EquipmentAllocationStartDate: removeTimeFromDate(
         EquipmentAllocationStartDate
       ) as unknown as Timestamp,
@@ -330,11 +326,12 @@ class DbEquipment {
 
       transaction.update(equipDocRef, {
         EquipmentAllotedQuantity:
-          equipData.EquipmentAllotedQuantity +
+          equipData.EquipmentAllotedQuantity -
           equipAllocData.EquipmentAllocationEquipQty,
       });
 
       transaction.update(equipAllocRef, {
+        EquipmentAllocationReturnedAt: serverTimestamp(),
         EquipmentAllocationIsReturned: true,
       });
     });

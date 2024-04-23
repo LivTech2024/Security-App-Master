@@ -358,10 +358,10 @@ export interface IEquipmentAllocations {
   EquipmentAllocationEquipQty: number;
   EquipmentAllocationDate: Timestamp | FieldValue;
   EquipmentAllocationEmpId: string;
-  EquipmentAllocationEmpName: string;
   EquipmentAllocationStartDate: Timestamp | FieldValue;
   EquipmentAllocationEndDate: Timestamp | FieldValue;
   EquipmentAllocationIsReturned: boolean;
+  EquipmentAllocationReturnedAt?: Timestamp | FieldValue;
   EquipmentAllocationCreatedAt: Timestamp | FieldValue;
 }
 

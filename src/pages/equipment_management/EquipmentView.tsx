@@ -5,7 +5,7 @@ import { useEditFormStore } from '../../store';
 import { useEffect, useState } from 'react';
 import AddEquipmentModal from '../../component/equipment_management/modal/AddEquipmentModal';
 import { useInView } from 'react-intersection-observer';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
 import DbEquipment from '../../firebase_configs/DB/DbEquipment';
 import { DocumentData } from 'firebase/firestore';
@@ -18,6 +18,20 @@ import NoSearchResult from '../../common/NoSearchResult';
 import { formatDate } from '../../utilities/misc';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import { numberFormatter } from '../../utilities/NumberFormater';
+import DbEmployee from '../../firebase_configs/DB/DbEmployee';
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from '../../utilities/TsxUtils';
+import { errorHandler } from '../../utilities/CustomError';
+import { openContextModal } from '@mantine/modals';
+
+export interface EquipmentAllocations extends IEquipmentAllocations {
+  EquipmentAllocationEmpEmail: string;
+  EquipmentAllocationEmpPhone: string;
+  EquipmentAllocationEmpName: string;
+}
 
 const EquipmentView = () => {
   const navigate = useNavigate();
@@ -74,10 +88,10 @@ const EquipmentView = () => {
     initialPageParam: null as null | DocumentData,
   });
 
-  const [data, setData] = useState<IEquipmentAllocations[]>(() => {
+  const [data, setData] = useState<EquipmentAllocations[]>(() => {
     if (snapshotData) {
       return snapshotData.pages.flatMap((page) =>
-        page.map((doc) => doc.data() as IEquipmentAllocations)
+        page.map((doc) => doc.data() as EquipmentAllocations)
       );
     }
     return [];
@@ -90,14 +104,24 @@ const EquipmentView = () => {
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
     if (snapshotData) {
-      const docData: IEquipmentAllocations[] = [];
+      const docData: EquipmentAllocations[] = [];
       snapshotData.pages?.forEach((page) => {
-        page?.forEach((doc) => {
-          const data = doc.data() as IEquipmentAllocations;
-          docData.push(data);
-        });
+        Promise.all(
+          page?.map(async (doc) => {
+            const data = doc.data() as IEquipmentAllocations;
+            const { EquipmentAllocationEmpId } = data;
+            const empData = await DbEmployee.getEmpById(
+              EquipmentAllocationEmpId
+            );
+            docData.push({
+              ...data,
+              EquipmentAllocationEmpName: empData.EmployeeName,
+              EquipmentAllocationEmpEmail: empData.EmployeeEmail,
+              EquipmentAllocationEmpPhone: empData.EmployeePhone,
+            } as unknown as EquipmentAllocations);
+          })
+        ).then(() => setData(docData));
       });
-      setData(docData);
     }
   }, [snapshotData]);
 
@@ -113,6 +137,41 @@ const EquipmentView = () => {
 
   //*Modal states
   const [addEquipmentModal, setAddEquipmentModal] = useState(false);
+
+  const queryClient = useQueryClient();
+
+  const onMarkReturn = async (equipAllocId: string, allotedQty: number) => {
+    try {
+      showModalLoader({});
+
+      await DbEquipment.returnEquipFromEmp(equipAllocId);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.EQUIPMENT_ALLOCATION_LIST],
+      });
+
+      if (equipmentData) {
+        const updateEquipData: IEquipmentsCollection = {
+          ...equipmentData,
+          EquipmentAllotedQuantity:
+            equipmentData.EquipmentAllotedQuantity - allotedQty,
+        };
+
+        setEquipmentData(updateEquipData);
+      }
+
+      showSnackbar({
+        message: 'Equipment returned successfully',
+        type: 'success',
+      });
+
+      closeModalLoader();
+    } catch (error) {
+      console.log(error);
+      closeModalLoader();
+      errorHandler(error);
+    }
+  };
 
   if (!equipmentData && !loading) {
     return (
@@ -201,7 +260,7 @@ const EquipmentView = () => {
             <thead className="bg-primary text-surface text-sm">
               <tr>
                 <th className="uppercase px-4 py-2 w-[25%] text-start">
-                  Employee Name
+                  Employee Details
                 </th>
                 <th className="uppercase px-4 py-2 w-[15%] text-start">
                   Allotment Qty
@@ -210,15 +269,16 @@ const EquipmentView = () => {
                   Allotment Date
                 </th>
 
-                <th className="uppercase px-4 py-2 w-[15%] text-start">
+                <th className="uppercase px-4 py-2 w-[12%] text-start">
                   Start Date
                 </th>
-                <th className="uppercase px-4 py-2 w-[15%] text-start">
+                <th className="uppercase px-4 py-2 w-[12%] text-start">
                   End Date
                 </th>
-                <th className="uppercase px-4 py-2 w-[15%] text-end">
+                <th className="uppercase px-4 py-2 w-[10%] text-end">
                   Is Returned
                 </th>
+                <th className="uppercase px-4 py-2 w-[16%] text-end">&nbsp;</th>
               </tr>
             </thead>
             <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -236,7 +296,17 @@ const EquipmentView = () => {
                       className="cursor-pointer"
                     >
                       <td className="align-top px-4 py-2 text-start">
-                        {eqp.EquipmentAllocationEmpName}
+                        <div className="flex flex-col">
+                          <span> {eqp.EquipmentAllocationEmpName}</span>
+                          <span className="text-sm text-textSecondary">
+                            {' '}
+                            {eqp.EquipmentAllocationEmpEmail}
+                          </span>
+                          <span className="text-sm text-textSecondary">
+                            {' '}
+                            {eqp.EquipmentAllocationEmpPhone}
+                          </span>
+                        </div>
                       </td>
                       <td className="align-top px-4 py-2 text-start">
                         {numberFormatter(
@@ -259,6 +329,35 @@ const EquipmentView = () => {
                       <td className="align-top px-4 py-2 text-end ">
                         {eqp.EquipmentAllocationIsReturned ? 'Yes' : 'No'}
                       </td>
+                      {!eqp.EquipmentAllocationIsReturned && (
+                        <td
+                          onClick={() => {
+                            openContextModal({
+                              modal: 'confirmModal',
+                              withCloseButton: false,
+                              centered: true,
+                              closeOnClickOutside: true,
+                              innerProps: {
+                                title: 'Confirm',
+                                body: 'Are you sure to mark returned this equipment',
+                                onConfirm: () => {
+                                  onMarkReturn(
+                                    eqp.EquipmentAllocationId,
+                                    eqp.EquipmentAllocationEquipQty
+                                  );
+                                },
+                              },
+                              size: '30%',
+                              styles: {
+                                body: { padding: '0px' },
+                              },
+                            });
+                          }}
+                          className="align-top px-4 py-2 text-end underline text-textPrimaryBlue cursor-pointer"
+                        >
+                          Mark return
+                        </td>
+                      )}
                     </tr>
                   );
                 })
