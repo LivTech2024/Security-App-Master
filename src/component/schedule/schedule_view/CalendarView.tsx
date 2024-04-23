@@ -95,7 +95,11 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
   const [isEmpLoading, setIsEmpLoading] = useState(false);
 
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(datesArray[0]);
+
+  useEffect(() => {
+    setSelectedDate(datesArray[0]);
+  }, [datesArray]);
 
   useEffect(() => {
     const fetchEmpSchedule = async () => {
