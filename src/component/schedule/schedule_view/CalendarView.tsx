@@ -68,9 +68,21 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
   const getScheduleForDay = (date: Date, schedules?: ISchedule[]) => {
     if (!schedules) return [];
-    return schedules.filter((schedule) =>
-      dayjs(toDate(schedule.shift.ShiftDate)).isSame(date, 'date')
-    );
+    return schedules
+      .filter((schedule) =>
+        dayjs(toDate(schedule.shift.ShiftDate)).isSame(date, 'date')
+      )
+      ?.sort(
+        (a, b) =>
+          Number(
+            a?.shift.ShiftStartTime?.split(':')[0] +
+              a?.shift.ShiftStartTime?.split(':')[1] || 0
+          ) -
+          Number(
+            b?.shift.ShiftStartTime?.split(':')[0] +
+              b?.shift.ShiftStartTime?.split(':')[1] || 0
+          )
+      );
   };
 
   const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(
