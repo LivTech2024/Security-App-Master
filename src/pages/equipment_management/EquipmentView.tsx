@@ -278,7 +278,9 @@ const EquipmentView = () => {
                 <th className="uppercase px-4 py-2 w-[10%] text-end">
                   Is Returned
                 </th>
-                <th className="uppercase px-4 py-2 w-[16%] text-end">&nbsp;</th>
+                <th className="uppercase px-4 py-2 w-[16%] text-end">
+                  Return Date
+                </th>
               </tr>
             </thead>
             <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -329,7 +331,12 @@ const EquipmentView = () => {
                       <td className="align-top px-4 py-2 text-end ">
                         {eqp.EquipmentAllocationIsReturned ? 'Yes' : 'No'}
                       </td>
-                      {!eqp.EquipmentAllocationIsReturned && (
+                      {eqp.EquipmentAllocationIsReturned &&
+                      eqp?.EquipmentAllocationReturnedAt ? (
+                        <td className="align-top px-4 py-2 text-end ">
+                          {formatDate(eqp?.EquipmentAllocationReturnedAt)}
+                        </td>
+                      ) : (
                         <td
                           onClick={() => {
                             openContextModal({
