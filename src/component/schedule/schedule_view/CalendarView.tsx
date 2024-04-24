@@ -358,9 +358,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                         (data, idx) => {
                           return (
                             <DropPoint
-                              accept={`${toDate(
-                                data.shift.ShiftDate
-                              ).toString()}${data.shift.ShiftPosition}`}
+                              accept={`${formatDate(data.shift.ShiftDate, 'DDMMYYYY')}${data.shift.ShiftPosition}`}
                               className="h-full"
                               id={data.shift.ShiftId}
                               key={idx}
@@ -450,7 +448,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                     return (
                                       <Draggable
                                         draggableId={data.EmpId}
-                                        type={`${selectedDate.toString()}${
+                                        type={`${formatDate(selectedDate, 'DDMMYYYY')}${
                                           data.EmpRole
                                         }`}
                                         callback={dropResult}

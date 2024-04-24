@@ -389,7 +389,7 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                             </div>
                           ) : (
                             <DropPoint
-                              accept={`${date.toString()}${emp.EmployeeRole}`}
+                              accept={`${formatDate(date, 'DDMMYYYY')}${emp.EmployeeRole}`}
                               id={emp.EmployeeId}
                               className="min-h-[60px]"
                             >
@@ -420,7 +420,7 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                       <Draggable
                         callback={dropResult}
                         draggableId={res.shift.ShiftId}
-                        type={`${toDate(res.shift.ShiftDate)}${
+                        type={`${formatDate(res.shift.ShiftDate, 'DDMMYYYY')}${
                           res.shift.ShiftPosition
                         }`}
                       >
