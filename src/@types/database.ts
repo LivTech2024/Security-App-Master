@@ -318,6 +318,7 @@ export interface IInvoicesCollection {
 export interface IClientsCollection {
   ClientId: string;
   ClientCompanyId: string;
+  ClientImage?: string | null;
   ClientName: string;
   ClientPhone: string;
   ClientNameSearchIndex: string[];

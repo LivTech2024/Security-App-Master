@@ -36,7 +36,15 @@ const ClientHome = () => {
   const { client } = useAuthState();
   return (
     <div className="flex flex-col w-full p-12 items-center gap-10 h-full justify-center ">
-      <div className="font-semibold text-2xl">Welcome {client?.ClientName}</div>
+      <div className="flex flex-col items-center gap-">
+        {client?.ClientImage && (
+          <img src={client?.ClientImage} alt="" className="w-full h-[140px] " />
+        )}
+
+        <div className="font-semibold text-2xl">
+          Welcome {client?.ClientName}
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full">
         <HomeItem
