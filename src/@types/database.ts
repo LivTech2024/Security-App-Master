@@ -373,3 +373,49 @@ export interface ISuperAdminCollection {
   SuperAdminName: string;
   SuperAdminPhone: string;
 }
+
+export interface IEmployeeDARCollection {
+  EmpDarId: string;
+  EmpDarEmpId: string;
+  EmpDarEmpName: string;
+  EmpDarCompanyId: string;
+  EmpDarCompanyBranchId: string | null;
+  EmpDarTitle: string;
+  EmpDarData: string; //* Content of DAR
+  EmpDarDate: Timestamp | FieldValue; //* Only Date with time 00:00:00
+  EmpDarCreatedAt: Timestamp | FieldValue;
+}
+
+export interface ILogBookCollection {
+  LogBookId: string;
+  LogBookCompanyId: string;
+  LogBookCompanyBranchId: string | null;
+  LogBookDate: Timestamp | FieldValue;
+  LogBookEmpId: string;
+  LogBookEmpName: string;
+  LogBookData: {
+    LogContent: string;
+    LogType:
+      | 'shift_start'
+      | 'shift_end'
+      | 'patrol_start'
+      | 'patrol_end'
+      | 'check_point';
+    LogReportedAt: Timestamp | FieldValue;
+  }[];
+  LogBookCreatedAt: Timestamp | FieldValue;
+}
+
+export interface IVisitorsCollection {
+  VisitorId: string; //* Doc Id
+  VisitorCompanyId: string;
+  VisitorCompanyBranchId: string;
+  VisitorAssetHandover: string;
+  VisitorComment: string | null;
+  VisitorContactNumber: string;
+  VisitorEmail: string;
+  VisitorInTime: Timestamp | FieldValue;
+  VisitorName: string;
+  VisitorNoOfPerson: number;
+  VisitorCreatedAt: Timestamp | FieldValue;
+}
