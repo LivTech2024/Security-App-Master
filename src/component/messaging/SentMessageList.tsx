@@ -54,21 +54,9 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
     initialPageParam: null as null | DocumentData,
   });
 
-  const [data, setData] = useState<ISentMessagesCollection[]>(() => {
-    if (snapshotData) {
-      return snapshotData.pages.flatMap((page) =>
-        page.map((doc) => doc.data() as ISentMessagesCollection)
-      );
-    }
-    return [];
-  });
+  const [isFetchingRecvUserNames, setIsFetchingRecvUserNames] = useState(true);
 
-  useEffect(() => {
-    console.log(error, 'error');
-  }, [error]);
-
-  // we are looping through the snapshot returned by react-query and converting them to data
-  useEffect(() => {
+  const fetchDataFromSnapshot = () => {
     if (snapshotData) {
       const docData: ISentMessagesCollection[] = [];
       snapshotData.pages?.forEach((page) => {
@@ -88,15 +76,42 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
                     clientSnapshot?.data() as IClientsCollection;
                   if (clientData) {
                     newRecList.push({ id, name: clientData.ClientName });
+                  } else {
+                    newRecList.push({ id, name: 'Admin' });
                   }
                 }
               })
             );
             docData.push({ ...data, MessageReceiversId: newRecList });
           })
-        ).then(() => setData(docData));
+        )
+          .then(() => {
+            setData(docData);
+            setIsFetchingRecvUserNames(false);
+          })
+          .catch(() => {
+            console.log(error);
+            setIsFetchingRecvUserNames(false);
+          });
       });
+      return docData;
+    } else {
+      setIsFetchingRecvUserNames(false);
+      return [];
     }
+  };
+
+  const [data, setData] = useState<ISentMessagesCollection[]>(() => {
+    return fetchDataFromSnapshot();
+  });
+
+  useEffect(() => {
+    console.log(error, 'error');
+  }, [error]);
+
+  // we are looping through the snapshot returned by react-query and converting them to data
+  useEffect(() => {
+    fetchDataFromSnapshot();
   }, [snapshotData]);
 
   // hook for pagination
@@ -150,7 +165,7 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
       <div className="font-semibold text-lg">Sent</div>
       {/* Received Messages list */}
       <div className="flex flex-col h-[calc(100vh-260px)] gap-4 overflow-auto remove-vertical-scrollbar">
-        {data.length === 0 && !isLoading ? (
+        {data.length === 0 && !isLoading && !isFetchingRecvUserNames ? (
           <div className="flex items-center justify-between w-full">
             <NoSearchResult text="No sent messages" />
           </div>
@@ -164,7 +179,7 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
                 <div className="flex items-center justify-between w-full gap-4">
                   <div className="w-[80%]">
                     To:{' '}
-                    <span className="font-semibold">
+                    <span className="font-semibold capitalize">
                       {msg.MessageReceiversId.map((rec) => rec.name).join(
                         ' , '
                       )}
@@ -203,7 +218,7 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
           })
         )}
 
-        {(isLoading || isFetchingNextPage) &&
+        {(isLoading || isFetchingNextPage || isFetchingRecvUserNames) &&
           Array.from({ length: 3 }).map((_, idx) => (
             <div ref={ref} key={idx} className="animate-pulse w-full mt-2">
               <div className="h-[150px] bg-shimmerColor w-full"></div>

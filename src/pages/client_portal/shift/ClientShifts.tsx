@@ -43,7 +43,7 @@ const ClientShifts = () => {
       if (lastPage?.length === 0) {
         return null;
       }
-      if (lastPage?.length === DisplayCount.EMPLOYEE_LIST) {
+      if (lastPage?.length === DisplayCount.SHIFT_LIST) {
         return lastPage.at(-1);
       }
       return null;
@@ -51,41 +51,7 @@ const ClientShifts = () => {
     initialPageParam: null as null | DocumentData,
   });
 
-  const [data, setData] = useState<ShiftsCollection[]>(() => {
-    if (snapshotData) {
-      const docData: ShiftsCollection[] = [];
-      snapshotData.pages?.forEach((page) => {
-        Promise.all(
-          page?.map(async (doc) => {
-            const data = doc.data() as IShiftsCollection;
-            const { ShiftAssignedUserId } = data;
-            const assignedUsersName: string[] = [];
-
-            await Promise.all(
-              ShiftAssignedUserId.map(async (id) => {
-                const empData = await DbEmployee.getEmpById(id);
-                const { EmployeeName } = empData;
-                assignedUsersName.push(EmployeeName);
-              })
-            );
-
-            docData.push({ ...data, ShiftAssignedUsers: assignedUsersName });
-          })
-        ).then(() => {
-          setData(docData);
-          setLoading(false);
-        });
-      });
-    }
-    return [];
-  });
-
-  useEffect(() => {
-    console.log(error, 'error');
-  }, [error]);
-
-  // we are looping through the snapshot returned by react-query and converting them to data
-  useEffect(() => {
+  const fetchDataFromSnapshot = () => {
     if (snapshotData) {
       const docData: ShiftsCollection[] = [];
       Promise.all(
@@ -108,8 +74,34 @@ const ClientShifts = () => {
             })
           );
         })
-      ).then(() => setData(docData));
+      )
+        .then(() => {
+          setData(docData);
+          setLoading(false);
+          return docData;
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+        });
+      return docData;
+    } else {
+      setLoading(false);
+      return [];
     }
+  };
+
+  const [data, setData] = useState<ShiftsCollection[]>(() => {
+    return fetchDataFromSnapshot();
+  });
+
+  useEffect(() => {
+    console.log(error, 'error');
+  }, [error]);
+
+  // we are looping through the snapshot returned by react-query and converting them to data
+  useEffect(() => {
+    fetchDataFromSnapshot();
   }, [snapshotData]);
 
   // hook for pagination
