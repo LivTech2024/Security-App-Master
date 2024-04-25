@@ -84,6 +84,9 @@ const Nav = ({
 }) => {
   const { userSignOut } = useAuthState();
   const navigate = useNavigate();
+
+  const { client } = useAuthState();
+
   return (
     <div
       className={`flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1 ${
@@ -148,6 +151,13 @@ const Nav = ({
           });
         }}
       />
+
+      {userType === 'client' && (
+        <div className="flex justify-end ml-auto px-4 text-lg">
+          {' '}
+          Welcome {client?.ClientName}
+        </div>
+      )}
     </div>
   );
 };
