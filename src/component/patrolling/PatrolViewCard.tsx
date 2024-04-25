@@ -120,7 +120,7 @@ const PatrolViewCard = ({
 
       <div className="mb-4 text-textTertiary">
         Last updated:{' '}
-        {formatDate(patrolData.PatrolModifiedAt, 'DD MMM-YY hh:mm A')}
+        {formatDate(patrolLogData.PatrolLogCreatedAt, 'DD MMM-YY hh:mm A')}
       </div>
     </div>
   );
