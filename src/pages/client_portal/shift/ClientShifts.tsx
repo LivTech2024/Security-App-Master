@@ -1,19 +1,25 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import {
-  DisplayCount,
-  PageRoutes,
-  REACT_QUERY_KEYS,
-} from '../../../@types/enum';
+import { DisplayCount, REACT_QUERY_KEYS } from '../../../@types/enum';
 import DbClient from '../../../firebase_configs/DB/DbClient';
 import { useAuthState } from '../../../store';
 import { DocumentData } from 'firebase/firestore';
 import { IShiftsCollection } from '../../../@types/database';
 import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import ShiftListTable from '../../../component/shifts/ShiftListTable';
+import NoSearchResult from '../../../common/NoSearchResult';
+import { formatDate } from '../../../utilities/misc';
+import TableShimmer from '../../../common/shimmer/TableShimmer';
+import DbEmployee from '../../../firebase_configs/DB/DbEmployee';
+
+interface ShiftsCollection
+  extends Omit<IShiftsCollection, 'ShiftAssignedUserId'> {
+  ShiftAssignedUsers: string[];
+}
 
 const ClientShifts = () => {
   const { client } = useAuthState();
+
+  const [loading, setLoading] = useState(true);
 
   const {
     data: snapshotData,
@@ -45,11 +51,31 @@ const ClientShifts = () => {
     initialPageParam: null as null | DocumentData,
   });
 
-  const [data, setData] = useState<IShiftsCollection[]>(() => {
+  const [data, setData] = useState<ShiftsCollection[]>(() => {
     if (snapshotData) {
-      return snapshotData.pages.flatMap((page) =>
-        page.map((doc) => doc.data() as IShiftsCollection)
-      );
+      const docData: ShiftsCollection[] = [];
+      snapshotData.pages?.forEach((page) => {
+        Promise.all(
+          page?.map(async (doc) => {
+            const data = doc.data() as IShiftsCollection;
+            const { ShiftAssignedUserId } = data;
+            const assignedUsersName: string[] = [];
+
+            await Promise.all(
+              ShiftAssignedUserId.map(async (id) => {
+                const empData = await DbEmployee.getEmpById(id);
+                const { EmployeeName } = empData;
+                assignedUsersName.push(EmployeeName);
+              })
+            );
+
+            docData.push({ ...data, ShiftAssignedUsers: assignedUsersName });
+          })
+        ).then(() => {
+          setData(docData);
+          setLoading(false);
+        });
+      });
     }
     return [];
   });
@@ -61,14 +87,28 @@ const ClientShifts = () => {
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
     if (snapshotData) {
-      const docData: IShiftsCollection[] = [];
-      snapshotData.pages?.forEach((page) => {
-        page?.forEach((doc) => {
-          const data = doc.data() as IShiftsCollection;
-          docData.push(data);
-        });
-      });
-      setData(docData);
+      const docData: ShiftsCollection[] = [];
+      Promise.all(
+        snapshotData.pages?.map(async (page) => {
+          await Promise.all(
+            page?.map(async (doc) => {
+              const data = doc.data() as IShiftsCollection;
+              const { ShiftAssignedUserId } = data;
+              const assignedUsersName: string[] = [];
+
+              await Promise.all(
+                ShiftAssignedUserId.map(async (id) => {
+                  const empData = await DbEmployee.getEmpById(id);
+                  const { EmployeeName } = empData;
+                  assignedUsersName.push(EmployeeName);
+                })
+              );
+
+              docData.push({ ...data, ShiftAssignedUsers: assignedUsersName });
+            })
+          );
+        })
+      ).then(() => setData(docData));
     }
   }, [snapshotData]);
 
@@ -87,13 +127,58 @@ const ClientShifts = () => {
         <span className="font-semibold text-xl">Shifts</span>
       </div>
 
-      <ShiftListTable
-        data={data}
-        isFetchingNextPage={isFetchingNextPage}
-        isLoading={isLoading}
-        redirectOnClick={PageRoutes.CLIENT_PORTAL_SHIFT_VIEW}
-        ref={ref}
-      />
+      <table className="rounded overflow-hidden w-full">
+        <thead className="bg-primary text-surface text-sm">
+          <tr>
+            <th className="uppercase px-4 py-2 w-[16.67%] text-start">Name</th>
+            <th className="uppercase px-4 py-2 w-[16.67%] text-start">Date</th>
+            <th className="uppercase px-4 py-2 w-[16.67%] text-start">
+              Start Time
+            </th>
+            <th className="uppercase px-4 py-2 w-[16.67%] text-start">
+              End Time
+            </th>
+
+            <th className="uppercase px-4 py-2 text-end">Employee</th>
+          </tr>
+        </thead>
+        <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
+          {data.length === 0 && !isLoading && !loading ? (
+            <tr>
+              <td colSpan={5}>
+                <NoSearchResult />
+              </td>
+            </tr>
+          ) : (
+            data.map((shift) => {
+              return (
+                <tr key={shift.ShiftId} className="">
+                  <td className="px-4 py-2 text-start">{shift.ShiftName}</td>
+                  <td className="px-4 py-2 text-start">
+                    {formatDate(shift.ShiftDate)}
+                  </td>
+                  <td className="px-4 py-2 text-start">
+                    {shift.ShiftStartTime}
+                  </td>
+                  <td className="px-4 py-2 text-start">{shift.ShiftEndTime}</td>
+
+                  <td className="px-4 py-2 text-end">
+                    {shift.ShiftAssignedUsers.join(',') || 'N/A'}
+                  </td>
+                </tr>
+              );
+            })
+          )}
+          <tr ref={ref}>
+            <td colSpan={5}>
+              {(isLoading || isFetchingNextPage || loading) &&
+                Array.from({ length: 10 }).map((_, idx) => (
+                  <TableShimmer key={idx} />
+                ))}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };
