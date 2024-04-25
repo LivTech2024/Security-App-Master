@@ -130,7 +130,6 @@ export interface IShiftsCollection {
     WellnessComment?: string | null;
     WellnessImg?: string | null;
   }[];
-  ShiftPhotos?: string[];
   ShiftPhotoUploadIntervalInMinutes?: number | null;
   ShiftCurrentStatus: {
     Status: 'pending' | 'started' | 'completed';

@@ -318,11 +318,11 @@ class DbPatrol {
         }
       });
 
+      transaction.delete(patrolRef);
+
       const imageDeletePromise = imageToBeDeleted.map((img) => {
         return CloudStorageImageHandler.deleteImageByUrl(img);
       });
-
-      transaction.delete(patrolRef);
 
       await Promise.all(imageDeletePromise);
     });

@@ -102,7 +102,7 @@ const PatrollingView = () => {
                 closeOnClickOutside: true,
                 innerProps: {
                   title: 'Confirm',
-                  body: 'Are you sure to delete this branch',
+                  body: 'Are you sure to delete this patrol log',
                   onConfirm: () => {
                     onDelete();
                   },

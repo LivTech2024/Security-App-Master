@@ -4,7 +4,6 @@ import {
   QueryConstraint,
   Timestamp,
   collection,
-  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -20,7 +19,7 @@ import {
 } from 'firebase/firestore';
 import { CollectionName } from '../../@types/enum';
 import { db } from '../config';
-import { getNewDocId } from './utils';
+import CloudStorageImageHandler, { getNewDocId } from './utils';
 import { IShiftTasksChild, IShiftsCollection } from '../../@types/database';
 import { removeTimeFromDate } from '../../utilities/misc';
 import { AddShiftFormFields } from '../../utilities/zod/schema';
@@ -186,9 +185,47 @@ class DbShift {
     });
   };
 
-  static deleteShift = (shiftId: string) => {
+  static deleteShift = async (shiftId: string) => {
     const shiftRef = doc(db, CollectionName.shifts, shiftId);
-    return deleteDoc(shiftRef);
+
+    await runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(shiftRef);
+      const shiftData = snapshot.data() as IShiftsCollection;
+
+      const { ShiftGuardWellnessReport, ShiftTask } = shiftData;
+
+      const imagesToBeDeleted: string[] = [];
+
+      if (ShiftGuardWellnessReport && ShiftGuardWellnessReport.length > 0) {
+        ShiftGuardWellnessReport.forEach((res) => {
+          if (res.WellnessImg && res?.WellnessImg?.length > 0) {
+            imagesToBeDeleted.push(res.WellnessImg);
+          }
+        });
+      }
+
+      if (ShiftTask && ShiftTask.length > 0) {
+        ShiftTask.forEach((res) => {
+          if (res.ShiftTaskStatus && res.ShiftTaskStatus?.length > 0) {
+            res.ShiftTaskStatus.forEach((status) => {
+              if (status.TaskPhotos && status.TaskPhotos.length > 0) {
+                status.TaskPhotos.forEach((img) => {
+                  imagesToBeDeleted.push(img);
+                });
+              }
+            });
+          }
+        });
+      }
+
+      transaction.delete(shiftRef);
+
+      const imageDeletePromise = imagesToBeDeleted.map((img) => {
+        return CloudStorageImageHandler.deleteImageByUrl(img);
+      });
+
+      await Promise.all(imageDeletePromise);
+    });
   };
 
   static getShifts = ({
