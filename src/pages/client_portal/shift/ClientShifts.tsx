@@ -7,7 +7,7 @@ import { IShiftsCollection } from '../../../@types/database';
 import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import NoSearchResult from '../../../common/NoSearchResult';
-import { formatDate } from '../../../utilities/misc';
+import { formatDate, toDate } from '../../../utilities/misc';
 import TableShimmer from '../../../common/shimmer/TableShimmer';
 import DbEmployee from '../../../firebase_configs/DB/DbEmployee';
 
@@ -142,24 +142,31 @@ const ClientShifts = () => {
               </td>
             </tr>
           ) : (
-            data.map((shift) => {
-              return (
-                <tr key={shift.ShiftId} className="">
-                  <td className="px-4 py-2 text-start">{shift.ShiftName}</td>
-                  <td className="px-4 py-2 text-start">
-                    {formatDate(shift.ShiftDate)}
-                  </td>
-                  <td className="px-4 py-2 text-start">
-                    {shift.ShiftStartTime}
-                  </td>
-                  <td className="px-4 py-2 text-start">{shift.ShiftEndTime}</td>
+            data
+              .sort(
+                (a, b) =>
+                  toDate(b.ShiftDate).getTime() - toDate(a.ShiftDate).getTime()
+              )
+              .map((shift) => {
+                return (
+                  <tr key={shift.ShiftId} className="">
+                    <td className="px-4 py-2 text-start">{shift.ShiftName}</td>
+                    <td className="px-4 py-2 text-start">
+                      {formatDate(shift.ShiftDate)}
+                    </td>
+                    <td className="px-4 py-2 text-start">
+                      {shift.ShiftStartTime}
+                    </td>
+                    <td className="px-4 py-2 text-start">
+                      {shift.ShiftEndTime}
+                    </td>
 
-                  <td className="px-4 py-2 text-end">
-                    {shift.ShiftAssignedUsers.join(',') || 'N/A'}
-                  </td>
-                </tr>
-              );
-            })
+                    <td className="px-4 py-2 text-end">
+                      {shift.ShiftAssignedUsers.join(',') || 'N/A'}
+                    </td>
+                  </tr>
+                );
+              })
           )}
           <tr ref={ref}>
             <td colSpan={5}>
