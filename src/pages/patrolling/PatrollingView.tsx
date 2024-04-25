@@ -23,6 +23,8 @@ const PatrollingView = () => {
 
   const [patrolData, setPatrolData] = useState<IPatrolsCollection | null>(null);
 
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,6 +53,15 @@ const PatrollingView = () => {
     fetchPatrolLogData();
   }, [patrolLogId]);
 
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
+
   if (!logData && !isPatrolLoading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -74,15 +85,15 @@ const PatrollingView = () => {
     const onDelete = async () => {
       if (!patrolLogId) return;
       try {
-        showModalLoader({});
+        setLoading(true);
 
         await DbPatrol.deletePatrolLog(patrolLogId);
 
         navigate(-1);
 
-        closeModalLoader();
+        setLoading(false);
       } catch (error) {
-        closeModalLoader();
+        setLoading(false);
         console.log(error);
         errorHandler(error);
       }

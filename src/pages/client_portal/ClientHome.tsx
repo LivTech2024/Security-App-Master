@@ -44,7 +44,7 @@ const ClientHome = () => {
           <img src={client?.ClientImage} alt="" className="w-full h-[140px] " />
         )} */}
 
-        <div className="font-semibold text-2xl uppercase">
+        <div className="font-semibold text-2xl uppercase mb-10">
           Welcome {client?.ClientName}
         </div>
       </div>
