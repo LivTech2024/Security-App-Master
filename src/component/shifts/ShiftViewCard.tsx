@@ -77,20 +77,6 @@ const ShiftViewCard = ({
         </div>
       </div>
 
-      <div className="flex flex-wrap">
-        {data?.ShiftPhotos &&
-          data?.ShiftPhotos?.map((img, idx) => {
-            return (
-              <img
-                src={img}
-                alt="shift_photos"
-                key={idx}
-                className="w-[100px] object-cover"
-              />
-            );
-          })}
-      </div>
-
       <div className="flex flex-col gap-1 mt-4">
         <p className="font-semibold">Shift Tasks</p>
         <div className="flex flex-wrap gap-6">
