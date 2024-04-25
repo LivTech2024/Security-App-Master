@@ -17,10 +17,11 @@ import {
   where,
 } from 'firebase/firestore';
 import { CollectionName } from '../../@types/enum';
-import { getNewDocId } from './utils';
+import CloudStorageImageHandler, { getNewDocId } from './utils';
 import { db } from '../config';
 import {
   IPatrolCheckPointsChild,
+  IPatrolLogsCollection,
   IPatrolsCollection,
 } from '../../@types/database';
 import { PatrollingFormFields } from '../../utilities/zod/schema';
@@ -298,6 +299,33 @@ class DbPatrol {
   static getPatrolLogById = (patrolLogId: string) => {
     const patrolRef = doc(db, CollectionName.patrolLogs, patrolLogId);
     return getDoc(patrolRef);
+  };
+
+  static deletePatrolLog = async (patrolLogId: string) => {
+    const patrolRef = doc(db, CollectionName.patrolLogs, patrolLogId);
+    await runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(patrolRef);
+      const patrolLogData = snapshot.data() as IPatrolLogsCollection;
+      const { PatrolLogCheckPoints } = patrolLogData;
+      const imageToBeDeleted: string[] = [];
+
+      PatrolLogCheckPoints.forEach((ch) => {
+        const { CheckPointImage } = ch;
+        if (CheckPointImage) {
+          CheckPointImage.forEach((img) => {
+            imageToBeDeleted.push(img);
+          });
+        }
+      });
+
+      const imageDeletePromise = imageToBeDeleted.map((img) => {
+        return CloudStorageImageHandler.deleteImageByUrl(img);
+      });
+
+      transaction.delete(patrolRef);
+
+      await Promise.all(imageDeletePromise);
+    });
   };
 }
 

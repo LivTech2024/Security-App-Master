@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import PatrolViewCard from '../../component/patrolling/PatrolViewCard';
 import { useEffect, useState } from 'react';
 import DbPatrol from '../../firebase_configs/DB/DbPatrol';
@@ -7,6 +7,10 @@ import {
   IPatrolLogsCollection,
   IPatrolsCollection,
 } from '../../@types/database';
+import Button from '../../common/button/Button';
+import { errorHandler } from '../../utilities/CustomError';
+import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
+import { openContextModal } from '@mantine/modals';
 
 const PatrollingView = () => {
   const [searchParam] = useSearchParams();
@@ -18,6 +22,8 @@ const PatrollingView = () => {
   const [logData, setLogData] = useState<IPatrolLogsCollection | null>(null);
 
   const [patrolData, setPatrolData] = useState<IPatrolsCollection | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPatrolLogData = async () => {
@@ -65,10 +71,51 @@ const PatrollingView = () => {
   }
 
   if (logData && patrolData) {
+    const onDelete = async () => {
+      if (!patrolLogId) return;
+      try {
+        showModalLoader({});
+
+        await DbPatrol.deletePatrolLog(patrolLogId);
+
+        navigate(-1);
+
+        closeModalLoader();
+      } catch (error) {
+        closeModalLoader();
+        console.log(error);
+        errorHandler(error);
+      }
+    };
+
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
         <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
           <span className="font-semibold text-xl">Patrol log data</span>
+          <Button
+            label="Delete"
+            onClick={() => {
+              openContextModal({
+                modal: 'confirmModal',
+                withCloseButton: false,
+                centered: true,
+                closeOnClickOutside: true,
+                innerProps: {
+                  title: 'Confirm',
+                  body: 'Are you sure to delete this branch',
+                  onConfirm: () => {
+                    onDelete();
+                  },
+                },
+                size: '30%',
+                styles: {
+                  body: { padding: '0px' },
+                },
+              });
+            }}
+            type="black"
+            className="px-4 py-2"
+          />
         </div>
         <PatrolViewCard patrolLogData={logData} patrolData={patrolData} />
       </div>
