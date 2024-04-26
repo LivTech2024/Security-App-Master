@@ -36,7 +36,11 @@ const ClientHome = () => {
   const { client } = useAuthState();
   return (
     <div
-      style={{ backgroundImage: `url(${client?.ClientImage})` }}
+      style={{
+        backgroundImage: `url(${client?.ClientImage})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+      }}
       className="flex flex-col w-full p-12 items-center gap-10 h-[calc(100vh-40px)] justify-center "
     >
       <div className="flex flex-col items-center gap-">

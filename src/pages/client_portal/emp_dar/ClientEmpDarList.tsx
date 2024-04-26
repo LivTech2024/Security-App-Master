@@ -171,10 +171,10 @@ const ClientEmpDarList = () => {
                   }
                 >
                   <td className="align-top px-4 py-2 text-start">
-                    <span className="line-clamp-3">{dar.EmpDarTitle}</span>
+                    <span className="line-clamp-2">{dar.EmpDarTitle}</span>
                   </td>
-                  <td className="align-top px-4 py-2 text-start uppercase">
-                    {dar.EmpDarEmpName}
+                  <td className="align-top px-4 py-2 text-start capitalize">
+                    <span className="line-clamp-2">{dar.EmpDarEmpName}</span>
                   </td>
 
                   <td className="align-top px-4 py-2 text-start">
@@ -183,7 +183,7 @@ const ClientEmpDarList = () => {
                     </span>
                   </td>
                   <td className="align-top px-4 py-2 text-end">
-                    <span className="line-clamp-4">{dar.EmpDarData}</span>
+                    <span className="line-clamp-2">{dar.EmpDarData}</span>
                   </td>
                 </tr>
               );
