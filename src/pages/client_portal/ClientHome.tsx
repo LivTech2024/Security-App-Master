@@ -44,9 +44,9 @@ const ClientHome = () => {
           <img src={client?.ClientImage} alt="" className="w-full h-[140px] " />
         )} */}
 
-        <div className="font-semibold text-2xl uppercase mb-10">
+        {/* <div className="font-semibold text-2xl uppercase mb-10">
           Welcome {client?.ClientName}
-        </div>
+        </div> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full">
