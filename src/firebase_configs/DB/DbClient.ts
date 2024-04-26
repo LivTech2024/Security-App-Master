@@ -458,6 +458,60 @@ class DbClient {
 
     return employees;
   };
+
+  static getClientEmpDar = ({
+    clientId,
+    lastDoc,
+    lmt,
+    endDate,
+    isLifeTime,
+    startDate,
+    searchQuery,
+  }: {
+    clientId: string;
+    lastDoc?: DocumentData | null;
+    lmt?: number;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+    searchQuery?: string | null;
+  }) => {
+    const reportRef = collection(db, CollectionName.employeesDAR);
+
+    let queryParams: QueryConstraint[] = [
+      where('EmpDarClientId', '==', clientId),
+      orderBy('EmpDarDate', 'desc'),
+    ];
+
+    if (searchQuery && searchQuery.length > 0) {
+      queryParams = [
+        ...queryParams,
+        orderBy('EmpDarTitle', 'asc'),
+        startAt(searchQuery),
+        endAt(searchQuery + '\uF8FF'),
+      ];
+    }
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('EmpDarDate', '>=', startDate),
+        where('EmpDarDate', '<=', endDate),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const empQuery = query(reportRef, ...queryParams);
+
+    return getDocs(empQuery);
+  };
 }
 
 export default DbClient;

@@ -713,6 +713,11 @@ class DbEmployee {
 
     return snapshot.data() as IEmployeesCollection;
   };
+
+  static getEmpDarById = (darId: string) => {
+    const darRef = doc(db, CollectionName.employeesDAR, darId);
+    return getDoc(darRef);
+  };
 }
 
 export default DbEmployee;

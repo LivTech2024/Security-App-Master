@@ -20,6 +20,7 @@ export enum CollectionName {
   superAdmin = 'SuperAdmin',
   equipments = 'Equipments',
   equipmentAllocations = 'EquipmentAllocations',
+  employeesDAR = 'EmployeesDAR',
 }
 
 export const DisplayCount = {
@@ -36,6 +37,7 @@ export const DisplayCount = {
   EQUIPMENT_ALLOCATION_LIST: 20,
   MESSAGE_RECEIVED_LIST: 20,
   MESSAGE_SENT_LIST: 20,
+  EMP_DAR_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -55,6 +57,7 @@ export const REACT_QUERY_KEYS = {
   EQUIPMENT_ALLOCATION_LIST: 'equipment-allocation-list',
   MESSAGE_RECEIVED_LIST: 'message-received-list',
   MESSAGE_SENT_LIST: 'message-sent-list',
+  EMP_DAR_LIST: 'emp-dar-list',
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -64,6 +67,7 @@ export const MinimumQueryCharacter = {
   CLIENT: 1,
   DOCUMENT: 1,
   EQUIPMENT: 1,
+  EMP_DAR: 1,
 } as const;
 
 export const CloudStoragePaths = {
@@ -118,6 +122,8 @@ export const PageRoutes = {
   CLIENT_PORTAL_PATROL_VIEW: '/client_portal/patrol_view',
   CLIENT_PORTAL_REPORTS: '/client_portal/reports',
   CLIENT_PORTAL_REPORT_VIEW: '/client_portal/report_view',
+  CLIENT_PORTAL_EMP_DAR_LIST: '/client_portal/emp_dar_list',
+  CLIENT_PORTAL_EMP_DAR_VIEW: '/client_portal/emp_dar_view',
   CLIENT_PORTAL_SHIFTS: '/client_portal/shifts',
   CLIENT_PORTAL_SHIFT_VIEW: '/client_portal/shift_view',
   CLIENT_PORTAL_MESSAGING: '/client_portal/messaging',

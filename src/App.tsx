@@ -54,6 +54,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import ClientMessaging from './pages/client_portal/ClientMessaging';
 import PatrolLogs from './pages/patrolling/PatrolLogs';
 import ClientPatrolLog from './pages/client_portal/patrol/ClientPatrolLog';
+import ClientEmpDarList from './pages/client_portal/emp_dar/ClientEmpDarList';
+import ClientEmpDarView from './pages/client_portal/emp_dar/ClientEmpDarView';
 
 function App() {
   useOnAuthStateChanged();
@@ -129,6 +131,14 @@ function App() {
               <Route
                 path={PageRoutes.CLIENT_PORTAL_MESSAGING}
                 Component={ClientMessaging}
+              />
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_EMP_DAR_LIST}
+                Component={ClientEmpDarList}
+              />
+              <Route
+                path={PageRoutes.CLIENT_PORTAL_EMP_DAR_VIEW}
+                Component={ClientEmpDarView}
               />
             </Routes>
           </Layout>
