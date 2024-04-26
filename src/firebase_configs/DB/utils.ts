@@ -157,6 +157,10 @@ export class CloudStorageFileHandler {
     return id + index + random + ms + '.pdf';
   };
 
+  static generateFileName = (id: string, name: string) => {
+    return `${id}_${name}.pdf`;
+  };
+
   static uploadFile = async (file: File, path: string) => {
     const storageRef = ref(storage, path);
     const { ref: snapRef } = await uploadBytes(storageRef, file);

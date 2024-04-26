@@ -37,7 +37,7 @@ const ClientHome = () => {
   return (
     <div
       style={{
-        backgroundImage: `url(${client?.ClientImage})`,
+        backgroundImage: `url(${client?.ClientHomePageBgImg})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
       }}

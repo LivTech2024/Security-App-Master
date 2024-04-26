@@ -317,7 +317,7 @@ export interface IInvoicesCollection {
 export interface IClientsCollection {
   ClientId: string;
   ClientCompanyId: string;
-  ClientImage?: string | null;
+  ClientHomePageBgImg?: string | null;
   ClientName: string;
   ClientPhone: string;
   ClientNameSearchIndex: string[];
@@ -329,6 +329,9 @@ export interface IClientsCollection {
   ClientContractAmount: number;
   ClientHourlyRate: number;
   ClientBalance: number;
+  ClientPostOrder?: string | null; //*Pdf or image
+  ClientSendEmailForEachPatrol: boolean; //*by default true
+  ClientSendEmailForEachShift: boolean; //*by default true
   ClientCreatedAt: Timestamp | FieldValue;
   ClientModifiedAt: Timestamp | FieldValue;
 }

@@ -277,6 +277,8 @@ export const clientSchema = z.object({
   ClientHourlyRate: z.coerce
     .number()
     .min(1, { message: 'Client hourly rate should be at least 1' }),
+  ClientSendEmailForEachPatrol: z.boolean(),
+  ClientSendEmailForEachShift: z.boolean(),
 });
 
 export type ClientFormFields = z.infer<typeof clientSchema>;

@@ -12,15 +12,18 @@ import {
   showSnackbar,
 } from '../../utilities/TsxUtils';
 import DbClient from '../../firebase_configs/DB/DbClient';
-import { REACT_QUERY_KEYS } from '../../@types/enum';
+import { PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
 import { errorHandler } from '../../utilities/CustomError';
 import { openContextModal } from '@mantine/modals';
 import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import InputDate from '../../common/inputs/InputDate';
 import { removeTimeFromDate, toDate } from '../../utilities/misc';
 import dayjs from 'dayjs';
+import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader';
+import InputHeader from '../../common/inputs/InputHeader';
+import { FaImage } from 'react-icons/fa';
 
 const ClientCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -40,6 +43,10 @@ const ClientCreateOrEdit = () => {
           ClientName: clientEditData.ClientName,
           ClientPassword: clientEditData.ClientPassword,
           ClientPhone: clientEditData.ClientPhone,
+          ClientSendEmailForEachPatrol:
+            clientEditData.ClientSendEmailForEachPatrol,
+          ClientSendEmailForEachShift:
+            clientEditData.ClientSendEmailForEachShift,
         }
       : undefined,
   });
@@ -55,6 +62,14 @@ const ClientCreateOrEdit = () => {
     dayjs().add(1, 'month').toDate()
   );
 
+  const [postOrderFile, setPostOrderFile] = useState<string | File | null>(
+    null
+  );
+
+  const [clientHomeBgImage, setClientHomeBgImage] = useState<string | null>(
+    null
+  );
+
   useEffect(() => {
     console.log(methods.formState.errors);
   }, [methods.formState.errors]);
@@ -63,7 +78,18 @@ const ClientCreateOrEdit = () => {
     if (isEdit) {
       setContractStartDate(toDate(clientEditData.ClientContractStartDate));
       setContractEndDate(toDate(clientEditData.ClientContractEndDate));
+      if (clientEditData.ClientHomePageBgImg) {
+        setClientHomeBgImage(clientEditData.ClientHomePageBgImg);
+      }
+      if (clientEditData.ClientPostOrder) {
+        setPostOrderFile(clientEditData.ClientPostOrder);
+      }
+      return;
     }
+    setContractStartDate(null);
+    setContractEndDate(null);
+    setClientHomeBgImage(null);
+    setPostOrderFile(null);
   }, [isEdit]);
 
   useEffect(() => {
@@ -82,24 +108,33 @@ const ClientCreateOrEdit = () => {
     );
   }, [contractEndDate]);
 
+  const [loading, setLoading] = useState(false);
+
   const onSubmit = async (data: ClientFormFields) => {
     if (!company) return;
 
     try {
-      showModalLoader({});
+      setLoading(true);
 
       if (isEdit) {
         await DbClient.updateClient({
           cmpId: company.CompanyId,
           clientId: clientEditData.ClientId,
           data,
+          postOrderFile,
+          clientHomeBgImage,
         });
         showSnackbar({
           message: 'Client updated successfully',
           type: 'success',
         });
       } else {
-        await DbClient.createClient({ cmpId: company.CompanyId, data });
+        await DbClient.createClient({
+          cmpId: company.CompanyId,
+          data,
+          postOrderFile,
+          clientHomeBgImage,
+        });
         showSnackbar({
           message: 'Client created successfully',
           type: 'success',
@@ -111,19 +146,20 @@ const ClientCreateOrEdit = () => {
       });
 
       methods.reset();
-      closeModalLoader();
-      navigate(-1);
+      setLoading(false);
+
+      navigate(PageRoutes.CLIENTS);
     } catch (error) {
       console.log(error);
       errorHandler(error);
-      closeModalLoader();
+      setLoading(false);
     }
   };
 
   const onDelete = async () => {
     if (!company || !isEdit) return;
     try {
-      showModalLoader({});
+      setLoading(true);
 
       await DbClient.deleteClient(clientEditData.ClientId);
 
@@ -138,14 +174,39 @@ const ClientCreateOrEdit = () => {
 
       methods.reset();
 
-      navigate(-1);
-      closeModalLoader();
+      navigate(PageRoutes.CLIENTS);
+      setLoading(false);
     } catch (error) {
       console.log(error);
       errorHandler(error);
-      closeModalLoader();
+      setLoading(false);
     }
   };
+
+  const handlePdfChange = (file: File) => {
+    setPostOrderFile(file);
+  };
+
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setClientHomeBgImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
+
   return (
     <div className="flex flex-col gap-4 p-6">
       <div className="flex items-center justify-between w-full bg-primaryGold rounded p-4 shadow">
@@ -244,26 +305,44 @@ const ClientCreateOrEdit = () => {
               setValue={setContractEndDate}
             />
 
-            <InputWithTopHeader
-              label="Contract Amount"
-              className="mx-0"
-              register={methods.register}
-              name="ClientContractAmount"
-              decimalCount={2}
-              error={methods.formState.errors.ClientContractAmount?.message}
-              leadingIcon={<div>$</div>}
-            />
+            <div className="flex flex-col gap-10">
+              <InputWithTopHeader
+                label="Contract Amount"
+                className="mx-0"
+                register={methods.register}
+                name="ClientContractAmount"
+                decimalCount={2}
+                error={methods.formState.errors.ClientContractAmount?.message}
+                leadingIcon={<div>$</div>}
+              />
+              <SwitchWithSideHeader
+                label="Send email for each patrol"
+                className="bg-onHoverBg px-4 py-2 rounded"
+                register={methods.register}
+                name="ClientSendEmailForEachPatrol"
+                errors={methods.formState.errors}
+              />
+            </div>
 
-            <InputWithTopHeader
-              label="Client hourly rate"
-              className="mx-0"
-              register={methods.register}
-              name="ClientHourlyRate"
-              decimalCount={2}
-              error={methods.formState.errors.ClientHourlyRate?.message}
-              leadingIcon={<div>$</div>}
-            />
-            <div>&nbsp;</div>
+            <div className="flex flex-col gap-10">
+              <InputWithTopHeader
+                label="Client hourly rate"
+                className="mx-0"
+                register={methods.register}
+                name="ClientHourlyRate"
+                decimalCount={2}
+                error={methods.formState.errors.ClientHourlyRate?.message}
+                leadingIcon={<div>$</div>}
+              />
+              <SwitchWithSideHeader
+                label="Send email for each shift"
+                className="bg-onHoverBg px-4 py-2 rounded"
+                register={methods.register}
+                name="ClientSendEmailForEachShift"
+                errors={methods.formState.errors}
+              />
+            </div>
+
             <TextareaWithTopHeader
               title="Client Address (Optional)"
               className="mx-0"
@@ -271,6 +350,58 @@ const ClientCreateOrEdit = () => {
               name="ClientAddress"
               error={methods.formState.errors.ClientAddress?.message}
             />
+
+            <label
+              htmlFor="fileUpload"
+              className="flex flex-col gap-1 cursor-pointer col-span-3"
+            >
+              <InputHeader title="Upload post order" fontClassName="text-lg" />
+              <div className="flex gap-4 items-center w-full">
+                {typeof postOrderFile === 'string' &&
+                  postOrderFile.startsWith('https') && (
+                    <a
+                      href={postOrderFile}
+                      className=" text-textPrimaryBlue cursor-pointer"
+                    >
+                      View Post Order
+                    </a>
+                  )}
+                <input
+                  id="fileUpload"
+                  type="file"
+                  accept="application/pdf"
+                  className={`border border-gray-300 p-2 rounded cursor-pointer`}
+                  onChange={(e) => handlePdfChange(e.target.files?.[0] as File)}
+                />
+              </div>
+            </label>
+            <label
+              htmlFor="img"
+              className="flex flex-col items-center border border-dashed border-black rounded-md p-4 cursor-pointer"
+            >
+              {clientHomeBgImage ? (
+                <img
+                  src={clientHomeBgImage}
+                  alt={'Void check'}
+                  className="w-full max-h-[200px] rounded"
+                />
+              ) : (
+                <>
+                  <FaImage className="text-3xl" />
+                  <span className="text-textPrimaryBlue cursor-pointer">
+                    Upload client home page image
+                  </span>
+                </>
+              )}
+              <input
+                id="img"
+                type="file"
+                accept="image/*"
+                hidden
+                className="hidden"
+                onChange={handleImageUpload}
+              />
+            </label>
           </form>
         </FormProvider>
       </div>

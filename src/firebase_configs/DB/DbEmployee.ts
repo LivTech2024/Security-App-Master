@@ -417,7 +417,6 @@ class DbEmployee {
         let empImageUrl = empImage;
 
         if (empImage && !empImage.startsWith('https')) {
-          console.log(empImage, 'image');
           const imageEmployee = [
             {
               base64: empImage,
@@ -427,8 +426,6 @@ class DbEmployee {
                 CloudStorageImageHandler.generateImageName(empId, 'profile'),
             },
           ];
-
-          console.log(imageEmployee, 'imageEmployee');
 
           const imageEmpUrl =
             await CloudStorageImageHandler.getImageDownloadUrls(

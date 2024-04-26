@@ -75,6 +75,8 @@ export const CloudStoragePaths = {
   EMPLOYEES_DOCUMENTS: 'employees/documents',
   COMPANIES_LOGOS: 'companies/logos',
   DOCUMENTS: 'documents',
+  CLIENT_IMAGES: 'clients/images',
+  CLIENT_DOCUMENTS: 'clients/documents',
 };
 
 export const ImageResolution = {
@@ -86,6 +88,8 @@ export const ImageResolution = {
   EMP_VOID_CHECK_HEIGHT: 480,
   COMPANY_LOGO_WIDTH: 1200,
   COMPANY_LOGO_HEIGHT: 1200,
+  CLIENT_HOME_PAGE_BG_IMG_WIDTH: 1200,
+  CLIENT_HOME_PAGE_BG_IMG_HEIGHT: 1200,
 };
 
 export const PageRoutes = {

@@ -17,7 +17,11 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '../config';
-import { CollectionName } from '../../@types/enum';
+import {
+  CloudStoragePaths,
+  CollectionName,
+  ImageResolution,
+} from '../../@types/enum';
 import { ClientFormFields } from '../../utilities/zod/schema';
 import {
   IClientsCollection,
@@ -25,7 +29,10 @@ import {
   IShiftsCollection,
 } from '../../@types/database';
 import CustomError from '../../utilities/CustomError';
-import { getNewDocId } from './utils';
+import CloudStorageImageHandler, {
+  CloudStorageFileHandler,
+  getNewDocId,
+} from './utils';
 import { fullTextSearchIndex, removeTimeFromDate } from '../../utilities/misc';
 import {
   createAuthUser,
@@ -64,95 +71,79 @@ class DbClient {
   static createClient = async ({
     cmpId,
     data,
+    postOrderFile,
+    clientHomeBgImage,
   }: {
     cmpId: string;
     data: ClientFormFields;
+    postOrderFile: File | string | null;
+    clientHomeBgImage: string | null;
   }) => {
-    const clientExist = await this.isClientExist(cmpId, data.ClientName);
+    let postOrderFileUrl: string | null = null;
+    let clientHomeBgImageUrl: string | null = null;
 
-    if (clientExist) {
-      throw new CustomError('This client already exist');
-    }
+    try {
+      const clientExist = await this.isClientExist(cmpId, data.ClientName);
 
-    const clientId = getNewDocId(CollectionName.clients);
+      if (clientExist) {
+        throw new CustomError('This client already exist');
+      }
 
-    const clientRefRef = doc(db, CollectionName.clients, clientId);
+      const clientId = getNewDocId(CollectionName.clients);
 
-    const ClientNameSearchIndex = fullTextSearchIndex(
-      data.ClientName.trim().toLowerCase()
-    );
+      const clientRefRef = doc(db, CollectionName.clients, clientId);
 
-    const newClient: IClientsCollection = {
-      ClientId: clientId,
-      ClientCompanyId: cmpId,
-      ClientName: data.ClientName,
-      ClientNameSearchIndex,
-      ClientEmail: data.ClientEmail,
-      ClientPhone: data.ClientPhone,
-      ClientAddress: data.ClientAddress || null,
-      ClientBalance: 0,
-      ClientCreatedAt: serverTimestamp(),
-      ClientModifiedAt: serverTimestamp(),
-      ClientPassword: data.ClientPassword,
-      ClientContractStartDate: removeTimeFromDate(
-        data.ClientContractStartDate
-      ) as unknown as Timestamp,
-      ClientContractEndDate: removeTimeFromDate(
-        data.ClientContractEndDate
-      ) as unknown as Timestamp,
-      ClientContractAmount: data.ClientContractAmount,
-      ClientHourlyRate: data.ClientHourlyRate,
-    };
+      const ClientNameSearchIndex = fullTextSearchIndex(
+        data.ClientName.trim().toLowerCase()
+      );
 
-    await runTransaction(db, async (transaction) => {
-      transaction.set(clientRefRef, newClient);
+      if (postOrderFile) {
+        const fileName = CloudStorageFileHandler.generateFileName(
+          clientId,
+          'post_order'
+        );
 
-      await createAuthUser({
-        email: data.ClientEmail,
-        password: data.ClientPassword,
-        role: 'client',
-        userId: clientId,
-      }).catch(() => {
-        throw new CustomError('This email id is already registered');
-      });
-    });
-  };
+        postOrderFileUrl = await CloudStorageFileHandler.uploadFile(
+          postOrderFile as File,
+          CloudStoragePaths.CLIENT_DOCUMENTS + '/' + fileName
+        );
+      }
 
-  static updateClient = async ({
-    cmpId,
-    data,
-    clientId,
-  }: {
-    cmpId: string;
-    clientId: string;
-    data: ClientFormFields;
-  }) => {
-    const clientExist = await this.isClientExist(
-      cmpId,
-      data.ClientName,
-      clientId
-    );
+      if (clientHomeBgImage) {
+        const imageEmployee = [
+          {
+            base64: clientHomeBgImage,
+            path:
+              CloudStoragePaths.CLIENT_IMAGES +
+              '/' +
+              CloudStorageImageHandler.generateImageName(
+                clientId,
+                'home_page_bg'
+              ),
+          },
+        ];
 
-    if (clientExist) {
-      throw new CustomError('This client already exist');
-    }
+        const clientHomeBgImageUrlTemp =
+          await CloudStorageImageHandler.getImageDownloadUrls(
+            imageEmployee,
+            ImageResolution.CLIENT_HOME_PAGE_BG_IMG_HEIGHT,
+            ImageResolution.CLIENT_HOME_PAGE_BG_IMG_WIDTH
+          );
 
-    const clientRefRef = doc(db, CollectionName.clients, clientId);
-
-    const ClientNameSearchIndex = fullTextSearchIndex(
-      data.ClientName.trim().toLowerCase()
-    );
-
-    await runTransaction(db, async (transaction) => {
-      const clientSnapshot = await transaction.get(clientRefRef);
-      const oldClientData = clientSnapshot.data() as IClientsCollection;
-
-      const updatedClient: Partial<IClientsCollection> = {
+        clientHomeBgImageUrl = clientHomeBgImageUrlTemp[0];
+      }
+      const newClient: IClientsCollection = {
+        ClientId: clientId,
+        ClientCompanyId: cmpId,
         ClientName: data.ClientName,
         ClientNameSearchIndex,
         ClientEmail: data.ClientEmail,
         ClientPhone: data.ClientPhone,
         ClientAddress: data.ClientAddress || null,
+        ClientBalance: 0,
+        ClientCreatedAt: serverTimestamp(),
+        ClientModifiedAt: serverTimestamp(),
+        ClientPassword: data.ClientPassword,
         ClientContractStartDate: removeTimeFromDate(
           data.ClientContractStartDate
         ) as unknown as Timestamp,
@@ -161,20 +152,149 @@ class DbClient {
         ) as unknown as Timestamp,
         ClientContractAmount: data.ClientContractAmount,
         ClientHourlyRate: data.ClientHourlyRate,
-        ClientModifiedAt: serverTimestamp(),
+        ClientSendEmailForEachShift: data.ClientSendEmailForEachShift,
+        ClientSendEmailForEachPatrol: data.ClientSendEmailForEachPatrol,
+        ClientPostOrder: postOrderFileUrl,
+        ClientHomePageBgImg: clientHomeBgImageUrl,
       };
 
-      transaction.update(clientRefRef, updatedClient);
+      await runTransaction(db, async (transaction) => {
+        transaction.set(clientRefRef, newClient);
 
-      if (oldClientData.ClientEmail !== data.ClientEmail) {
-        await updateAuthUser({
+        await createAuthUser({
           email: data.ClientEmail,
+          password: data.ClientPassword,
+          role: 'client',
           userId: clientId,
         }).catch(() => {
           throw new CustomError('This email id is already registered');
         });
+      });
+    } catch (error) {
+      console.log(error);
+      if (postOrderFileUrl) {
+        await CloudStorageFileHandler.deleteFileByUrl(postOrderFileUrl);
       }
-    });
+      if (clientHomeBgImageUrl) {
+        await CloudStorageImageHandler.deleteImageByUrl(clientHomeBgImageUrl);
+      }
+      throw error;
+    }
+  };
+
+  static updateClient = async ({
+    cmpId,
+    data,
+    clientId,
+    postOrderFile,
+    clientHomeBgImage,
+  }: {
+    cmpId: string;
+    clientId: string;
+    data: ClientFormFields;
+    postOrderFile: File | string | null;
+    clientHomeBgImage: string | null;
+  }) => {
+    try {
+      const clientExist = await this.isClientExist(
+        cmpId,
+        data.ClientName,
+        clientId
+      );
+
+      if (clientExist) {
+        throw new CustomError('This client already exist');
+      }
+
+      const clientRefRef = doc(db, CollectionName.clients, clientId);
+
+      const ClientNameSearchIndex = fullTextSearchIndex(
+        data.ClientName.trim().toLowerCase()
+      );
+
+      let postOrderFileUrl: string | null =
+        typeof postOrderFile === 'string' && postOrderFile.startsWith('https')
+          ? postOrderFile
+          : null;
+
+      if (postOrderFile && typeof postOrderFile !== 'string') {
+        const fileName = CloudStorageFileHandler.generateFileName(
+          clientId,
+          'post_order'
+        );
+
+        postOrderFileUrl = await CloudStorageFileHandler.uploadFile(
+          postOrderFile as File,
+          CloudStoragePaths.CLIENT_DOCUMENTS + '/' + fileName
+        );
+      }
+
+      let clientHomeBgImageUrl = clientHomeBgImage;
+
+      if (clientHomeBgImage && !clientHomeBgImage.startsWith('https')) {
+        const imageEmployee = [
+          {
+            base64: clientHomeBgImage,
+            path:
+              CloudStoragePaths.CLIENT_IMAGES +
+              '/' +
+              CloudStorageImageHandler.generateImageName(
+                clientId,
+                'home_page_bg'
+              ),
+          },
+        ];
+
+        const clientHomeBgImageUrlTemp =
+          await CloudStorageImageHandler.getImageDownloadUrls(
+            imageEmployee,
+            ImageResolution.CLIENT_HOME_PAGE_BG_IMG_HEIGHT,
+            ImageResolution.CLIENT_HOME_PAGE_BG_IMG_WIDTH
+          );
+
+        clientHomeBgImageUrl = clientHomeBgImageUrlTemp[0];
+      }
+
+      await runTransaction(db, async (transaction) => {
+        const clientSnapshot = await transaction.get(clientRefRef);
+        const oldClientData = clientSnapshot.data() as IClientsCollection;
+
+        const updatedClient: Partial<IClientsCollection> = {
+          ClientName: data.ClientName,
+          ClientNameSearchIndex,
+          ClientEmail: data.ClientEmail,
+          ClientPhone: data.ClientPhone,
+          ClientAddress: data.ClientAddress || null,
+          ClientContractStartDate: removeTimeFromDate(
+            data.ClientContractStartDate
+          ) as unknown as Timestamp,
+          ClientContractEndDate: removeTimeFromDate(
+            data.ClientContractEndDate
+          ) as unknown as Timestamp,
+          ClientContractAmount: data.ClientContractAmount,
+          ClientHourlyRate: data.ClientHourlyRate,
+          ClientModifiedAt: serverTimestamp(),
+          ClientSendEmailForEachShift: data.ClientSendEmailForEachShift,
+          ClientSendEmailForEachPatrol: data.ClientSendEmailForEachPatrol,
+          ClientPostOrder: postOrderFileUrl,
+          ClientHomePageBgImg: clientHomeBgImageUrl,
+        };
+
+        transaction.update(clientRefRef, updatedClient);
+
+        if (oldClientData.ClientEmail !== data.ClientEmail) {
+          await updateAuthUser({
+            email: data.ClientEmail,
+            userId: clientId,
+          }).catch(() => {
+            throw new CustomError('This email id is already registered');
+          });
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   };
 
   static deleteClient = async (clientId: string) => {
@@ -205,8 +325,24 @@ class DbClient {
 
     await runTransaction(db, async (transaction) => {
       const clientRef = doc(db, CollectionName.clients, clientId);
+      const snapshot = await transaction.get(clientRef);
+      const clientData = snapshot.data() as IClientsCollection;
+
       transaction.delete(clientRef);
+
       await deleteAuthUser(clientId);
+
+      if (clientData.ClientHomePageBgImg) {
+        await CloudStorageImageHandler.deleteImageByUrl(
+          clientData.ClientHomePageBgImg
+        );
+      }
+
+      if (clientData.ClientPostOrder) {
+        await CloudStorageFileHandler.deleteFileByUrl(
+          clientData.ClientPostOrder
+        );
+      }
     });
   };
 
