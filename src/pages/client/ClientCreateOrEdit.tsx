@@ -361,6 +361,7 @@ const ClientCreateOrEdit = () => {
                   postOrderFile.startsWith('https') && (
                     <a
                       href={postOrderFile}
+                      target="_blank"
                       className=" text-textPrimaryBlue cursor-pointer"
                     >
                       View Post Order
