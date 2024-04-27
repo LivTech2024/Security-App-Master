@@ -142,7 +142,7 @@ const Home = () => {
           icon={<GrCertificate className="text-2xl text-primaryGold" />}
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.VISITOR_LIST}
           name="Visitor management"
           icon={<FaPeopleGroup className="text-2xl text-primaryGold" />}
         />

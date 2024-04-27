@@ -56,6 +56,8 @@ import PatrolLogs from './pages/patrolling/PatrolLogs';
 import ClientPatrolLog from './pages/client_portal/patrol/ClientPatrolLog';
 import ClientEmpDarList from './pages/client_portal/emp_dar/ClientEmpDarList';
 import ClientEmpDarView from './pages/client_portal/emp_dar/ClientEmpDarView';
+import VisitorList from './pages/visitor_management/VisitorList';
+import VisitorView from './pages/visitor_management/VisitorView';
 
 function App() {
   useOnAuthStateChanged();
@@ -248,6 +250,8 @@ function App() {
             <Route path={PageRoutes.EQUIPMENT_VIEW} Component={EquipmentView} />
 
             <Route path={PageRoutes.MESSAGING} Component={Messaging} />
+            <Route path={PageRoutes.VISITOR_LIST} Component={VisitorList} />
+            <Route path={PageRoutes.VISITOR_VIEW} Component={VisitorView} />
           </Routes>
         </Layout>
       </ModalsProvider>

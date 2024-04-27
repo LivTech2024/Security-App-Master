@@ -21,6 +21,7 @@ export enum CollectionName {
   equipments = 'Equipments',
   equipmentAllocations = 'EquipmentAllocations',
   employeesDAR = 'EmployeesDAR',
+  visitors = 'Visitors',
 }
 
 export const DisplayCount = {
@@ -38,6 +39,7 @@ export const DisplayCount = {
   MESSAGE_RECEIVED_LIST: 20,
   MESSAGE_SENT_LIST: 20,
   EMP_DAR_LIST: 20,
+  VISITOR_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -58,6 +60,7 @@ export const REACT_QUERY_KEYS = {
   MESSAGE_RECEIVED_LIST: 'message-received-list',
   MESSAGE_SENT_LIST: 'message-sent-list',
   EMP_DAR_LIST: 'emp-dar-list',
+  VISITOR_LIST: 'visitor-list',
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -104,6 +107,8 @@ export const PageRoutes = {
   PATROLLING_LOGS: '/patrolling_logs',
   PATROLLING_CREATE_OR_EDIT: '/patrolling_create_or_edit',
   PATROLLING_VIEW: '/patrolling_view',
+  VISITOR_LIST: '/visitor_list',
+  VISITOR_VIEW: '/visitor_view',
   LOCATIONS: '/locations',
   COMPANY_BRANCHES: '/company_branches',
   REPORTS: '/reports',

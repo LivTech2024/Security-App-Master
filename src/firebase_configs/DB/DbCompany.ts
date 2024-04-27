@@ -45,6 +45,7 @@ import {
   SettingsFormFields,
 } from '../../utilities/zod/schema';
 import CustomError from '../../utilities/CustomError';
+import dayjs from 'dayjs';
 
 class DbCompany {
   static createCompany = async (
@@ -763,6 +764,68 @@ class DbCompany {
     const docQuery = query(docRef, ...queryParams);
 
     return getDocs(docQuery);
+  };
+
+  //*Visitors
+  static getVisitors = ({
+    cmpId,
+    branchId,
+    lastDoc,
+    lmt,
+    endDate,
+    isLifeTime,
+    startDate,
+  }: {
+    cmpId: string;
+    branchId?: string;
+    lastDoc?: DocumentData | null;
+    lmt?: number;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+  }) => {
+    const reportRef = collection(db, CollectionName.visitors);
+
+    let queryParams: QueryConstraint[] = [
+      where('VisitorCompanyId', '==', cmpId),
+      orderBy('VisitorCreatedAt', 'desc'),
+    ];
+
+    if (branchId) {
+      queryParams = [
+        ...queryParams,
+        where('VisitorCompanyBranchId', '==', branchId),
+      ];
+    }
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where(
+          'VisitorCreatedAt',
+          '>=',
+          dayjs(startDate).startOf('day').toDate()
+        ),
+        where('VisitorCreatedAt', '<=', dayjs(endDate).endOf('day').toDate()),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const empQuery = query(reportRef, ...queryParams);
+
+    return getDocs(empQuery);
+  };
+
+  static getVisitorById = (visitorId: string) => {
+    const visitorDocRef = doc(db, CollectionName.visitors, visitorId);
+    return getDoc(visitorDocRef);
   };
 }
 
