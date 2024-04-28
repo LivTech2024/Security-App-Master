@@ -321,7 +321,8 @@ export interface IInvoicesCollection {
 export interface IClientPostOrderChildCollection {
   PostOrderPdf: string;
   PostOrderTitle: string;
-  PostOrderOtherData?: string | null;
+  PostOrderOtherData?: string[];
+  PostOrderComment?: string | null;
 }
 
 export interface IClientsCollection {
