@@ -1,3 +1,4 @@
+import LazyLoad from 'react-lazyload';
 import {
   IPatrolLogsCollection,
   IPatrolsCollection,
@@ -91,11 +92,13 @@ const PatrolViewCard = ({
                                 target="_blank"
                                 className="text-textPrimaryBlue"
                               >
-                                <img
-                                  src={img}
-                                  alt=""
-                                  className="w-[100px] h-[100px] rounded object-cover"
-                                />
+                                <LazyLoad height={100} unmountIfInvisible>
+                                  <img
+                                    src={img}
+                                    alt=""
+                                    className="w-[100px] h-[100px] rounded object-cover"
+                                  />
+                                </LazyLoad>
                               </a>
                             );
                           })}{' '}
