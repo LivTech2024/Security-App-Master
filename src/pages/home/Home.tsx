@@ -133,7 +133,7 @@ const Home = () => {
           name="Equipment Management"
         />
         <HomeItem
-          path={PageRoutes.KEY_VIEW}
+          path={PageRoutes.KEY_LIST}
           icon={<FaKey className="text-2xl text-primaryGold" />}
           name="Key Management"
         />

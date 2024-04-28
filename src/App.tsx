@@ -58,6 +58,8 @@ import ClientEmpDarList from './pages/client_portal/emp_dar/ClientEmpDarList';
 import ClientEmpDarView from './pages/client_portal/emp_dar/ClientEmpDarView';
 import VisitorList from './pages/visitor_management/VisitorList';
 import VisitorView from './pages/visitor_management/VisitorView';
+import KeyList from './pages/key_management/KeyList';
+import KeyView from './pages/key_management/KeyView';
 
 function App() {
   useOnAuthStateChanged();
@@ -206,6 +208,7 @@ function App() {
               Component={EmployeeCreateOrEdit}
             />
             <Route path={PageRoutes.SCHEDULES} Component={Schedule} />
+
             <Route
               path={PageRoutes.PATROLLING_LIST}
               Component={PatrollingList}
@@ -219,37 +222,49 @@ function App() {
               path={PageRoutes.PATROLLING_VIEW}
               Component={PatrollingView}
             />
+
             <Route path={PageRoutes.LOCATIONS} Component={Locations} />
+
             <Route
               path={PageRoutes.COMPANY_BRANCHES}
               Component={CompanyBranches}
             />
             <Route path={PageRoutes.REPORTS} Component={Reports} />
             <Route path={PageRoutes.REPORT_VIEW} Component={ReportView} />
+
             <Route path={PageRoutes.SETTINGS} Component={Settings} />
+
             <Route
               path={PageRoutes.PAYMENTS_AND_BILLING}
               Component={PaymentsAndBilling}
             />
+
             <Route path={PageRoutes.INVOICE_LIST} Component={InvoiceList} />
             <Route
               path={PageRoutes.INVOICE_GENERATE}
               Component={InvoiceGenerate}
             />
+
             <Route path={PageRoutes.CLIENTS} Component={Clients} />
             <Route path={PageRoutes.CLIENT_VIEW} Component={ClientView} />
             <Route
               path={PageRoutes.CLIENT_CREATE_OR_EDIT}
               Component={ClientCreateOrEdit}
             />
+
             <Route
               path={PageRoutes.DOCUMENT_REPOSITORY}
               Component={DocumentRepository}
             />
+
             <Route path={PageRoutes.EQUIPMENT_LIST} Component={EquipmentList} />
             <Route path={PageRoutes.EQUIPMENT_VIEW} Component={EquipmentView} />
 
+            <Route path={PageRoutes.KEY_LIST} Component={KeyList} />
+            <Route path={PageRoutes.KEY_VIEW} Component={KeyView} />
+
             <Route path={PageRoutes.MESSAGING} Component={Messaging} />
+
             <Route path={PageRoutes.VISITOR_LIST} Component={VisitorList} />
             <Route path={PageRoutes.VISITOR_VIEW} Component={VisitorView} />
           </Routes>
