@@ -217,6 +217,10 @@ export interface IReportCategoriesCollection {
 
 export interface IReportsCollection {
   ReportId: string;
+  ReportLocationId: string;
+  ReportLocationName: string;
+  ReportIsFollowUpRequired: boolean;
+  ReportFollowedUpId?: string | null; //*Id of report which followed up this report
   ReportCompanyId: string;
   ReportCompanyBranchId?: string;
   ReportEmployeeId: string;
@@ -314,6 +318,12 @@ export interface IInvoicesCollection {
   InvoiceModifiedAt: Timestamp | FieldValue;
 }
 
+export interface IClientPostOrderChildCollection {
+  PostOrderPdf: string;
+  PostOrderTitle: string;
+  PostOrderOtherData?: string | null;
+}
+
 export interface IClientsCollection {
   ClientId: string;
   ClientCompanyId: string;
@@ -329,7 +339,7 @@ export interface IClientsCollection {
   ClientContractAmount: number;
   ClientHourlyRate: number;
   ClientBalance: number;
-  ClientPostOrder?: string | null; //*Pdf or image
+  ClientPostOrder?: IClientPostOrderChildCollection | null;
   ClientSendEmailForEachPatrol: boolean; //*by default true
   ClientSendEmailForEachShift: boolean; //*by default true
   ClientCreatedAt: Timestamp | FieldValue;
@@ -395,6 +405,10 @@ export interface ILogBookCollection {
   LogBookId: string;
   LogBookCompanyId: string;
   LogBookCompanyBranchId: string | null;
+  LogBookClientId: string;
+  LogBookClientName: string;
+  LogBookLocationId: string;
+  LogBookLocationName: string;
   LogBookDate: Timestamp | FieldValue;
   LogBookEmpId: string;
   LogBookEmpName: string;
@@ -402,6 +416,7 @@ export interface ILogBookCollection {
     LogContent: string;
     LogType:
       | 'shift_start'
+      | 'shift_break'
       | 'shift_end'
       | 'patrol_start'
       | 'patrol_end'
@@ -416,10 +431,14 @@ export interface IVisitorsCollection {
   VisitorCompanyId: string;
   VisitorCompanyBranchId: string;
   VisitorAssetHandover: string;
+  VisitorAssetDurationInMinute: number;
+  VisitorLocationId: string;
+  VisitorLocationName: string;
   VisitorComment: string | null;
   VisitorContactNumber: string;
   VisitorEmail: string;
   VisitorInTime: Timestamp | FieldValue;
+  VisitorOutTime: Timestamp | FieldValue;
   VisitorName: string;
   VisitorNoOfPerson: number;
   VisitorCreatedAt: Timestamp | FieldValue;

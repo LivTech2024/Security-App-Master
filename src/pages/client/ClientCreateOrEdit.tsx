@@ -62,9 +62,10 @@ const ClientCreateOrEdit = () => {
     dayjs().add(1, 'month').toDate()
   );
 
-  const [postOrderFile, setPostOrderFile] = useState<string | File | null>(
-    null
-  );
+  const [postOrderData, setPostOrderData] = useState<{
+    PostOrderPdf: string | File;
+    PostOrderTitle: string;
+  } | null>(null);
 
   const [clientHomeBgImage, setClientHomeBgImage] = useState<string | null>(
     null
@@ -81,15 +82,21 @@ const ClientCreateOrEdit = () => {
       if (clientEditData.ClientHomePageBgImg) {
         setClientHomeBgImage(clientEditData.ClientHomePageBgImg);
       }
-      if (clientEditData.ClientPostOrder) {
-        setPostOrderFile(clientEditData.ClientPostOrder);
+      if (
+        clientEditData.ClientPostOrder &&
+        clientEditData.ClientPostOrder.PostOrderPdf
+      ) {
+        setPostOrderData({
+          PostOrderPdf: clientEditData.ClientPostOrder.PostOrderPdf,
+          PostOrderTitle: clientEditData.ClientPostOrder.PostOrderTitle,
+        });
       }
       return;
     }
     setContractStartDate(null);
     setContractEndDate(null);
     setClientHomeBgImage(null);
-    setPostOrderFile(null);
+    setPostOrderData(null);
   }, [isEdit]);
 
   useEffect(() => {
@@ -121,7 +128,7 @@ const ClientCreateOrEdit = () => {
           cmpId: company.CompanyId,
           clientId: clientEditData.ClientId,
           data,
-          postOrderFile,
+          postOrderData,
           clientHomeBgImage,
         });
         showSnackbar({
@@ -132,7 +139,7 @@ const ClientCreateOrEdit = () => {
         await DbClient.createClient({
           cmpId: company.CompanyId,
           data,
-          postOrderFile,
+          postOrderData,
           clientHomeBgImage,
         });
         showSnackbar({
@@ -184,7 +191,12 @@ const ClientCreateOrEdit = () => {
   };
 
   const handlePdfChange = (file: File) => {
-    setPostOrderFile(file);
+    setPostOrderData((prev) => {
+      if (prev) {
+        return { ...prev, PostOrderPdf: file };
+      }
+      return { PostOrderPdf: file, PostOrderTitle: '' };
+    });
   };
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -351,58 +363,87 @@ const ClientCreateOrEdit = () => {
               error={methods.formState.errors.ClientAddress?.message}
             />
 
-            <label
-              htmlFor="fileUpload"
-              className="flex flex-col gap-1 cursor-pointer col-span-3"
-            >
-              <InputHeader title="Upload post order" fontClassName="text-lg" />
-              <div className="flex gap-4 items-center w-full">
-                {typeof postOrderFile === 'string' &&
-                  postOrderFile.startsWith('https') && (
-                    <a
-                      href={postOrderFile}
-                      target="_blank"
-                      className=" text-textPrimaryBlue cursor-pointer"
-                    >
-                      View Post Order
-                    </a>
-                  )}
-                <input
-                  id="fileUpload"
-                  type="file"
-                  accept="application/pdf"
-                  className={`border border-gray-300 p-2 rounded cursor-pointer`}
-                  onChange={(e) => handlePdfChange(e.target.files?.[0] as File)}
+            <div className="flex flex-col gap-4 col-span-2 bg-onHoverBg p-4 rounded">
+              <div className="font-semibold">Post Order Details</div>
+              <div className="flex gap-4 items-center">
+                <label
+                  htmlFor="fileUpload"
+                  className="flex flex-col gap-1 cursor-pointer w-full"
+                >
+                  <InputHeader title="Upload post order pdf" fontClassName="" />
+                  <div className="flex gap-4 items-center w-full">
+                    {typeof postOrderData?.PostOrderPdf === 'string' &&
+                      postOrderData?.PostOrderPdf.startsWith('https') && (
+                        <a
+                          href={postOrderData?.PostOrderPdf}
+                          target="_blank"
+                          className=" text-textPrimaryBlue cursor-pointer"
+                        >
+                          View Post Order
+                        </a>
+                      )}
+                    <input
+                      id="fileUpload"
+                      type="file"
+                      accept="application/pdf"
+                      className={`border border-gray-300 p-2 rounded cursor-pointer w-full`}
+                      onChange={(e) =>
+                        handlePdfChange(e.target.files?.[0] as File)
+                      }
+                    />
+                  </div>
+                </label>
+                {/* Post Order Title Input */}
+                <InputWithTopHeader
+                  className="mx-0 w-full"
+                  label="Post Order Title"
+                  value={postOrderData?.PostOrderTitle}
+                  onChange={(e) =>
+                    setPostOrderData((prev) => {
+                      if (prev) {
+                        return { ...prev, PostOrderTitle: e.target.value };
+                      }
+                      return {
+                        PostOrderTitle: e.target.value,
+                        PostOrderPdf: '',
+                      };
+                    })
+                  }
                 />
               </div>
-            </label>
-            <label
-              htmlFor="img"
-              className="flex flex-col items-center border border-dashed border-black rounded-md p-4 cursor-pointer"
-            >
-              {clientHomeBgImage ? (
-                <img
-                  src={clientHomeBgImage}
-                  alt={'Void check'}
-                  className="w-full max-h-[200px] rounded"
+            </div>
+            <div className="flex flex-col gap-4 bg-onHoverBg p-4 rounded">
+              <div className="font-semibold">
+                Client Portal Background Image
+              </div>
+              <label
+                htmlFor="img"
+                className="flex flex-col items-center justify-center border border-dashed border-black rounded-md p-4 cursor-pointer"
+              >
+                {clientHomeBgImage ? (
+                  <img
+                    src={clientHomeBgImage}
+                    alt={'Void check'}
+                    className="w-full max-h-[200px] rounded"
+                  />
+                ) : (
+                  <>
+                    <FaImage className="text-3xl" />
+                    <span className="text-textPrimaryBlue cursor-pointer">
+                      Upload image
+                    </span>
+                  </>
+                )}
+                <input
+                  id="img"
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  className="hidden"
+                  onChange={handleImageUpload}
                 />
-              ) : (
-                <>
-                  <FaImage className="text-3xl" />
-                  <span className="text-textPrimaryBlue cursor-pointer">
-                    Upload client home page image
-                  </span>
-                </>
-              )}
-              <input
-                id="img"
-                type="file"
-                accept="image/*"
-                hidden
-                className="hidden"
-                onChange={handleImageUpload}
-              />
-            </label>
+              </label>
+            </div>
           </form>
         </FormProvider>
       </div>
