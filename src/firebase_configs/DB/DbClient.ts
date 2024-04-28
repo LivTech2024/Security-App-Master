@@ -373,10 +373,15 @@ class DbClient {
         );
       }
 
-      if (clientData.ClientPostOrder?.PostOrderOtherData) {
-        await CloudStorageFileHandler.deleteFileByUrl(
-          clientData.ClientPostOrder.PostOrderOtherData
-        );
+      if (
+        clientData.ClientPostOrder?.PostOrderOtherData &&
+        clientData.ClientPostOrder?.PostOrderOtherData.length > 0
+      ) {
+        const otherDataDeletePromise =
+          clientData.ClientPostOrder.PostOrderOtherData.map((url) => {
+            return CloudStorageFileHandler.deleteFileByUrl(url);
+          });
+        await Promise.all(otherDataDeletePromise);
       }
     });
   };
