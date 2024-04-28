@@ -391,13 +391,16 @@ export interface IEmployeeDARCollection {
   EmpDarEmpId: string;
   EmpDarEmpName: string;
   EmpDarClientId: string;
+  EmpDarClientName: string;
+  EmpDarLocationId: string;
+  EmpDarLocationName: string;
   EmpDarShiftId: string;
   EmpDarCompanyId: string;
   EmpDarCompanyBranchId: string | null;
   EmpDarTitle: string;
-  EmpDarImages: string[];
+  EmpDarMedias: string[];
   EmpDarData: string; //* Content of DAR
-  EmpDarDate: Timestamp | FieldValue; //* Only Date with time 00:00:00
+  EmpDarDate: Timestamp | FieldValue; //* Same as Shift Date
   EmpDarCreatedAt: Timestamp | FieldValue;
 }
 

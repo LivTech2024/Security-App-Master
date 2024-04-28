@@ -65,7 +65,7 @@ const NavItem = ({
   return (
     <div
       onClick={() => (path ? navigate(path) : callback && callback())}
-      className={`uppercase cursor-pointer p-2 duration-200 ${
+      className={`uppercase cursor-pointer p-2 duration-200 whitespace-nowrap ${
         location.pathname === path ||
         location.pathname.includes(`/${name.toLowerCase()}`)
           ? 'bg-surface text-textPrimary'
@@ -89,7 +89,7 @@ const Nav = ({
 
   return (
     <div
-      className={`flex items-center gap-4 w-full bg-primary text-surface  text-sm p-1 ${
+      className={`flex overflow-x-auto sidebar-scrollbar items-center gap-4 w-full bg-primary text-surface  text-sm p-1 ${
         userType === 'admin' && 'justify-between'
       }`}
     >
@@ -107,6 +107,17 @@ const Nav = ({
               { name: 'Company Branches', path: PageRoutes.COMPANY_BRANCHES },
               { name: 'Manage Locations', path: PageRoutes.LOCATIONS },
               { name: 'Manage Clients', path: PageRoutes.CLIENTS },
+            ]}
+          />
+          <NavItem
+            name="Assets"
+            isDropdownReq
+            dropdownChildren={[
+              {
+                name: 'Equipment Management',
+                path: PageRoutes.EQUIPMENT_LIST,
+              },
+              { name: 'Key Management', path: PageRoutes.KEY_LIST },
             ]}
           />
           <NavItem path={PageRoutes.MESSAGING} name="Messaging" />

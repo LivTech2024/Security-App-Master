@@ -11,3 +11,17 @@
 .remove-vertical-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.sidebar-scrollbar::-webkit-scrollbar {
+  display: block;
+  background-color: #ffffff00;
+  background-color: #051e34b3;
+  width: 8px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #8a9bb2;
+  border-radius: 8px;
+  border: 2px solid #262f3d;
+  cursor: pointer;
+}

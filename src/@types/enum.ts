@@ -124,6 +124,8 @@ export const PageRoutes = {
   DOCUMENT_REPOSITORY: '/document_repository',
   EQUIPMENT_LIST: '/equipment_list',
   EQUIPMENT_VIEW: '/equipment_view',
+  KEY_LIST: '/key_list',
+  KEY_VIEW: '/key_view',
   MESSAGING: '/messaging',
   CLIENT_PORTAL_HOME: '/client_portal/',
   CLIENT_PORTAL_PATROLS: '/client_portal/patrols',

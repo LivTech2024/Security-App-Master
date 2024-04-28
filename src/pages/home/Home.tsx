@@ -12,6 +12,7 @@ import {
   FaClock,
   FaCommentDots,
   FaExclamationTriangle,
+  FaKey,
   FaTasks,
   FaToolbox,
 } from 'react-icons/fa';
@@ -130,6 +131,11 @@ const Home = () => {
           path={PageRoutes.EQUIPMENT_LIST}
           icon={<FaToolbox className="text-2xl text-primaryGold" />}
           name="Equipment Management"
+        />
+        <HomeItem
+          path={PageRoutes.KEY_VIEW}
+          icon={<FaKey className="text-2xl text-primaryGold" />}
+          name="Key Management"
         />
         <HomeItem
           path={PageRoutes.PAYMENTS_AND_BILLING}
