@@ -88,11 +88,11 @@ const ClientEmpDarView = () => {
               <p className="font-semibold">Report Data:</p>
               <p>{data.EmpDarData}</p>
             </div>
-            {data.EmpDarImages && data.EmpDarImages.length && (
+            {data.EmpDarMedias && data.EmpDarMedias.length && (
               <div className="col-span-2">
                 <p className="font-semibold">Images</p>
                 <div className="flex flex-wrap gap-4">
-                  {data.EmpDarImages?.map((src) => {
+                  {data.EmpDarMedias?.map((src) => {
                     return (
                       <img
                         src={src}
