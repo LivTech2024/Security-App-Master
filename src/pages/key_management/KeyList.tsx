@@ -21,6 +21,7 @@ import NoSearchResult from '../../common/NoSearchResult';
 import { numberFormatter } from '../../utilities/NumberFormater';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import AddKeyModal from '../../component/key_management/modal/AddKeyModal';
+import KeyAllocationModal from '../../component/key_management/modal/KeyAllocationModal';
 
 const KeyList = () => {
   const navigate = useNavigate();
@@ -116,6 +117,7 @@ const KeyList = () => {
 
   //modal states
   const [addKeyModal, setAddKeyModal] = useState(false);
+  const [keyAllocModal, setKeyAllocModal] = useState(false);
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
@@ -124,7 +126,9 @@ const KeyList = () => {
           <div className="flex items-center gap-4">
             <Button
               label="Allot Key"
-              onClick={() => {}}
+              onClick={() => {
+                setKeyAllocModal(true);
+              }}
               type="blue"
               className="px-6"
             />
@@ -141,6 +145,7 @@ const KeyList = () => {
       />
 
       <AddKeyModal opened={addKeyModal} setOpened={setAddKeyModal} />
+      <KeyAllocationModal opened={keyAllocModal} setOpened={setKeyAllocModal} />
 
       <div className="flex items-center bg-surface shadow p-4 rounded w-full justify-between">
         <SearchBar value={query} setValue={setQuery} placeholder="Search key" />

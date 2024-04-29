@@ -22,11 +22,13 @@ import { db } from '../config';
 import {
   IEquipmentAllocations,
   IEquipmentsCollection,
+  IKeyAllocations,
   IKeysCollection,
 } from '../../@types/database';
 import {
   EquipmentAllocationFormFields,
   EquipmentFormFields,
+  KeyAllocationFormFields,
   KeyFormFields,
 } from '../../utilities/zod/schema';
 import CustomError from '../../utilities/CustomError';
@@ -525,6 +527,127 @@ class DbAssets {
     const docQuery = query(docRef, ...queryParams);
 
     return getDocs(docQuery);
+  };
+
+  static createKeyAllocation = async (data: KeyAllocationFormFields) => {
+    const keyAllocId = getNewDocId(CollectionName.keyAllocations);
+    const keyAllocRef = doc(db, CollectionName.keyAllocations, keyAllocId);
+
+    const {
+      KeyAllocationDate,
+      KeyAllocationEndTime,
+      KeyAllocationKeyId,
+      KeyAllocationKeyQty,
+      KeyAllocationPurpose,
+      KeyAllocationRecipientContact,
+      KeyAllocationRecipientName,
+      KeyAllocationStartTime,
+      KeyAllocationRecipientCompany,
+    } = data;
+
+    const newKeyAllocData: IKeyAllocations = {
+      KeyAllocationId: keyAllocId,
+      KeyAllocationKeyId,
+      KeyAllocationKeyQty,
+      KeyAllocationDate: removeTimeFromDate(
+        KeyAllocationDate
+      ) as unknown as Timestamp,
+      KeyAllocationRecipientName,
+      KeyAllocationRecipientContact,
+      KeyAllocationPurpose,
+      KeyAllocationStartTime: KeyAllocationStartTime as unknown as Timestamp,
+      KeyAllocationEndTime: KeyAllocationEndTime as unknown as Timestamp,
+      KeyAllocationIsReturned: false,
+      KeyAllocationRecipientCompany: KeyAllocationRecipientCompany || null,
+      KeyAllocationCreatedAt: serverTimestamp(),
+    };
+
+    await runTransaction(db, async (transaction) => {
+      const keyDocRef = doc(db, CollectionName.equipments, KeyAllocationKeyId);
+
+      const keySnapshot = await transaction.get(keyDocRef);
+      const keyData = keySnapshot.data() as IKeysCollection;
+      const { KeyAllotedQuantity } = keyData;
+
+      transaction.update(keyDocRef, {
+        KeyAllotedQuantity: KeyAllotedQuantity + KeyAllocationKeyQty,
+      });
+
+      transaction.set(keyAllocRef, newKeyAllocData);
+    });
+  };
+
+  static updateKeyAllocation = async (
+    equipAllocId: string,
+    data: KeyAllocationFormFields
+  ) => {
+    const keyAllocRef = doc(db, CollectionName.keyAllocations, equipAllocId);
+
+    const {
+      KeyAllocationDate,
+      KeyAllocationEndTime,
+      KeyAllocationKeyId,
+      KeyAllocationKeyQty,
+      KeyAllocationPurpose,
+      KeyAllocationRecipientContact,
+      KeyAllocationRecipientName,
+      KeyAllocationStartTime,
+      KeyAllocationRecipientCompany,
+    } = data;
+
+    const newKeyAllocData: Partial<IKeyAllocations> = {
+      KeyAllocationKeyId,
+      KeyAllocationKeyQty,
+      KeyAllocationDate: removeTimeFromDate(
+        KeyAllocationDate
+      ) as unknown as Timestamp,
+      KeyAllocationRecipientName,
+      KeyAllocationStartTime: removeTimeFromDate(
+        KeyAllocationStartTime
+      ) as unknown as Timestamp,
+      KeyAllocationEndTime: removeTimeFromDate(
+        KeyAllocationEndTime
+      ) as unknown as Timestamp,
+      KeyAllocationPurpose,
+      KeyAllocationRecipientContact,
+      KeyAllocationRecipientCompany: KeyAllocationRecipientCompany || null,
+    };
+
+    await runTransaction(db, async (transaction) => {
+      const keyAllocOldSnapshot = await transaction.get(keyAllocRef);
+      const keyAllocOldData = keyAllocOldSnapshot.data() as IKeyAllocations;
+
+      //*Reverse changed made to old equipment
+
+      const oldKeyDocRef = doc(
+        db,
+        CollectionName.keys,
+        keyAllocOldData.KeyAllocationKeyId
+      );
+      const oldKeySnapshot = await transaction.get(oldKeyDocRef);
+      const oldKeyData = oldKeySnapshot.data() as IKeysCollection;
+
+      //* Make changes to new key
+      const keyDocRef = doc(db, CollectionName.keys, data.KeyAllocationKeyId);
+
+      const equipSnapshot = await transaction.get(keyDocRef);
+      const equipData = equipSnapshot.data() as IEquipmentsCollection;
+      const { EquipmentAllotedQuantity } = equipData;
+
+      //*old update
+      transaction.update(oldKeyDocRef, {
+        KeyAllotedQuantity:
+          oldKeyData.KeyAllotedQuantity - keyAllocOldData.KeyAllocationKeyQty,
+      });
+
+      //*new update
+      transaction.update(keyDocRef, {
+        EquipmentAllotedQuantity:
+          EquipmentAllotedQuantity + KeyAllocationKeyQty,
+      });
+
+      transaction.set(keyAllocRef, newKeyAllocData);
+    });
   };
 }
 

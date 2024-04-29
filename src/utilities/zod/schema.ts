@@ -332,6 +332,27 @@ export const keySchema = z.object({
 
 export type KeyFormFields = z.infer<typeof keySchema>;
 
+//*Equipment Allocation Schema
+export const keyAllocationSchema = z.object({
+  KeyAllocationKeyId: z.string().min(3, { message: 'Please select equipment' }),
+  KeyAllocationKeyQty: z.coerce.number().min(1).default(0),
+  KeyAllocationDate: z.date(),
+  KeyAllocationRecipientName: z
+    .string()
+    .min(3, { message: 'Please enter recipient name' }),
+  KeyAllocationRecipientContact: z
+    .string()
+    .min(3, { message: 'Please enter recipient contact' }),
+  KeyAllocationRecipientCompany: z.string().optional().nullable(),
+  KeyAllocationPurpose: z
+    .string()
+    .min(3, { message: 'Please enter purpose of this key allotment' }),
+  KeyAllocationStartTime: z.date(),
+  KeyAllocationEndTime: z.date(),
+});
+
+export type KeyAllocationFormFields = z.infer<typeof keyAllocationSchema>;
+
 //*Settings Schema
 export const settingsSchema = z.object({
   SettingEmpWellnessIntervalInMins: z.coerce.number().min(1),
