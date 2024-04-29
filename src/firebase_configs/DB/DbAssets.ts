@@ -492,6 +492,40 @@ class DbAssets {
 
     return getDocs(docQuery);
   };
+
+  static getKeyById = (keyId: string) => {
+    const keyRef = doc(db, CollectionName.keys, keyId);
+    return getDoc(keyRef);
+  };
+
+  static getKeyAllocations = ({
+    lmt,
+    lastDoc,
+    keyId,
+  }: {
+    lmt?: number;
+    lastDoc?: DocumentData | null;
+    keyId: string;
+  }) => {
+    const docRef = collection(db, CollectionName.keyAllocations);
+
+    let queryParams: QueryConstraint[] = [
+      where('KeyAllocationKeyId', '==', keyId),
+      orderBy('KeyAllocationDate', 'desc'),
+    ];
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const docQuery = query(docRef, ...queryParams);
+
+    return getDocs(docQuery);
+  };
 }
 
 export default DbAssets;

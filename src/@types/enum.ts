@@ -43,6 +43,7 @@ export const DisplayCount = {
   EMP_DAR_LIST: 20,
   VISITOR_LIST: 20,
   KEY_LIST: 20,
+  KEY_ALLOCATION: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -65,6 +66,7 @@ export const REACT_QUERY_KEYS = {
   EMP_DAR_LIST: 'emp-dar-list',
   VISITOR_LIST: 'visitor-list',
   KEY_LIST: 'key-list',
+  KEY_ALLOCATION: 'key-allocation',
 } as const;
 
 export const MinimumQueryCharacter = {
