@@ -19,8 +19,6 @@ interface ShiftsCollection
 const ClientShifts = () => {
   const { client } = useAuthState();
 
-  const [loading, setLoading] = useState(true);
-
   const {
     data: snapshotData,
     fetchNextPage,
@@ -37,7 +35,28 @@ const ClientShifts = () => {
         lastDoc: pageParam,
         clientId: client!.ClientId,
       });
-      return snapshot.docs;
+
+      const docData: ShiftsCollection[] = [];
+
+      await Promise.all(
+        snapshot?.docs?.map(async (doc) => {
+          const data = doc.data() as IShiftsCollection;
+          const { ShiftAssignedUserId } = data;
+          const assignedUsersName: string[] = [];
+
+          await Promise.all(
+            ShiftAssignedUserId.map(async (id) => {
+              const empData = await DbEmployee.getEmpById(id);
+              const { EmployeeName } = empData;
+              assignedUsersName.push(EmployeeName);
+            })
+          );
+
+          docData.push({ ...data, ShiftAssignedUsers: assignedUsersName });
+        })
+      );
+
+      return docData;
     },
     getNextPageParam: (lastPage) => {
       if (lastPage?.length === 0) {
@@ -54,46 +73,20 @@ const ClientShifts = () => {
   const fetchDataFromSnapshot = () => {
     if (snapshotData) {
       const docData: ShiftsCollection[] = [];
-      Promise.all(
-        snapshotData.pages?.map(async (page) => {
-          await Promise.all(
-            page?.map(async (doc) => {
-              const data = doc.data() as IShiftsCollection;
-              const { ShiftAssignedUserId } = data;
-              const assignedUsersName: string[] = [];
-
-              await Promise.all(
-                ShiftAssignedUserId.map(async (id) => {
-                  const empData = await DbEmployee.getEmpById(id);
-                  const { EmployeeName } = empData;
-                  assignedUsersName.push(EmployeeName);
-                })
-              );
-
-              docData.push({ ...data, ShiftAssignedUsers: assignedUsersName });
-            })
-          );
-        })
-      )
-        .then(() => {
-          setData(docData);
-          setLoading(false);
-          return docData;
-        })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
+      snapshotData.pages?.forEach((page) => {
+        page?.forEach((data) => {
+          docData.push(data);
         });
+      });
       return docData;
-    } else {
-      setLoading(false);
-      return [];
     }
+
+    return [];
   };
 
-  const [data, setData] = useState<ShiftsCollection[]>(() => {
-    return fetchDataFromSnapshot();
-  });
+  const [data, setData] = useState<ShiftsCollection[]>(() =>
+    fetchDataFromSnapshot()
+  );
 
   useEffect(() => {
     console.log(error, 'error');
@@ -101,7 +94,7 @@ const ClientShifts = () => {
 
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
-    fetchDataFromSnapshot();
+    setData(fetchDataFromSnapshot());
   }, [snapshotData]);
 
   // hook for pagination
@@ -135,7 +128,7 @@ const ClientShifts = () => {
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
-          {data.length === 0 && !isLoading && !loading ? (
+          {data.length === 0 && !isLoading ? (
             <tr>
               <td colSpan={5}>
                 <NoSearchResult />
@@ -170,7 +163,7 @@ const ClientShifts = () => {
           )}
           <tr ref={ref}>
             <td colSpan={5}>
-              {(isLoading || isFetchingNextPage || loading) &&
+              {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />
                 ))}
