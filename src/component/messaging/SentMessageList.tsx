@@ -40,7 +40,34 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
         lastDoc: pageParam,
         senderId: senderId,
       });
-      return snapshot.docs;
+
+      const docData: ISentMessagesCollection[] = [];
+
+      await Promise.all(
+        snapshot?.docs.map(async (doc) => {
+          const data = doc.data() as IMessagesCollection;
+          const { MessageReceiversId } = data;
+          const newRecList: { id: string; name: string }[] = [];
+          await Promise.all(
+            MessageReceiversId.map(async (id) => {
+              const emp = await DbEmployee.getEmpById(id);
+              if (emp) {
+                newRecList.push({ id, name: emp.EmployeeName });
+              } else {
+                const clientSnapshot = await DbClient.getClientById(id);
+                const clientData = clientSnapshot?.data() as IClientsCollection;
+                if (clientData) {
+                  newRecList.push({ id, name: clientData.ClientName });
+                } else {
+                  newRecList.push({ id, name: 'Admin' });
+                }
+              }
+            })
+          );
+          docData.push({ ...data, MessageReceiversId: newRecList });
+        })
+      );
+      return docData;
     },
     getNextPageParam: (lastPage) => {
       if (lastPage?.length === 0) {
@@ -54,56 +81,23 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
     initialPageParam: null as null | DocumentData,
   });
 
-  const [isFetchingRecvUserNames, setIsFetchingRecvUserNames] = useState(true);
-
   const fetchDataFromSnapshot = () => {
     if (snapshotData) {
       const docData: ISentMessagesCollection[] = [];
       snapshotData.pages?.forEach((page) => {
-        Promise.all(
-          page?.map(async (doc) => {
-            const data = doc.data() as IMessagesCollection;
-            const { MessageReceiversId } = data;
-            const newRecList: { id: string; name: string }[] = [];
-            await Promise.all(
-              MessageReceiversId.map(async (id) => {
-                const emp = await DbEmployee.getEmpById(id);
-                if (emp) {
-                  newRecList.push({ id, name: emp.EmployeeName });
-                } else {
-                  const clientSnapshot = await DbClient.getClientById(id);
-                  const clientData =
-                    clientSnapshot?.data() as IClientsCollection;
-                  if (clientData) {
-                    newRecList.push({ id, name: clientData.ClientName });
-                  } else {
-                    newRecList.push({ id, name: 'Admin' });
-                  }
-                }
-              })
-            );
-            docData.push({ ...data, MessageReceiversId: newRecList });
-          })
-        )
-          .then(() => {
-            setData(docData);
-            setIsFetchingRecvUserNames(false);
-          })
-          .catch(() => {
-            console.log(error);
-            setIsFetchingRecvUserNames(false);
-          });
+        page?.forEach(async (data) => {
+          docData.push(data);
+        });
       });
       return docData;
-    } else {
-      setIsFetchingRecvUserNames(false);
-      return [];
     }
+
+    return [];
   };
 
-  const [data, setData] = useState<ISentMessagesCollection[]>(() => {
-    return fetchDataFromSnapshot();
-  });
+  const [data, setData] = useState<ISentMessagesCollection[]>(() =>
+    fetchDataFromSnapshot()
+  );
 
   useEffect(() => {
     console.log(error, 'error');
@@ -111,7 +105,7 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
 
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
-    fetchDataFromSnapshot();
+    setData(fetchDataFromSnapshot());
   }, [snapshotData]);
 
   // hook for pagination
@@ -165,7 +159,7 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
       <div className="font-semibold text-lg">Sent</div>
       {/* Received Messages list */}
       <div className="flex flex-col h-[calc(100vh-260px)] gap-4 overflow-auto remove-vertical-scrollbar">
-        {data.length === 0 && !isLoading && !isFetchingRecvUserNames ? (
+        {data.length === 0 && !isLoading ? (
           <div className="flex items-center justify-between w-full">
             <NoSearchResult text="No sent messages" />
           </div>
@@ -218,7 +212,7 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
           })
         )}
 
-        {(isLoading || isFetchingNextPage || isFetchingRecvUserNames) &&
+        {(isLoading || isFetchingNextPage) &&
           Array.from({ length: 3 }).map((_, idx) => (
             <div ref={ref} key={idx} className="animate-pulse w-full mt-2">
               <div className="h-[150px] bg-shimmerColor w-full"></div>
