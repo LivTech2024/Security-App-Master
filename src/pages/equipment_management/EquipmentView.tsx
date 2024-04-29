@@ -74,7 +74,22 @@ const EquipmentView = () => {
         lastDoc: pageParam,
         equipmentId: equipId as string,
       });
-      return snapshot.docs;
+      const docData: EquipmentAllocations[] = [];
+
+      await Promise.all(
+        snapshot?.docs?.map(async (doc) => {
+          const data = doc.data() as IEquipmentAllocations;
+          const { EquipmentAllocationEmpId } = data;
+          const empData = await DbEmployee.getEmpById(EquipmentAllocationEmpId);
+          docData.push({
+            ...data,
+            EquipmentAllocationEmpName: empData.EmployeeName,
+            EquipmentAllocationEmpEmail: empData.EmployeeEmail,
+            EquipmentAllocationEmpPhone: empData.EmployeePhone,
+          } as unknown as EquipmentAllocations);
+        })
+      );
+      return docData;
     },
     getNextPageParam: (lastPage) => {
       if (lastPage?.length === 0) {
@@ -88,14 +103,23 @@ const EquipmentView = () => {
     initialPageParam: null as null | DocumentData,
   });
 
-  const [data, setData] = useState<EquipmentAllocations[]>(() => {
+  const fetchDataFromSnapshot = () => {
     if (snapshotData) {
-      return snapshotData.pages.flatMap((page) =>
-        page.map((doc) => doc.data() as EquipmentAllocations)
-      );
+      const docData: EquipmentAllocations[] = [];
+      snapshotData.pages?.forEach((page) => {
+        page?.forEach((data) => {
+          docData.push(data);
+        });
+      });
+      return docData;
     }
+
     return [];
-  });
+  };
+
+  const [data, setData] = useState<EquipmentAllocations[]>(() =>
+    fetchDataFromSnapshot()
+  );
 
   useEffect(() => {
     console.log(error, 'error');
@@ -103,26 +127,7 @@ const EquipmentView = () => {
 
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
-    if (snapshotData) {
-      const docData: EquipmentAllocations[] = [];
-      snapshotData.pages?.forEach((page) => {
-        Promise.all(
-          page?.map(async (doc) => {
-            const data = doc.data() as IEquipmentAllocations;
-            const { EquipmentAllocationEmpId } = data;
-            const empData = await DbEmployee.getEmpById(
-              EquipmentAllocationEmpId
-            );
-            docData.push({
-              ...data,
-              EquipmentAllocationEmpName: empData.EmployeeName,
-              EquipmentAllocationEmpEmail: empData.EmployeeEmail,
-              EquipmentAllocationEmpPhone: empData.EmployeePhone,
-            } as unknown as EquipmentAllocations);
-          })
-        ).then(() => setData(docData));
-      });
-    }
+    setData(fetchDataFromSnapshot());
   }, [snapshotData]);
 
   // hook for pagination
