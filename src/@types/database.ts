@@ -448,3 +448,32 @@ export interface IVisitorsCollection {
   VisitorNoOfPerson: number;
   VisitorCreatedAt: Timestamp | FieldValue;
 }
+
+export interface IKeysCollection {
+  KeyId: string;
+  KeyCompanyId: string;
+  KeyCompanyBranchId: string | null;
+  KeyName: string;
+  KeyNameSearchIndex: string[];
+  KeyDescription: string | null;
+  KeyAllotedQuantity: number;
+  KeyTotalQuantity: number;
+  KeyCreatedAt: Timestamp | FieldValue;
+  KeyModifiedAt: Timestamp | FieldValue;
+}
+
+export interface IKeyAllocations {
+  KeyAllocationId: string;
+  KeyAllocationKeyId: string;
+  KeyAllocationKeyQty: number;
+  KeyAllocationDate: Timestamp | FieldValue;
+  KeyAllocationRecipientName: string;
+  KeyAllocationRecipientContact: string;
+  KeyAllocationRecipientCompany?: string | null;
+  KeyAllocationPurpose: string;
+  KeyAllocationStartTime: Timestamp | FieldValue;
+  KeyAllocationEndTime: Timestamp | FieldValue;
+  KeyAllocationIsReturned: boolean;
+  KeyAllocationReturnedAt?: Timestamp | FieldValue;
+  KeyAllocationCreatedAt: Timestamp | FieldValue;
+}
