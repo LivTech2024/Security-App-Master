@@ -5,6 +5,7 @@ import DbCompany from '../../firebase_configs/DB/DbCompany';
 import NoSearchResult from '../../common/NoSearchResult';
 import { IoArrowBackCircle } from 'react-icons/io5';
 import { formatDate } from '../../utilities/misc';
+import { PageRoutes } from '../../@types/enum';
 
 const ReportView = () => {
   const [searchParam] = useSearchParams();
@@ -89,47 +90,82 @@ const ReportView = () => {
               <p>{data?.ReportEmployeeName || 'N/A'}</p>
             </div>
             <div className="flex items-center gap-4">
-              <p className="font-semibold flex gap-2">Report Created At:</p>
+              <p className="font-semibold flex gap-2">Report Date:</p>
               <p>{formatDate(data.ReportCreatedAt, 'DD MMM-YY hh:mm A')}</p>
             </div>
+            {data.ReportLocationName && (
+              <div className="flex items-center gap-4">
+                <p className="font-semibold flex gap-2">Report Location:</p>
+                <p>{data.ReportLocationName}</p>
+              </div>
+            )}
+
+            <div className="flex items-center gap-4">
+              <p className="font-semibold flex gap-2">
+                Report Follow Up Required:
+              </p>
+              <p>{data.ReportIsFollowUpRequired ? 'Yes' : 'No'}</p>
+            </div>
+
+            {data.ReportIsFollowUpRequired && data.ReportFollowedUpId && (
+              <div className="flex items-center gap-4">
+                <p className="font-semibold flex gap-2">Followed Up Report:</p>
+                <p
+                  onClick={() =>
+                    navigate(
+                      PageRoutes.REPORT_VIEW +
+                        `?id=${data.ReportIsFollowUpRequired}`
+                    )
+                  }
+                  className="text-textPrimaryBlue cursor-pointer"
+                >
+                  {data.ReportFollowedUpId}
+                </p>
+              </div>
+            )}
+
             <div className="flex items-start gap-4 col-span-2">
               <p className="font-semibold flex gap-2">Report Data:</p>
               <p>{data.ReportData}</p>
             </div>
 
-            <div className="flex items-start gap-4 col-span-2">
-              <p className="font-semibold flex gap-2">Report Images:</p>
-              <div className="flex flex-col gap-4">
-                {data?.ReportImage
-                  ? data?.ReportImage?.map((img) => {
-                      return (
-                        <a href={img} target="_blank">
-                          {img}
-                        </a>
-                      );
-                    })
-                  : 'N/A'}
+            {data?.ReportImage?.length && (
+              <div className="flex items-start gap-4 col-span-2">
+                <p className="font-semibold flex gap-2">Report Images:</p>
+                <div className="flex flex-col gap-4">
+                  {data?.ReportImage
+                    ? data?.ReportImage?.map((img) => {
+                        return (
+                          <a href={img} target="_blank">
+                            {img}
+                          </a>
+                        );
+                      })
+                    : 'N/A'}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="flex items-start gap-4 col-span-2">
-              <p className="font-semibold flex gap-2">Report Videos:</p>
-              <div className="flex flex-col gap-4">
-                {data?.ReportVideo
-                  ? data?.ReportVideo?.map((src) => {
-                      return (
-                        <a
-                          href={src}
-                          target="_blank"
-                          className="cursor-pointer text-textPrimaryBlue"
-                        >
-                          {src}
-                        </a>
-                      );
-                    })
-                  : 'N/A'}
+            {data?.ReportVideo?.length && (
+              <div className="flex items-start gap-4 col-span-2">
+                <p className="font-semibold flex gap-2">Report Videos:</p>
+                <div className="flex flex-col gap-4">
+                  {data?.ReportVideo
+                    ? data?.ReportVideo?.map((src) => {
+                        return (
+                          <a
+                            href={src}
+                            target="_blank"
+                            className="cursor-pointer text-textPrimaryBlue"
+                          >
+                            {src}
+                          </a>
+                        );
+                      })
+                    : 'N/A'}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
