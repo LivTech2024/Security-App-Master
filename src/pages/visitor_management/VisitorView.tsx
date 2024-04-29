@@ -62,20 +62,34 @@ const VisitorView = () => {
               <p>{data?.VisitorContactNumber || 'N/A'}</p>
             </div>
             <div className="flex items-center gap-4">
-              <p className="font-semibold flex gap-2">No. Of Person:</p>
+              <p className="font-semibold flex gap-2">No. of Person:</p>
               <p>{data?.VisitorNoOfPerson || 'N/A'}</p>
             </div>
-            <div className="flex items-center gap-4 col-span-2">
+            <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2">Comment:</p>
               <p>{data?.VisitorComment || 'N/A'}</p>
             </div>
-            <div className="flex items-center gap-4 col-span-2">
-              <p className="font-semibold flex gap-2">Asserts Handover:</p>
-              <p>{data?.VisitorAssetHandover || 'N/A'}</p>
+            <div className="flex items-center gap-4">
+              <p className="font-semibold flex gap-2">Location:</p>
+              <p>{data?.VisitorLocationName || 'N/A'}</p>
             </div>
             <div className="flex items-center gap-4">
-              <p className="font-semibold flex gap-2">Visitor In Time:</p>
+              <p className="font-semibold flex gap-2"> In Time:</p>
               <p>{formatDate(data.VisitorInTime, 'DD MMM-YY hh:mm A')}</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <p className="font-semibold flex gap-2"> Out Time:</p>
+              <p>{formatDate(data.VisitorOutTime, 'DD MMM-YY hh:mm A')}</p>
+            </div>
+            <div className="flex items-center gap-4 col-span-1">
+              <p className="font-semibold flex gap-2">Assets Handover:</p>
+              <p>{data?.VisitorAssetHandover || 'N/A'}</p>
+            </div>
+            <div className="flex items-center gap-4 col-span-1">
+              <p className="font-semibold flex gap-2">
+                Assets Handover Duration:
+              </p>
+              <p>{`${data?.VisitorAssetDurationInMinute} minutes` || 'N/A'}</p>
             </div>
           </div>
         </div>

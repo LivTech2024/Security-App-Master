@@ -134,15 +134,12 @@ const VisitorList = () => {
               Visitor Name
             </th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">Contact</th>
-            <th className="uppercase px-4 py-2 w-[12%] text-center">
-              No. of person
-            </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">In Time</th>
 
-            <th className="uppercase px-4 py-2 w-[20%] text-start">Comment</th>
-            <th className="uppercase px-4 py-2 w-[22%] text-end">
-              Asset handover
-            </th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">In Time</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">Out Time</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">Location</th>
+
+            <th className="uppercase px-4 py-2 w-[25%] text-end">Asset</th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -176,17 +173,19 @@ const VisitorList = () => {
                     </div>
                   </td>
 
-                  <td className="align-top px-4 py-2 text-center">
-                    {visitor.VisitorNoOfPerson}
-                  </td>
                   <td className="align-top px-4 py-2 text-start">
-                    <span className="line-clamp-4">
+                    <span className="line-clamp-2">
                       {formatDate(visitor.VisitorInTime, 'DD MMM-YY hh:mm A')}
                     </span>
                   </td>
                   <td className="align-top px-4 py-2 text-start ">
                     <span className="line-clamp-2">
-                      {visitor.VisitorComment}
+                      {formatDate(visitor.VisitorOutTime, 'DD MMM-YY hh:mm A')}
+                    </span>
+                  </td>
+                  <td className="align-top px-4 py-2 text-start ">
+                    <span className="line-clamp-2">
+                      {visitor.VisitorLocationName}
                     </span>
                   </td>
                   <td className="align-top px-4 py-2 text-end">

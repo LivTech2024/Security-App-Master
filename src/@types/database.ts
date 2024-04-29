@@ -189,6 +189,7 @@ export interface IPatrolsCollection {
 export interface IPatrolLogsCollection {
   PatrolLogId: string;
   PatrolId: string;
+  PatrolLogShiftId: string;
   PatrolDate: Timestamp | FieldValue; //*Same as ShiftDate
   PatrolLogGuardId: string;
   PatrolLogGuardName: string;
