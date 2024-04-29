@@ -22,6 +22,8 @@ export enum CollectionName {
   equipmentAllocations = 'EquipmentAllocations',
   employeesDAR = 'EmployeesDAR',
   visitors = 'Visitors',
+  keys = 'Keys',
+  keyAllocations = 'KeyAllocations',
 }
 
 export const DisplayCount = {
@@ -40,6 +42,7 @@ export const DisplayCount = {
   MESSAGE_SENT_LIST: 20,
   EMP_DAR_LIST: 20,
   VISITOR_LIST: 20,
+  KEY_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -61,6 +64,7 @@ export const REACT_QUERY_KEYS = {
   MESSAGE_SENT_LIST: 'message-sent-list',
   EMP_DAR_LIST: 'emp-dar-list',
   VISITOR_LIST: 'visitor-list',
+  KEY_LIST: 'key-list',
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -71,6 +75,7 @@ export const MinimumQueryCharacter = {
   DOCUMENT: 1,
   EQUIPMENT: 1,
   EMP_DAR: 1,
+  KEY: 1,
 } as const;
 
 export const CloudStoragePaths = {

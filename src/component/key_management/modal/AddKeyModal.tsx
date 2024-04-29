@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Dialog from '../../../common/Dialog';
-import {
-  EquipmentFormFields,
-  equipmentSchema,
-} from '../../../utilities/zod/schema';
+import { KeyFormFields, keySchema } from '../../../utilities/zod/schema';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
@@ -20,20 +17,20 @@ import { REACT_QUERY_KEYS } from '../../../@types/enum';
 import { useQueryClient } from '@tanstack/react-query';
 import { openContextModal } from '@mantine/modals';
 
-const AddEquipmentModal = ({
+const AddKeyModal = ({
   opened,
   setOpened,
 }: {
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const methods = useForm<EquipmentFormFields>({
-    resolver: zodResolver(equipmentSchema),
+  const methods = useForm<KeyFormFields>({
+    resolver: zodResolver(keySchema),
   });
 
-  const { equipmentEditData, setEquipmentEditData } = useEditFormStore();
+  const { keyEditData, setKeyEditData } = useEditFormStore();
 
-  const isEdit = !!equipmentEditData;
+  const isEdit = !!keyEditData;
 
   const queryClient = useQueryClient();
 
@@ -42,48 +39,48 @@ const AddEquipmentModal = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    let allFormFields: EquipmentFormFields = {
-      EquipmentName: '',
-      EquipmentDescription: null,
-      EquipmentTotalQuantity: 0,
-      EquipmentCompanyBranchId: null,
+    let allFormFields: KeyFormFields = {
+      KeyName: '',
+      KeyDescription: null,
+      KeyTotalQuantity: 0,
+      KeyCompanyBranchId: null,
     };
     if (isEdit) {
       allFormFields = {
-        EquipmentName: equipmentEditData.EquipmentName,
-        EquipmentDescription: equipmentEditData.EquipmentDescription,
-        EquipmentTotalQuantity: equipmentEditData.EquipmentTotalQuantity,
-        EquipmentCompanyBranchId: equipmentEditData.EquipmentCompanyBranchId,
+        KeyName: keyEditData.KeyName,
+        KeyDescription: keyEditData.KeyDescription,
+        KeyTotalQuantity: keyEditData.KeyTotalQuantity,
+        KeyCompanyBranchId: keyEditData.KeyCompanyBranchId,
       };
     }
     methods.reset(allFormFields);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdit, equipmentEditData, opened]);
+  }, [isEdit, keyEditData, opened]);
 
-  const onSubmit = async (data: EquipmentFormFields) => {
+  const onSubmit = async (data: KeyFormFields) => {
     if (!company) return;
     try {
       setLoading(true);
 
       if (isEdit) {
-        await DbAssets.updateEquipment(equipmentEditData.EquipmentId, data);
+        await DbAssets.updateKey(keyEditData.KeyId, data);
         showSnackbar({
-          message: 'Equipment updated successfully',
+          message: 'Key updated successfully',
           type: 'success',
         });
       } else {
-        await DbAssets.createEquipment(company.CompanyId, data);
+        await DbAssets.createKey(company.CompanyId, data);
         showSnackbar({
-          message: 'Equipment created successfully',
+          message: 'Key created successfully',
           type: 'success',
         });
       }
 
       await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_KEYS.EQUIPMENT_LIST],
+        queryKey: [REACT_QUERY_KEYS.KEY_LIST],
       });
 
-      setEquipmentEditData(null);
+      setKeyEditData(null);
 
       setOpened(false);
       setLoading(false);
@@ -99,10 +96,10 @@ const AddEquipmentModal = ({
     try {
       setLoading(true);
 
-      await DbAssets.deleteEquipment(equipmentEditData.EquipmentId);
+      await DbAssets.deleteEquipment(keyEditData.KeyId);
 
       await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_KEYS.EQUIPMENT_LIST],
+        queryKey: [REACT_QUERY_KEYS.KEY_LIST],
       });
 
       showSnackbar({
@@ -110,7 +107,7 @@ const AddEquipmentModal = ({
         type: 'success',
       });
 
-      setEquipmentEditData(null);
+      setKeyEditData(null);
       setOpened(false);
       setLoading(false);
     } catch (error) {
@@ -132,7 +129,7 @@ const AddEquipmentModal = ({
     <Dialog
       opened={opened}
       setOpened={setOpened}
-      title="Add Equipment"
+      title="Add Key"
       size="60%"
       isFormModal
       positiveCallback={methods.handleSubmit(onSubmit)}
@@ -145,7 +142,7 @@ const AddEquipmentModal = ({
               closeOnClickOutside: true,
               innerProps: {
                 title: 'Confirm',
-                body: 'Are you sure to delete this equipment',
+                body: 'Are you sure to delete this key',
                 onConfirm: () => {
                   onDelete();
                 },
@@ -170,18 +167,18 @@ const AddEquipmentModal = ({
         >
           <InputWithTopHeader
             className="mx-0"
-            label="Equipment Name"
+            label="Key Name"
             register={methods.register}
-            name="EquipmentName"
-            error={methods.formState.errors?.EquipmentName?.message}
+            name="KeyName"
+            error={methods.formState.errors?.KeyName?.message}
           />
           <InputSelect
             label="Select Branch"
             placeholder="Select Branch"
-            value={methods.watch('EquipmentCompanyBranchId') || ''}
+            value={methods.watch('KeyCompanyBranchId') || ''}
             clearable
             onChange={(e) =>
-              methods.setValue('EquipmentCompanyBranchId', e as string)
+              methods.setValue('KeyCompanyBranchId', e as string)
             }
             data={companyBranches.map((branches) => {
               return {
@@ -189,22 +186,22 @@ const AddEquipmentModal = ({
                 value: branches.CompanyBranchId,
               };
             })}
-            error={methods.formState.errors?.EquipmentCompanyBranchId?.message}
+            error={methods.formState.errors?.KeyCompanyBranchId?.message}
           />
           <InputWithTopHeader
             className="mx-0"
             label="Total Quantity"
             register={methods.register}
             decimalCount={0}
-            name="EquipmentTotalQuantity"
-            error={methods.formState.errors?.EquipmentTotalQuantity?.message}
+            name="KeyTotalQuantity"
+            error={methods.formState.errors?.KeyTotalQuantity?.message}
           />
           <InputWithTopHeader
             className="mx-0"
             label="Description"
             register={methods.register}
-            name="EquipmentDescription"
-            error={methods.formState.errors?.EquipmentDescription?.message}
+            name="KeyDescription"
+            error={methods.formState.errors?.KeyDescription?.message}
           />
         </form>
       </FormProvider>
@@ -212,4 +209,4 @@ const AddEquipmentModal = ({
   );
 };
 
-export default AddEquipmentModal;
+export default AddKeyModal;

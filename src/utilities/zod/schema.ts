@@ -318,6 +318,20 @@ export type EquipmentAllocationFormFields = z.infer<
   typeof equipmentAllocationSchema
 >;
 
+//*Key Schema
+export const keySchema = z.object({
+  KeyName: z
+    .string()
+    .min(2, { message: 'Equipment name should be at least 2 characters' }),
+  KeyCompanyBranchId: z.string().nullable().optional(),
+  KeyDescription: z.string().nullable(),
+  KeyTotalQuantity: z.coerce
+    .number()
+    .min(1, { message: 'Equipment total quantity should be at least 1' }),
+});
+
+export type KeyFormFields = z.infer<typeof keySchema>;
+
 //*Settings Schema
 export const settingsSchema = z.object({
   SettingEmpWellnessIntervalInMins: z.coerce.number().min(1),

@@ -5,6 +5,8 @@ import {
   IEmployeesCollection,
   IEquipmentAllocations,
   IEquipmentsCollection,
+  IKeyAllocations,
+  IKeysCollection,
   ILocationsCollection,
   IPatrolsCollection,
   IShiftsCollection,
@@ -65,12 +67,36 @@ export interface EquipmentAllocation
     | 'EquipmentAllocationDate'
     | 'EquipmentAllocationStartDate'
     | 'EquipmentAllocationEndDate'
+    | 'EquipmentAllocationReturnedAt'
     | 'EquipmentAllocationCreatedAt'
   > {
   EquipmentAllocationDate: string;
   EquipmentAllocationStartDate: string;
   EquipmentAllocationEndDate: string;
+  EquipmentAllocationReturnedAt: string;
   EquipmentAllocationCreatedAt: string;
+}
+
+export interface Key
+  extends Omit<IKeysCollection, 'KeyCreatedAt' | 'KeyModifiedAt'> {
+  KeyCreatedAt: string;
+  KeyModifiedAt: string;
+}
+
+export interface KeyAllocation
+  extends Omit<
+    IKeyAllocations,
+    | 'KeyAllocationDate'
+    | 'KeyAllocationStartTime'
+    | 'KeyAllocationEndTime'
+    | 'KeyAllocationReturnedAt'
+    | 'KeyAllocationCreatedAt'
+  > {
+  KeyAllocationDate: string;
+  KeyAllocationStartTime: string;
+  KeyAllocationEndTime: string;
+  KeyAllocationReturnedAt: string;
+  KeyAllocationCreatedAt: string;
 }
 
 interface EditFormState {
@@ -100,6 +126,12 @@ interface EditFormState {
 
   equipAllocationEditData: EquipmentAllocation | null;
   setEquipAllocationEditData: (equipAlloc: EquipmentAllocation | null) => void;
+
+  keyEditData: Key | null;
+  setKeyEditData: (key: Key | null) => void;
+
+  keyAllocationEditData: KeyAllocation | null;
+  setKeyAllocationEditData: (keyAlloc: KeyAllocation | null) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -147,4 +179,13 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   equipAllocationEditData: null,
   setEquipAllocationEditData: (equipAlloc) =>
     set((state) => ({ ...state, equipAllocationEditData: equipAlloc })),
+
+  //Key
+  keyEditData: null,
+  setKeyEditData: (key) => set((state) => ({ ...state, keyEditData: key })),
+
+  //KeyAllocation
+  keyAllocationEditData: null,
+  setKeyAllocationEditData: (keyAlloc) =>
+    set((state) => ({ ...state, keyAllocationEditData: keyAlloc })),
 });

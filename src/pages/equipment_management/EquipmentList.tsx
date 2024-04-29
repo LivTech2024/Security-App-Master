@@ -11,7 +11,7 @@ import {
   REACT_QUERY_KEYS,
 } from '../../@types/enum';
 import { DocumentData } from 'firebase/firestore';
-import DbEquipment from '../../firebase_configs/DB/DbEquipment';
+import DbAssets from '../../firebase_configs/DB/DbAssets';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useAuthState, useEditFormStore } from '../../store';
@@ -51,7 +51,7 @@ const EquipmentList = () => {
       branchId,
     ],
     queryFn: async ({ pageParam }) => {
-      const snapshot = await DbEquipment.getEquipments({
+      const snapshot = await DbAssets.getEquipments({
         lmt: DisplayCount.EQUIPMENT_LIST,
         lastDoc: pageParam,
         searchQuery: debouncedQuery,

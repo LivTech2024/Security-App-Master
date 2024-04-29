@@ -14,7 +14,7 @@ import {
   showSnackbar,
 } from '../../../utilities/TsxUtils';
 import { errorHandler } from '../../../utilities/CustomError';
-import DbEquipment from '../../../firebase_configs/DB/DbEquipment';
+import DbAssets from '../../../firebase_configs/DB/DbAssets';
 import { PageRoutes, REACT_QUERY_KEYS } from '../../../@types/enum';
 import { openContextModal } from '@mantine/modals';
 import InputSelect from '../../../common/inputs/InputSelect';
@@ -67,7 +67,7 @@ const EquipAllocationModal = ({
       setLoading(true);
 
       if (isEdit) {
-        await DbEquipment.updateEquipAllocation(
+        await DbAssets.updateEquipAllocation(
           equipAllocationEditData?.EquipmentAllocationId,
           data
         );
@@ -76,7 +76,7 @@ const EquipAllocationModal = ({
           type: 'success',
         });
       } else {
-        await DbEquipment.createEquipAllocation(data);
+        await DbAssets.createEquipAllocation(data);
         showSnackbar({
           message: 'Equipment allocation done successfully',
           type: 'success',
@@ -102,7 +102,7 @@ const EquipAllocationModal = ({
     try {
       setLoading(true);
 
-      await DbEquipment.deleteEquipAllocation(
+      await DbAssets.deleteEquipAllocation(
         equipAllocationEditData.EquipmentAllocationId
       );
 

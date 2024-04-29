@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthState } from '../../store';
 import { IEquipmentsCollection } from '../../@types/database';
-import DbEquipment from '../../firebase_configs/DB/DbEquipment';
+import DbAssets from '../../firebase_configs/DB/DbAssets';
 
 interface Props {
   limit?: number;
@@ -23,7 +23,7 @@ const useFetchEquipments = ({ limit, searchQuery }: Props) => {
     )
       return;
     const fetchInitialEquipments = async () => {
-      const snapshot = await DbEquipment.getEquipments({
+      const snapshot = await DbAssets.getEquipments({
         lmt: limit,
         lastDoc: null,
         searchQuery:

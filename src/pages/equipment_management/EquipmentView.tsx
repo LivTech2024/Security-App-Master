@@ -7,7 +7,7 @@ import AddEquipmentModal from '../../component/equipment_management/modal/AddEqu
 import { useInView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
-import DbEquipment from '../../firebase_configs/DB/DbEquipment';
+import DbAssets from '../../firebase_configs/DB/DbAssets';
 import { DocumentData } from 'firebase/firestore';
 import {
   IEquipmentAllocations,
@@ -49,7 +49,7 @@ const EquipmentView = () => {
 
   useEffect(() => {
     if (!equipId) return;
-    DbEquipment.getEquipmentById(equipId).then((snapshot) => {
+    DbAssets.getEquipmentById(equipId).then((snapshot) => {
       const data = snapshot.data() as IEquipmentsCollection;
       if (data) {
         setEquipmentData(data);
@@ -69,7 +69,7 @@ const EquipmentView = () => {
   } = useInfiniteQuery({
     queryKey: [REACT_QUERY_KEYS.EQUIPMENT_ALLOCATION_LIST, equipId],
     queryFn: async ({ pageParam }) => {
-      const snapshot = await DbEquipment.getEquipAllocations({
+      const snapshot = await DbAssets.getEquipAllocations({
         lmt: DisplayCount.EQUIPMENT_ALLOCATION_LIST,
         lastDoc: pageParam,
         equipmentId: equipId as string,
@@ -149,7 +149,7 @@ const EquipmentView = () => {
     try {
       showModalLoader({});
 
-      await DbEquipment.returnEquipFromEmp(equipAllocId);
+      await DbAssets.returnEquipFromEmp(equipAllocId);
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.EQUIPMENT_ALLOCATION_LIST],

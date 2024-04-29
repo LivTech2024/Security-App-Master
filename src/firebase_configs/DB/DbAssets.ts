@@ -22,15 +22,17 @@ import { db } from '../config';
 import {
   IEquipmentAllocations,
   IEquipmentsCollection,
+  IKeysCollection,
 } from '../../@types/database';
 import {
   EquipmentAllocationFormFields,
   EquipmentFormFields,
+  KeyFormFields,
 } from '../../utilities/zod/schema';
 import CustomError from '../../utilities/CustomError';
 import { fullTextSearchIndex, removeTimeFromDate } from '../../utilities/misc';
 
-class DbEquipment {
+class DbAssets {
   static createEquipment = async (cmpId: string, data: EquipmentFormFields) => {
     const equipId = getNewDocId(CollectionName.equipments);
     const equipRef = doc(db, CollectionName.equipments, equipId);
@@ -397,6 +399,99 @@ class DbEquipment {
 
     return getDocs(docQuery);
   };
+
+  //*Keys
+
+  static createKey = async (cmpId: string, data: KeyFormFields) => {
+    const keyId = getNewDocId(CollectionName.keys);
+
+    const keyRef = doc(db, CollectionName.keys, keyId);
+
+    const newEquipment: IKeysCollection = {
+      KeyId: keyId,
+      KeyName: data.KeyName,
+      KeyNameSearchIndex: fullTextSearchIndex(
+        data.KeyName.trim().toLowerCase()
+      ),
+      KeyCompanyId: cmpId,
+      KeyCompanyBranchId: data.KeyCompanyBranchId || null,
+      KeyDescription: data.KeyDescription,
+      KeyAllotedQuantity: 0,
+      KeyTotalQuantity: Number(data.KeyTotalQuantity),
+      KeyCreatedAt: serverTimestamp(),
+      KeyModifiedAt: serverTimestamp(),
+    };
+
+    return setDoc(keyRef, newEquipment);
+  };
+
+  static updateKey = (keyId: string, data: KeyFormFields) => {
+    const keyRef = doc(db, CollectionName.keys, keyId);
+
+    const newEquipment: Partial<IKeysCollection> = {
+      KeyName: data.KeyName,
+      KeyNameSearchIndex: fullTextSearchIndex(
+        data.KeyName.trim().toLowerCase()
+      ),
+      KeyCompanyBranchId: data.KeyCompanyBranchId || null,
+      KeyDescription: data.KeyDescription,
+      KeyTotalQuantity: Number(data.KeyTotalQuantity),
+      KeyModifiedAt: serverTimestamp(),
+    };
+
+    return updateDoc(keyRef, newEquipment);
+  };
+
+  static getKeys = ({
+    lmt,
+    lastDoc,
+    searchQuery,
+    cmpId,
+    branchId,
+  }: {
+    lmt?: number;
+    lastDoc?: DocumentData | null;
+    searchQuery?: string;
+    cmpId: string;
+    branchId?: string | null;
+  }) => {
+    const docRef = collection(db, CollectionName.keys);
+
+    let queryParams: QueryConstraint[] = [
+      where('KeyCompanyId', '==', cmpId),
+      orderBy('KeyCreatedAt', 'desc'),
+    ];
+
+    if (branchId) {
+      queryParams = [
+        ...queryParams,
+        where('KeyCompanyBranchId', '==', branchId),
+      ];
+    }
+
+    if (searchQuery && searchQuery.length > 0) {
+      queryParams = [
+        ...queryParams,
+        where(
+          'KeyNameSearchIndex',
+          'array-contains',
+          searchQuery.toLocaleLowerCase()
+        ),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const docQuery = query(docRef, ...queryParams);
+
+    return getDocs(docQuery);
+  };
 }
 
-export default DbEquipment;
+export default DbAssets;
