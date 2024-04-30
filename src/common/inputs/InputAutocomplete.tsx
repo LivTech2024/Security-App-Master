@@ -108,9 +108,12 @@ const InputAutoComplete = ({
     }
   };
 
-  useEffect(() => {
-    setSuggestions(data);
-  }, []);
+  useEffect(
+    () => {
+      setSuggestions(data);
+    },
+    isFilterReq ? [data] : []
+  );
 
   const handleSuggestionClick = (suggestion: string) => {
     onChange(suggestion);
@@ -210,8 +213,7 @@ const InputAutoComplete = ({
           error
             ? 'border-red-400'
             : 'border-inputBorder focus-within:ring-[2px]'
-        } 
-         dark:bg-primaryVariantDark `}
+        } `}
         style={{ backgroundColor: bg }}
       >
         <AutocompleteDropdown
@@ -220,7 +222,7 @@ const InputAutoComplete = ({
           target={
             <div className="flex justify-center items-center w-full">
               {leadingIcon ? (
-                <div className="px-2 pt-2 pb-[9px] h-full flex justify-center items-center cursor-pointer hover:bg-onHoverBgLight   dark:hover:bg-onBackgroundLight">
+                <div className="px-2 pt-2 pb-[9px] h-full flex justify-center items-center cursor-pointer hover:bg-onHoverBg ">
                   {leadingIcon}
                 </div>
               ) : null}
@@ -236,7 +238,7 @@ const InputAutoComplete = ({
                 }
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                className={`w-full text-lg py-1 dark:bg-primaryVariantDark ${
+                className={`w-full text-lg py-1  ${
                   leadingIcon ? 'pl-0' : 'pl-2'
                 } outline-none ${tailIcon ? 'pr-0' : 'pr-2'}`}
                 ref={inputRef}
@@ -258,7 +260,7 @@ const InputAutoComplete = ({
               {tailIcon ? (
                 <div
                   onClick={onTailIconClick}
-                  className="px-2 pt-2 pb-[9px] h-full flex justify-center items-center cursor-pointer hover:bg-onHoverBgLight   dark:hover:bg-onSurfaceLight"
+                  className="px-2 pt-2 pb-[9px] h-full flex justify-center items-center cursor-pointer hover:bg-onHoverBg   "
                 >
                   {tailIcon}
                 </div>
@@ -285,9 +287,9 @@ const InputAutoComplete = ({
             {suggestions.map((suggestion, index) => (
               <li
                 key={index}
-                className={`px-4 py-2 cursor-pointer flex flex-col gap-1 items-start w-full  hover:text-surfaceLight group ${
+                className={`px-4 py-2 cursor-pointer flex flex-col gap-1 items-start w-full  hover:text-surface group ${
                   index === activeSuggestion
-                    ? 'bg-secondaryLight text-surfaceLight'
+                    ? 'bg-secondary text-surface'
                     : 'hover:bg-switchSecondaryBlueBg'
                 }`}
                 onClick={() => {
@@ -303,9 +305,9 @@ const InputAutoComplete = ({
                 <span
                   className={` ${
                     index === activeSuggestion
-                      ? 'bg-secondaryLight text-surfaceLight'
-                      : 'text-textTertiaryLight dark:text-textSecondaryDark'
-                  } flex flex-col w-full   text-xs  group-hover:text-surfaceLight`}
+                      ? 'bg-secondary text-surface'
+                      : 'text-textTertiary '
+                  } flex flex-col w-full   text-xs  group-hover:text-surface`}
                 >
                   {suggestion.description}
                 </span>

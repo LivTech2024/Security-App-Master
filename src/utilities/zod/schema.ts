@@ -334,7 +334,9 @@ export type KeyFormFields = z.infer<typeof keySchema>;
 
 //*Equipment Allocation Schema
 export const keyAllocationSchema = z.object({
-  KeyAllocationKeyId: z.string().min(3, { message: 'Please select equipment' }),
+  KeyAllocationKeyName: z
+    .string()
+    .min(3, { message: 'Please select equipment' }),
   KeyAllocationKeyQty: z.coerce.number().min(1).default(0),
   KeyAllocationDate: z.date(),
   KeyAllocationRecipientName: z

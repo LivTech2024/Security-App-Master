@@ -28,7 +28,7 @@ const KeyList = () => {
 
   const { company } = useAuthState();
 
-  const { setKeyEditData } = useEditFormStore();
+  const { setKeyEditData, setKeyAllocationEditData } = useEditFormStore();
 
   const [query, setQuery] = useState('');
 
@@ -127,6 +127,7 @@ const KeyList = () => {
             <Button
               label="Allot Key"
               onClick={() => {
+                setKeyAllocationEditData(null);
                 setKeyAllocModal(true);
               }}
               type="blue"

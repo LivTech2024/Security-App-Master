@@ -18,13 +18,14 @@ import { REACT_QUERY_KEYS } from '../../../@types/enum';
 import { errorHandler } from '../../../utilities/CustomError';
 import Dialog from '../../../common/Dialog';
 import { openContextModal } from '@mantine/modals';
-import InputSelect from '../../../common/inputs/InputSelect';
 import { AiOutlinePlus } from 'react-icons/ai';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import InputDate from '../../../common/inputs/InputDate';
 import TextareaWithTopHeader from '../../../common/inputs/TextareaWithTopHeader';
 import dayjs from 'dayjs';
 import { toDate } from '../../../utilities/misc';
+import InputAutoComplete from '../../../common/inputs/InputAutocomplete';
+import { IKeysCollection } from '../../../@types/database';
 
 const KeyAllocationModal = ({
   opened,
@@ -46,11 +47,11 @@ const KeyAllocationModal = ({
 
   const { company } = useAuthState();
 
-  const [equipSearchQuery, setEquipSearchQuery] = useState('');
+  const keyName = methods.watch('KeyAllocationKeyName');
 
   const { data: keys } = useFetchKeys({
     limit: 5,
-    searchQuery: equipSearchQuery,
+    searchQuery: keyName,
   });
 
   const [loading, setLoading] = useState(false);
@@ -92,7 +93,7 @@ const KeyAllocationModal = ({
   //*Populate data on edit
   useEffect(() => {
     let allFormFields: Partial<KeyAllocationFormFields> = {
-      KeyAllocationKeyId: '',
+      KeyAllocationKeyName: '',
       KeyAllocationKeyQty: 0,
       KeyAllocationRecipientName: '',
       KeyAllocationRecipientContact: '',
@@ -103,7 +104,6 @@ const KeyAllocationModal = ({
     setAllocEndTime(null);
     if (isEdit) {
       allFormFields = {
-        KeyAllocationKeyId: keyAllocationEditData.KeyAllocationKeyId,
         KeyAllocationKeyQty: keyAllocationEditData.KeyAllocationKeyQty,
         KeyAllocationPurpose: keyAllocationEditData.KeyAllocationPurpose,
         KeyAllocationRecipientCompany:
@@ -113,6 +113,14 @@ const KeyAllocationModal = ({
         KeyAllocationRecipientName:
           keyAllocationEditData.KeyAllocationRecipientName,
       };
+
+      DbAssets.getKeyById(keyAllocationEditData.KeyAllocationKeyId).then(
+        (snapshot) => {
+          const data = snapshot.data() as IKeysCollection;
+          const { KeyName } = data;
+          methods.setValue('KeyAllocationKeyName', KeyName);
+        }
+      );
 
       setAllocDate(toDate(keyAllocationEditData.KeyAllocationDate));
       setAllocStartTime(toDate(keyAllocationEditData.KeyAllocationStartTime));
@@ -130,14 +138,15 @@ const KeyAllocationModal = ({
       if (isEdit) {
         await DbAssets.updateKeyAllocation(
           keyAllocationEditData?.KeyAllocationId,
-          data
+          data,
+          company.CompanyId
         );
         showSnackbar({
           message: 'Key allocation updated successfully',
           type: 'success',
         });
       } else {
-        await DbAssets.createKeyAllocation(data);
+        await DbAssets.createKeyAllocation(data, company.CompanyId);
         showSnackbar({
           message: 'Key allocation done successfully',
           type: 'success',
@@ -145,7 +154,7 @@ const KeyAllocationModal = ({
       }
 
       await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_KEYS.KEY_LIST],
+        queryKey: [REACT_QUERY_KEYS.KEY_LIST, REACT_QUERY_KEYS.KEY_ALLOCATION],
       });
 
       setKeyAllocationEditData(null);
@@ -233,16 +242,20 @@ const KeyAllocationModal = ({
           onSubmit={methods.handleSubmit(onSubmit)}
           className="grid grid-cols-2 gap-4"
         >
-          <InputSelect
+          <InputAutoComplete
             label="Select key"
+            value={methods.watch('KeyAllocationKeyName')}
+            onChange={(e) => {
+              const keyName = keys.find((key) => key.KeyId === e)?.KeyName;
+              methods.setValue(
+                'KeyAllocationKeyName',
+                keyName || (e as string)
+              );
+            }}
             data={keys.map((key) => {
               return { label: key.KeyName, value: key.KeyId };
             })}
-            value={methods.watch('KeyAllocationKeyId')}
-            onChange={(e) => {
-              methods.setValue('KeyAllocationKeyId', e as string);
-            }}
-            nothingFoundMessage={
+            dropDownHeader={
               <div
                 onClick={() => {
                   setOpened(false);
@@ -255,10 +268,8 @@ const KeyAllocationModal = ({
                 </div>
               </div>
             }
-            searchable
-            searchValue={equipSearchQuery}
-            onSearchChange={setEquipSearchQuery}
-            error={methods.formState?.errors?.KeyAllocationKeyId?.message}
+            newOptionCreatable
+            error={methods.formState?.errors?.KeyAllocationKeyName?.message}
           />
 
           <InputWithTopHeader

@@ -1,5 +1,6 @@
 import {
   DocumentData,
+  DocumentReference,
   QueryConstraint,
   Timestamp,
   collection,
@@ -573,14 +574,29 @@ class DbAssets {
     return getDocs(docQuery);
   };
 
-  static createKeyAllocation = async (data: KeyAllocationFormFields) => {
+  static getKeyByName = (name: string, companyId: string) => {
+    const keyRef = collection(db, CollectionName.keys);
+    const keyQuery = query(
+      keyRef,
+      where('KeyCompanyId', '==', companyId),
+      where('KeyName', '==', name),
+      limit(1)
+    );
+
+    return getDocs(keyQuery);
+  };
+
+  static createKeyAllocation = async (
+    data: KeyAllocationFormFields,
+    companyId: string
+  ) => {
     const keyAllocId = getNewDocId(CollectionName.keyAllocations);
     const keyAllocRef = doc(db, CollectionName.keyAllocations, keyAllocId);
 
     const {
       KeyAllocationDate,
       KeyAllocationEndTime,
-      KeyAllocationKeyId,
+      KeyAllocationKeyName,
       KeyAllocationKeyQty,
       KeyAllocationPurpose,
       KeyAllocationRecipientContact,
@@ -589,33 +605,66 @@ class DbAssets {
       KeyAllocationRecipientCompany,
     } = data;
 
-    const newKeyAllocData: IKeyAllocations = {
-      KeyAllocationId: keyAllocId,
-      KeyAllocationKeyId,
-      KeyAllocationKeyQty,
-      KeyAllocationDate: removeTimeFromDate(
-        KeyAllocationDate
-      ) as unknown as Timestamp,
-      KeyAllocationRecipientName,
-      KeyAllocationRecipientContact,
-      KeyAllocationPurpose,
-      KeyAllocationStartTime: KeyAllocationStartTime as unknown as Timestamp,
-      KeyAllocationEndTime: KeyAllocationEndTime as unknown as Timestamp,
-      KeyAllocationIsReturned: false,
-      KeyAllocationRecipientCompany: KeyAllocationRecipientCompany || null,
-      KeyAllocationCreatedAt: serverTimestamp(),
-    };
-
     await runTransaction(db, async (transaction) => {
-      const keyDocRef = doc(db, CollectionName.keys, KeyAllocationKeyId);
+      const keySnapshot = await this.getKeyByName(
+        KeyAllocationKeyName,
+        companyId
+      );
 
-      const keySnapshot = await transaction.get(keyDocRef);
-      const keyData = keySnapshot.data() as IKeysCollection;
-      const { KeyAllotedQuantity } = keyData;
+      let KeyAllocationKeyId: string = '';
 
-      transaction.update(keyDocRef, {
-        KeyAllotedQuantity: KeyAllotedQuantity + KeyAllocationKeyQty,
-      });
+      //*Check if key already exist else create a new key
+      if (keySnapshot.size > 0) {
+        const keyData = keySnapshot?.docs[0]?.data() as IKeysCollection;
+
+        const { KeyAllotedQuantity, KeyId } = keyData;
+
+        KeyAllocationKeyId = KeyId;
+
+        const keyDocRef = doc(db, CollectionName.keys, KeyId);
+
+        transaction.update(keyDocRef, {
+          KeyAllotedQuantity: KeyAllotedQuantity + KeyAllocationKeyQty,
+        });
+      } else {
+        KeyAllocationKeyId = getNewDocId(CollectionName.keys);
+
+        const keyDocRef = doc(db, CollectionName.keys, KeyAllocationKeyId);
+
+        const newKey: IKeysCollection = {
+          KeyId: KeyAllocationKeyId,
+          KeyCompanyId: companyId,
+          KeyCompanyBranchId: null,
+          KeyName: KeyAllocationKeyName,
+          KeyNameSearchIndex: fullTextSearchIndex(
+            KeyAllocationKeyName.trim().toLowerCase()
+          ),
+          KeyDescription: null,
+          KeyAllotedQuantity: KeyAllocationKeyQty,
+          KeyTotalQuantity: KeyAllocationKeyQty,
+          KeyCreatedAt: serverTimestamp(),
+          KeyModifiedAt: serverTimestamp(),
+        };
+
+        transaction.set(keyDocRef, newKey);
+      }
+
+      const newKeyAllocData: IKeyAllocations = {
+        KeyAllocationId: keyAllocId,
+        KeyAllocationKeyId,
+        KeyAllocationKeyQty,
+        KeyAllocationDate: removeTimeFromDate(
+          KeyAllocationDate
+        ) as unknown as Timestamp,
+        KeyAllocationRecipientName,
+        KeyAllocationRecipientContact,
+        KeyAllocationPurpose,
+        KeyAllocationStartTime: KeyAllocationStartTime as unknown as Timestamp,
+        KeyAllocationEndTime: KeyAllocationEndTime as unknown as Timestamp,
+        KeyAllocationIsReturned: false,
+        KeyAllocationRecipientCompany: KeyAllocationRecipientCompany || null,
+        KeyAllocationCreatedAt: serverTimestamp(),
+      };
 
       transaction.set(keyAllocRef, newKeyAllocData);
     });
@@ -623,14 +672,15 @@ class DbAssets {
 
   static updateKeyAllocation = async (
     keyAllocId: string,
-    data: KeyAllocationFormFields
+    data: KeyAllocationFormFields,
+    companyId: string
   ) => {
     const keyAllocRef = doc(db, CollectionName.keyAllocations, keyAllocId);
 
     const {
       KeyAllocationDate,
       KeyAllocationEndTime,
-      KeyAllocationKeyId,
+      KeyAllocationKeyName,
       KeyAllocationKeyQty,
       KeyAllocationPurpose,
       KeyAllocationRecipientContact,
@@ -639,32 +689,71 @@ class DbAssets {
       KeyAllocationRecipientCompany,
     } = data;
 
-    const updatedKeyAllocData: Partial<IKeyAllocations> = {
-      KeyAllocationKeyId,
-      KeyAllocationKeyQty,
-      KeyAllocationDate: removeTimeFromDate(
-        KeyAllocationDate
-      ) as unknown as Timestamp,
-      KeyAllocationRecipientName,
-      KeyAllocationStartTime: removeTimeFromDate(
-        KeyAllocationStartTime
-      ) as unknown as Timestamp,
-      KeyAllocationEndTime: removeTimeFromDate(
-        KeyAllocationEndTime
-      ) as unknown as Timestamp,
-      KeyAllocationPurpose,
-      KeyAllocationRecipientContact,
-      KeyAllocationRecipientCompany: KeyAllocationRecipientCompany || null,
-    };
-
     await runTransaction(db, async (transaction) => {
       const keyAllocOldSnapshot = await transaction.get(keyAllocRef);
       const keyAllocOldData = keyAllocOldSnapshot.data() as IKeyAllocations;
 
-      const keyDocRef = doc(db, CollectionName.keys, data.KeyAllocationKeyId);
-      const equipSnapshot = await transaction.get(keyDocRef);
-      const equipData = equipSnapshot.data() as IKeysCollection;
-      const { KeyAllotedQuantity } = equipData;
+      const keySnapshot = await this.getKeyByName(
+        KeyAllocationKeyName,
+        companyId
+      );
+
+      let KeyAllocationKeyId: string = '';
+      let keyDocRef: DocumentReference | null = null;
+      let KeyAllotedQuantity = 0;
+      let newKey: IKeysCollection | null = null;
+
+      //*Check if key already exist else create a new key
+      if (keySnapshot.size > 0) {
+        const keyData = keySnapshot?.docs[0]?.data() as IKeysCollection;
+
+        const { KeyAllotedQuantity: allotedQty, KeyId } = keyData;
+
+        KeyAllocationKeyId = KeyId;
+
+        KeyAllotedQuantity = allotedQty;
+
+        keyDocRef = doc(db, CollectionName.keys, KeyId);
+      } else {
+        KeyAllocationKeyId = getNewDocId(CollectionName.keys);
+
+        keyDocRef = doc(db, CollectionName.keys, KeyAllocationKeyId);
+
+        newKey = {
+          KeyId: KeyAllocationKeyId,
+          KeyCompanyId: companyId,
+          KeyCompanyBranchId: null,
+          KeyName: KeyAllocationKeyName,
+          KeyNameSearchIndex: fullTextSearchIndex(
+            KeyAllocationKeyName.trim().toLowerCase()
+          ),
+          KeyDescription: null,
+          KeyAllotedQuantity: KeyAllocationKeyQty,
+          KeyTotalQuantity: KeyAllocationKeyQty,
+          KeyCreatedAt: serverTimestamp(),
+          KeyModifiedAt: serverTimestamp(),
+        };
+
+        KeyAllotedQuantity = newKey.KeyAllotedQuantity;
+      }
+
+      const updatedKeyAllocData: Partial<IKeyAllocations> = {
+        KeyAllocationKeyId,
+        KeyAllocationKeyQty,
+        KeyAllocationDate: removeTimeFromDate(
+          KeyAllocationDate
+        ) as unknown as Timestamp,
+        KeyAllocationRecipientName,
+        KeyAllocationStartTime: removeTimeFromDate(
+          KeyAllocationStartTime
+        ) as unknown as Timestamp,
+        KeyAllocationEndTime: removeTimeFromDate(
+          KeyAllocationEndTime
+        ) as unknown as Timestamp,
+        KeyAllocationPurpose,
+        KeyAllocationRecipientContact,
+        KeyAllocationRecipientCompany: KeyAllocationRecipientCompany || null,
+      };
 
       if (
         keyAllocOldData.KeyAllocationKeyId !==
@@ -685,9 +774,13 @@ class DbAssets {
         });
 
         //*new update
-        transaction.update(keyDocRef, {
-          KeyAllotedQuantity: KeyAllotedQuantity + KeyAllocationKeyQty,
-        });
+        if (newKey) {
+          transaction.set(keyDocRef, newKey);
+        } else {
+          transaction.update(keyDocRef, {
+            KeyAllotedQuantity: KeyAllotedQuantity + KeyAllocationKeyQty,
+          });
+        }
       } else {
         transaction.update(keyDocRef, {
           KeyAllotedQuantity:
