@@ -153,9 +153,14 @@ const KeyAllocationModal = ({
         });
       }
 
-      await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_KEYS.KEY_LIST, REACT_QUERY_KEYS.KEY_ALLOCATION],
+      const keyAllocQueryInvPromise = queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.KEY_ALLOCATION],
       });
+      const keyListQueryInvPromise = queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.KEY_LIST],
+      });
+
+      await Promise.all([keyAllocQueryInvPromise, keyListQueryInvPromise]);
 
       setKeyAllocationEditData(null);
       setLoading(false);
