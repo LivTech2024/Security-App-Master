@@ -24,6 +24,7 @@ import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import InputDate from '../../../common/inputs/InputDate';
 import TextareaWithTopHeader from '../../../common/inputs/TextareaWithTopHeader';
 import dayjs from 'dayjs';
+import { toDate } from '../../../utilities/misc';
 
 const KeyAllocationModal = ({
   opened,
@@ -32,14 +33,14 @@ const KeyAllocationModal = ({
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const { keyAllocationEditData, setKeyAllocationEditData } =
+    useEditFormStore();
+
+  const isEdit = !!keyAllocationEditData;
+
   const methods = useForm<KeyAllocationFormFields>({
     resolver: zodResolver(keyAllocationSchema),
   });
-
-  const { equipAllocationEditData, setEquipAllocationEditData } =
-    useEditFormStore();
-
-  const isEdit = !!equipAllocationEditData;
 
   const queryClient = useQueryClient();
 
@@ -88,6 +89,39 @@ const KeyAllocationModal = ({
     }
   }, [allocEndTime]);
 
+  //*Populate data on edit
+  useEffect(() => {
+    let allFormFields: Partial<KeyAllocationFormFields> = {
+      KeyAllocationKeyId: '',
+      KeyAllocationKeyQty: 0,
+      KeyAllocationRecipientName: '',
+      KeyAllocationRecipientContact: '',
+      KeyAllocationPurpose: '',
+    };
+    setAllocDate(new Date());
+    setAllocStartTime(null);
+    setAllocEndTime(null);
+    if (isEdit) {
+      allFormFields = {
+        KeyAllocationKeyId: keyAllocationEditData.KeyAllocationKeyId,
+        KeyAllocationKeyQty: keyAllocationEditData.KeyAllocationKeyQty,
+        KeyAllocationPurpose: keyAllocationEditData.KeyAllocationPurpose,
+        KeyAllocationRecipientCompany:
+          keyAllocationEditData.KeyAllocationRecipientCompany,
+        KeyAllocationRecipientContact:
+          keyAllocationEditData.KeyAllocationRecipientContact,
+        KeyAllocationRecipientName:
+          keyAllocationEditData.KeyAllocationRecipientName,
+      };
+
+      setAllocDate(toDate(keyAllocationEditData.KeyAllocationDate));
+      setAllocStartTime(toDate(keyAllocationEditData.KeyAllocationStartTime));
+      setAllocEndTime(toDate(keyAllocationEditData.KeyAllocationEndTime));
+    }
+    methods.reset(allFormFields);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit, keyAllocationEditData, opened]);
+
   const onSubmit = async (data: KeyAllocationFormFields) => {
     if (!company) return;
     try {
@@ -95,7 +129,7 @@ const KeyAllocationModal = ({
 
       if (isEdit) {
         await DbAssets.updateKeyAllocation(
-          equipAllocationEditData?.EquipmentAllocationId,
+          keyAllocationEditData?.KeyAllocationId,
           data
         );
         showSnackbar({
@@ -111,10 +145,10 @@ const KeyAllocationModal = ({
       }
 
       await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_KEYS.EQUIPMENT_LIST],
+        queryKey: [REACT_QUERY_KEYS.KEY_LIST],
       });
 
-      setEquipAllocationEditData(null);
+      setKeyAllocationEditData(null);
       setLoading(false);
       setOpened(false);
     } catch (error) {
@@ -129,20 +163,18 @@ const KeyAllocationModal = ({
     try {
       setLoading(true);
 
-      await DbAssets.deleteEquipAllocation(
-        equipAllocationEditData.EquipmentAllocationId
-      );
+      await DbAssets.deleteKeyAllocation(keyAllocationEditData.KeyAllocationId);
 
       await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_KEYS.EQUIPMENT_LIST],
+        queryKey: [REACT_QUERY_KEYS.KEY_ALLOCATION],
       });
 
       showSnackbar({
-        message: 'Equipment deleted successfully',
+        message: 'Key allocation deleted successfully',
         type: 'success',
       });
 
-      setEquipAllocationEditData(null);
+      setKeyAllocationEditData(null);
       setOpened(false);
       setLoading(false);
     } catch (error) {
