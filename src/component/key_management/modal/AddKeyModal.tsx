@@ -13,9 +13,10 @@ import {
   showSnackbar,
 } from '../../../utilities/TsxUtils';
 import DbAssets from '../../../firebase_configs/DB/DbAssets';
-import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { PageRoutes, REACT_QUERY_KEYS } from '../../../@types/enum';
 import { useQueryClient } from '@tanstack/react-query';
 import { openContextModal } from '@mantine/modals';
+import { useNavigate } from 'react-router-dom';
 
 const AddKeyModal = ({
   opened,
@@ -24,6 +25,8 @@ const AddKeyModal = ({
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const navigate = useNavigate();
+
   const methods = useForm<KeyFormFields>({
     resolver: zodResolver(keySchema),
   });
@@ -96,7 +99,7 @@ const AddKeyModal = ({
     try {
       setLoading(true);
 
-      await DbAssets.deleteEquipment(keyEditData.KeyId);
+      await DbAssets.deleteKey(keyEditData.KeyId);
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.KEY_LIST],
@@ -110,6 +113,8 @@ const AddKeyModal = ({
       setKeyEditData(null);
       setOpened(false);
       setLoading(false);
+
+      navigate(PageRoutes.KEY_LIST);
     } catch (error) {
       setLoading(false);
       console.log(error);
