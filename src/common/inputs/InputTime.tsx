@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { AiOutlineClockCircle } from 'react-icons/ai';
-
-import PopupMenu from '../PopupMenu';
+import { useRef } from 'react';
+import { TimeInput } from '@mantine/dates';
+import { FaRegClock } from 'react-icons/fa';
 import InputHeader from './InputHeader';
-import InputError from './InputError';
 
 interface InputTimeProps {
   label?: string;
   fontClassName?: string;
   value: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
-  use12Hours?: boolean;
   disabled?: boolean;
   showSeconds?: boolean;
   error?: string | null;
@@ -22,207 +19,52 @@ const InputTime = ({
   fontClassName,
   label,
   onChange,
-  use12Hours,
   showSeconds = false,
   error,
 }: InputTimeProps) => {
-  const [dropdown, setDropdown] = useState(false);
-
-  const minutesArray = Array.from({ length: 60 }, (_, i) => i + 0);
-
-  const secondsArray = Array.from({ length: 60 }, (_, i) => i + 0);
-
-  const [hrs, setHrs] = useState(value.slice(0, 2));
-
-  const [mins, setMins] = useState(value.slice(3, 5));
-
-  const [sec, setSec] = useState(value?.slice(6, 8));
-
-  const [scrolled, setScrolled] = useState(false);
-
-  const [hoursFormat, setHoursFormat] = useState(
-    showSeconds ? value?.slice(9) : value.slice(6)
-  );
-
-  const hoursArray = Array.from(
-    { length: use12Hours ? 12 : 24 },
-    use12Hours ? (_, i) => i + 1 : (_, i) => i + 0
-  );
-
-  useEffect(() => {
-    if (hrs?.length == 0 || mins?.length === 0 || (use12Hours && !hoursFormat))
-      return;
-    if (!showSeconds) {
-      onChange(hrs + ':' + mins + ' ' + hoursFormat);
-    } else if (use12Hours) {
-      onChange(hrs + ':' + mins + ':' + sec + ' ' + hoursFormat);
-    } else {
-      onChange(hrs + ':' + mins);
-    }
-  }, [mins, hrs, hoursFormat]);
-
-  const scrollToDiv = (id: string) => {
-    if (!id) return;
-    const element = document.querySelector('#' + id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'auto', inline: 'nearest' });
-    }
-  };
-
-  useEffect(() => {
-    if (!dropdown && scrolled) {
-      setScrolled(false);
-    }
-    if (dropdown && !scrolled) {
-      setTimeout(() => {
-        scrollToDiv('hh' + hrs);
-        scrollToDiv('mm' + mins);
-        scrollToDiv('ss' + sec);
-        setScrolled(true);
-      }, 100);
-    }
-  }, [dropdown, scrolled, hrs, mins, sec]);
+  const ref = useRef<HTMLInputElement>(null);
 
   return (
-    <div className={` gap-1 flex flex-col w-full `}>
+    <div className={` gap-1 flex flex-col `}>
       {label ? (
         <InputHeader title={label} fontClassName={fontClassName} />
       ) : null}
+
       <div
-        className={`flex items-center w-full border-[1px]  ${
+        className={`flex items-center bg-white w-full h-11  rounded border border-[#ccc]  ${
           error
             ? 'border-red-400'
             : 'border-inputBorder focus-within:ring-[2px]'
-        }  rounded `}
+        }   overflow-hidden`}
       >
-        <PopupMenu
-          opened={dropdown}
-          setOpened={setDropdown}
-          width="auto"
-          position="bottom"
-          target={
-            <input
-              value={value.length > 1 ? value : 'hh:mm'}
-              type="text"
-              className={`w-full text-lg py-2 pl-2
-               outline-none  pr-2`}
-              disabled={disabled}
-              onClick={() => setDropdown(!dropdown)}
-            />
-          }
-        >
-          <div className="flex justify-start p-4">
-            <div className="flex flex-col h-[200px] overflow-scroll remove-vertical-scrollbar">
-              {hoursArray.map((h) => {
-                return (
-                  <span
-                    id={'hh' + h}
-                    onClick={() =>
-                      setHrs(h < 10 ? '0' + h.toString() : h.toString())
-                    }
-                    className={`${
-                      hrs === (h < 10 ? '0' + h.toString() : h.toString())
-                        ? 'bg-secondary text-surface'
-                        : 'hover:bg-switchSecondaryBlueBg'
-                    } py-2 px-[14px] flex justify-center items-center cursor-pointer rounded-md text-sm`}
-                    key={h}
-                  >
-                    {h < 10 ? '0' + h : h}
-                  </span>
-                );
-              })}
-            </div>
-
-            <div className="flex flex-col h-[200px] overflow-scroll remove-vertical-scrollbar">
-              {minutesArray.map((m) => {
-                return (
-                  <span
-                    id={'mm' + m}
-                    onClick={() => {
-                      setMins(m < 10 ? '0' + m.toString() : m.toString());
-                      !use12Hours && !showSeconds && setDropdown(false);
-                    }}
-                    className={`${
-                      mins === (m < 10 ? '0' + m.toString() : m.toString())
-                        ? 'bg-secondary text-surface'
-                        : 'hover:bg-switchSecondaryBlueBg'
-                    } py-2 px-[14px] flex justify-center items-center cursor-pointer rounded-md text-sm`}
-                    key={m}
-                  >
-                    {m < 10 ? '0' + m : m}
-                  </span>
-                );
-              })}
-            </div>
-
-            {showSeconds && (
-              <div className="flex flex-col h-[200px] overflow-scroll remove-vertical-scrollbar">
-                {secondsArray.map((m) => {
-                  return (
-                    <span
-                      id={'ss' + m}
-                      onClick={() => {
-                        setSec(m < 10 ? '0' + m.toString() : m.toString());
-                        !use12Hours && setDropdown(false);
-                      }}
-                      className={`${
-                        sec === (m < 10 ? '0' + m.toString() : m.toString())
-                          ? 'bg-secondary text-surface'
-                          : 'hover:bg-switchSecondaryBlueBg'
-                      } py-2 px-[14px] flex justify-center items-center cursor-pointer rounded-md text-sm`}
-                      key={m}
-                    >
-                      {m < 10 ? '0' + m : m}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-
-            {use12Hours && (
-              <div className="flex flex-col justify-center items-end">
-                <span
-                  onClick={() => {
-                    setDropdown(false);
-                    setHoursFormat('AM');
-                  }}
-                  className={`${
-                    hoursFormat === 'AM'
-                      ? 'bg-secondary text-surface'
-                      : 'hover:bg-switchSecondaryBlueBg'
-                  } py-2 px-[14px] flex justify-center items-center cursor-pointer rounded-md text-sm`}
-                >
-                  AM
-                </span>
-                <span
-                  onClick={() => {
-                    setDropdown(false);
-                    setHoursFormat('PM');
-                  }}
-                  className={`${
-                    hoursFormat === 'PM'
-                      ? 'bg-secondary text-surface'
-                      : 'hover:bg-switchSecondaryBlueBg'
-                  } py-2 px-[14px] flex justify-center items-center cursor-pointer rounded-md text-sm`}
-                >
-                  PM
-                </span>
-              </div>
-            )}
-          </div>
-        </PopupMenu>
-        <div
-          onClick={() => {
-            if (!disabled) {
-              setDropdown(!dropdown);
-            }
+        <TimeInput
+          ref={ref}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full px-2"
+          styles={{
+            input: {
+              border: 'none',
+              fontWeight: '400',
+              fontSize: '18px',
+              backgroundColor: 'transparent',
+              padding: '0px',
+            },
           }}
-          className="ml-auto px-2 pt-2 pb-[9px] h-full flex justify-center items-center cursor-pointer hover:bg-onHoverBg "
+          withSeconds={showSeconds}
+          disabled={disabled}
+        />
+
+        <div
+          onClick={() => ref.current?.showPicker()}
+          className="px-2 pt-2 pb-[9px] h-full flex justify-center items-center cursor-pointer hover:bg-onHoverBg "
         >
-          <AiOutlineClockCircle />
+          <FaRegClock className="w-4 h-4 text-textTertiary" />
         </div>
       </div>
-      {error && <InputError errorMessage={error} />}
+      {error && (
+        <small className="text-red-600 text-xs px-1 text-start">{error}</small>
+      )}
     </div>
   );
 };
