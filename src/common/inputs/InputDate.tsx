@@ -1,4 +1,4 @@
-import { DateInput, DatePickerInput } from '@mantine/dates';
+import { DateInput, DatePickerInput, DateTimePicker } from '@mantine/dates';
 import React from 'react';
 import { MdCalendarToday } from 'react-icons/md';
 
@@ -12,7 +12,7 @@ interface InputDateProps {
   label?: string;
   error?: string;
   id?: string;
-  type?: 'default' | 'range';
+  type?: 'default' | 'range' | 'date_time';
 }
 
 const InputDate = ({
@@ -73,14 +73,52 @@ const InputDate = ({
             },
           }}
         />
+      ) : type === 'range' ? (
+        <DatePickerInput
+          type="range"
+          dropdownType="modal"
+          placeholder="Pick dates range"
+          value={rangeValue}
+          onChange={rangeOnChange}
+          popoverProps={{
+            styles: {
+              dropdown: {
+                backgroundColor: `#FFFFFF`,
+                zIndex: 300,
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
+                position: 'absolute',
+              },
+            },
+          }}
+          styles={{
+            input: {
+              border: `1px solid #0000001A`,
+              fontWeight: 'normal',
+              fontSize: '18px',
+              borderRadius: '4px',
+              background: '#FFFFFF',
+              color: '#000000',
+              padding: '8px 8px',
+            },
+            day: {
+              color: `#000000`,
+              ':hover': {
+                color: '#000000',
+              },
+            },
+          }}
+        />
       ) : (
-        type === 'range' && (
-          <DatePickerInput
-            type="range"
-            dropdownType="modal"
-            placeholder="Pick dates range"
-            value={rangeValue}
-            onChange={rangeOnChange}
+        type === 'date_time' && (
+          <DateTimePicker
+            rightSection={
+              <label htmlFor={id ? id : label}>
+                <MdCalendarToday size={16} className="cursor-pointer" />
+              </label>
+            }
+            value={value}
+            onChange={setValue}
+            className="focus-within:ring-[2px] rounded px-2 py-[6px]  border border-inputBorder"
             popoverProps={{
               styles: {
                 dropdown: {
@@ -93,13 +131,13 @@ const InputDate = ({
             }}
             styles={{
               input: {
-                border: `1px solid #0000001A`,
+                border: 'none',
                 fontWeight: 'normal',
                 fontSize: '18px',
                 borderRadius: '4px',
                 background: '#FFFFFF',
                 color: '#000000',
-                padding: '8px 8px',
+                padding: 0,
               },
               day: {
                 color: `#000000`,

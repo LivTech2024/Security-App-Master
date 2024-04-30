@@ -107,7 +107,7 @@ class DbAssets {
       equipAllocData.forEach((alloc) => {
         const equipAllocDocRef = doc(
           db,
-          CollectionName.equipments,
+          CollectionName.equipmentAllocations,
           alloc.EquipmentAllocationId
         );
 
@@ -364,7 +364,7 @@ class DbAssets {
 
         transaction.update(equipDocRef, {
           EquipmentAllotedQuantity:
-            equipData.EquipmentAllotedQuantity +
+            equipData.EquipmentAllotedQuantity -
             equipAllocData.EquipmentAllocationEquipQty,
         });
       }
@@ -442,6 +442,50 @@ class DbAssets {
     };
 
     return updateDoc(keyRef, newEquipment);
+  };
+
+  static deleteKey = async (keyId: string) => {
+    const keyAllocRef = collection(db, CollectionName.keyAllocations);
+
+    const keyAllocQuery = query(
+      keyAllocRef,
+      where('KeyAllocationKeyId', '==', keyId),
+      where('KeyAllocationIsReturned', '==', false),
+      limit(1)
+    );
+    const keyAllocSnapshot = await getDocs(keyAllocQuery);
+
+    if (keyAllocSnapshot.size > 0) {
+      throw new CustomError(
+        'This key is already alloted to someone and its not returned yet'
+      );
+    }
+
+    const keyAllocDeleteQuery = query(
+      keyAllocRef,
+      where('KeyAllocationKeyId', '==', keyId)
+    );
+
+    const keyAllocDeleteSnapshot = await getDocs(keyAllocDeleteQuery);
+    const keyAllocData = keyAllocDeleteSnapshot.docs.map(
+      (doc) => doc.data() as IKeyAllocations
+    );
+
+    await runTransaction(db, async (transaction) => {
+      const keyRef = doc(db, CollectionName.keys, keyId);
+
+      keyAllocData.forEach((alloc) => {
+        const keyAllocDocRef = doc(
+          db,
+          CollectionName.keyAllocations,
+          alloc.KeyAllocationId
+        );
+
+        transaction.delete(keyAllocDocRef);
+      });
+
+      transaction.delete(keyRef);
+    });
   };
 
   static getKeys = ({
@@ -563,7 +607,7 @@ class DbAssets {
     };
 
     await runTransaction(db, async (transaction) => {
-      const keyDocRef = doc(db, CollectionName.equipments, KeyAllocationKeyId);
+      const keyDocRef = doc(db, CollectionName.keys, KeyAllocationKeyId);
 
       const keySnapshot = await transaction.get(keyDocRef);
       const keyData = keySnapshot.data() as IKeysCollection;
@@ -647,6 +691,61 @@ class DbAssets {
       });
 
       transaction.set(keyAllocRef, newKeyAllocData);
+    });
+  };
+
+  static returnKeyFromRecipient = async (keyAllocId: string) => {
+    const keyAllocRef = doc(db, CollectionName.keyAllocations, keyAllocId);
+
+    await runTransaction(db, async (transaction) => {
+      const keyAllocSnapshot = await transaction.get(keyAllocRef);
+      const keyAllocData = keyAllocSnapshot.data() as IKeyAllocations;
+
+      const keyDocRef = doc(
+        db,
+        CollectionName.keys,
+        keyAllocData.KeyAllocationKeyId
+      );
+
+      const keySnapshot = await transaction.get(keyDocRef);
+      const keyData = keySnapshot.data() as IKeysCollection;
+
+      transaction.update(keyDocRef, {
+        KeyAllotedQuantity:
+          keyData.KeyAllotedQuantity - keyAllocData.KeyAllocationKeyQty,
+      });
+
+      transaction.update(keyAllocRef, {
+        KeyAllocationReturnedAt: serverTimestamp(),
+        KeyAllocationIsReturned: true,
+      });
+    });
+  };
+
+  static deleteKeyAllocation = async (keyAllocId: string) => {
+    const keyAllocRef = doc(db, CollectionName.keyAllocations, keyAllocId);
+
+    await runTransaction(db, async (transaction) => {
+      const keyAllocSnapshot = await transaction.get(keyAllocRef);
+      const keyAllocData = keyAllocSnapshot.data() as IKeyAllocations;
+
+      if (!keyAllocData.KeyAllocationIsReturned) {
+        const keyDocRef = doc(
+          db,
+          CollectionName.keys,
+          keyAllocData.KeyAllocationKeyId
+        );
+
+        const keySnapshot = await transaction.get(keyDocRef);
+        const keyData = keySnapshot.data() as IKeysCollection;
+
+        transaction.update(keyDocRef, {
+          KeyAllotedQuantity:
+            keyData.KeyAllotedQuantity - keyAllocData.KeyAllocationKeyQty,
+        });
+      }
+
+      transaction.delete(keyAllocRef);
     });
   };
 }

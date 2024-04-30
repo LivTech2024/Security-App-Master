@@ -21,6 +21,9 @@ import { openContextModal } from '@mantine/modals';
 import InputSelect from '../../../common/inputs/InputSelect';
 import { AiOutlinePlus } from 'react-icons/ai';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
+import InputDate from '../../../common/inputs/InputDate';
+import TextareaWithTopHeader from '../../../common/inputs/TextareaWithTopHeader';
+import dayjs from 'dayjs';
 
 const KeyAllocationModal = ({
   opened,
@@ -50,6 +53,40 @@ const KeyAllocationModal = ({
   });
 
   const [loading, setLoading] = useState(false);
+
+  const [allocDate, setAllocDate] = useState<Date | null>(new Date());
+
+  const [allocStartTime, setAllocStartTime] = useState<Date | null>(null);
+
+  const [allocEndTime, setAllocEndTime] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!allocDate) return;
+    methods.setValue('KeyAllocationDate', allocDate);
+  }, [allocDate]);
+
+  useEffect(() => {
+    if (!allocStartTime) return;
+    methods.setValue('KeyAllocationStartTime', allocStartTime);
+    if (allocEndTime && dayjs(allocStartTime).isAfter(allocEndTime, 'minute')) {
+      methods.setError('KeyAllocationStartTime', {
+        message: 'Start time cannot be greater than end time',
+      });
+    }
+  }, [allocStartTime]);
+
+  useEffect(() => {
+    if (!allocEndTime) return;
+    methods.setValue('KeyAllocationEndTime', allocEndTime);
+    if (
+      allocStartTime &&
+      dayjs(allocEndTime).isBefore(allocStartTime, 'minute')
+    ) {
+      methods.setError('KeyAllocationEndTime', {
+        message: 'End time cannot be smaller than start time',
+      });
+    }
+  }, [allocEndTime]);
 
   const onSubmit = async (data: KeyAllocationFormFields) => {
     if (!company) return;
@@ -216,6 +253,44 @@ const KeyAllocationModal = ({
             error={
               methods.formState.errors.KeyAllocationRecipientCompany?.message
             }
+          />
+
+          <InputDate
+            label="Date"
+            value={allocDate}
+            setValue={setAllocDate}
+            error={methods.formState.errors.KeyAllocationDate?.message}
+          />
+          <InputWithTopHeader
+            className="mx-0"
+            label="Allocation QTY"
+            register={methods.register}
+            decimalCount={0}
+            name="KeyAllocationKeyQty"
+            error={methods.formState.errors.KeyAllocationKeyQty?.message}
+          />
+
+          <InputDate
+            type="date_time"
+            label="Start Time"
+            value={allocStartTime}
+            setValue={setAllocStartTime}
+            error={methods.formState.errors.KeyAllocationStartTime?.message}
+          />
+          <InputDate
+            type="date_time"
+            label="End Time"
+            value={allocEndTime}
+            setValue={setAllocEndTime}
+            error={methods.formState.errors.KeyAllocationEndTime?.message}
+          />
+
+          <TextareaWithTopHeader
+            className="mx-0 col-span-2"
+            title="Allocation Purpose"
+            register={methods.register}
+            name="KeyAllocationPurpose"
+            error={methods.formState.errors.KeyAllocationPurpose?.message}
           />
         </form>
       </FormProvider>
