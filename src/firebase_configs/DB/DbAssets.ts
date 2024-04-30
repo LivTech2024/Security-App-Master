@@ -251,7 +251,7 @@ class DbAssets {
       EquipmentAllocationStartDate,
     } = data;
 
-    const newEquipAllocData: Partial<IEquipmentAllocations> = {
+    const updatedEquipAllocData: Partial<IEquipmentAllocations> = {
       EquipmentAllocationEquipId,
       EquipmentAllocationEquipQty,
       EquipmentAllocationDate: removeTimeFromDate(
@@ -271,17 +271,6 @@ class DbAssets {
       const equipAllocOldData =
         equipAllocOldSnapshot.data() as IEquipmentAllocations;
 
-      //*Reverse changed made to old equipment
-
-      const oldEquipDocRef = doc(
-        db,
-        CollectionName.equipments,
-        equipAllocOldData.EquipmentAllocationEquipId
-      );
-      const oldEquipSnapshot = await transaction.get(oldEquipDocRef);
-      const oldEquipData = oldEquipSnapshot.data() as IEquipmentsCollection;
-
-      //* Make changes to new equipment
       const equipDocRef = doc(
         db,
         CollectionName.equipments,
@@ -292,20 +281,40 @@ class DbAssets {
       const equipData = equipSnapshot.data() as IEquipmentsCollection;
       const { EquipmentAllotedQuantity } = equipData;
 
-      //*old update
-      transaction.update(oldEquipDocRef, {
-        EquipmentAllotedQuantity:
-          oldEquipData.EquipmentAllotedQuantity -
-          equipAllocOldData.EquipmentAllocationEquipQty,
-      });
+      if (
+        equipAllocOldData.EquipmentAllocationEquipId !==
+        updatedEquipAllocData.EquipmentAllocationId
+      ) {
+        const oldEquipDocRef = doc(
+          db,
+          CollectionName.equipments,
+          equipAllocOldData.EquipmentAllocationEquipId
+        );
+        const oldEquipSnapshot = await transaction.get(oldEquipDocRef);
+        const oldEquipData = oldEquipSnapshot.data() as IEquipmentsCollection;
 
-      //*new update
-      transaction.update(equipDocRef, {
-        EquipmentAllotedQuantity:
-          EquipmentAllotedQuantity + EquipmentAllocationEquipQty,
-      });
+        //*Update old key
+        transaction.update(oldEquipDocRef, {
+          EquipmentAllotedQuantity:
+            oldEquipData.EquipmentAllotedQuantity -
+            equipAllocOldData.EquipmentAllocationEquipQty,
+        });
 
-      transaction.update(equipAllocRef, newEquipAllocData);
+        //*Update new key
+        transaction.update(equipDocRef, {
+          EquipmentAllotedQuantity:
+            EquipmentAllotedQuantity + EquipmentAllocationEquipQty,
+        });
+      } else {
+        transaction.update(equipDocRef, {
+          EquipmentAllotedQuantity:
+            EquipmentAllotedQuantity -
+            equipAllocOldData.EquipmentAllocationEquipQty +
+            EquipmentAllocationEquipQty,
+        });
+      }
+
+      transaction.update(equipAllocRef, updatedEquipAllocData);
     });
   };
 
