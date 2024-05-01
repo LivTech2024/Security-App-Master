@@ -6,6 +6,7 @@ import NoSearchResult from '../../common/NoSearchResult';
 import { IoArrowBackCircle } from 'react-icons/io5';
 import { formatDate } from '../../utilities/misc';
 import { PageRoutes } from '../../@types/enum';
+import LazyLoad from 'react-lazyload';
 
 const ReportView = () => {
   const [searchParam] = useSearchParams();
@@ -130,14 +131,20 @@ const ReportView = () => {
             </div>
 
             {data?.ReportImage?.length && (
-              <div className="flex items-start gap-4 col-span-2">
+              <div className="flex flex-col gap-4 col-span-2">
                 <p className="font-semibold flex gap-2">Report Images:</p>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-wrap-reverse gap-4">
                   {data?.ReportImage
                     ? data?.ReportImage?.map((img) => {
                         return (
                           <a href={img} target="_blank">
-                            {img}
+                            <LazyLoad height={100} unmountIfInvisible>
+                              <img
+                                src={img}
+                                alt=""
+                                className="w-[100px] h-[100px] rounded object-cover"
+                              />
+                            </LazyLoad>
                           </a>
                         );
                       })

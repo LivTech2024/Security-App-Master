@@ -403,6 +403,11 @@ export interface IEmployeeDARCollection {
   EmpDarMedias: string[];
   EmpDarData: string; //* Content of DAR
   EmpDarDate: Timestamp | FieldValue; //* Same as Shift Date
+  EmpDarTile: {
+    TileContent: string;
+    TileTime: string;
+    TileImages: string[];
+  }[];
   EmpDarCreatedAt: Timestamp | FieldValue;
 }
 
