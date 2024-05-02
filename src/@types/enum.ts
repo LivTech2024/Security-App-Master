@@ -134,6 +134,7 @@ export const PageRoutes = {
   KEY_LIST: '/key_list',
   KEY_VIEW: '/key_view',
   MESSAGING: '/messaging',
+  TIME_AND_ATTENDANCE: '/time_and_attendance',
   CLIENT_PORTAL_HOME: '/client_portal/',
   CLIENT_PORTAL_PATROLS: '/client_portal/patrols',
   CLIENT_PORTAL_PATROL_LOGS: '/client_portal/patrol_logs',

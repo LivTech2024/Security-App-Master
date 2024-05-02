@@ -178,7 +178,7 @@ const Home = () => {
           icon={<MdOutlineSensors className="text-2xl text-primaryGold" />}
         />
         <HomeItem
-          path={PageRoutes.SHIFT_LIST}
+          path={PageRoutes.TIME_AND_ATTENDANCE}
           name="Time & Attendance"
           icon={<FaClock className="text-2xl text-primaryGold" />}
         />

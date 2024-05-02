@@ -11,8 +11,12 @@ import Button from '../../common/button/Button';
 import { errorHandler } from '../../utilities/CustomError';
 import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
 import { openContextModal } from '@mantine/modals';
+import { useAuthState } from '../../store';
+import PageHeader from '../../common/PageHeader';
 
 const PatrollingView = () => {
+  const { admin, company } = useAuthState();
+
   const [searchParam] = useSearchParams();
 
   const patrolLogId = searchParam.get('id');
@@ -83,7 +87,7 @@ const PatrollingView = () => {
 
   if (logData && patrolData) {
     const onDelete = async () => {
-      if (!patrolLogId) return;
+      if (!patrolLogId || !admin || !company) return;
       try {
         setLoading(true);
 
@@ -101,33 +105,39 @@ const PatrollingView = () => {
 
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
-        <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-          <span className="font-semibold text-xl">Patrol log data</span>
-          <Button
-            label="Delete"
-            onClick={() => {
-              openContextModal({
-                modal: 'confirmModal',
-                withCloseButton: false,
-                centered: true,
-                closeOnClickOutside: true,
-                innerProps: {
-                  title: 'Confirm',
-                  body: 'Are you sure to delete this patrol log',
-                  onConfirm: () => {
-                    onDelete();
-                  },
-                },
-                size: '30%',
-                styles: {
-                  body: { padding: '0px' },
-                },
-              });
-            }}
-            type="black"
-            className="px-4 py-2"
-          />
-        </div>
+        <PageHeader
+          title="Patrol log data"
+          rightSection={
+            admin &&
+            company && (
+              <Button
+                label="Delete"
+                onClick={() => {
+                  openContextModal({
+                    modal: 'confirmModal',
+                    withCloseButton: false,
+                    centered: true,
+                    closeOnClickOutside: true,
+                    innerProps: {
+                      title: 'Confirm',
+                      body: 'Are you sure to delete this patrol log',
+                      onConfirm: () => {
+                        onDelete();
+                      },
+                    },
+                    size: '30%',
+                    styles: {
+                      body: { padding: '0px' },
+                    },
+                  });
+                }}
+                type="black"
+                className="px-4 py-2"
+              />
+            )
+          }
+        />
+
         <PatrolViewCard patrolLogData={logData} patrolData={patrolData} />
       </div>
     );

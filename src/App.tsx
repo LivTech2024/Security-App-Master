@@ -60,6 +60,7 @@ import VisitorList from './pages/visitor_management/VisitorList';
 import VisitorView from './pages/visitor_management/VisitorView';
 import KeyList from './pages/key_management/KeyList';
 import KeyView from './pages/key_management/KeyView';
+import TimeAndAttendance from './pages/time_and_attendance/TimeAndAttendance';
 
 function App() {
   useOnAuthStateChanged();
@@ -267,6 +268,11 @@ function App() {
 
             <Route path={PageRoutes.VISITOR_LIST} Component={VisitorList} />
             <Route path={PageRoutes.VISITOR_VIEW} Component={VisitorView} />
+
+            <Route
+              path={PageRoutes.TIME_AND_ATTENDANCE}
+              Component={TimeAndAttendance}
+            />
           </Routes>
         </Layout>
       </ModalsProvider>
