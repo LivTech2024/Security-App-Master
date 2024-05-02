@@ -13,8 +13,8 @@ interface DateFilterPopupProps {
   setStartDate: React.Dispatch<React.SetStateAction<Date | string | null>>;
   endDate: Date | string | null;
   setEndDate: React.Dispatch<React.SetStateAction<Date | string | null>>;
-  isLifetime: boolean;
-  setIsLifetime: React.Dispatch<React.SetStateAction<boolean>>;
+  isLifetime?: boolean;
+  setIsLifetime?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 dayjs.extend(quarterOfYear);
@@ -39,7 +39,7 @@ const DateFilterDropdown = ({
   const customDateRange = () => {
     const invalid = value.find((i) => i === null);
     if (!value[0] || !value[1] || invalid) return;
-    setIsLifetime(false);
+    setIsLifetime && setIsLifetime(false);
     setStartDate(dayjs(value[0]).toDate());
     setEndDate(dayjs(value[1]).toDate());
   };
@@ -90,7 +90,7 @@ const DateFilterDropdown = ({
               setDateFilterDropdown(false);
               setStartDate(dayjs().startOf('D').toDate());
               setEndDate(dayjs().endOf('D').toDate());
-              setIsLifetime(false);
+              setIsLifetime && setIsLifetime(false);
             }}
             className="px-4 py-[8px] w-full text-sm cursor-pointer hover:bg-onHoverBg capitalize"
           >
@@ -101,7 +101,7 @@ const DateFilterDropdown = ({
               setDateFilterDropdown(false);
               setStartDate(dayjs().subtract(1, 'day').startOf('day').toDate());
               setEndDate(dayjs().subtract(1, 'day').endOf('day').toDate());
-              setIsLifetime(false);
+              setIsLifetime && setIsLifetime(false);
             }}
             className="px-4 py-[8px] w-full text-sm cursor-pointer hover:bg-onHoverBg capitalize"
           >
@@ -113,7 +113,7 @@ const DateFilterDropdown = ({
               setDateFilterDropdown(false);
               setStartDate(dayjs().startOf('week').toDate());
               setEndDate(dayjs().endOf('week').toDate());
-              setIsLifetime(false);
+              setIsLifetime && setIsLifetime(false);
             }}
             className="px-4 py-[8px] w-full text-sm cursor-pointer hover:bg-onHoverBg capitalize"
           >
@@ -125,7 +125,7 @@ const DateFilterDropdown = ({
               setDateFilterDropdown(false);
               setStartDate(dayjs().startOf('M').toDate());
               setEndDate(dayjs().endOf('M').toDate());
-              setIsLifetime(false);
+              setIsLifetime && setIsLifetime(false);
             }}
             className="px-4 py-[8px] w-full text-sm cursor-pointer hover:bg-onHoverBg capitalize"
           >
@@ -136,7 +136,7 @@ const DateFilterDropdown = ({
               setDateFilterDropdown(false);
               setStartDate(dayjs().startOf('Q').toDate());
               setEndDate(dayjs().endOf('Q').toDate());
-              setIsLifetime(false);
+              setIsLifetime && setIsLifetime(false);
             }}
             className="px-4 py-[8px] w-full text-sm cursor-pointer hover:bg-onHoverBg capitalize"
           >
@@ -147,21 +147,23 @@ const DateFilterDropdown = ({
               setDateFilterDropdown(false);
               setStartDate(dayjs().startOf('year').toDate());
               setEndDate(dayjs().endOf('year').toDate());
-              setIsLifetime(false);
+              setIsLifetime && setIsLifetime(false);
             }}
             className="px-4 py-[8px] w-full text-sm cursor-pointer hover:bg-onHoverBg capitalize"
           >
             this year
           </span>
-          <span
-            onClick={() => {
-              setDateFilterDropdown(false);
-              setIsLifetime(true);
-            }}
-            className="px-4 py-[8px] w-full text-sm cursor-pointer hover:bg-onHoverBg capitalize"
-          >
-            all
-          </span>
+          {setIsLifetime && (
+            <span
+              onClick={() => {
+                setDateFilterDropdown(false);
+                setIsLifetime(true);
+              }}
+              className="px-4 py-[8px] w-full text-sm cursor-pointer hover:bg-onHoverBg capitalize"
+            >
+              all
+            </span>
+          )}
           <span
             onClick={() => {
               setDateFilterDropdown(false);
@@ -175,7 +177,7 @@ const DateFilterDropdown = ({
       </PopupMenu>
       <div className="hidden ">
         <Dialog
-          size="auto"
+          size="350px"
           opened={customDateRangeModal}
           setOpened={setCustomDateRangeModal}
           title="Select custom date range"

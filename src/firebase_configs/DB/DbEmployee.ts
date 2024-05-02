@@ -43,6 +43,7 @@ import {
   deleteAuthUser,
   updateAuthUser,
 } from '../../API/AuthUser';
+import dayjs from 'dayjs';
 
 class DbEmployee {
   static isEmpRoleExist = async (empRole: string, empRoleId: string | null) => {
@@ -714,6 +715,44 @@ class DbEmployee {
   static getEmpDarById = (darId: string) => {
     const darRef = doc(db, CollectionName.employeesDAR, darId);
     return getDoc(darRef);
+  };
+
+  static getEmpShifts = ({
+    companyId,
+    empId,
+    endDate,
+    startDate,
+    lastDoc,
+    lmt,
+  }: {
+    empId: string;
+    companyId: string;
+    startDate: Date | string | null;
+    endDate: Date | string | null;
+    lastDoc?: DocumentData | null;
+    lmt?: number | null;
+  }) => {
+    const shiftRef = collection(db, CollectionName.shifts);
+
+    let queryParams: QueryConstraint[] = [
+      where('ShiftCompanyId', '==', companyId),
+      where('ShiftAssignedUserId', 'array-contains', empId),
+      where('ShiftDate', '>=', dayjs(startDate).startOf('day').toDate()),
+      where('ShiftDate', '<=', dayjs(endDate).endOf('day').toDate()),
+      orderBy('ShiftDate', 'desc'),
+    ];
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const shiftQuery = query(shiftRef, ...queryParams);
+
+    return getDocs(shiftQuery);
   };
 }
 

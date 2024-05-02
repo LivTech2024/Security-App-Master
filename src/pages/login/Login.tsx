@@ -139,9 +139,6 @@ const Login = () => {
 
       await signInSuccess(dbUser.user);
 
-      showSnackbar({ message: 'Login successful', type: 'success' });
-      closeModalLoader();
-
       window.location.reload();
     } catch (error) {
       closeModalLoader();

@@ -80,6 +80,7 @@ const InputDate = ({
           placeholder="Pick dates range"
           value={rangeValue}
           onChange={rangeOnChange}
+          className="focus-within:ring-[2px] rounded px-2 py-[6px]  border border-inputBorder"
           popoverProps={{
             styles: {
               dropdown: {
@@ -92,13 +93,13 @@ const InputDate = ({
           }}
           styles={{
             input: {
-              border: `1px solid #0000001A`,
+              border: 'none',
               fontWeight: 'normal',
               fontSize: '18px',
               borderRadius: '4px',
               background: '#FFFFFF',
               color: '#000000',
-              padding: '8px 8px',
+              padding: 0,
             },
             day: {
               color: `#000000`,
