@@ -135,6 +135,7 @@ export interface IShiftsCollection {
     Status: 'pending' | 'started' | 'completed';
     StatusReportedById?: string;
     StatusReportedByName?: string;
+    StatusStartedTime?: Timestamp | FieldValue;
     StatusReportedTime?: Timestamp | FieldValue;
     StatusShiftTotalHrs?: number;
   }[];
