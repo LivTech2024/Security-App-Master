@@ -3,10 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { IReportsCollection } from '../../@types/database';
 import DbCompany from '../../firebase_configs/DB/DbCompany';
 import NoSearchResult from '../../common/NoSearchResult';
-import { IoArrowBackCircle } from 'react-icons/io5';
 import { formatDate } from '../../utilities/misc';
 import { PageRoutes } from '../../@types/enum';
 import LazyLoad from 'react-lazyload';
+import PageHeader from '../../common/PageHeader';
 
 const ReportView = () => {
   const [searchParam] = useSearchParams();
@@ -41,17 +41,7 @@ const ReportView = () => {
   if (loading) {
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6 animate-pulse">
-        <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-          <div
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-4 cursor-pointer "
-          >
-            <div className="cursor-pointer">
-              <IoArrowBackCircle className="h-6 w-6" />
-            </div>
-            <div className="font-semibold text-lg">Report data</div>
-          </div>
-        </div>
+        <PageHeader title="Report data" />
         <div className="h-[40vh] bg-shimmerColor w-full"></div>
       </div>
     );
@@ -60,17 +50,7 @@ const ReportView = () => {
   if (data)
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
-        <div className="flex justify-between w-full p-4 rounded bg-primaryGold  items-center">
-          <div
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-4 cursor-pointer "
-          >
-            <div className="cursor-pointer">
-              <IoArrowBackCircle className="h-6 w-6" />
-            </div>
-            <div className="font-semibold text-lg">Report data</div>
-          </div>
-        </div>
+        <PageHeader title="Report data" />
 
         <div className="bg-surface shadow-md rounded-lg p-4">
           <div className="grid grid-cols-2 gap-4 text-lg">
@@ -108,19 +88,18 @@ const ReportView = () => {
               <p>{data.ReportIsFollowUpRequired ? 'Yes' : 'No'}</p>
             </div>
 
-            {data.ReportIsFollowUpRequired && data.ReportFollowedUpId && (
+            {data.ReportFollowedUpId && (
               <div className="flex items-center gap-4">
                 <p className="font-semibold flex gap-2">Followed Up Report:</p>
                 <p
                   onClick={() =>
                     navigate(
-                      PageRoutes.REPORT_VIEW +
-                        `?id=${data.ReportIsFollowUpRequired}`
+                      PageRoutes.REPORT_VIEW + `?id=${data.ReportFollowedUpId}`
                     )
                   }
-                  className="text-textPrimaryBlue cursor-pointer"
+                  className="text-textPrimaryBlue cursor-pointer text-sm mt-[2px] underline"
                 >
-                  {data.ReportFollowedUpId}
+                  Click here to view
                 </p>
               </div>
             )}
@@ -130,7 +109,7 @@ const ReportView = () => {
               <p>{data.ReportData}</p>
             </div>
 
-            {data?.ReportImage?.length && (
+            {data?.ReportImage?.length ? (
               <div className="flex flex-col gap-4 col-span-2">
                 <p className="font-semibold flex gap-2">Report Images:</p>
                 <div className="flex flex-wrap-reverse gap-4">
@@ -151,9 +130,9 @@ const ReportView = () => {
                     : 'N/A'}
                 </div>
               </div>
-            )}
+            ) : null}
 
-            {data?.ReportVideo?.length && (
+            {data?.ReportVideo?.length ? (
               <div className="flex items-start gap-4 col-span-2">
                 <p className="font-semibold flex gap-2">Report Videos:</p>
                 <div className="flex flex-col gap-4">
@@ -172,7 +151,7 @@ const ReportView = () => {
                     : 'N/A'}
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
