@@ -231,11 +231,13 @@ export const invoiceSchema = z
       .max(6, { message: 'Invoice number should be at most 6 character' }),
     InvoiceDate: z.date(),
     InvoiceDueDate: z.date(),
-    InvoiceSubtotal: numberString({ message: 'Subtotal amount is required' }),
-    InvoiceTotalAmount: numberString({ message: 'Total amount is required' }),
-    InvoiceReceivedAmount: numberString({
-      message: 'Received amount amount is required',
-    }),
+    InvoiceSubtotal: z.coerce
+      .number()
+      .min(1, { message: 'Subtotal amount is required' }),
+    InvoiceTotalAmount: z.coerce
+      .number()
+      .min(1, { message: 'Total amount is required' }),
+    InvoiceReceivedAmount: z.coerce.number(),
     InvoiceDescription: z.string().optional().nullable(),
     InvoiceTerms: z.string().optional().nullable(),
   })

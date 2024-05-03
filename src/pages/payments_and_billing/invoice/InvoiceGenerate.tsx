@@ -19,13 +19,15 @@ import {
   showSnackbar,
 } from '../../../utilities/TsxUtils';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import { useAuthState } from '../../../store';
+import { useAuthState, useEditFormStore } from '../../../store';
 import DbPayment from '../../../firebase_configs/DB/DbPayment';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../../@types/enum';
 import useFetchClients from '../../../hooks/fetch/useFetchClients';
 import InputAutoComplete from '../../../common/inputs/InputAutocomplete';
 import PageHeader from '../../../common/PageHeader';
+import { toDate } from '../../../utilities/misc';
+import { openContextModal } from '@mantine/modals';
 
 const numberToString = (value: number) => {
   return String(value) as unknown as number;
@@ -34,8 +36,28 @@ const numberToString = (value: number) => {
 const InvoiceGenerate = () => {
   const { company } = useAuthState();
 
+  const { invoiceEditData } = useEditFormStore();
+
+  const isEdit = !!invoiceEditData;
+
   const methods = useForm<InvoiceFormFields>({
     resolver: zodResolver(invoiceSchema),
+    defaultValues: isEdit
+      ? {
+          InvoiceClientAddress: invoiceEditData.InvoiceClientAddress,
+          InvoiceClientId: invoiceEditData.InvoiceClientId,
+          InvoiceClientName: invoiceEditData.InvoiceClientName,
+          InvoiceClientPhone: invoiceEditData.InvoiceClientPhone,
+          InvoiceDate: toDate(invoiceEditData.InvoiceDate),
+          InvoiceDescription: invoiceEditData.InvoiceDescription,
+          InvoiceDueDate: toDate(invoiceEditData.InvoiceDueDate),
+          InvoiceNumber: invoiceEditData.InvoiceNumber,
+          InvoiceReceivedAmount: invoiceEditData.InvoiceReceivedAmount,
+          InvoiceSubtotal: invoiceEditData.InvoiceSubtotal,
+          InvoiceTerms: invoiceEditData.InvoiceTerms,
+          InvoiceTotalAmount: invoiceEditData.InvoiceTotalAmount,
+        }
+      : undefined,
   });
 
   const [invoiceItems, setInvoiceItems] = useState<IInvoiceItems[]>([
@@ -57,6 +79,17 @@ const InvoiceGenerate = () => {
     searchQuery: clientSearchQuery,
   });
 
+  //*Populate edit data
+  useEffect(() => {
+    if (isEdit) {
+      setInvoiceItems(invoiceEditData.InvoiceItems);
+      setInvoiceDate(toDate(invoiceEditData.InvoiceDate));
+      setInvoiceDueDate(toDate(invoiceEditData.InvoiceDueDate));
+      setInvoiceTaxList(invoiceEditData.InvoiceTaxList);
+      setClientSearchQuery(invoiceEditData.InvoiceClientName);
+    }
+  }, [isEdit, invoiceEditData]);
+
   useEffect(() => {
     const selectedClient = clients.find(
       (c) => c.ClientName === clientSearchQuery
@@ -73,7 +106,7 @@ const InvoiceGenerate = () => {
       methods.setValue('InvoiceClientAddress', '');
       methods.setValue('InvoiceClientPhone', '');
     }
-  }, [clientSearchQuery]);
+  }, [clientSearchQuery, clients]);
 
   useEffect(() => {
     console.log(methods.formState.errors);
@@ -165,9 +198,10 @@ const InvoiceGenerate = () => {
 
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+
   const onSubmit = async (data: InvoiceFormFields) => {
     if (!company) return;
-    console.log(data, 'data', invoiceItems, invoiceTaxList);
     try {
       if (
         invoiceItems.length === 0 ||
@@ -180,40 +214,113 @@ const InvoiceGenerate = () => {
         throw new CustomError('Please add items to generate invoice');
       }
 
-      showModalLoader({});
+      setLoading(true);
 
-      await DbPayment.createInvoice({
-        cmpId: company.CompanyId,
-        data,
-        items: invoiceItems,
-        taxes: invoiceTaxList,
-      });
+      if (isEdit) {
+        await DbPayment.updateInvoice({
+          cmpId: company.CompanyId,
+          invoiceId: invoiceEditData.InvoiceId,
+          data,
+          items: invoiceItems,
+          taxes: invoiceTaxList,
+        });
 
-      showSnackbar({
-        message: 'Invoice created successfully',
-        type: 'success',
-      });
-      closeModalLoader();
+        showSnackbar({
+          message: 'Invoice updated successfully',
+          type: 'success',
+        });
+      } else {
+        await DbPayment.createInvoice({
+          cmpId: company.CompanyId,
+          data,
+          items: invoiceItems,
+          taxes: invoiceTaxList,
+        });
+
+        showSnackbar({
+          message: 'Invoice created successfully',
+          type: 'success',
+        });
+      }
+      setLoading(false);
 
       navigate(PageRoutes.INVOICE_LIST);
     } catch (error) {
       console.log(error);
       errorHandler(error);
-      closeModalLoader();
+      setLoading(false);
     }
   };
+
+  const onDelete = async () => {
+    if (!isEdit) return;
+    try {
+      setLoading(true);
+
+      await DbPayment.deleteInvoice(invoiceEditData.InvoiceId);
+
+      showSnackbar({
+        message: 'Invoice deleted successfully',
+        type: 'success',
+      });
+
+      setLoading(false);
+      navigate(PageRoutes.INVOICE_LIST);
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
         title="Create new invoice"
         rightSection={
-          <Button
-            label="Save"
-            onClick={methods.handleSubmit(onSubmit)}
-            type="black"
-            className="px-6 py-2"
-          />
+          <div className="flex gap-4 items-center">
+            {isEdit && (
+              <Button
+                label="Delete"
+                onClick={() => {
+                  openContextModal({
+                    modal: 'confirmModal',
+                    withCloseButton: false,
+                    centered: true,
+                    closeOnClickOutside: true,
+                    innerProps: {
+                      title: 'Confirm',
+                      body: 'Are you sure to delete this invoice',
+                      onConfirm: () => {
+                        onDelete();
+                      },
+                    },
+                    size: '30%',
+                    styles: {
+                      body: { padding: '0px' },
+                    },
+                  });
+                }}
+                type="blue"
+                className="px-6 py-2"
+              />
+            )}
+            <Button
+              label={isEdit ? 'Update' : 'Save'}
+              onClick={methods.handleSubmit(onSubmit)}
+              type="black"
+              className="px-6 py-2"
+            />
+          </div>
         }
       />
 
@@ -225,6 +332,7 @@ const InvoiceGenerate = () => {
           <div className="flex gap-4 justify-between">
             <div className="flex flex-col bg-surface shadow p-4 rounded gap-4 w-[60%] max-w-2xl justify-start">
               <div className="font-semibold">Bill To.</div>
+
               <InputAutoComplete
                 label="Client"
                 value={clientSearchQuery}

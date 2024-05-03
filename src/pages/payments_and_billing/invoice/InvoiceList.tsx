@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAuthState } from '../../../store';
+import { useAuthState, useEditFormStore } from '../../../store';
 import dayjs from 'dayjs';
 import DateFilterDropdown from '../../../common/dropdown/DateFilterDropdown';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +31,8 @@ import PageHeader from '../../../common/PageHeader';
 
 const InvoiceList = () => {
   const navigate = useNavigate();
+
+  const { setInvoiceEditData } = useEditFormStore();
 
   const [startDate, setStartDate] = useState<Date | string | null>(
     dayjs().startOf('M').toDate()
@@ -172,7 +174,10 @@ const InvoiceList = () => {
           <Button
             type="black"
             label="Generate new invoice"
-            onClick={() => navigate(PageRoutes.INVOICE_GENERATE)}
+            onClick={() => {
+              setInvoiceEditData(null);
+              navigate(PageRoutes.INVOICE_GENERATE);
+            }}
             className="px-4 py-2"
           />
         }
@@ -217,26 +222,56 @@ const InvoiceList = () => {
             data.map((invoice) => {
               return (
                 <tr key={invoice.InvoiceId}>
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() => {
+                      setInvoiceEditData(invoice);
+                      navigate(PageRoutes.INVOICE_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start "
+                  >
                     <span className="line-clamp-3">
                       {invoice.InvoiceClientName}
                     </span>
                   </td>
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() => {
+                      setInvoiceEditData(invoice);
+                      navigate(PageRoutes.INVOICE_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start"
+                  >
                     {invoice.InvoiceNumber}
                   </td>
 
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() => {
+                      setInvoiceEditData(invoice);
+                      navigate(PageRoutes.INVOICE_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-2">
                       {invoice.InvoiceItems.map(
                         (item) => item.ItemDescription
                       ).join(',')}
                     </span>
                   </td>
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() => {
+                      setInvoiceEditData(invoice);
+                      navigate(PageRoutes.INVOICE_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start"
+                  >
                     {formatDate(invoice.InvoiceDate)}
                   </td>
-                  <td className="align-top px-4 py-2 text-start ">
+                  <td
+                    onClick={() => {
+                      setInvoiceEditData(invoice);
+                      navigate(PageRoutes.INVOICE_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start "
+                  >
                     {numberFormatter(invoice.InvoiceTotalAmount, true)}
                   </td>
                   <td

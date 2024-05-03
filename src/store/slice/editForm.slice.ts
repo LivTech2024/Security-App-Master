@@ -5,6 +5,7 @@ import {
   IEmployeesCollection,
   IEquipmentAllocations,
   IEquipmentsCollection,
+  IInvoicesCollection,
   IKeyAllocations,
   IKeysCollection,
   ILocationsCollection,
@@ -132,6 +133,9 @@ interface EditFormState {
 
   keyAllocationEditData: KeyAllocation | null;
   setKeyAllocationEditData: (keyAlloc: KeyAllocation | null) => void;
+
+  invoiceEditData: IInvoicesCollection | null;
+  setInvoiceEditData: (inv: IInvoicesCollection | null) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -188,4 +192,9 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   keyAllocationEditData: null,
   setKeyAllocationEditData: (keyAlloc) =>
     set((state) => ({ ...state, keyAllocationEditData: keyAlloc })),
+
+  //Invoices
+  invoiceEditData: null,
+  setInvoiceEditData: (inv) =>
+    set((state) => ({ ...state, invoiceEditData: inv })),
 });

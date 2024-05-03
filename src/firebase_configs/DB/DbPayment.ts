@@ -27,15 +27,24 @@ import { getNewDocId } from './utils';
 import { removeTimeFromDate } from '../../utilities/misc';
 
 class DbPayment {
-  static isInvoiceNumberExist = async (cmpId: string, invoiceNo: string) => {
+  static isInvoiceNumberExist = async (
+    cmpId: string,
+    invoiceNo: string,
+    invoiceId?: string
+  ) => {
     const invoiceRef = collection(db, CollectionName.invoices);
 
-    const invoiceQuery = query(
-      invoiceRef,
+    let queryParams: QueryConstraint[] = [
       where('InvoiceCompanyId', '==', cmpId),
       where('InvoiceNumber', '==', invoiceNo),
-      limit(1)
-    );
+    ];
+
+    if (invoiceId) {
+      queryParams = [...queryParams, where('InvoiceId', '!=', invoiceId)];
+    }
+    queryParams = [...queryParams, limit(1)];
+
+    const invoiceQuery = query(invoiceRef, ...queryParams);
 
     const snapshot = await getDocs(invoiceQuery);
 
@@ -103,6 +112,108 @@ class DbPayment {
         ClientBalance: client.ClientBalance + balanceAmount,
       });
       transaction.set(invoiceRef, newInvoice);
+    });
+  };
+
+  static updateInvoice = async ({
+    invoiceId,
+    cmpId,
+    data,
+    items,
+    taxes,
+  }: {
+    invoiceId: string;
+    cmpId: string;
+    data: InvoiceFormFields;
+    items: IInvoiceItems[];
+    taxes: IInvoiceTaxList[];
+  }) => {
+    const invoiceNoExist = await this.isInvoiceNumberExist(
+      cmpId,
+      data.InvoiceNumber,
+      invoiceId
+    );
+
+    if (invoiceNoExist) {
+      throw new CustomError('This invoice number already exist');
+    }
+
+    await runTransaction(db, async (transaction) => {
+      const invoiceRef = doc(db, CollectionName.invoices, invoiceId);
+
+      const invoiceSnapshot = await transaction.get(invoiceRef);
+      const oldInvoiceData = invoiceSnapshot.data() as IInvoicesCollection;
+
+      const updatedInvoice: Partial<IInvoicesCollection> = {
+        InvoiceClientId: data.InvoiceClientId,
+        InvoiceClientName: data.InvoiceClientName,
+        InvoiceClientPhone: data.InvoiceClientPhone,
+        InvoiceClientAddress: data.InvoiceClientAddress || null,
+        InvoiceNumber: data.InvoiceNumber,
+        InvoiceDate: removeTimeFromDate(
+          data.InvoiceDate
+        ) as unknown as Timestamp,
+        InvoiceDueDate: removeTimeFromDate(
+          data.InvoiceDueDate
+        ) as unknown as Timestamp,
+        InvoiceItems: items,
+        InvoiceSubtotal: data.InvoiceSubtotal ?? 0,
+        InvoiceTaxList: taxes,
+        InvoiceTotalAmount: data.InvoiceTotalAmount ?? 0,
+        InvoiceDescription: data.InvoiceDescription || null,
+        InvoiceReceivedAmount: data.InvoiceReceivedAmount ?? 0,
+        InvoiceTerms: data.InvoiceTerms || null,
+        InvoiceModifiedAt: serverTimestamp(),
+      };
+
+      if (oldInvoiceData.InvoiceClientId !== updatedInvoice.InvoiceClientId) {
+        //*Update the balance of old client
+        const oldBalanceAmount =
+          (oldInvoiceData.InvoiceTotalAmount || 0) -
+          (oldInvoiceData.InvoiceReceivedAmount || 0);
+        const oldClientRef = doc(
+          db,
+          CollectionName.clients,
+          oldInvoiceData.InvoiceClientId
+        );
+        const oldClientSnapshot = await transaction.get(oldClientRef);
+        const oldClientData = oldClientSnapshot.data() as IClientsCollection;
+
+        transaction.update(oldClientRef, {
+          ClientBalance: oldClientData.ClientBalance - oldBalanceAmount,
+        });
+
+        //*Update the balance of new client
+        const newBalanceAmount =
+          (data.InvoiceTotalAmount || 0) - (data.InvoiceReceivedAmount || 0);
+
+        const clientRef = doc(db, CollectionName.clients, data.InvoiceClientId);
+        const snapshot = await transaction.get(clientRef);
+        const client = snapshot.data() as IClientsCollection;
+
+        transaction.update(clientRef, {
+          ClientBalance: client.ClientBalance + newBalanceAmount,
+        });
+      } else {
+        const newBalanceAmount =
+          (data.InvoiceTotalAmount || 0) - (data.InvoiceReceivedAmount || 0);
+
+        const oldBalanceAmount =
+          (oldInvoiceData.InvoiceTotalAmount || 0) -
+          (oldInvoiceData.InvoiceReceivedAmount || 0);
+
+        const clientRef = doc(db, CollectionName.clients, data.InvoiceClientId);
+        const snapshot = await transaction.get(clientRef);
+        const client = snapshot.data() as IClientsCollection;
+
+        transaction.update(clientRef, {
+          ClientBalance:
+            client.ClientBalance - oldBalanceAmount + newBalanceAmount,
+        });
+      }
+
+      //* Update the invoice
+      transaction.update(invoiceRef, updatedInvoice);
     });
   };
 
