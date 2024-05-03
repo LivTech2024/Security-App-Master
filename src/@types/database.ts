@@ -408,6 +408,7 @@ export interface IEmployeeDARCollection {
     TileContent: string;
     TileTime: string;
     TileImages: string[];
+    TileLocation: string;
   }[];
   EmpDarCreatedAt: Timestamp | FieldValue;
 }

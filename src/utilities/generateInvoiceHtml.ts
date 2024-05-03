@@ -44,6 +44,7 @@ export async function generateInvoiceHTML({
         <style>
           body {
             font-family: Arial, sans-serif;
+            padding:20px;
           }
           .invoice-details {
             display: flex;
@@ -69,8 +70,9 @@ export async function generateInvoiceHTML({
          
         <img src="${
           companyDetails.CompanyLogo
-        }" style="width:100px;" alt="Company Logo">
-          <div>
+        }" style="width:140px; object-fit: cover;" alt="Company Logo">
+
+          <div style="text-align: end;">
             <p>${companyDetails.CompanyName}</p>
             <p>${companyDetails.CompanyPhone}</p>
             <p>${companyDetails.CompanyEmail}</p>
@@ -81,9 +83,9 @@ export async function generateInvoiceHTML({
           <div>
             <p>Customer Name: ${invoiceData.InvoiceClientName}</p>
             <p>Customer Phone: ${invoiceData.InvoiceClientPhone}</p>
-            <p>Customer Address: ${invoiceData.InvoiceClientAddress}</p>
+            ${invoiceData.InvoiceClientAddress ? '<p>Customer Address: ${invoiceData.InvoiceClientAddress}</p>' : ''}
           </div>
-          <div>
+          <div style="text-align: end;">
             <p>Invoice Number: ${invoiceData.InvoiceNumber}</p>
             <p>Invoice Date: ${formatDate(invoiceData.InvoiceDate)}</p>
             <p>Invoice Due Date: ${formatDate(invoiceData.InvoiceDueDate)}</p>

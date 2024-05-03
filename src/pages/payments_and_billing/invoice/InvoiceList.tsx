@@ -24,9 +24,10 @@ import { numberFormatter } from '../../../utilities/NumberFormater';
 import { MdOutlinePrint } from 'react-icons/md';
 import { errorHandler } from '../../../utilities/CustomError';
 import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils';
-import { htmlStringToPdf } from '../../../utilities/htmlStringToPdf';
 import { generateInvoiceHTML } from '../../../utilities/generateInvoiceHtml';
 import DbClient from '../../../firebase_configs/DB/DbClient';
+import { htmlToPdf } from '../../../API/HtmlToPdf';
+import PageHeader from '../../../common/PageHeader';
 
 const InvoiceList = () => {
   const navigate = useNavigate();
@@ -135,7 +136,25 @@ const InvoiceList = () => {
         clientBalance: clientData.ClientBalance,
       });
 
-      await htmlStringToPdf('invoice.pdf', html);
+      const response = await htmlToPdf({ file_name: 'invoice.pdf', html });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+
+      // Create a link element
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+
+      const invName = 'invoice.pdf';
+
+      link.download = invName; // Specify the filename for the downloaded file
+
+      // Append the link to the body
+      document.body.appendChild(link);
+
+      // Trigger a click on the link to start the download
+      link.click();
+
+      // Remove the link from the DOM
+      document.body.removeChild(link);
 
       closeModalLoader();
     } catch (error) {
@@ -147,15 +166,17 @@ const InvoiceList = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Invoices</span>
-        <Button
-          type="black"
-          label="Generate new invoice"
-          onClick={() => navigate(PageRoutes.INVOICE_GENERATE)}
-          className="px-4 py-2"
-        />
-      </div>
+      <PageHeader
+        title="Invoices"
+        rightSection={
+          <Button
+            type="black"
+            label="Generate new invoice"
+            onClick={() => navigate(PageRoutes.INVOICE_GENERATE)}
+            className="px-4 py-2"
+          />
+        }
+      />
       <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
         <DateFilterDropdown
           endDate={endDate}
@@ -188,7 +209,7 @@ const InvoiceList = () => {
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={5}>
+              <td colSpan={6}>
                 <NoSearchResult />
               </td>
             </tr>
@@ -229,7 +250,7 @@ const InvoiceList = () => {
             })
           )}
           <tr ref={ref}>
-            <td colSpan={5}>
+            <td colSpan={6}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />

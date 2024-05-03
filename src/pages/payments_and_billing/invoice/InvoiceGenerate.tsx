@@ -25,6 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../../@types/enum';
 import useFetchClients from '../../../hooks/fetch/useFetchClients';
 import InputAutoComplete from '../../../common/inputs/InputAutocomplete';
+import PageHeader from '../../../common/PageHeader';
 
 const numberToString = (value: number) => {
   return String(value) as unknown as number;
@@ -204,16 +205,18 @@ const InvoiceGenerate = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Create new invoice</span>
+      <PageHeader
+        title="Create new invoice"
+        rightSection={
+          <Button
+            label="Save"
+            onClick={methods.handleSubmit(onSubmit)}
+            type="black"
+            className="px-6 py-2"
+          />
+        }
+      />
 
-        <Button
-          label="Save"
-          onClick={methods.handleSubmit(onSubmit)}
-          type="black"
-          className="px-6 py-2"
-        />
-      </div>
       <FormProvider {...methods}>
         <form
           onSubmit={methods.handleSubmit(onSubmit)}

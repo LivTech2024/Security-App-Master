@@ -9,11 +9,12 @@ export const htmlToPdf = ({
   html: string;
   file_name: string;
 }) => {
-  return axios.post<{ html: string; file_name: string }>(
+  return axios.post(
     `${baseUrl}/api/html_to_pdf`,
     {
       html,
       file_name,
-    }
+    },
+    { responseType: 'blob' }
   );
 };
