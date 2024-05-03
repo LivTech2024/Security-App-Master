@@ -10,6 +10,7 @@ import NoSearchResult from '../../../common/NoSearchResult';
 import { formatDate, toDate } from '../../../utilities/misc';
 import TableShimmer from '../../../common/shimmer/TableShimmer';
 import DbEmployee from '../../../firebase_configs/DB/DbEmployee';
+import PageHeader from '../../../common/PageHeader';
 
 interface ShiftsCollection
   extends Omit<IShiftsCollection, 'ShiftAssignedUserId'> {
@@ -108,9 +109,7 @@ const ClientShifts = () => {
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Shifts</span>
-      </div>
+      <PageHeader title="Shifts" />
 
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">

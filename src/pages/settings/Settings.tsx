@@ -2,13 +2,13 @@ import { Tabs } from '@mantine/core';
 import CompanyInfo from '../../component/settings/CompanyInfo';
 import AdminInfo from '../../component/settings/AdminInfo';
 import AccountSettings from '../../component/settings/AccountSettings';
+import PageHeader from '../../common/PageHeader';
 
 const account_settings = () => {
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Settings</span>
-      </div>
+      <PageHeader title="Settings" />
+
       <Tabs defaultValue="company_info">
         <Tabs.List justify="center">
           <Tabs.Tab

@@ -5,6 +5,7 @@ import Button from '../../common/button/Button';
 import GeneratePaystubModal from '../../component/payments_and_billing/modal/GeneratePaystubModal';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../@types/enum';
+import PageHeader from '../../common/PageHeader';
 
 const PaymentsAndBilling = () => {
   const [generatePaystubModal, setGeneratePaystubModal] = useState(false);
@@ -12,9 +13,7 @@ const PaymentsAndBilling = () => {
   const navigate = useNavigate();
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Payments and billing</span>
-      </div>
+      <PageHeader title="Payments and billing" />
 
       <GeneratePaystubModal
         opened={generatePaystubModal}

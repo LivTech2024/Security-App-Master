@@ -3,7 +3,7 @@ import { useJsApiLoader } from '@react-google-maps/api';
 import AddLocationModal from '../../component/locations/modal/AddLocationModal';
 import { useAuthState, useEditFormStore } from '../../store';
 import { useDebouncedValue } from '@mantine/hooks';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import {
   DisplayCount,
   MinimumQueryCharacter,
@@ -15,16 +15,10 @@ import { ILocationsCollection } from '../../@types/database';
 import { useInView } from 'react-intersection-observer';
 import NoSearchResult from '../../common/NoSearchResult';
 import TableShimmer from '../../common/shimmer/TableShimmer';
-import { FaRegTrashAlt } from 'react-icons/fa';
-import {
-  closeModalLoader,
-  showModalLoader,
-  showSnackbar,
-} from '../../utilities/TsxUtils';
-import { errorHandler } from '../../utilities/CustomError';
-import { openContextModal } from '@mantine/modals';
 import { Library } from '@googlemaps/js-api-loader';
 import { Location } from '../../store/slice/editForm.slice';
+import PageHeader from '../../common/PageHeader';
+import Button from '../../common/button/Button';
 
 const libraries: Library[] = ['places'];
 
@@ -116,32 +110,6 @@ const Locations = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
-  const queryClient = useQueryClient();
-
-  //* For deleting location
-  const onDelete = async (locId: string) => {
-    if (!company) return;
-    try {
-      showModalLoader({});
-
-      await DbCompany.deleteLocation(locId);
-
-      await queryClient.invalidateQueries({
-        queryKey: [REACT_QUERY_KEYS.LOCATION_LIST],
-      });
-
-      closeModalLoader();
-      showSnackbar({
-        message: 'Location deleted successfully',
-        type: 'success',
-      });
-    } catch (error) {
-      errorHandler(error);
-      closeModalLoader();
-      console.log(error);
-    }
-  };
-
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_JAVASCRIPT_API,
@@ -151,19 +119,20 @@ const Locations = () => {
   if (isLoaded)
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
-        <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-          <span className="font-semibold text-xl">Locations</span>
+        <PageHeader
+          title="Add Location"
+          rightSection={
+            <Button
+              label="Add Location"
+              onClick={() => {
+                setLocationAddModal(true);
+                setLocationEditData(null);
+              }}
+              type="black"
+            />
+          }
+        />
 
-          <button
-            onClick={() => {
-              setLocationAddModal(true);
-              setLocationEditData(null);
-            }}
-            className="bg-primary text-surface px-4 py-2 rounded"
-          >
-            Add Location
-          </button>
-        </div>
         <div className="hidden">
           <AddLocationModal
             opened={locationAddModal}
@@ -174,7 +143,7 @@ const Locations = () => {
         <table className="rounded overflow-hidden w-full">
           <thead className="bg-primary text-surface text-sm">
             <tr>
-              <th className="uppercase px-4 py-2 w-[25%] text-start">
+              <th className="uppercase px-4 py-2 w-[20%] text-start">
                 Location Name
               </th>
               <th className="uppercase px-4 py-2 w-[30%] text-start">
@@ -184,7 +153,6 @@ const Locations = () => {
               <th className="uppercase px-4 py-2 w-[20%] text-end">
                 Longitude
               </th>
-              <th className="uppercase px-4 py-2 w-[5%] text-end"></th>
             </tr>
           </thead>
           <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -218,30 +186,6 @@ const Locations = () => {
                     </td>
                     <td className="px-4 py-2 align-top text-end">
                       {loc.LocationCoordinates.longitude}
-                    </td>
-                    <td className="px-4 py-2 align-top text-end justify-end flex">
-                      <FaRegTrashAlt
-                        onClick={() => {
-                          openContextModal({
-                            modal: 'confirmModal',
-                            withCloseButton: false,
-                            centered: true,
-                            closeOnClickOutside: true,
-                            innerProps: {
-                              title: 'Confirm',
-                              body: 'Are you sure to delete this location',
-                              onConfirm: () => {
-                                onDelete(loc.LocationId);
-                              },
-                            },
-                            size: '30%',
-                            styles: {
-                              body: { padding: '0px' },
-                            },
-                          });
-                        }}
-                        className="cursor-pointer text-lg hover:scale-105 text-textPrimaryRed"
-                      />
                     </td>
                   </tr>
                 );

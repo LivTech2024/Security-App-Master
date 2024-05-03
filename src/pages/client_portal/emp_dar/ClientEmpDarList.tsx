@@ -18,6 +18,7 @@ import NoSearchResult from '../../../common/NoSearchResult';
 import { useNavigate } from 'react-router-dom';
 import { formatDate } from '../../../utilities/misc';
 import TableShimmer from '../../../common/shimmer/TableShimmer';
+import PageHeader from '../../../common/PageHeader';
 
 const ClientEmpDarList = () => {
   const navigate = useNavigate();
@@ -117,9 +118,7 @@ const ClientEmpDarList = () => {
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Reports</span>
-      </div>
+      <PageHeader title="Reports" />
 
       <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
         <SearchBar

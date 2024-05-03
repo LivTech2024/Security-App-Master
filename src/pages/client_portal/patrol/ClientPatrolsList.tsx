@@ -13,6 +13,7 @@ import { IPatrolsCollection } from '../../../@types/database';
 import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import PatrolListTable from '../../../component/patrolling/PatrolListTable';
+import PageHeader from '../../../common/PageHeader';
 
 const ClientPatrolsList = () => {
   const { client } = useAuthState();
@@ -95,9 +96,7 @@ const ClientPatrolsList = () => {
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Patrols</span>
-      </div>
+      <PageHeader title="Patrols" />
 
       <PatrolListTable
         data={data}

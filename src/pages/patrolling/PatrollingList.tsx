@@ -14,6 +14,8 @@ import { DocumentData } from 'firebase/firestore';
 import { IPatrolsCollection } from '../../@types/database';
 import { useInView } from 'react-intersection-observer';
 import PatrolListTable from '../../component/patrolling/PatrolListTable';
+import PageHeader from '../../common/PageHeader';
+import Button from '../../common/button/Button';
 
 export const PatrolStatus = ({
   status,
@@ -131,19 +133,19 @@ const PatrollingList = () => {
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Patrolling</span>
-
-        <button
-          onClick={() => {
-            setPatrolEditData(null);
-            navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT);
-          }}
-          className="bg-primary text-surface px-4 py-2 rounded"
-        >
-          Create Patrolling
-        </button>
-      </div>
+      <PageHeader
+        title="Patrolling"
+        rightSection={
+          <Button
+            label="Create Patrolling"
+            onClick={() => {
+              setPatrolEditData(null);
+              navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT);
+            }}
+            type="black"
+          />
+        }
+      />
 
       <PatrolListTable
         data={data}

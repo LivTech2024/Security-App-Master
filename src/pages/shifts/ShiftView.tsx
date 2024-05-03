@@ -7,10 +7,10 @@ import { Shift } from '../../store/slice/editForm.slice';
 import DbShift from '../../firebase_configs/DB/DbShift';
 import NoSearchResult from '../../common/NoSearchResult';
 import { PageRoutes } from '../../@types/enum';
-import { IoArrowBackCircle } from 'react-icons/io5';
 import Button from '../../common/button/Button';
 import ShiftViewCard from '../../component/shifts/ShiftViewCard';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
+import PageHeader from '../../common/PageHeader';
 
 const ShiftView = () => {
   const { setShiftEditData } = useEditFormStore();
@@ -79,17 +79,8 @@ const ShiftView = () => {
   if (loading) {
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6 animate-pulse">
-        <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-          <div
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-4 cursor-pointer "
-          >
-            <div className="cursor-pointer">
-              <IoArrowBackCircle className="h-6 w-6" />
-            </div>
-            <div className="font-semibold text-lg">Shift data</div>
-          </div>
-        </div>
+        <PageHeader title="Shift data" />
+
         <div className="h-[40vh] bg-shimmerColor w-full"></div>
       </div>
     );
@@ -98,30 +89,24 @@ const ShiftView = () => {
   if (data)
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
-        <div className="flex justify-between w-full p-4 rounded bg-primaryGold  items-center">
-          <div
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-4 cursor-pointer "
-          >
-            <div className="cursor-pointer">
-              <IoArrowBackCircle className="h-6 w-6" />
-            </div>
-            <div className="font-semibold text-lg">Shift data</div>
-          </div>
-          <Button
-            type="black"
-            onClick={() => {
-              setShiftEditData(
-                firebaseDataToObject(
-                  data as unknown as Record<string, unknown>
-                ) as unknown as Shift
-              );
-              navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
-            }}
-            className="bg-primary text-surface px-4 py-2 rounded"
-            label="Edit Shift"
-          />
-        </div>
+        <PageHeader
+          title="Shift data"
+          rightSection={
+            <Button
+              type="black"
+              onClick={() => {
+                setShiftEditData(
+                  firebaseDataToObject(
+                    data as unknown as Record<string, unknown>
+                  ) as unknown as Shift
+                );
+                navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
+              }}
+              className="bg-primary text-surface px-4 py-2 rounded"
+              label="Edit Shift"
+            />
+          }
+        />
 
         <ShiftViewCard
           data={data}

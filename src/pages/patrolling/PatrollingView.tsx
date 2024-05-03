@@ -77,9 +77,8 @@ const PatrollingView = () => {
   if (isPatrolLoading) {
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6 animate-pulse">
-        <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-          <span className="font-semibold text-xl">Patrolling data</span>
-        </div>
+        <PageHeader title="Patrolling data" />
+
         <div className="h-[40vh] bg-shimmerColor w-full"></div>
       </div>
     );

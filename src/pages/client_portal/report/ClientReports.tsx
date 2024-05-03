@@ -15,6 +15,7 @@ import ReportListTable from '../../../component/report/ReportListTable';
 import DateFilterDropdown from '../../../common/dropdown/DateFilterDropdown';
 import SearchBar from '../../../common/inputs/SearchBar';
 import { useDebouncedValue } from '@mantine/hooks';
+import PageHeader from '../../../common/PageHeader';
 
 const ClientReports = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -113,9 +114,7 @@ const ClientReports = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Reports</span>
-      </div>
+      <PageHeader title="Reports" />
 
       <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
         <SearchBar

@@ -4,6 +4,7 @@ import AddBranchModal from '../../component/company_branches/modal/AddBranchModa
 import { useAuthState, useEditFormStore } from '../../store';
 import NoSearchResult from '../../common/NoSearchResult';
 import { CompanyBranches as ICompanyBranches } from '../../store/slice/auth.slice';
+import PageHeader from '../../common/PageHeader';
 
 const CompanyBranches = () => {
   const [addBranchModal, setAddBranchModal] = useState(false);
@@ -12,10 +13,9 @@ const CompanyBranches = () => {
   const { setCompanyBranchEditData } = useEditFormStore();
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Company Branches</span>
-
-        <div className="flex items-center gap-4">
+      <PageHeader
+        title="Company Branches"
+        rightSection={
           <Button
             type="black"
             label="Create New Branch"
@@ -25,8 +25,9 @@ const CompanyBranches = () => {
             }}
             className="px-4 py-2"
           />
-        </div>
-      </div>
+        }
+      />
+
       <AddBranchModal opened={addBranchModal} setOpened={setAddBranchModal} />
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">

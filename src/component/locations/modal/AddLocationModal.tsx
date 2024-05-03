@@ -71,6 +71,8 @@ const AddLocationModal = ({
     resetForm();
   }, [opened, isEdit, locationEditData]);
 
+  const [loading, setLoading] = useState(false);
+
   const onSubmit = async () => {
     if (!locationName) {
       showSnackbar({ message: 'Please enter location name', type: 'error' });
@@ -86,7 +88,7 @@ const AddLocationModal = ({
     }
     if (!company) return;
     try {
-      showModalLoader({});
+      setLoading(true);
 
       const formattedCoordinates = {
         lat: Number(coordinates.lat),
@@ -112,14 +114,14 @@ const AddLocationModal = ({
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.LOCATION_LIST],
       });
-      closeModalLoader();
+      setLoading(false);
       resetForm();
       setOpened(false);
 
       showSnackbar({ message: 'Location added successfully', type: 'success' });
     } catch (error) {
       errorHandler(error);
-      closeModalLoader();
+      setLoading(false);
       console.log(error);
     }
   };
@@ -127,7 +129,7 @@ const AddLocationModal = ({
   const onDelete = async () => {
     if (!company || !isEdit) return;
     try {
-      showModalLoader({});
+      setLoading(true);
 
       await DbCompany.deleteLocation(locationEditData.LocationId);
 
@@ -135,7 +137,7 @@ const AddLocationModal = ({
         queryKey: [REACT_QUERY_KEYS.LOCATION_LIST],
       });
 
-      closeModalLoader();
+      setLoading(false);
       resetForm();
       setOpened(false);
       showSnackbar({
@@ -144,10 +146,19 @@ const AddLocationModal = ({
       });
     } catch (error) {
       errorHandler(error);
-      closeModalLoader();
+      setLoading(false);
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
   return (
     <Dialog
       opened={opened}

@@ -21,6 +21,7 @@ import AddEquipmentModal from '../../component/equipment_management/modal/AddEqu
 import EquipAllocationModal from '../../component/equipment_management/modal/EquipAllocationModal';
 import { numberFormatter } from '../../utilities/NumberFormater';
 import { useNavigate } from 'react-router-dom';
+import PageHeader from '../../common/PageHeader';
 
 const EquipmentList = () => {
   const navigate = useNavigate();
@@ -120,27 +121,30 @@ const EquipmentList = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Equipment Management</span>
-        <div className="flex items-center gap-4">
-          <Button
-            label="Allot Equipment"
-            onClick={() => {
-              setEquipAllocationModal(true);
-            }}
-            type="blue"
-            className="px-6"
-          />
-          <Button
-            label="Create New Equipment"
-            onClick={() => {
-              setEquipmentEditData(null);
-              setAddEquipmentModal(true);
-            }}
-            type="black"
-          />
-        </div>
-      </div>
+      <PageHeader
+        title="Equipment Management"
+        rightSection={
+          <div className="flex items-center gap-4">
+            <Button
+              label="Allot Equipment"
+              onClick={() => {
+                setEquipAllocationModal(true);
+              }}
+              type="blue"
+              className="px-6"
+            />
+            <Button
+              label="Create New Equipment"
+              onClick={() => {
+                setEquipmentEditData(null);
+                setAddEquipmentModal(true);
+              }}
+              type="black"
+            />
+          </div>
+        }
+      />
+
       <div className="flex items-center bg-surface shadow p-4 rounded w-full justify-between">
         <SearchBar
           value={query}

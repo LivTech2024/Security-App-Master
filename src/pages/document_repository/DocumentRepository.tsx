@@ -23,6 +23,7 @@ import DocumentCategoriesModal from '../../component/document_repository/modal/D
 import InputSelect from '../../common/inputs/InputSelect';
 import AddDocumentModal from '../../component/document_repository/modal/AddDocumentModal';
 import { IDocument } from '../../store/slice/editForm.slice';
+import PageHeader from '../../common/PageHeader';
 
 const DocumentRepository = () => {
   const { company } = useAuthState();
@@ -148,24 +149,26 @@ const DocumentRepository = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Document Repository</span>
-        <div className="flex items-center gap-4">
-          <Button
-            label="Document Categories"
-            onClick={() => setDocumentCategoriesModal(true)}
-            type="blue"
-          />
-          <Button
-            label="Add New Document"
-            onClick={() => {
-              setDocumentEditData(null);
-              setAddDocumentModal(true);
-            }}
-            type="black"
-          />
-        </div>
-      </div>
+      <PageHeader
+        title="Document Repository"
+        rightSection={
+          <div className="flex items-center gap-4">
+            <Button
+              label="Document Categories"
+              onClick={() => setDocumentCategoriesModal(true)}
+              type="blue"
+            />
+            <Button
+              label="Add New Document"
+              onClick={() => {
+                setDocumentEditData(null);
+                setAddDocumentModal(true);
+              }}
+              type="black"
+            />
+          </div>
+        }
+      />
 
       <DocumentCategoriesModal
         opened={documentCategoriesModal}

@@ -14,6 +14,7 @@ import Button from '../../common/button/Button';
 import ReportCategoriesModal from '../../component/report/modal/ReportCategoriesModal';
 import ReportListTable from '../../component/report/ReportListTable';
 import ReportListMenu from '../../component/report/ReportListMenu';
+import PageHeader from '../../common/PageHeader';
 
 const Reports = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -148,14 +149,17 @@ const Reports = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Reports</span>
-        <Button
-          label="Report Categories"
-          onClick={() => setReportCategoriesModal(true)}
-          type="black"
-        />
-      </div>
+      <PageHeader
+        title="Reports"
+        rightSection={
+          <Button
+            label="Report Categories"
+            onClick={() => setReportCategoriesModal(true)}
+            type="black"
+          />
+        }
+      />
+
       <ReportCategoriesModal
         opened={reportCategoriesModal}
         setOpened={setReportCategoriesModal}

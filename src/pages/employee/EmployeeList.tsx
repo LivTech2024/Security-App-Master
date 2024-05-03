@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import SearchBar from '../../common/inputs/SearchBar';
 import SelectBranch from '../../common/SelectBranch';
 import empDefaultPlaceHolder from '../../../public/assets/avatar.png';
+import PageHeader from '../../common/PageHeader';
 
 const EmployeeList = () => {
   const navigate = useNavigate();
@@ -119,27 +120,28 @@ const EmployeeList = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Employees</span>
-
-        <div className="flex items-center gap-4">
-          <Button
-            type="blue"
-            label="Create Employee Role"
-            onClick={() => setAddEmployeeRoleModal(true)}
-            className="px-4 py-2"
-          />
-          <button
-            onClick={() => {
-              setEmployeeEditData(null);
-              navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT);
-            }}
-            className="bg-primary text-surface px-4 py-2 rounded"
-          >
-            Create Employee
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Employees"
+        rightSection={
+          <div className="flex items-center gap-4">
+            <Button
+              type="blue"
+              label="Create Employee Role"
+              onClick={() => setAddEmployeeRoleModal(true)}
+              className="px-4 py-2"
+            />
+            <button
+              onClick={() => {
+                setEmployeeEditData(null);
+                navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT);
+              }}
+              className="bg-primary text-surface px-4 py-2 rounded"
+            >
+              Create Employee
+            </button>
+          </div>
+        }
+      />
 
       <div className="flex items-center bg-surface shadow p-4 rounded w-full justify-between">
         <SearchBar

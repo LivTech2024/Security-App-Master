@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { IoArrowBackCircle } from 'react-icons/io5';
 import Button from '../../common/button/Button';
 import { useEditFormStore } from '../../store';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -15,6 +14,7 @@ import {
 } from '../../utilities/misc';
 import { numberFormatter } from '../../utilities/NumberFormater';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
+import PageHeader from '../../common/PageHeader';
 
 const ClientView = () => {
   const { setClientEditData } = useEditFormStore();
@@ -111,17 +111,8 @@ const ClientView = () => {
   if (loading) {
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6 ">
-        <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-          <div
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-4 cursor-pointer "
-          >
-            <div className="cursor-pointer">
-              <IoArrowBackCircle className="h-6 w-6" />
-            </div>
-            <div className="font-semibold text-lg">Client data</div>
-          </div>
-        </div>
+        <PageHeader title="Client data" />
+
         <div className="h-[40vh] bg-shimmerColor w-full animate-pulse"></div>
       </div>
     );
@@ -130,26 +121,20 @@ const ClientView = () => {
   if (data)
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
-        <div className="flex justify-between w-full p-4 rounded bg-primaryGold  items-center">
-          <div
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-4 cursor-pointer "
-          >
-            <div className="cursor-pointer">
-              <IoArrowBackCircle className="h-6 w-6" />
-            </div>
-            <div className="font-semibold text-lg">Client data</div>
-          </div>
-          <Button
-            type="black"
-            onClick={() => {
-              setClientEditData(data as unknown as Client);
-              navigate(PageRoutes.CLIENT_CREATE_OR_EDIT);
-            }}
-            className="bg-primary text-surface px-4 py-2 rounded"
-            label="Edit Client"
-          />
-        </div>
+        <PageHeader
+          title="Client data"
+          rightSection={
+            <Button
+              type="black"
+              onClick={() => {
+                setClientEditData(data as unknown as Client);
+                navigate(PageRoutes.CLIENT_CREATE_OR_EDIT);
+              }}
+              className="bg-primary text-surface px-4 py-2 rounded"
+              label="Edit Client"
+            />
+          }
+        />
 
         {/* <div className="bg-surface shadow-md rounded-lg p-4 flex gap-4">
           <DateFilterDropdown

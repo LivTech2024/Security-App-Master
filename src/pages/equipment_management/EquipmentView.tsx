@@ -1,5 +1,4 @@
-import { IoArrowBackCircle } from 'react-icons/io5';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Button from '../../common/button/Button';
 import { useEditFormStore } from '../../store';
 import { useEffect, useState } from 'react';
@@ -26,6 +25,7 @@ import {
 } from '../../utilities/TsxUtils';
 import { errorHandler } from '../../utilities/CustomError';
 import { openContextModal } from '@mantine/modals';
+import PageHeader from '../../common/PageHeader';
 
 export interface EquipmentAllocations extends IEquipmentAllocations {
   EquipmentAllocationEmpEmail: string;
@@ -34,8 +34,6 @@ export interface EquipmentAllocations extends IEquipmentAllocations {
 }
 
 const EquipmentView = () => {
-  const navigate = useNavigate();
-
   const [searchParam] = useSearchParams();
 
   const equipId = searchParam.get('id');
@@ -188,17 +186,8 @@ const EquipmentView = () => {
 
   if (loading) {
     <div className="flex flex-col w-full h-full p-6 gap-6 ">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <div
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-4 cursor-pointer "
-        >
-          <div className="cursor-pointer">
-            <IoArrowBackCircle className="h-6 w-6" />
-          </div>
-          <div className="font-semibold text-lg">Equipment data</div>
-        </div>
-      </div>
+      <PageHeader title="Equipment data" />
+
       <div className="h-[40vh] bg-shimmerColor w-full animate-pulse"></div>
     </div>;
   }
@@ -206,26 +195,20 @@ const EquipmentView = () => {
   if (equipmentData)
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
-        <div className="flex justify-between w-full p-4 rounded bg-primaryGold  items-center">
-          <div
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-4 cursor-pointer "
-          >
-            <div className="cursor-pointer">
-              <IoArrowBackCircle className="h-6 w-6" />
-            </div>
-            <div className="font-semibold text-lg">Equipment data</div>
-          </div>
-          <Button
-            type="black"
-            onClick={() => {
-              setEquipmentEditData(equipmentData as unknown as Equipment);
-              setAddEquipmentModal(true);
-            }}
-            className="bg-primary text-surface px-4 py-2 rounded"
-            label="Edit Equipment"
-          />
-        </div>
+        <PageHeader
+          title="Equipment data"
+          rightSection={
+            <Button
+              type="black"
+              onClick={() => {
+                setEquipmentEditData(equipmentData as unknown as Equipment);
+                setAddEquipmentModal(true);
+              }}
+              className="bg-primary text-surface px-4 py-2 rounded"
+              label="Edit Equipment"
+            />
+          }
+        />
 
         <AddEquipmentModal
           opened={addEquipmentModal}

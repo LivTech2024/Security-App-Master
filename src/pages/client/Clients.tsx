@@ -19,6 +19,7 @@ import TableShimmer from '../../common/shimmer/TableShimmer';
 import { numberFormatter } from '../../utilities/NumberFormater';
 import { useNavigate } from 'react-router-dom';
 import { formatDate } from '../../utilities/misc';
+import PageHeader from '../../common/PageHeader';
 
 const Clients = () => {
   const { company } = useAuthState();
@@ -110,10 +111,9 @@ const Clients = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Clients</span>
-
-        <div className="flex items-center gap-4">
+      <PageHeader
+        title="Clients"
+        rightSection={
           <Button
             type="black"
             label="Create new client"
@@ -123,8 +123,8 @@ const Clients = () => {
             }}
             className="px-4 py-2"
           />
-        </div>
-      </div>
+        }
+      />
 
       <div className="flex items-center bg-surface shadow p-4 rounded w-full justify-between">
         <SearchBar

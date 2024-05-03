@@ -8,6 +8,8 @@ import { useInView } from 'react-intersection-observer';
 import { useAuthState, useEditFormStore } from '../../store';
 import { useNavigate } from 'react-router-dom';
 import ShiftListTable from '../../component/shifts/ShiftListTable';
+import PageHeader from '../../common/PageHeader';
+import Button from '../../common/button/Button';
 
 const ShiftList = () => {
   const { setShiftEditData } = useEditFormStore();
@@ -85,18 +87,19 @@ const ShiftList = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">Shifts</span>
-        <button
-          onClick={() => {
-            setShiftEditData(null);
-            navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
-          }}
-          className="bg-primary text-surface px-4 py-2 rounded"
-        >
-          Create Shift
-        </button>
-      </div>
+      <PageHeader
+        title="Shifts"
+        rightSection={
+          <Button
+            label="Create Shift"
+            type="black"
+            onClick={() => {
+              setShiftEditData(null);
+              navigate(PageRoutes.SHIFT_CREATE_OR_EDIT);
+            }}
+          />
+        }
+      />
 
       <ShiftListTable
         data={data}

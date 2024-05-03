@@ -16,6 +16,7 @@ import { formatDate } from '../../utilities/misc';
 import { PatrolStatus } from '../../component/patrolling/PatrolStatus';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import { useAuthState } from '../../store';
+import PageHeader from '../../common/PageHeader';
 
 const PatrolLogs = () => {
   const { company, admin } = useAuthState();
@@ -133,12 +134,8 @@ const PatrolLogs = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <div className="flex justify-between w-full p-4 rounded bg-primaryGold text-surface items-center">
-        <span className="font-semibold text-xl">
-          Patrol Logs{' : '}
-          <span className="italic">{patrolData?.PatrolName}</span>
-        </span>
-      </div>
+      <PageHeader title={`Patrol Logs : ${patrolData?.PatrolName}`} />
+
       <div className="flex justify-between w-full p-4 rounded bg-surface shadow items-center">
         <DateFilterDropdown
           endDate={endDate}
