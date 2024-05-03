@@ -263,10 +263,10 @@ const InvoiceGenerate = () => {
           <div className="flex flex-col gap-4 bg-surface shadow rounded p-4">
             <div className="font-semibold">Enter items details</div>
             <div className="grid grid-cols-4 gap-4 bg-onHoverBg p-2 rounded">
-              <div className="font-semibold">Item name</div>
-              <div className="font-semibold">Item quantity</div>
-              <div className="font-semibold">Item price</div>
-              <div className="font-semibold">Total amount</div>
+              <div className="font-semibold">Description</div>
+              <div className="font-semibold">Quantity</div>
+              <div className="font-semibold">Rate</div>
+              <div className="font-semibold">Amount</div>
             </div>
             {invoiceItems.map((item, index) => (
               <div key={index} className="grid grid-cols-4 gap-4">
@@ -282,7 +282,7 @@ const InvoiceGenerate = () => {
                   />
                   <InputWithTopHeader
                     className="mx-0 w-full"
-                    placeholder="Item Name"
+                    placeholder="Description"
                     value={item.ItemDescription}
                     onChange={(e) =>
                       handleItemChange(index, 'ItemDescription', e.target.value)
