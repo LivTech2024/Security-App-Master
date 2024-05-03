@@ -24,6 +24,7 @@ import {
 import { errorHandler } from '../../utilities/CustomError';
 import { openContextModal } from '@mantine/modals';
 import { Library } from '@googlemaps/js-api-loader';
+import { Location } from '../../store/slice/editForm.slice';
 
 const libraries: Library[] = ['places'];
 
@@ -196,7 +197,14 @@ const Locations = () => {
             ) : (
               data.map((loc) => {
                 return (
-                  <tr key={loc.LocationId} className="">
+                  <tr
+                    onClick={() => {
+                      setLocationEditData(loc as unknown as Location);
+                      setLocationAddModal(true);
+                    }}
+                    key={loc.LocationId}
+                    className="cursor-pointer"
+                  >
                     <td className="px-4 py-2 align-top text-start">
                       {loc.LocationName}
                     </td>

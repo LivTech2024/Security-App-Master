@@ -34,8 +34,8 @@ const AddLocationModal = ({
   const [locationName, setLocationName] = useState('');
   const [address, setAddress] = useState('');
   const [coordinates, setCoordinates] = useState<{
-    lat: null | number;
-    lng: null | number;
+    lat: null | string;
+    lng: null | string;
   }>({ lat: null, lng: null });
 
   const handleSelect = async (selectedAddress: string) => {
@@ -44,7 +44,7 @@ const AddLocationModal = ({
       const results = await geocodeByAddress(selectedAddress);
       const latLng = await getLatLng(results[0]);
       const { lat, lng } = latLng;
-      setCoordinates({ lat, lng });
+      setCoordinates({ lat: String(lat), lng: String(lng) });
     } catch (error) {
       console.error('Error selecting address', error);
     }
@@ -63,8 +63,8 @@ const AddLocationModal = ({
       setAddress(locationEditData.LocationAddress);
       setLocationName(locationEditData.LocationName);
       setCoordinates({
-        lat: locationEditData.LocationCoordinates.latitude,
-        lng: locationEditData.LocationCoordinates.longitude,
+        lat: String(locationEditData.LocationCoordinates.latitude),
+        lng: String(locationEditData.LocationCoordinates.longitude),
       });
       return;
     }
@@ -78,23 +78,34 @@ const AddLocationModal = ({
     if (!address) {
       showSnackbar({ message: 'Please enter address', type: 'error' });
     }
+    if (!coordinates.lat || !coordinates.lng) {
+      showSnackbar({
+        message: 'Please enter latitude and longitude',
+        type: 'error',
+      });
+    }
     if (!company) return;
     try {
       showModalLoader({});
+
+      const formattedCoordinates = {
+        lat: Number(coordinates.lat),
+        lng: Number(coordinates.lng),
+      };
 
       if (isEdit) {
         await DbCompany.updateLocation(
           locationEditData.LocationId,
           locationName,
           address,
-          coordinates
+          formattedCoordinates
         );
       } else {
         await DbCompany.addLocation(
           company.CompanyId,
           locationName,
           address,
-          coordinates
+          formattedCoordinates
         );
       }
 
@@ -231,14 +242,28 @@ const AddLocationModal = ({
         <div className="flex items-center gap-4 w-full">
           <InputWithTopHeader
             className="mx-0 w-full"
-            disabled
             value={coordinates.lat || ''}
+            onChange={(e) =>
+              setCoordinates((prev) => {
+                return {
+                  ...prev,
+                  lat: e.target.value,
+                };
+              })
+            }
             label="Latitude"
           />
           <InputWithTopHeader
             className="mx-0 w-full"
-            disabled
             value={coordinates.lng || ''}
+            onChange={(e) =>
+              setCoordinates((prev) => {
+                return {
+                  ...prev,
+                  lng: e.target.value,
+                };
+              })
+            }
             label="Longitude"
           />
         </div>
