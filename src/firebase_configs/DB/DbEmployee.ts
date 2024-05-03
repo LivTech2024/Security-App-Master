@@ -5,7 +5,6 @@ import {
   collection,
   deleteDoc,
   doc,
-  endAt,
   getDoc,
   getDocs,
   limit,
@@ -15,7 +14,6 @@ import {
   serverTimestamp,
   setDoc,
   startAfter,
-  startAt,
   updateDoc,
   where,
 } from 'firebase/firestore';
@@ -714,7 +712,6 @@ class DbEmployee {
     return snapshot.data() as IEmployeesCollection;
   };
 
-  //! Todo
   static getEmpDars = ({
     cmpId,
     lastDoc,
@@ -722,7 +719,7 @@ class DbEmployee {
     endDate,
     isLifeTime,
     startDate,
-    searchQuery,
+    empId,
   }: {
     cmpId: string;
     lastDoc?: DocumentData | null;
@@ -730,7 +727,7 @@ class DbEmployee {
     startDate?: Date | string | null;
     endDate?: Date | string | null;
     isLifeTime?: boolean;
-    searchQuery?: string | null;
+    empId?: string;
   }) => {
     const reportRef = collection(db, CollectionName.employeesDAR);
 
@@ -739,21 +736,16 @@ class DbEmployee {
       orderBy('EmpDarDate', 'desc'),
     ];
 
-    if (searchQuery && searchQuery.length > 0) {
-      queryParams = [
-        ...queryParams,
-        orderBy('EmpDarTitle', 'asc'),
-        startAt(searchQuery),
-        endAt(searchQuery + '\uF8FF'),
-      ];
-    }
-
     if (!isLifeTime) {
       queryParams = [
         ...queryParams,
         where('EmpDarDate', '>=', startDate),
         where('EmpDarDate', '<=', endDate),
       ];
+    }
+
+    if (empId) {
+      queryParams = [...queryParams, where('EmpDarEmpId', '==', empId)];
     }
 
     if (lastDoc) {
