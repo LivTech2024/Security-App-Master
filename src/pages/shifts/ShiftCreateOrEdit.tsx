@@ -104,7 +104,12 @@ const ShiftCreateOrEdit = () => {
   );
 
   const [shiftTasks, setShiftTasks] = useState<ShiftTask[]>([
-    { TaskName: '', TaskQrCodeRequired: false, TaskReturnReq: false },
+    {
+      TaskName: '',
+      TaskQrCodeRequired: false,
+      TaskReturnReq: false,
+      TaskId: '',
+    },
   ]);
 
   const [selectedDays, setSelectedDays] = useState<Date[]>([]);
@@ -233,6 +238,7 @@ const ShiftCreateOrEdit = () => {
               TaskName: task.ShiftTask,
               TaskQrCodeRequired: task.ShiftTaskQrCodeReq,
               TaskReturnReq: task.ShiftTaskReturnReq,
+              TaskId: task.ShiftTaskId,
             };
           })
         );

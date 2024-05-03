@@ -5,6 +5,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  endAt,
   getDoc,
   getDocs,
   limit,
@@ -14,6 +15,7 @@ import {
   serverTimestamp,
   setDoc,
   startAfter,
+  startAt,
   updateDoc,
   where,
 } from 'firebase/firestore';
@@ -710,6 +712,61 @@ class DbEmployee {
     const snapshot = await getDoc(empRef);
 
     return snapshot.data() as IEmployeesCollection;
+  };
+
+  //! Todo
+  static getEmpDars = ({
+    cmpId,
+    lastDoc,
+    lmt,
+    endDate,
+    isLifeTime,
+    startDate,
+    searchQuery,
+  }: {
+    cmpId: string;
+    lastDoc?: DocumentData | null;
+    lmt?: number;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+    searchQuery?: string | null;
+  }) => {
+    const reportRef = collection(db, CollectionName.employeesDAR);
+
+    let queryParams: QueryConstraint[] = [
+      where('EmpDarCompanyId', '==', cmpId),
+      orderBy('EmpDarDate', 'desc'),
+    ];
+
+    if (searchQuery && searchQuery.length > 0) {
+      queryParams = [
+        ...queryParams,
+        orderBy('EmpDarTitle', 'asc'),
+        startAt(searchQuery),
+        endAt(searchQuery + '\uF8FF'),
+      ];
+    }
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('EmpDarDate', '>=', startDate),
+        where('EmpDarDate', '<=', endDate),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const empQuery = query(reportRef, ...queryParams);
+
+    return getDocs(empQuery);
   };
 
   static getEmpDarById = (darId: string) => {

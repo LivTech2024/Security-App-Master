@@ -109,6 +109,8 @@ export const PageRoutes = {
   SHIFT_CREATE_OR_EDIT: '/shift_create_or_edit',
   EMPLOYEE_LIST: '/employee_list',
   EMPLOYEE_CREATE_OR_EDIT: '/employee_create_or_edit',
+  EMPLOYEE_DAR_LIST: '/employee_dar_list',
+  EMPLOYEE_DAR_VIEW: '/employee_dar_view',
   SCHEDULES: '/schedules',
   PATROLLING_LIST: '/patrolling_list',
   PATROLLING_LOGS: '/patrolling_logs',

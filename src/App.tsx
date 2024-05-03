@@ -61,6 +61,8 @@ import VisitorView from './pages/visitor_management/VisitorView';
 import KeyList from './pages/key_management/KeyList';
 import KeyView from './pages/key_management/KeyView';
 import TimeAndAttendance from './pages/time_and_attendance/TimeAndAttendance';
+import EmpDarList from './pages/employee_dar/EmpDarList';
+import EmpDarView from './pages/employee_dar/EmpDarView';
 
 function App() {
   useOnAuthStateChanged();
@@ -197,18 +199,23 @@ function App() {
           <ToastContainer />
           <Routes>
             <Route path={PageRoutes.HOME} Component={Home} />
+
+            <Route path={PageRoutes.SCHEDULES} Component={Schedule} />
             <Route path={PageRoutes.SHIFT_LIST} Component={ShiftList} />
             <Route
               path={PageRoutes.SHIFT_CREATE_OR_EDIT}
               Component={ShiftCreateOrEdit}
             />
             <Route path={PageRoutes.SHIFT_VIEW} Component={ShiftView} />
+
             <Route path={PageRoutes.EMPLOYEE_LIST} Component={EmployeeList} />
             <Route
               path={PageRoutes.EMPLOYEE_CREATE_OR_EDIT}
               Component={EmployeeCreateOrEdit}
             />
-            <Route path={PageRoutes.SCHEDULES} Component={Schedule} />
+
+            <Route path={PageRoutes.EMPLOYEE_DAR_LIST} Component={EmpDarList} />
+            <Route path={PageRoutes.EMPLOYEE_DAR_VIEW} Component={EmpDarView} />
 
             <Route
               path={PageRoutes.PATROLLING_LIST}

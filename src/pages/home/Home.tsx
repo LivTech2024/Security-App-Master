@@ -4,6 +4,7 @@ import {
   MdOutlineSensors,
   MdPeople,
 } from 'react-icons/md';
+import { LuActivitySquare } from 'react-icons/lu';
 import { useAuthState } from '../../store';
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineAudit, AiOutlineSchedule } from 'react-icons/ai';
@@ -109,6 +110,11 @@ const Home = () => {
           path={PageRoutes.EMPLOYEE_LIST}
           icon={<MdPeople className="text-4xl text-primaryGold" />}
           name="Employee Management"
+        />
+        <HomeItem
+          path={PageRoutes.EMPLOYEE_DAR_LIST}
+          icon={<LuActivitySquare className="text-4xl text-primaryGold" />}
+          name="Employee DAR"
         />
         <HomeItem
           path={PageRoutes.REPORTS}

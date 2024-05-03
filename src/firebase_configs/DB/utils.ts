@@ -29,6 +29,12 @@ class CloudStorageImageHandler {
     return `${id}_${name}.jpg`;
   };
 
+  static generateImageNameWithRandom = (id: string, index: number) => {
+    const random = Math.floor(Math.random() * (9999 - 1111 + 1)) + 1111;
+    const ms = new Date().getMilliseconds();
+    return id + index + random + ms + '.pdf';
+  };
+
   static deleteImageByUrl = (url: string) => {
     const imgRef = ref(storage, url);
     return deleteObject(imgRef);

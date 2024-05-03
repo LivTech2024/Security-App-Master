@@ -21,7 +21,7 @@ import { CollectionName } from '../../@types/enum';
 import { db } from '../config';
 import CloudStorageImageHandler, { getNewDocId } from './utils';
 import { IShiftTasksChild, IShiftsCollection } from '../../@types/database';
-import { removeTimeFromDate } from '../../utilities/misc';
+import { getRandomNumbers, removeTimeFromDate } from '../../utilities/misc';
 import { AddShiftFormFields } from '../../utilities/zod/schema';
 import { ShiftTask } from '../../component/shifts/ShiftTaskForm';
 import { generateBarcodesAndDownloadPDF } from '../../utilities/generateBarcodesAndDownloadPdf';
@@ -41,8 +41,11 @@ class DbShift {
       shiftTasks = [];
       tasks.map((task, idx) => {
         if (task.TaskName && task.TaskName.length > 0) {
+          const random = getRandomNumbers();
+          const shiftTaskId = `${shiftId}${random}${idx}`;
+
           shiftTasks.push({
-            ShiftTaskId: `${shiftId}${idx}`,
+            ShiftTaskId: shiftTaskId,
             ShiftTask: task.TaskName,
             ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
             ShiftTaskReturnReq: task.TaskReturnReq,
@@ -128,8 +131,15 @@ class DbShift {
 
       tasks.map((task, idx) => {
         if (task.TaskName && task.TaskName.length > 0) {
+          let shiftTaskId = task.TaskId;
+
+          if (!shiftTaskId) {
+            const random = getRandomNumbers();
+            shiftTaskId = `${shiftId}${random}${idx}`;
+          }
+
           shiftTasks.push({
-            ShiftTaskId: `${shiftId}${idx}`,
+            ShiftTaskId: shiftTaskId,
             ShiftTask: task.TaskName,
             ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
             ShiftTaskReturnReq: task.TaskReturnReq,

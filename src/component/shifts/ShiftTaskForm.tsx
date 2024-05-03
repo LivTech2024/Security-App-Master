@@ -7,6 +7,7 @@ export interface ShiftTask {
   TaskName: string;
   TaskQrCodeRequired: boolean;
   TaskReturnReq: boolean;
+  TaskId: string | null;
 }
 
 interface Props {
@@ -22,6 +23,7 @@ const ShiftTaskForm: React.FC<Props> = ({ tasks, setTasks }) => {
         TaskName: '',
         TaskQrCodeRequired: false,
         TaskReturnReq: false,
+        TaskId: '',
       },
     ]);
   };
