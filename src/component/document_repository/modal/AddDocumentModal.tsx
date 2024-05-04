@@ -3,11 +3,7 @@ import Dialog from '../../../common/Dialog';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import InputSelect from '../../../common/inputs/InputSelect';
 import { IDocumentCategories } from '../../../@types/database';
-import {
-  closeModalLoader,
-  showModalLoader,
-  showSnackbar,
-} from '../../../utilities/TsxUtils';
+import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils';
 import DbCompany from '../../../firebase_configs/DB/DbCompany';
 import { useAuthState, useEditFormStore } from '../../../store';
 import CustomError, { errorHandler } from '../../../utilities/CustomError';
@@ -37,13 +33,6 @@ const AddDocumentModal = ({
   const [loading, setLoading] = useState(false);
 
   const handlePdfChange = (file: File) => {
-    if (file.size > 200000) {
-      showSnackbar({
-        message: 'File size must be less than 200kb',
-        type: 'error',
-      });
-      return;
-    }
     setDocument(file);
   };
 
