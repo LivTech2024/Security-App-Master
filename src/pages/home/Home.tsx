@@ -194,7 +194,7 @@ const Home = () => {
           icon={<AiOutlineAudit className="text-2xl text-primaryGold" />}
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.PERFORMANCE_ASSURANCE}
           name="Performance Assurance"
           icon={<MdAssuredWorkload className="text-2xl text-primaryGold" />}
         />

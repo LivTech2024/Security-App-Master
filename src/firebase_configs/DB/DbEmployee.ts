@@ -803,6 +803,41 @@ class DbEmployee {
 
     return getDocs(shiftQuery);
   };
+
+  static getEmpPatrolLogs = ({
+    empId,
+    endDate,
+    startDate,
+    lastDoc,
+    lmt,
+  }: {
+    empId: string;
+    startDate: Date | string | null;
+    endDate: Date | string | null;
+    lastDoc?: DocumentData | null;
+    lmt?: number | null;
+  }) => {
+    const patrolLogRef = collection(db, CollectionName.patrolLogs);
+
+    let queryParams: QueryConstraint[] = [
+      where('PatrolLogGuardId', '==', empId),
+      where('PatrolDate', '>=', dayjs(startDate).startOf('day').toDate()),
+      where('PatrolDate', '<=', dayjs(endDate).endOf('day').toDate()),
+      orderBy('PatrolDate', 'desc'),
+    ];
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const patrolLogQuery = query(patrolLogRef, ...queryParams);
+
+    return getDocs(patrolLogQuery);
+  };
 }
 
 export default DbEmployee;

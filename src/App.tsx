@@ -63,6 +63,7 @@ import KeyView from './pages/key_management/KeyView';
 import TimeAndAttendance from './pages/time_and_attendance/TimeAndAttendance';
 import EmpDarList from './pages/employee_dar/EmpDarList';
 import EmpDarView from './pages/employee_dar/EmpDarView';
+import PerformanceAssurance from './pages/performance_assurance/PerformanceAssurance';
 
 function App() {
   useOnAuthStateChanged();
@@ -279,6 +280,11 @@ function App() {
             <Route
               path={PageRoutes.TIME_AND_ATTENDANCE}
               Component={TimeAndAttendance}
+            />
+
+            <Route
+              path={PageRoutes.PERFORMANCE_ASSURANCE}
+              Component={PerformanceAssurance}
             />
           </Routes>
         </Layout>
