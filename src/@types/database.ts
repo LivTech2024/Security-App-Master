@@ -400,9 +400,7 @@ export interface IEmployeeDARCollection {
   EmpDarShiftId: string;
   EmpDarCompanyId: string;
   EmpDarCompanyBranchId: string | null;
-  EmpDarTitle: string;
   EmpDarMedias: string[];
-  EmpDarData: string; //* Content of DAR
   EmpDarDate: Timestamp | FieldValue; //* Same as Shift Date
   EmpDarTile: {
     TileContent: string;
