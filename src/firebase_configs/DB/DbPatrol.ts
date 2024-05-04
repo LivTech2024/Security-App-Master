@@ -25,7 +25,7 @@ import {
   IPatrolsCollection,
 } from '../../@types/database';
 import { PatrollingFormFields } from '../../utilities/zod/schema';
-import { generateBarcodesAndDownloadPDF } from '../../utilities/generateBarcodesAndDownloadPdf';
+import { generateBarcodesAndDownloadPDF } from '../../utilities/pdf/generateBarcodesAndDownloadPdf';
 import {
   fullTextSearchIndex,
   getRandomNumbers,

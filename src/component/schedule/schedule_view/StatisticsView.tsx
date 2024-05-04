@@ -12,7 +12,7 @@ import SelectBranch from '../../../common/SelectBranch';
 import dayjs from 'dayjs';
 import { numberFormatter } from '../../../utilities/NumberFormater';
 import Button from '../../../common/button/Button';
-import { generateStatsViewHtml } from '../../../utilities/genrateStatsViewHtml';
+import { generateStatsViewHtml } from '../../../utilities/pdf/genrateStatsViewHtml';
 import { htmlStringToPdf } from '../../../utilities/htmlStringToPdf';
 
 const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {

@@ -1,5 +1,5 @@
 import QRCode from 'qrcode';
-import { htmlStringToPdf } from './htmlStringToPdf';
+import { htmlStringToPdf } from '../htmlStringToPdf';
 
 interface QrCodeData {
   code: string;

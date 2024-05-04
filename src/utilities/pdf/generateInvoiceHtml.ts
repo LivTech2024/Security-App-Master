@@ -1,7 +1,7 @@
-import { IInvoicesCollection } from '../@types/database';
-import { Company } from '../store/slice/auth.slice';
-import { numberFormatter } from './NumberFormater';
-import { formatDate } from './misc';
+import { IInvoicesCollection } from '../../@types/database';
+import { Company } from '../../store/slice/auth.slice';
+import { numberFormatter } from '../NumberFormater';
+import { formatDate } from '../misc';
 
 interface GenerateInvoiceHTMLArgs {
   invoiceData: IInvoicesCollection;

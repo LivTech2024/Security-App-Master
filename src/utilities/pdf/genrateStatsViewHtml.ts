@@ -1,4 +1,4 @@
-import { formatDate } from './misc';
+import { formatDate } from '../misc';
 
 export const generateStatsViewHtml = (
   shiftsSummary: JSX.Element,

@@ -8,7 +8,7 @@ import {
   showModalLoader,
   showSnackbar,
 } from '../../../utilities/TsxUtils';
-import { getPaystubHtml } from '../../../utilities/getPaystubHtml';
+import { getPaystubHtml } from '../../../utilities/pdf/getPaystubHtml';
 import { useAuthState } from '../../../store';
 import dayjs from 'dayjs';
 import { errorHandler } from '../../../utilities/CustomError';

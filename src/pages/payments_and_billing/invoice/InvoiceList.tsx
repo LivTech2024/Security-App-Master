@@ -24,7 +24,7 @@ import { numberFormatter } from '../../../utilities/NumberFormater';
 import { MdOutlinePrint } from 'react-icons/md';
 import { errorHandler } from '../../../utilities/CustomError';
 import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils';
-import { generateInvoiceHTML } from '../../../utilities/generateInvoiceHtml';
+import { generateInvoiceHTML } from '../../../utilities/pdf/generateInvoiceHtml';
 import DbClient from '../../../firebase_configs/DB/DbClient';
 import { htmlToPdf } from '../../../API/HtmlToPdf';
 import PageHeader from '../../../common/PageHeader';

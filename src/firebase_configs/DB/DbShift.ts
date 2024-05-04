@@ -24,7 +24,7 @@ import { IShiftTasksChild, IShiftsCollection } from '../../@types/database';
 import { getRandomNumbers, removeTimeFromDate } from '../../utilities/misc';
 import { AddShiftFormFields } from '../../utilities/zod/schema';
 import { ShiftTask } from '../../component/shifts/ShiftTaskForm';
-import { generateBarcodesAndDownloadPDF } from '../../utilities/generateBarcodesAndDownloadPdf';
+import { generateBarcodesAndDownloadPDF } from '../../utilities/pdf/generateBarcodesAndDownloadPdf';
 
 class DbShift {
   static addShift = async (
