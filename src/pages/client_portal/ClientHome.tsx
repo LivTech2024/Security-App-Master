@@ -5,6 +5,7 @@ import { FaBell, FaCommentDots } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { TbReport } from 'react-icons/tb';
 import { AiOutlineSchedule } from 'react-icons/ai';
+import { LuActivitySquare } from 'react-icons/lu';
 
 const HomeItem = ({
   name,
@@ -50,7 +51,7 @@ const ClientHome = () => {
       }}
       className="flex flex-col w-full p-12 items-center gap-10 h-[calc(100vh-40px)] justify-center "
     >
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
         <HomeItem
           //isAlertIconReq={true}
           path={PageRoutes.CLIENT_PORTAL_PATROLS}
@@ -66,6 +67,11 @@ const ClientHome = () => {
           path={PageRoutes.CLIENT_PORTAL_REPORTS}
           icon={<TbReport className="text-3xl text-primaryGold" />}
           name="Reports"
+        />
+        <HomeItem
+          path={PageRoutes.CLIENT_PORTAL_EMP_DAR_LIST}
+          icon={<LuActivitySquare className="text-4xl text-primaryGold" />}
+          name="Employee DAR"
         />
         <HomeItem
           path={PageRoutes.CLIENT_PORTAL_MESSAGING}

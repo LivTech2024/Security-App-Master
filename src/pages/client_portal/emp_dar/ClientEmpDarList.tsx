@@ -1,4 +1,3 @@
-import { useDebouncedValue } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import { useAuthState } from '../../../store';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -12,13 +11,12 @@ import { IEmployeeDARCollection } from '../../../@types/database';
 import DbClient from '../../../firebase_configs/DB/DbClient';
 import dayjs from 'dayjs';
 import { useInView } from 'react-intersection-observer';
-import SearchBar from '../../../common/inputs/SearchBar';
-import DateFilterDropdown from '../../../common/dropdown/DateFilterDropdown';
 import NoSearchResult from '../../../common/NoSearchResult';
 import { useNavigate } from 'react-router-dom';
 import { formatDate } from '../../../utilities/misc';
 import TableShimmer from '../../../common/shimmer/TableShimmer';
 import PageHeader from '../../../common/PageHeader';
+import EmpDarListMenus from '../../../component/emp_dar/EmpDarListMenus';
 
 const ClientEmpDarList = () => {
   const navigate = useNavigate();
@@ -33,11 +31,9 @@ const ClientEmpDarList = () => {
 
   const [isLifeTime, setIsLifeTime] = useState(false);
 
+  const [selectedEmpId, setSelectedEmpId] = useState('');
+
   const { client } = useAuthState();
-
-  const [query, setQuery] = useState('');
-
-  const [debouncedQuery] = useDebouncedValue(query, 200);
 
   const {
     data: snapshotData,
@@ -54,7 +50,7 @@ const ClientEmpDarList = () => {
       isLifeTime,
       startDate,
       endDate,
-      debouncedQuery,
+      selectedEmpId,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbClient.getClientEmpDar({
@@ -64,7 +60,7 @@ const ClientEmpDarList = () => {
         isLifeTime,
         startDate,
         endDate,
-        searchQuery: debouncedQuery,
+        empId: selectedEmpId,
       });
       return snapshot.docs;
     },
@@ -118,41 +114,32 @@ const ClientEmpDarList = () => {
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <PageHeader title="Reports" />
-
-      <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
-        <SearchBar
-          value={query}
-          setValue={setQuery}
-          placeholder="Search report by name"
-        />
-        <DateFilterDropdown
-          endDate={endDate}
-          isLifetime={isLifeTime}
-          setEndDate={setEndDate}
-          setIsLifetime={setIsLifeTime}
-          setStartDate={setStartDate}
-          startDate={startDate}
-        />
-      </div>
+      <PageHeader title="Employees daily activity report" />
+      <EmpDarListMenus
+        endDate={endDate}
+        isLifeTime={isLifeTime}
+        setEndDate={setEndDate}
+        setIsLifeTime={setIsLifeTime}
+        setStartDate={setStartDate}
+        startDate={startDate}
+        selectedEmpId={selectedEmpId}
+        setSelectedEmpId={setSelectedEmpId}
+      />
 
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
             <th className="uppercase px-4 py-2 w-[15%] text-start">
-              Report Title
-            </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">
               Employee Name
             </th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">Date</th>
-            <th className="uppercase px-4 py-2 w-[55%] text-end">Data</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">Location</th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={4}>
+              <td colSpan={3}>
                 <NoSearchResult />
               </td>
             </tr>
@@ -169,9 +156,6 @@ const ClientEmpDarList = () => {
                     )
                   }
                 >
-                  <td className="align-top px-4 py-2 text-start">
-                    <span className="line-clamp-2">{dar.EmpDarTitle}</span>
-                  </td>
                   <td className="align-top px-4 py-2 text-start capitalize">
                     <span className="line-clamp-2">{dar.EmpDarEmpName}</span>
                   </td>
@@ -182,14 +166,16 @@ const ClientEmpDarList = () => {
                     </span>
                   </td>
                   <td className="align-top px-4 py-2 text-end">
-                    <span className="line-clamp-2">{dar.EmpDarData}</span>
+                    <span className="line-clamp-2">
+                      {dar.EmpDarLocationName}
+                    </span>
                   </td>
                 </tr>
               );
             })
           )}
           <tr ref={ref}>
-            <td colSpan={4}>
+            <td colSpan={3}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />

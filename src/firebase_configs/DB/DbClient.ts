@@ -517,16 +517,17 @@ class DbClient {
 
     let queryParams: QueryConstraint[] = [
       where('ReportClientId', '==', clientId),
-      orderBy('ReportCreatedAt', 'desc'),
-      orderBy('ReportName', 'asc'),
     ];
 
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [
         ...queryParams,
+        orderBy('ReportName'),
         startAt(searchQuery),
         endAt(searchQuery + '\uF8FF'),
       ];
+    } else {
+      queryParams = [...queryParams, orderBy('ReportCreatedAt', 'desc')];
     }
 
     if (categoryId) {
@@ -643,6 +644,7 @@ class DbClient {
     isLifeTime,
     startDate,
     searchQuery,
+    empId,
   }: {
     clientId: string;
     lastDoc?: DocumentData | null;
@@ -651,6 +653,7 @@ class DbClient {
     endDate?: Date | string | null;
     isLifeTime?: boolean;
     searchQuery?: string | null;
+    empId?: string | null;
   }) => {
     const reportRef = collection(db, CollectionName.employeesDAR);
 
@@ -674,6 +677,10 @@ class DbClient {
         where('EmpDarDate', '>=', startDate),
         where('EmpDarDate', '<=', endDate),
       ];
+    }
+
+    if (empId) {
+      queryParams = [...queryParams, where('EmpDarEmpId', '==', empId)];
     }
 
     if (lastDoc) {
