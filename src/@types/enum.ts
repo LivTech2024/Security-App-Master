@@ -46,6 +46,7 @@ export const DisplayCount = {
   VISITOR_LIST: 20,
   KEY_LIST: 20,
   KEY_ALLOCATION: 20,
+  TASK_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -69,6 +70,7 @@ export const REACT_QUERY_KEYS = {
   VISITOR_LIST: 'visitor-list',
   KEY_LIST: 'key-list',
   KEY_ALLOCATION: 'key-allocation',
+  TASK_LIST: 'task-list',
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -80,6 +82,7 @@ export const MinimumQueryCharacter = {
   EQUIPMENT: 1,
   EMP_DAR: 1,
   KEY: 1,
+  TASK_LIST: 1,
 } as const;
 
 export const CloudStoragePaths = {
