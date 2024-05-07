@@ -482,3 +482,30 @@ export interface IKeyAllocations {
   KeyAllocationReturnedAt?: Timestamp | FieldValue;
   KeyAllocationCreatedAt: Timestamp | FieldValue;
 }
+
+export interface ITasksCollection {
+  TaskId: string;
+  TaskDescription: string;
+  TaskStartDate: Timestamp | FieldValue;
+  TaskForDays: number;
+
+  //* Either task will be alloted to location
+  TaskAllotedLocationId?: string | null;
+
+  //* Or it will be alloted directly to emp
+  TaskAllotedToEmpIds?: string[] | null;
+  TaskIsAllotedToAllEmps?: boolean;
+  TaskCreatedAt: Timestamp | FieldValue;
+}
+
+//* A log will be generated for each employee when he start/completes the task
+export interface ITaskLogsCollection {
+  TaskLogId: string;
+  TaskId: string;
+  TaskLogEmpId: string;
+  TaskLogEmpName: string;
+  TaskLogComment?: string | null;
+  TaskLogStatus: 'pending' | 'completed';
+  TaskLogCompletionTime: Timestamp | FieldValue;
+  TaskLogCreatedAt: Timestamp | FieldValue;
+}
