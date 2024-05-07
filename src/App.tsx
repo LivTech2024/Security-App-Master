@@ -64,6 +64,8 @@ import TimeAndAttendance from './pages/time_and_attendance/TimeAndAttendance';
 import EmpDarList from './pages/employee_dar/EmpDarList';
 import EmpDarView from './pages/employee_dar/EmpDarView';
 import PerformanceAssurance from './pages/performance_assurance/PerformanceAssurance';
+import TaskList from './pages/task_and_tracking/TaskList';
+import TaskLogs from './pages/task_and_tracking/TaskLogs';
 
 function App() {
   useOnAuthStateChanged();
@@ -285,6 +287,15 @@ function App() {
             <Route
               path={PageRoutes.PERFORMANCE_ASSURANCE}
               Component={PerformanceAssurance}
+            />
+
+            <Route
+              path={PageRoutes.TASK_AND_TRACKING_LIST}
+              Component={TaskList}
+            />
+            <Route
+              path={PageRoutes.TASK_AND_TRACKING_LOGS}
+              Component={TaskLogs}
             />
           </Routes>
         </Layout>

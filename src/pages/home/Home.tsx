@@ -199,7 +199,7 @@ const Home = () => {
           icon={<MdAssuredWorkload className="text-2xl text-primaryGold" />}
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.TASK_AND_TRACKING_LIST}
           name="Task assignment and tracking"
           icon={<FaTasks className="text-2xl text-primaryGold" />}
         />

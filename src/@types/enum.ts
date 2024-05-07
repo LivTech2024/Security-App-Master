@@ -138,6 +138,8 @@ export const PageRoutes = {
   MESSAGING: '/messaging',
   TIME_AND_ATTENDANCE: '/time_and_attendance',
   PERFORMANCE_ASSURANCE: '/performance_assurance',
+  TASK_AND_TRACKING_LIST: '/task_and_tracking_list',
+  TASK_AND_TRACKING_LOGS: '/task_and_tracking_logs',
   CLIENT_PORTAL_HOME: '/client_portal/',
   CLIENT_PORTAL_PATROLS: '/client_portal/patrols',
   CLIENT_PORTAL_PATROL_LOGS: '/client_portal/patrol_logs',
