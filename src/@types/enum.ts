@@ -24,6 +24,8 @@ export enum CollectionName {
   visitors = 'Visitors',
   keys = 'Keys',
   keyAllocations = 'KeyAllocations',
+  tasks = 'Tasks',
+  taskLogs = 'TaskLogs',
 }
 
 export const DisplayCount = {

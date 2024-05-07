@@ -17,6 +17,7 @@ import {
   ILocationsCollection,
   IReportCategoriesCollection,
   ISettingsCollection,
+  ITasksCollection,
 } from '../../@types/database';
 import {
   doc,
@@ -43,9 +44,11 @@ import {
   CompanyBranchFormFields,
   CompanyCreateFormFields,
   SettingsFormFields,
+  TaskFormFields,
 } from '../../utilities/zod/schema';
 import CustomError from '../../utilities/CustomError';
 import dayjs from 'dayjs';
+import { Timestamp } from 'firebase/firestore';
 
 class DbCompany {
   static createCompany = async (
@@ -826,6 +829,41 @@ class DbCompany {
   static getVisitorById = (visitorId: string) => {
     const visitorDocRef = doc(db, CollectionName.visitors, visitorId);
     return getDoc(visitorDocRef);
+  };
+
+  static createNewTask = (cmpId: string, data: TaskFormFields) => {
+    const taskId = getNewDocId(CollectionName.tasks);
+    const taskRef = doc(db, CollectionName.tasks, taskId);
+
+    let newTask: ITasksCollection = {
+      TaskId: taskId,
+      TaskCompanyId: cmpId,
+      TaskDescription: data.TaskDescription,
+      TaskStartDate: data.TaskStartDate as unknown as Timestamp,
+      TaskForDays: data.TaskForDays,
+      TaskCreatedAt: serverTimestamp(),
+    };
+
+    if (data.TaskAllotedLocationId && data.TaskAllotedLocationId.length > 0) {
+      newTask = {
+        ...newTask,
+        TaskAllotedLocationId: data.TaskAllotedLocationId,
+      };
+    } else {
+      if (data.TaskAllotedToEmpIds) {
+        newTask = {
+          ...newTask,
+          TaskAllotedToEmpIds: data.TaskAllotedToEmpIds,
+        };
+      } else {
+        newTask = {
+          ...newTask,
+          TaskIsAllotedToAllEmps: true,
+        };
+      }
+    }
+
+    return setDoc(taskRef, newTask);
   };
 }
 

@@ -363,3 +363,39 @@ export const settingsSchema = z.object({
 });
 
 export type SettingsFormFields = z.infer<typeof settingsSchema>;
+
+//*Task Schema
+export const taskSchema = z
+  .object({
+    TaskCompanyBranchId: z.string().nullable().optional(),
+    TaskDescription: z.string().min(1),
+    TaskStartDate: z.date(),
+    TaskForDays: z.coerce.number().min(1),
+    TaskAllotedLocationId: z.string().nullable().optional(),
+    TaskAllotedToEmpIds: z.array(z.string()).nullable().optional(),
+    TaskIsAllotedToAllEmps: z.boolean().nullable().optional(),
+  })
+  .superRefine(
+    (
+      { TaskAllotedLocationId, TaskAllotedToEmpIds, TaskIsAllotedToAllEmps },
+      ctx
+    ) => {
+      if (
+        !TaskAllotedLocationId &&
+        (!TaskAllotedToEmpIds || TaskAllotedToEmpIds.length === 0) &&
+        !TaskIsAllotedToAllEmps
+      ) {
+        ctx.addIssue({
+          path: [
+            'TaskAllotedLocationId',
+            'TaskAllotedToEmpIds',
+            'TaskIsAllotedToAllEmps',
+          ],
+          message: `Please allot this task to either location or employees`,
+          code: 'custom',
+        });
+      }
+    }
+  );
+
+export type TaskFormFields = z.infer<typeof taskSchema>;

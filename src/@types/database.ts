@@ -485,15 +485,13 @@ export interface IKeyAllocations {
 
 export interface ITasksCollection {
   TaskId: string;
+  TaskCompanyId: string;
+  TaskCompanyBranchId?: string | null;
   TaskDescription: string;
   TaskStartDate: Timestamp | FieldValue;
   TaskForDays: number;
-
-  //* Either task will be alloted to location
-  TaskAllotedLocationId?: string | null;
-
-  //* Or it will be alloted directly to emp
-  TaskAllotedToEmpIds?: string[] | null;
+  TaskAllotedLocationId?: string | null; //* Either task will be alloted to location
+  TaskAllotedToEmpIds?: string[] | null; //* Or it will be alloted directly to emp
   TaskIsAllotedToAllEmps?: boolean;
   TaskCreatedAt: Timestamp | FieldValue;
 }
