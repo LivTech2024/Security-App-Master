@@ -17,6 +17,7 @@ import {
   ILocationsCollection,
   IReportCategoriesCollection,
   ISettingsCollection,
+  ITaskLogsCollection,
   ITasksCollection,
 } from '../../@types/database';
 import {
@@ -48,7 +49,7 @@ import {
 } from '../../utilities/zod/schema';
 import CustomError from '../../utilities/CustomError';
 import dayjs from 'dayjs';
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp, endAt, startAt } from 'firebase/firestore';
 
 class DbCompany {
   static createCompany = async (
@@ -838,6 +839,7 @@ class DbCompany {
     let newTask: ITasksCollection = {
       TaskId: taskId,
       TaskCompanyId: cmpId,
+      TaskCompanyBranchId: data.TaskCompanyBranchId,
       TaskDescription: data.TaskDescription,
       TaskStartDate: data.TaskStartDate as unknown as Timestamp,
       TaskForDays: data.TaskForDays,
@@ -864,6 +866,106 @@ class DbCompany {
     }
 
     return setDoc(taskRef, newTask);
+  };
+
+  static updateTask = (taskId: string, data: TaskFormFields) => {
+    const taskRef = doc(db, CollectionName.tasks, taskId);
+
+    let updatedTask: Partial<ITasksCollection> = {
+      TaskId: taskId,
+      TaskCompanyBranchId: data.TaskCompanyBranchId,
+      TaskDescription: data.TaskDescription,
+      TaskStartDate: data.TaskStartDate as unknown as Timestamp,
+      TaskForDays: data.TaskForDays,
+    };
+
+    if (data.TaskAllotedLocationId && data.TaskAllotedLocationId.length > 0) {
+      updatedTask = {
+        ...updatedTask,
+        TaskAllotedLocationId: data.TaskAllotedLocationId,
+      };
+    } else {
+      if (data.TaskAllotedToEmpIds) {
+        updatedTask = {
+          ...updatedTask,
+          TaskAllotedToEmpIds: data.TaskAllotedToEmpIds,
+        };
+      } else {
+        updatedTask = {
+          ...updatedTask,
+          TaskIsAllotedToAllEmps: true,
+        };
+      }
+    }
+
+    return updateDoc(taskRef, updatedTask);
+  };
+
+  static deleteTask = async (taskId: string) => {
+    await runTransaction(db, async (transaction) => {
+      const taskRef = doc(db, CollectionName.tasks, taskId);
+
+      //* Fetch all the task logs and delete it before deleting task
+      const taskLogRef = collection(db, CollectionName.taskLogs);
+      const taskLogQuery = query(taskLogRef, where('TaskId', '==', taskId));
+      const taskLogSnapshot = await getDocs(taskLogQuery);
+
+      taskLogSnapshot.forEach((docs) => {
+        const { TaskLogId } = docs.data() as ITaskLogsCollection;
+        const taskLogRef = doc(db, CollectionName.taskLogs, TaskLogId);
+        transaction.delete(taskLogRef);
+      });
+
+      transaction.delete(taskRef);
+    });
+  };
+
+  static getTasks = async ({
+    lmt,
+    lastDoc,
+    cmpId,
+    cmpBranchId,
+    searchQuery,
+  }: {
+    lmt?: number;
+    lastDoc?: DocumentData | null;
+    cmpId: string;
+    cmpBranchId?: string | null;
+    searchQuery?: string | null;
+  }) => {
+    const taskRef = collection(db, CollectionName.tasks);
+
+    let queryParams: QueryConstraint[] = [where('TaskCompanyId', '==', cmpId)];
+
+    if (searchQuery && searchQuery.length > 0) {
+      queryParams = [
+        ...queryParams,
+        orderBy('TaskDescription'),
+        startAt(searchQuery),
+        endAt(searchQuery + '\uF8FF'),
+      ];
+    } else {
+      queryParams = [...queryParams, orderBy('TaskCreatedAt', 'desc')];
+    }
+
+    if (cmpBranchId && cmpBranchId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where('TaskCompanyBranchId', '==', cmpBranchId),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const taskQuery = query(taskRef, ...queryParams);
+
+    return getDocs(taskQuery);
   };
 }
 
