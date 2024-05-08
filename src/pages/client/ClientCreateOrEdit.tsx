@@ -18,11 +18,7 @@ import { openContextModal } from '@mantine/modals';
 import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
 import { ChangeEvent, useEffect, useState } from 'react';
-import InputDate from '../../common/inputs/InputDate';
-import { removeTimeFromDate, toDate } from '../../utilities/misc';
-import dayjs from 'dayjs';
 import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader';
-import InputHeader from '../../common/inputs/InputHeader';
 import { FaImage } from 'react-icons/fa';
 
 const ClientCreateOrEdit = () => {
@@ -37,9 +33,7 @@ const ClientCreateOrEdit = () => {
     defaultValues: isEdit
       ? {
           ClientAddress: clientEditData.ClientAddress,
-          ClientContractAmount: clientEditData.ClientContractAmount,
           ClientEmail: clientEditData.ClientEmail,
-          ClientHourlyRate: clientEditData.ClientHourlyRate,
           ClientName: clientEditData.ClientName,
           ClientPassword: clientEditData.ClientPassword,
           ClientPhone: clientEditData.ClientPhone,
@@ -55,18 +49,6 @@ const ClientCreateOrEdit = () => {
 
   const queryClient = useQueryClient();
 
-  const [contractStartDate, setContractStartDate] = useState<Date | null>(
-    new Date()
-  );
-  const [contractEndDate, setContractEndDate] = useState<Date | null>(
-    dayjs().add(1, 'month').toDate()
-  );
-
-  const [postOrderData, setPostOrderData] = useState<{
-    PostOrderPdf: string | File;
-    PostOrderTitle: string;
-  } | null>(null);
-
   const [clientHomeBgImage, setClientHomeBgImage] = useState<string | null>(
     null
   );
@@ -77,43 +59,14 @@ const ClientCreateOrEdit = () => {
 
   useEffect(() => {
     if (isEdit) {
-      setContractStartDate(toDate(clientEditData.ClientContractStartDate));
-      setContractEndDate(toDate(clientEditData.ClientContractEndDate));
       if (clientEditData.ClientHomePageBgImg) {
         setClientHomeBgImage(clientEditData.ClientHomePageBgImg);
       }
-      if (
-        clientEditData.ClientPostOrder &&
-        clientEditData.ClientPostOrder.PostOrderPdf
-      ) {
-        setPostOrderData({
-          PostOrderPdf: clientEditData.ClientPostOrder.PostOrderPdf,
-          PostOrderTitle: clientEditData.ClientPostOrder.PostOrderTitle,
-        });
-      }
+
       return;
     }
-    setContractStartDate(null);
-    setContractEndDate(null);
     setClientHomeBgImage(null);
-    setPostOrderData(null);
   }, [isEdit]);
-
-  useEffect(() => {
-    if (!contractStartDate) return;
-    methods.setValue(
-      'ClientContractStartDate',
-      removeTimeFromDate(contractStartDate)
-    );
-  }, [contractStartDate]);
-
-  useEffect(() => {
-    if (!contractEndDate) return;
-    methods.setValue(
-      'ClientContractEndDate',
-      removeTimeFromDate(contractEndDate)
-    );
-  }, [contractEndDate]);
 
   const [loading, setLoading] = useState(false);
 
@@ -128,7 +81,6 @@ const ClientCreateOrEdit = () => {
           cmpId: company.CompanyId,
           clientId: clientEditData.ClientId,
           data,
-          postOrderData,
           clientHomeBgImage,
         });
         showSnackbar({
@@ -139,7 +91,6 @@ const ClientCreateOrEdit = () => {
         await DbClient.createClient({
           cmpId: company.CompanyId,
           data,
-          postOrderData,
           clientHomeBgImage,
         });
         showSnackbar({
@@ -188,15 +139,6 @@ const ClientCreateOrEdit = () => {
       errorHandler(error);
       setLoading(false);
     }
-  };
-
-  const handlePdfChange = (file: File) => {
-    setPostOrderData((prev) => {
-      if (prev) {
-        return { ...prev, PostOrderPdf: file };
-      }
-      return { PostOrderPdf: file, PostOrderTitle: '' };
-    });
   };
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -305,50 +247,18 @@ const ClientCreateOrEdit = () => {
               disabled={isEdit}
             />
 
-            <InputDate
-              label="Contract Start Date"
-              value={contractStartDate}
-              setValue={setContractStartDate}
-            />
-
-            <InputDate
-              label="Contract End Date"
-              value={contractEndDate}
-              setValue={setContractEndDate}
-            />
-
-            <div className="flex flex-col gap-10">
-              <InputWithTopHeader
-                label="Contract Amount"
-                className="mx-0"
-                register={methods.register}
-                name="ClientContractAmount"
-                decimalCount={2}
-                error={methods.formState.errors.ClientContractAmount?.message}
-                leadingIcon={<div>$</div>}
-              />
+            <div className="flex items-end col-span-2 gap-4 w-full">
               <SwitchWithSideHeader
                 label="Send email for each patrol"
-                className="bg-onHoverBg px-4 py-2 rounded"
+                className="bg-onHoverBg px-4 py-2 rounded w-full"
                 register={methods.register}
                 name="ClientSendEmailForEachPatrol"
                 errors={methods.formState.errors}
               />
-            </div>
 
-            <div className="flex flex-col gap-10">
-              <InputWithTopHeader
-                label="Client hourly rate"
-                className="mx-0"
-                register={methods.register}
-                name="ClientHourlyRate"
-                decimalCount={2}
-                error={methods.formState.errors.ClientHourlyRate?.message}
-                leadingIcon={<div>$</div>}
-              />
               <SwitchWithSideHeader
                 label="Send email for each shift"
-                className="bg-onHoverBg px-4 py-2 rounded"
+                className="bg-onHoverBg px-4 py-2 rounded w-full"
                 register={methods.register}
                 name="ClientSendEmailForEachShift"
                 errors={methods.formState.errors}
@@ -362,89 +272,37 @@ const ClientCreateOrEdit = () => {
               name="ClientAddress"
               error={methods.formState.errors.ClientAddress?.message}
             />
-
-            <div className="flex flex-col gap-4 col-span-2 bg-onHoverBg p-4 rounded">
-              <div className="font-semibold">Post Order Details</div>
-              <div className="flex gap-4 items-center">
-                <label
-                  htmlFor="fileUpload"
-                  className="flex flex-col gap-1 cursor-pointer w-full"
-                >
-                  <InputHeader title="Upload post order pdf" fontClassName="" />
-                  <div className="flex gap-4 items-center w-full">
-                    {typeof postOrderData?.PostOrderPdf === 'string' &&
-                      postOrderData?.PostOrderPdf.startsWith('https') && (
-                        <a
-                          href={postOrderData?.PostOrderPdf}
-                          target="_blank"
-                          className=" text-textPrimaryBlue cursor-pointer"
-                        >
-                          View Post Order
-                        </a>
-                      )}
-                    <input
-                      id="fileUpload"
-                      type="file"
-                      accept="application/pdf"
-                      className={`border border-gray-300 p-2 rounded cursor-pointer w-full`}
-                      onChange={(e) =>
-                        handlePdfChange(e.target.files?.[0] as File)
-                      }
-                    />
-                  </div>
-                </label>
-                {/* Post Order Title Input */}
-                <InputWithTopHeader
-                  className="mx-0 w-full"
-                  label="Post Order Title"
-                  value={postOrderData?.PostOrderTitle}
-                  onChange={(e) =>
-                    setPostOrderData((prev) => {
-                      if (prev) {
-                        return { ...prev, PostOrderTitle: e.target.value };
-                      }
-                      return {
-                        PostOrderTitle: e.target.value,
-                        PostOrderPdf: '',
-                      };
-                    })
-                  }
-                />
-              </div>
-            </div>
-            <div className="flex flex-col gap-4 bg-onHoverBg p-4 rounded">
-              <div className="font-semibold">
-                Client Portal Background Image
-              </div>
-              <label
-                htmlFor="img"
-                className="flex flex-col items-center justify-center border border-dashed border-black rounded-md p-4 cursor-pointer"
-              >
-                {clientHomeBgImage ? (
-                  <img
-                    src={clientHomeBgImage}
-                    alt={'Void check'}
-                    className="w-full max-h-[200px] rounded"
-                  />
-                ) : (
-                  <>
-                    <FaImage className="text-3xl" />
-                    <span className="text-textPrimaryBlue cursor-pointer">
-                      Upload image
-                    </span>
-                  </>
-                )}
-                <input
-                  id="img"
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  className="hidden"
-                  onChange={handleImageUpload}
-                />
-              </label>
-            </div>
           </form>
+          <div className="flex flex-col gap-4 bg-onHoverBg p-4 rounded mt-4">
+            <div className="font-semibold">Client Portal Background Image</div>
+            <label
+              htmlFor="img"
+              className="flex flex-col items-center justify-center border border-dashed border-black rounded-md p-4 cursor-pointer"
+            >
+              {clientHomeBgImage ? (
+                <img
+                  src={clientHomeBgImage}
+                  alt={'Void check'}
+                  className="w-full max-h-[400px] rounded"
+                />
+              ) : (
+                <>
+                  <FaImage className="text-3xl" />
+                  <span className="text-textPrimaryBlue cursor-pointer">
+                    Upload image
+                  </span>
+                </>
+              )}
+              <input
+                id="img"
+                type="file"
+                accept="image/*"
+                hidden
+                className="hidden"
+                onChange={handleImageUpload}
+              />
+            </label>
+          </div>
         </FormProvider>
       </div>
     </div>

@@ -18,7 +18,6 @@ import NoSearchResult from '../../common/NoSearchResult';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import { numberFormatter } from '../../utilities/NumberFormater';
 import { useNavigate } from 'react-router-dom';
-import { formatDate } from '../../utilities/misc';
 import PageHeader from '../../common/PageHeader';
 
 const Clients = () => {
@@ -137,18 +136,13 @@ const Clients = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[20%] text-start">
+            <th className="uppercase px-4 py-2 w-[25%] text-start">
               Client Name
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-start">Email</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">Phone</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">
-              <span className="line-clamp-1">Contract End Date</span>
-            </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-center">
-              <span className="line-clamp-1">Contract Amount</span>
-            </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-end">Balance</th>
+            <th className="uppercase px-4 py-2 w-[25%] text-start">Email</th>
+            <th className="uppercase px-4 py-2 w-[25%] text-start">Phone</th>
+
+            <th className="uppercase px-4 py-2 w-[25%] text-end">Balance</th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -176,14 +170,6 @@ const Clients = () => {
                   </td>
                   <td className="align-top px-4 py-2 text-start">
                     <span className="line-clamp-1">{client.ClientPhone}</span>
-                  </td>
-                  <td className="align-top px-4 py-2 text-start">
-                    <span className="line-clamp-1">
-                      {formatDate(client.ClientContractEndDate)}
-                    </span>
-                  </td>
-                  <td className="align-top px-4 py-2 text-center ">
-                    {numberFormatter(client.ClientContractAmount, true)}
                   </td>
                   <td className="align-top px-4 py-2 text-end ">
                     {numberFormatter(client.ClientBalance, true)}

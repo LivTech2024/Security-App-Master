@@ -2,19 +2,16 @@ import { useEffect, useState } from 'react';
 import Button from '../../common/button/Button';
 import { useEditFormStore } from '../../store';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { IClientsCollection, IShiftsCollection } from '../../@types/database';
+import { IClientsCollection } from '../../@types/database';
 import DbClient from '../../firebase_configs/DB/DbClient';
 import NoSearchResult from '../../common/NoSearchResult';
 import { PageRoutes } from '../../@types/enum';
 import { Client } from '../../store/slice/editForm.slice';
-import {
-  formatDate,
-  getHoursDiffInTwoTimeString,
-  toDate,
-} from '../../utilities/misc';
+
 import { numberFormatter } from '../../utilities/NumberFormater';
-import DbEmployee from '../../firebase_configs/DB/DbEmployee';
 import PageHeader from '../../common/PageHeader';
+import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
+import dayjs from 'dayjs';
 
 const ClientView = () => {
   const { setClientEditData } = useEditFormStore();
@@ -25,21 +22,17 @@ const ClientView = () => {
 
   const [loading, setLoading] = useState(true);
 
-  /* const [startDate, setStartDate] = useState<Date | string | null>(
-    dayjs().startOf("M").toDate()
+  const [startDate, setStartDate] = useState<Date | string | null>(
+    dayjs().startOf('M').toDate()
   );
 
   const [endDate, setEndDate] = useState<Date | string | null>(
-    dayjs().endOf("M").toDate()
+    dayjs().endOf('M').toDate()
   );
 
-  const [isLifeTime, setIsLifeTime] = useState(false); */
+  const [isLifeTime, setIsLifeTime] = useState(false);
 
   const [data, setData] = useState<IClientsCollection | null>(null);
-
-  const [totalClientExpToDate, setTotalClientExpToDate] = useState(0);
-
-  const [totalProfitToDate, setTotalProfitToDate] = useState(0);
 
   const navigate = useNavigate();
 
@@ -49,52 +42,6 @@ const ClientView = () => {
       const clientData = snapshot.data() as IClientsCollection;
       if (clientData) {
         setData(clientData);
-        const shiftSnapshot = await DbClient.getAllShiftsOfClient(
-          clientData.ClientId,
-          toDate(clientData.ClientContractStartDate),
-          toDate(clientData.ClientContractEndDate)
-        );
-        const shifts = shiftSnapshot.docs?.map(
-          (doc) => doc.data() as IShiftsCollection
-        );
-
-        let totalCost = 0;
-        let totalCostToClient = 0;
-
-        await Promise.all(
-          shifts?.map(async (shift) => {
-            const {
-              ShiftAssignedUserId,
-              ShiftStartTime,
-              ShiftEndTime,
-              ShiftCurrentStatus,
-            } = shift;
-
-            if (
-              ShiftCurrentStatus.some((status) => status.Status === 'completed')
-            ) {
-              const shiftHours = getHoursDiffInTwoTimeString(
-                ShiftStartTime,
-                ShiftEndTime
-              );
-
-              totalCostToClient += shiftHours * clientData.ClientHourlyRate;
-
-              await Promise.all(
-                ShiftAssignedUserId?.map(async (empId) => {
-                  const empData = await DbEmployee.getEmpById(empId);
-                  if (empData) {
-                    const { EmployeePayRate } = empData;
-                    totalCost += EmployeePayRate * shiftHours;
-                  }
-                })
-              );
-            }
-          })
-        );
-
-        setTotalClientExpToDate(totalCost);
-        setTotalProfitToDate(totalCostToClient - totalCost);
       }
       setLoading(false);
     });
@@ -136,7 +83,7 @@ const ClientView = () => {
           }
         />
 
-        {/* <div className="bg-surface shadow-md rounded-lg p-4 flex gap-4">
+        <div className="bg-surface shadow rounded p-4 flex gap-4">
           <DateFilterDropdown
             endDate={endDate}
             isLifetime={isLifeTime}
@@ -145,8 +92,8 @@ const ClientView = () => {
             setStartDate={setStartDate}
             startDate={startDate}
           />
-        </div> */}
-        <div className="bg-surface shadow-md rounded-lg p-4">
+        </div>
+        <div className="bg-surface shadow rounded p-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="font-semibold">Client Name:</p>
@@ -164,30 +111,7 @@ const ClientView = () => {
               <p className="font-semibold">Client Address:</p>
               <p>{data?.ClientAddress ?? 'N/A'}</p>
             </div>
-            <div>
-              <p className="font-semibold">Contract Start Date:</p>
-              <p>{formatDate(data?.ClientContractStartDate)}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Contract End Date:</p>
-              <p>{formatDate(data?.ClientContractEndDate)}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Contract Amount:</p>
-              <p>{numberFormatter(data?.ClientContractAmount, true)}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Client Hourly Rate:</p>
-              <p>{numberFormatter(data?.ClientHourlyRate, true)}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Client Total Expense To Date:</p>
-              <p>{numberFormatter(totalClientExpToDate, true)}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Total Profit To Date:</p>
-              <p>{numberFormatter(totalProfitToDate, true)}</p>
-            </div>
+
             <div>
               <p className="font-semibold">Client Balance To Date:</p>
               <p>{numberFormatter(data?.ClientBalance, true)}</p>

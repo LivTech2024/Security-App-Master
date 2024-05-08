@@ -1,7 +1,6 @@
 import {
   DocumentData,
   QueryConstraint,
-  Timestamp,
   collection,
   doc,
   endAt,
@@ -29,11 +28,8 @@ import {
   IShiftsCollection,
 } from '../../@types/database';
 import CustomError from '../../utilities/CustomError';
-import CloudStorageImageHandler, {
-  CloudStorageFileHandler,
-  getNewDocId,
-} from './utils';
-import { fullTextSearchIndex, removeTimeFromDate } from '../../utilities/misc';
+import CloudStorageImageHandler, { getNewDocId } from './utils';
+import { fullTextSearchIndex } from '../../utilities/misc';
 import {
   createAuthUser,
   deleteAuthUser,
@@ -71,18 +67,12 @@ class DbClient {
   static createClient = async ({
     cmpId,
     data,
-    postOrderData,
     clientHomeBgImage,
   }: {
     cmpId: string;
     data: ClientFormFields;
-    postOrderData: {
-      PostOrderPdf: string | File;
-      PostOrderTitle: string;
-    } | null;
     clientHomeBgImage: string | null;
   }) => {
-    let postOrderFileUrl: string | null = null;
     let clientHomeBgImageUrl: string | null = null;
 
     try {
@@ -99,18 +89,6 @@ class DbClient {
       const ClientNameSearchIndex = fullTextSearchIndex(
         data.ClientName.trim().toLowerCase()
       );
-
-      if (postOrderData?.PostOrderPdf) {
-        const fileName = CloudStorageFileHandler.generateFileName(
-          clientId,
-          'post_order'
-        );
-
-        postOrderFileUrl = await CloudStorageFileHandler.uploadFile(
-          postOrderData?.PostOrderPdf as File,
-          CloudStoragePaths.CLIENT_DOCUMENTS + '/' + fileName
-        );
-      }
 
       if (clientHomeBgImage) {
         const imageEmployee = [
@@ -135,7 +113,7 @@ class DbClient {
 
         clientHomeBgImageUrl = clientHomeBgImageUrlTemp[0];
       }
-      let newClient: IClientsCollection = {
+      const newClient: IClientsCollection = {
         ClientId: clientId,
         ClientCompanyId: cmpId,
         ClientName: data.ClientName,
@@ -144,31 +122,13 @@ class DbClient {
         ClientPhone: data.ClientPhone,
         ClientAddress: data.ClientAddress || null,
         ClientBalance: 0,
-        ClientCreatedAt: serverTimestamp(),
-        ClientModifiedAt: serverTimestamp(),
         ClientPassword: data.ClientPassword,
-        ClientContractStartDate: removeTimeFromDate(
-          data.ClientContractStartDate
-        ) as unknown as Timestamp,
-        ClientContractEndDate: removeTimeFromDate(
-          data.ClientContractEndDate
-        ) as unknown as Timestamp,
-        ClientContractAmount: data.ClientContractAmount,
-        ClientHourlyRate: data.ClientHourlyRate,
         ClientSendEmailForEachShift: data.ClientSendEmailForEachShift,
         ClientSendEmailForEachPatrol: data.ClientSendEmailForEachPatrol,
         ClientHomePageBgImg: clientHomeBgImageUrl,
+        ClientCreatedAt: serverTimestamp(),
+        ClientModifiedAt: serverTimestamp(),
       };
-
-      if (postOrderData && postOrderFileUrl) {
-        newClient = {
-          ...newClient,
-          ClientPostOrder: {
-            PostOrderPdf: postOrderFileUrl,
-            PostOrderTitle: postOrderData?.PostOrderTitle,
-          },
-        };
-      }
 
       await runTransaction(db, async (transaction) => {
         transaction.set(clientRefRef, newClient);
@@ -184,9 +144,6 @@ class DbClient {
       });
     } catch (error) {
       console.log(error);
-      if (postOrderFileUrl) {
-        await CloudStorageFileHandler.deleteFileByUrl(postOrderFileUrl);
-      }
       if (clientHomeBgImageUrl) {
         await CloudStorageImageHandler.deleteImageByUrl(clientHomeBgImageUrl);
       }
@@ -198,16 +155,11 @@ class DbClient {
     cmpId,
     data,
     clientId,
-    postOrderData,
     clientHomeBgImage,
   }: {
     cmpId: string;
     clientId: string;
     data: ClientFormFields;
-    postOrderData: {
-      PostOrderPdf: string | File;
-      PostOrderTitle: string;
-    } | null;
     clientHomeBgImage: string | null;
   }) => {
     try {
@@ -226,27 +178,6 @@ class DbClient {
       const ClientNameSearchIndex = fullTextSearchIndex(
         data.ClientName.trim().toLowerCase()
       );
-
-      let postOrderFileUrl: string | null =
-        typeof postOrderData?.PostOrderPdf === 'string' &&
-        postOrderData?.PostOrderPdf.startsWith('https')
-          ? postOrderData?.PostOrderPdf
-          : null;
-
-      if (
-        postOrderData?.PostOrderPdf &&
-        typeof postOrderData?.PostOrderPdf !== 'string'
-      ) {
-        const fileName = CloudStorageFileHandler.generateFileName(
-          clientId,
-          'post_order'
-        );
-
-        postOrderFileUrl = await CloudStorageFileHandler.uploadFile(
-          postOrderData?.PostOrderPdf as File,
-          CloudStoragePaths.CLIENT_DOCUMENTS + '/' + fileName
-        );
-      }
 
       let clientHomeBgImageUrl = clientHomeBgImage;
 
@@ -278,36 +209,17 @@ class DbClient {
         const clientSnapshot = await transaction.get(clientRefRef);
         const oldClientData = clientSnapshot.data() as IClientsCollection;
 
-        let updatedClient: Partial<IClientsCollection> = {
+        const updatedClient: Partial<IClientsCollection> = {
           ClientName: data.ClientName,
           ClientNameSearchIndex,
           ClientEmail: data.ClientEmail,
           ClientPhone: data.ClientPhone,
           ClientAddress: data.ClientAddress || null,
-          ClientContractStartDate: removeTimeFromDate(
-            data.ClientContractStartDate
-          ) as unknown as Timestamp,
-          ClientContractEndDate: removeTimeFromDate(
-            data.ClientContractEndDate
-          ) as unknown as Timestamp,
-          ClientContractAmount: data.ClientContractAmount,
-          ClientHourlyRate: data.ClientHourlyRate,
           ClientModifiedAt: serverTimestamp(),
           ClientSendEmailForEachShift: data.ClientSendEmailForEachShift,
           ClientSendEmailForEachPatrol: data.ClientSendEmailForEachPatrol,
           ClientHomePageBgImg: clientHomeBgImageUrl,
         };
-
-        if (postOrderData && postOrderFileUrl) {
-          updatedClient = {
-            ...updatedClient,
-            ClientPostOrder: {
-              ...oldClientData.ClientPostOrder,
-              PostOrderPdf: postOrderFileUrl,
-              PostOrderTitle: postOrderData.PostOrderTitle,
-            },
-          };
-        }
 
         transaction.update(clientRefRef, updatedClient);
 
@@ -365,23 +277,6 @@ class DbClient {
         await CloudStorageImageHandler.deleteImageByUrl(
           clientData.ClientHomePageBgImg
         );
-      }
-
-      if (clientData.ClientPostOrder?.PostOrderPdf) {
-        await CloudStorageFileHandler.deleteFileByUrl(
-          clientData.ClientPostOrder.PostOrderPdf
-        );
-      }
-
-      if (
-        clientData.ClientPostOrder?.PostOrderOtherData &&
-        clientData.ClientPostOrder?.PostOrderOtherData.length > 0
-      ) {
-        const otherDataDeletePromise =
-          clientData.ClientPostOrder.PostOrderOtherData.map((url) => {
-            return CloudStorageFileHandler.deleteFileByUrl(url);
-          });
-        await Promise.all(otherDataDeletePromise);
       }
     });
   };

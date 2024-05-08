@@ -334,13 +334,6 @@ export interface IInvoicesCollection {
   InvoiceModifiedAt: Timestamp | FieldValue;
 }
 
-export interface IClientPostOrderChildCollection {
-  PostOrderPdf: string;
-  PostOrderTitle: string;
-  PostOrderOtherData?: string[];
-  PostOrderComment?: string | null;
-}
-
 export interface IClientsCollection {
   ClientId: string;
   ClientCompanyId: string;
@@ -351,12 +344,7 @@ export interface IClientsCollection {
   ClientEmail: string; //* This will be used for client portal login
   ClientPassword: string; //* This will be used for client portal login
   ClientAddress: string | null;
-  ClientContractStartDate: Timestamp | FieldValue;
-  ClientContractEndDate: Timestamp | FieldValue;
-  ClientContractAmount: number;
-  ClientHourlyRate: number;
   ClientBalance: number;
-  ClientPostOrder?: IClientPostOrderChildCollection | null;
   ClientSendEmailForEachPatrol: boolean; //*by default true
   ClientSendEmailForEachShift: boolean; //*by default true
   ClientCreatedAt: Timestamp | FieldValue;

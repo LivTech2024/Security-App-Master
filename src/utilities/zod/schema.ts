@@ -289,14 +289,6 @@ export const clientSchema = z.object({
     .string()
     .min(6, { message: 'Client password should be at least 6 characters' }),
   ClientAddress: z.string().nullable().optional(),
-  ClientContractStartDate: z.date(),
-  ClientContractEndDate: z.date(),
-  ClientContractAmount: z.coerce
-    .number()
-    .min(1, { message: 'Client contract should be at least 1' }),
-  ClientHourlyRate: z.coerce
-    .number()
-    .min(1, { message: 'Client hourly rate should be at least 1' }),
   ClientSendEmailForEachPatrol: z.boolean(),
   ClientSendEmailForEachShift: z.boolean(),
 });

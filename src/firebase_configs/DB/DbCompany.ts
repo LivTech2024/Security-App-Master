@@ -534,6 +534,17 @@ class DbCompany {
         );
       }
 
+      if (
+        locationData?.LocationPostOrder?.PostOrderOtherData &&
+        locationData?.LocationPostOrder?.PostOrderOtherData.length > 0
+      ) {
+        const otherDataDeletePromise =
+          locationData?.LocationPostOrder?.PostOrderOtherData.map((url) => {
+            return CloudStorageFileHandler.deleteFileByUrl(url);
+          });
+        await Promise.all(otherDataDeletePromise);
+      }
+
       transaction.delete(locationRef);
     });
   };
