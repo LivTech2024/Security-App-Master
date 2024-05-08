@@ -287,7 +287,7 @@ export interface ILocationsCollection {
   LocationContractStartDate?: Timestamp | FieldValue;
   LocationContractEndDate?: Timestamp | FieldValue;
   LocationContractAmount?: number;
-  LocationHourlyRate?: number;
+  LocationPatrolPerHitRate?: number;
   LocationPostOrder?: ILocationPostOrderChildCollection | null;
   LocationModifiedAt: Timestamp | FieldValue;
   LocationCreatedAt: Timestamp | FieldValue;

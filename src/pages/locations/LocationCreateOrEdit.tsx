@@ -45,7 +45,8 @@ const LocationCreateOrEdit = () => {
           LocationAddress: locationEditData?.LocationAddress,
           LocationClientId: locationEditData?.LocationClientId,
           LocationContractAmount: locationEditData?.LocationContractAmount || 0,
-          LocationHourlyRate: locationEditData?.LocationHourlyRate || 0,
+          LocationPatrolPerHitRate:
+            locationEditData?.LocationPatrolPerHitRate || 0,
           LocationCoordinates: {
             lat: String(locationEditData?.LocationCoordinates.latitude),
             lng: String(locationEditData?.LocationCoordinates.longitude),
@@ -316,12 +317,12 @@ const LocationCreateOrEdit = () => {
               leadingIcon={<div>$</div>}
             />
             <InputWithTopHeader
-              label="Client hourly rate"
+              label="Patrol per hit rate"
               className="mx-0"
               register={methods.register}
-              name="LocationHourlyRate"
+              name="LocationPatrolPerHitRate"
               decimalCount={2}
-              error={methods.formState.errors.LocationHourlyRate?.message}
+              error={methods.formState.errors.LocationPatrolPerHitRate?.message}
               leadingIcon={<div>$</div>}
             />
           </div>

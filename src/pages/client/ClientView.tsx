@@ -94,7 +94,7 @@ const ClientView = () => {
           />
         </div>
         <div className="bg-surface shadow rounded p-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="font-semibold">Client Name:</p>
               <p>{data?.ClientName}</p>

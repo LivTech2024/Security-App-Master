@@ -350,7 +350,7 @@ class DbCompany {
         LocationContractEndDate,
         LocationContractStartDate,
         LocationCoordinates,
-        LocationHourlyRate,
+        LocationPatrolPerHitRate,
         LocationName,
         LocationClientId,
       } = data;
@@ -387,7 +387,7 @@ class DbCompany {
           LocationContractEndDate as unknown as Timestamp,
         LocationContractStartDate:
           LocationContractStartDate as unknown as Timestamp,
-        LocationHourlyRate,
+        LocationPatrolPerHitRate,
         LocationPostOrder: null,
         LocationModifiedAt: serverTimestamp(),
         LocationCreatedAt: serverTimestamp(),
@@ -427,7 +427,7 @@ class DbCompany {
       LocationContractEndDate,
       LocationContractStartDate,
       LocationCoordinates,
-      LocationHourlyRate,
+      LocationPatrolPerHitRate,
       LocationName,
       LocationClientId,
     } = data;
@@ -476,7 +476,7 @@ class DbCompany {
           LocationContractEndDate as unknown as Timestamp,
         LocationContractStartDate:
           LocationContractStartDate as unknown as Timestamp,
-        LocationHourlyRate,
+        LocationPatrolPerHitRate,
 
         LocationModifiedAt: serverTimestamp(),
       };
