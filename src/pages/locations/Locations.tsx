@@ -7,6 +7,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import {
   DisplayCount,
   MinimumQueryCharacter,
+  PageRoutes,
   REACT_QUERY_KEYS,
 } from '../../@types/enum';
 import DbCompany from '../../firebase_configs/DB/DbCompany';
@@ -19,10 +20,13 @@ import { Library } from '@googlemaps/js-api-loader';
 import { Location } from '../../store/slice/editForm.slice';
 import PageHeader from '../../common/PageHeader';
 import Button from '../../common/button/Button';
+import { useNavigate } from 'react-router-dom';
 
 const libraries: Library[] = ['places'];
 
 const Locations = () => {
+  const navigate = useNavigate();
+
   const [locationAddModal, setLocationAddModal] = useState(false);
 
   const { company } = useAuthState();
@@ -125,8 +129,8 @@ const Locations = () => {
             <Button
               label="Add Location"
               onClick={() => {
-                setLocationAddModal(true);
                 setLocationEditData(null);
+                navigate(PageRoutes.LOCATION_CREATE_OR_EDIT);
               }}
               type="black"
             />
@@ -168,7 +172,7 @@ const Locations = () => {
                   <tr
                     onClick={() => {
                       setLocationEditData(loc as unknown as Location);
-                      setLocationAddModal(true);
+                      navigate(PageRoutes.LOCATION_CREATE_OR_EDIT);
                     }}
                     key={loc.LocationId}
                     className="cursor-pointer"

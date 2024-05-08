@@ -44,6 +44,7 @@ import {
   AdminUpdateFormFields,
   CompanyBranchFormFields,
   CompanyCreateFormFields,
+  LocationCreateFormFields,
   SettingsFormFields,
   TaskFormFields,
 } from '../../utilities/zod/schema';
@@ -329,59 +330,170 @@ class DbCompany {
     await deleteDoc(loggedInRef);
   };
 
-  static addLocation = (
+  static addLocation = async (
     cmpId: string,
-    locationName: string,
-    locationAddress: string,
-    locationCoordinates: { lat: number | null; lng: number | null }
+    data: LocationCreateFormFields,
+    postOrderData: {
+      PostOrderPdf: string | File;
+      PostOrderTitle: string;
+    } | null
   ) => {
-    const locationId = getNewDocId(CollectionName.locations);
-    const locationRef = doc(db, CollectionName.locations, locationId);
+    let postOrderFileUrl: string | null = null;
 
-    const nameSearchIndex = fullTextSearchIndex(
-      locationName.trim().toLowerCase()
-    );
+    try {
+      const locationId = getNewDocId(CollectionName.locations);
+      const locationRef = doc(db, CollectionName.locations, locationId);
 
-    const newLocation: ILocationsCollection = {
-      LocationId: locationId,
-      LocationCompanyId: cmpId,
-      LocationName: locationName,
-      LocationSearchIndex: nameSearchIndex,
-      LocationAddress: locationAddress,
-      LocationCoordinates: new GeoPoint(
-        locationCoordinates.lat || 0,
-        locationCoordinates.lng || 0
-      ),
-      LocationCreatedAt: serverTimestamp(),
-    };
+      const {
+        LocationAddress,
+        LocationContractAmount,
+        LocationContractEndDate,
+        LocationContractStartDate,
+        LocationCoordinates,
+        LocationHourlyRate,
+        LocationName,
+        LocationClientId,
+      } = data;
 
-    return setDoc(locationRef, newLocation);
+      const nameSearchIndex = fullTextSearchIndex(
+        LocationName.trim().toLowerCase()
+      );
+
+      if (postOrderData?.PostOrderPdf) {
+        const fileName = CloudStorageFileHandler.generateFileName(
+          locationId,
+          'post_order'
+        );
+
+        postOrderFileUrl = await CloudStorageFileHandler.uploadFile(
+          postOrderData?.PostOrderPdf as File,
+          CloudStoragePaths.COMPANIES_LOCATIONS_DOCUMENTS + '/' + fileName
+        );
+      }
+
+      let newLocation: ILocationsCollection = {
+        LocationId: locationId,
+        LocationCompanyId: cmpId,
+        LocationClientId,
+        LocationName,
+        LocationSearchIndex: nameSearchIndex,
+        LocationAddress,
+        LocationCoordinates: new GeoPoint(
+          Number(LocationCoordinates.lat || 0),
+          Number(LocationCoordinates.lng || 0)
+        ),
+        LocationContractAmount,
+        LocationContractEndDate:
+          LocationContractEndDate as unknown as Timestamp,
+        LocationContractStartDate:
+          LocationContractStartDate as unknown as Timestamp,
+        LocationHourlyRate,
+        LocationPostOrder: null,
+        LocationModifiedAt: serverTimestamp(),
+        LocationCreatedAt: serverTimestamp(),
+      };
+
+      if (postOrderData && postOrderFileUrl) {
+        newLocation = {
+          ...newLocation,
+          LocationPostOrder: {
+            PostOrderPdf: postOrderFileUrl,
+            PostOrderTitle: postOrderData?.PostOrderTitle,
+          },
+        };
+      }
+
+      await setDoc(locationRef, newLocation);
+    } catch (error) {
+      if (postOrderFileUrl) {
+        await CloudStorageFileHandler.deleteFileByUrl(postOrderFileUrl);
+      }
+      console.log(error);
+      throw error;
+    }
   };
 
-  static updateLocation = (
+  static updateLocation = async (
     locationId: string,
-    locationName: string,
-    locationAddress: string,
-    locationCoordinates: { lat: number | null; lng: number | null }
+    data: LocationCreateFormFields,
+    postOrderData: {
+      PostOrderPdf: string | File;
+      PostOrderTitle: string;
+    } | null
   ) => {
-    const locationRef = doc(db, CollectionName.locations, locationId);
+    const {
+      LocationAddress,
+      LocationContractAmount,
+      LocationContractEndDate,
+      LocationContractStartDate,
+      LocationCoordinates,
+      LocationHourlyRate,
+      LocationName,
+      LocationClientId,
+    } = data;
 
     const nameSearchIndex = fullTextSearchIndex(
-      locationName.trim().toLowerCase()
+      LocationName.trim().toLowerCase()
     );
 
-    const newLocation: Partial<ILocationsCollection> = {
-      LocationName: locationName,
-      LocationSearchIndex: nameSearchIndex,
-      LocationAddress: locationAddress,
-      LocationCoordinates: new GeoPoint(
-        locationCoordinates.lat || 0,
-        locationCoordinates.lng || 0
-      ),
-      LocationCreatedAt: serverTimestamp(),
-    };
+    let postOrderFileUrl: string | null =
+      typeof postOrderData?.PostOrderPdf === 'string' &&
+      postOrderData?.PostOrderPdf.startsWith('https')
+        ? postOrderData?.PostOrderPdf
+        : null;
 
-    return updateDoc(locationRef, newLocation);
+    await runTransaction(db, async (transaction) => {
+      const locationRef = doc(db, CollectionName.locations, locationId);
+      const locationSnapshot = await transaction.get(locationRef);
+      const oldLocationData = locationSnapshot.data() as ILocationsCollection;
+
+      if (
+        postOrderData?.PostOrderPdf &&
+        typeof postOrderData?.PostOrderPdf !== 'string'
+      ) {
+        const fileName = CloudStorageFileHandler.generateFileName(
+          locationId,
+          'post_order'
+        );
+
+        postOrderFileUrl = await CloudStorageFileHandler.uploadFile(
+          postOrderData?.PostOrderPdf as File,
+          CloudStoragePaths.COMPANIES_LOCATIONS_DOCUMENTS + '/' + fileName
+        );
+      }
+
+      let updatedLocation: Partial<ILocationsCollection> = {
+        LocationName,
+        LocationSearchIndex: nameSearchIndex,
+        LocationAddress,
+        LocationClientId,
+        LocationCoordinates: new GeoPoint(
+          Number(LocationCoordinates.lat || 0),
+          Number(LocationCoordinates.lng || 0)
+        ),
+        LocationContractAmount,
+        LocationContractEndDate:
+          LocationContractEndDate as unknown as Timestamp,
+        LocationContractStartDate:
+          LocationContractStartDate as unknown as Timestamp,
+        LocationHourlyRate,
+
+        LocationModifiedAt: serverTimestamp(),
+      };
+
+      if (postOrderData && postOrderFileUrl) {
+        updatedLocation = {
+          ...updatedLocation,
+          LocationPostOrder: {
+            ...oldLocationData?.LocationPostOrder,
+            PostOrderPdf: postOrderFileUrl,
+            PostOrderTitle: postOrderData.PostOrderTitle,
+          },
+        };
+      }
+
+      transaction.update(locationRef, updatedLocation);
+    });
   };
 
   static deleteLocation = async (locationId: string) => {
@@ -411,8 +523,19 @@ class DbCompany {
       throw new CustomError('This location is already used');
     }
 
-    const locationRef = doc(db, CollectionName.locations, locationId);
-    return deleteDoc(locationRef);
+    await runTransaction(db, async (transaction) => {
+      const locationRef = doc(db, CollectionName.locations, locationId);
+      const snapshot = await transaction.get(locationRef);
+      const locationData = snapshot.data() as ILocationsCollection;
+
+      if (locationData?.LocationPostOrder?.PostOrderPdf) {
+        await CloudStorageFileHandler.deleteFileByUrl(
+          locationData?.LocationPostOrder?.PostOrderPdf
+        );
+      }
+
+      transaction.delete(locationRef);
+    });
   };
 
   static getLocations = ({

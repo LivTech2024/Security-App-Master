@@ -92,6 +92,7 @@ export const CloudStoragePaths = {
   DOCUMENTS: 'documents',
   CLIENT_IMAGES: 'clients/images',
   CLIENT_DOCUMENTS: 'clients/documents',
+  COMPANIES_LOCATIONS_DOCUMENTS: 'companies/locations/documents',
 };
 
 export const ImageResolution = {
@@ -124,6 +125,7 @@ export const PageRoutes = {
   VISITOR_LIST: '/visitor_list',
   VISITOR_VIEW: '/visitor_view',
   LOCATIONS: '/locations',
+  LOCATION_CREATE_OR_EDIT: '/location_create_or_edit',
   COMPANY_BRANCHES: '/company_branches',
   REPORTS: '/reports',
   REPORT_VIEW: '/report_view',

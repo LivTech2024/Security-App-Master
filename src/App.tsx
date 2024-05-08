@@ -66,6 +66,7 @@ import EmpDarView from './pages/employee_dar/EmpDarView';
 import PerformanceAssurance from './pages/performance_assurance/PerformanceAssurance';
 import TaskList from './pages/task_and_tracking/TaskList';
 import TaskLogs from './pages/task_and_tracking/TaskLogs';
+import LocationCreateOrEdit from './pages/locations/LocationCreateOrEdit';
 
 function App() {
   useOnAuthStateChanged();
@@ -235,6 +236,10 @@ function App() {
             />
 
             <Route path={PageRoutes.LOCATIONS} Component={Locations} />
+            <Route
+              path={PageRoutes.LOCATION_CREATE_OR_EDIT}
+              Component={LocationCreateOrEdit}
+            />
 
             <Route
               path={PageRoutes.COMPANY_BRANCHES}

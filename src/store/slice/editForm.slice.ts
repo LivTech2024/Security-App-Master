@@ -34,8 +34,12 @@ export interface Shift
 }
 
 export interface Location
-  extends Omit<ILocationsCollection, 'LocationCreatedAt'> {
+  extends Omit<
+    ILocationsCollection,
+    'LocationCreatedAt' | 'LocationModifiedAt'
+  > {
   LocationCreatedAt: string;
+  LocationModifiedAt: string;
 }
 
 export interface Client

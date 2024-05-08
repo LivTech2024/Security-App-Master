@@ -269,13 +269,27 @@ export interface IMessagesCollection {
   MessageCreatedAt: Timestamp | FieldValue;
 }
 
+export interface ILocationPostOrderChildCollection {
+  PostOrderPdf: string;
+  PostOrderTitle: string;
+  PostOrderOtherData?: string[];
+  PostOrderComment?: string | null;
+}
+
 export interface ILocationsCollection {
   LocationId: string;
   LocationCompanyId: string;
+  LocationClientId: string;
   LocationName: string;
   LocationSearchIndex: string[];
   LocationAddress: string;
   LocationCoordinates: GeoPoint;
+  LocationContractStartDate?: Timestamp | FieldValue;
+  LocationContractEndDate?: Timestamp | FieldValue;
+  LocationContractAmount?: number;
+  LocationHourlyRate?: number;
+  LocationPostOrder?: ILocationPostOrderChildCollection | null;
+  LocationModifiedAt: Timestamp | FieldValue;
   LocationCreatedAt: Timestamp | FieldValue;
 }
 

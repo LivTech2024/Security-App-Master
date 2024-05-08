@@ -21,6 +21,24 @@ export const companyCreateSchema = z.object({
 
 export type CompanyCreateFormFields = z.infer<typeof companyCreateSchema>;
 
+//*Location  create schema
+export const locationCreateSchema = z.object({
+  LocationClientId: z.string().min(3),
+  LocationName: z
+    .string()
+    .min(3, { message: 'Location name should be minimum 3 characters' }),
+  LocationAddress: z
+    .string()
+    .min(3, { message: 'Address should be at least 3 characters' }),
+  LocationCoordinates: z.object({ lat: z.string(), lng: z.string() }),
+  LocationContractStartDate: z.date(),
+  LocationContractEndDate: z.date(),
+  LocationContractAmount: z.coerce.number(),
+  LocationHourlyRate: z.coerce.number(),
+});
+
+export type LocationCreateFormFields = z.infer<typeof locationCreateSchema>;
+
 //*Admin  update schema
 export const adminUpdateSchema = z.object({
   AdminName: z
