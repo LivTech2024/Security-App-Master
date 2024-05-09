@@ -17,9 +17,16 @@ import { PatrolStatus } from '../../component/patrolling/PatrolStatus';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import { useAuthState } from '../../store';
 import PageHeader from '../../common/PageHeader';
+import Button from '../../common/button/Button';
+import { errorHandler } from '../../utilities/CustomError';
+import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
+import { generatePatrolLogsHtml } from '../../utilities/pdf/generatePatrolLogsHtml';
+import { htmlToPdf } from '../../API/HtmlToPdf';
+import DbCompany from '../../firebase_configs/DB/DbCompany';
+import { Company } from '../../store/slice/auth.slice';
 
 const PatrolLogs = () => {
-  const { company, admin } = useAuthState();
+  const { company, admin, client } = useAuthState();
 
   const [searchParam] = useSearchParams();
 
@@ -132,9 +139,76 @@ const PatrolLogs = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const downloadReport = async () => {
+    if (!patrolData) return;
+    if (!company && !client) return;
+    try {
+      showModalLoader({});
+
+      let companyDetails = company;
+
+      if (!companyDetails) {
+        const companySnapshot = await DbCompany.getCompanyById(
+          client!.ClientCompanyId
+        );
+        companyDetails = companySnapshot.data() as Company;
+      }
+
+      const snapshot = await DbPatrol.getPatrolLogs({
+        isLifeTime,
+        startDate,
+        endDate,
+        patrolId: String(patrolId),
+      });
+
+      const data = snapshot.docs.map(
+        (doc) => doc.data() as IPatrolLogsCollection
+      );
+
+      const html = generatePatrolLogsHtml({
+        companyDetails,
+        patrolLogs: data,
+        patrolData,
+        endDate: (endDate as Date) || null,
+        startDate: (startDate as Date) || null,
+      });
+
+      const response = await htmlToPdf({ file_name: 'patrol_logs.pdf', html });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+
+      // Create a link element
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+
+      const invName = 'patrol_logs.pdf';
+
+      link.download = invName; // Specify the filename for the downloaded file
+
+      // Append the link to the body
+      document.body.appendChild(link);
+
+      // Trigger a click on the link to start the download
+      link.click();
+
+      // Remove the link from the DOM
+      document.body.removeChild(link);
+
+      closeModalLoader();
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      closeModalLoader();
+    }
+  };
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <PageHeader title={`Patrol Logs : ${patrolData?.PatrolName}`} />
+      <PageHeader
+        title={`Patrol Logs : ${patrolData?.PatrolName}`}
+        rightSection={
+          <Button label="Download" type="black" onClick={downloadReport} />
+        }
+      />
 
       <div className="flex justify-between w-full p-4 rounded bg-surface shadow items-center">
         <DateFilterDropdown
