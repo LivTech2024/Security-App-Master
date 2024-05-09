@@ -47,6 +47,8 @@ const LocationCreateOrEdit = () => {
           LocationContractAmount: locationEditData?.LocationContractAmount || 0,
           LocationPatrolPerHitRate:
             locationEditData?.LocationPatrolPerHitRate || 0,
+          LocationShiftHourlyRate:
+            locationEditData?.LocationShiftHourlyRate || 0,
           LocationCoordinates: {
             lat: String(locationEditData?.LocationCoordinates.latitude),
             lng: String(locationEditData?.LocationCoordinates.longitude),
@@ -276,56 +278,62 @@ const LocationCreateOrEdit = () => {
           name="LocationAddress"
           error={methods.formState.errors.LocationAddress?.message}
         />
-        <div className="flex flex-col col-span-2 w-full gap-4 justify-between">
-          <div className="grid grid-cols-2 w-full gap-4">
-            <InputSelect
-              label="Select Client"
-              data={clients.map((res) => {
-                return { label: res.ClientName, value: res.ClientId };
-              })}
-              value={methods.watch('LocationClientId')}
-              onChange={(e) =>
-                methods.setValue('LocationClientId', e as string)
-              }
-              searchable
-              searchValue={clientSearchQuery}
-              onSearchChange={setClientSearchQuery}
-              error={methods.formState.errors.LocationClientId?.message}
-            />
+        <div className="flex flex-col gap-4 justify-between">
+          <InputDate
+            label="Contract Start Date"
+            value={contractStartDate}
+            setValue={setContractStartDate}
+          />
+          <InputSelect
+            label="Select Client"
+            data={clients.map((res) => {
+              return { label: res.ClientName, value: res.ClientId };
+            })}
+            value={methods.watch('LocationClientId')}
+            onChange={(e) => methods.setValue('LocationClientId', e as string)}
+            searchable
+            searchValue={clientSearchQuery}
+            onSearchChange={setClientSearchQuery}
+            error={methods.formState.errors.LocationClientId?.message}
+          />
+        </div>
 
-            <div className="flex items-center gap-4">
-              <InputDate
-                label="Contract Start Date"
-                value={contractStartDate}
-                setValue={setContractStartDate}
-              />
-              <InputDate
-                label="Contract End Date"
-                value={contractEndDate}
-                setValue={setContractEndDate}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 w-full gap-4">
-            <InputWithTopHeader
-              label="Contract Amount"
-              className="mx-0"
-              register={methods.register}
-              name="LocationContractAmount"
-              decimalCount={2}
-              error={methods.formState.errors.LocationContractAmount?.message}
-              leadingIcon={<div>$</div>}
-            />
-            <InputWithTopHeader
-              label="Patrol per hit rate"
-              className="mx-0"
-              register={methods.register}
-              name="LocationPatrolPerHitRate"
-              decimalCount={2}
-              error={methods.formState.errors.LocationPatrolPerHitRate?.message}
-              leadingIcon={<div>$</div>}
-            />
-          </div>
+        <div className="flex flex-col gap-4 justify-between">
+          <InputDate
+            label="Contract End Date"
+            value={contractEndDate}
+            setValue={setContractEndDate}
+          />
+          <InputWithTopHeader
+            label="Contract Amount"
+            className="mx-0"
+            register={methods.register}
+            name="LocationContractAmount"
+            decimalCount={2}
+            error={methods.formState.errors.LocationContractAmount?.message}
+            leadingIcon={<div>$</div>}
+          />
+        </div>
+
+        <div className="flex flex-col gap-4 justify-between">
+          <InputWithTopHeader
+            label="Patrol Per Hit Rate"
+            className="mx-0"
+            register={methods.register}
+            name="LocationPatrolPerHitRate"
+            decimalCount={2}
+            error={methods.formState.errors.LocationPatrolPerHitRate?.message}
+            leadingIcon={<div>$</div>}
+          />
+          <InputWithTopHeader
+            label="Shift Hourly Rate"
+            className="mx-0"
+            register={methods.register}
+            name="LocationPatrolPerHitRate"
+            decimalCount={2}
+            error={methods.formState.errors.LocationPatrolPerHitRate?.message}
+            leadingIcon={<div>$</div>}
+          />
         </div>
 
         <div className="flex flex-col gap-4 col-span-2 bg-onHoverBg p-4 rounded">

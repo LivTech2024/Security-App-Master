@@ -35,6 +35,7 @@ export const locationCreateSchema = z.object({
   LocationContractEndDate: z.date(),
   LocationContractAmount: z.coerce.number(),
   LocationPatrolPerHitRate: z.coerce.number(),
+  LocationShiftHourlyRate: z.coerce.number(),
 });
 
 export type LocationCreateFormFields = z.infer<typeof locationCreateSchema>;

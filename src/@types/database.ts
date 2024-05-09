@@ -284,10 +284,11 @@ export interface ILocationsCollection {
   LocationSearchIndex: string[];
   LocationAddress: string;
   LocationCoordinates: GeoPoint;
-  LocationContractStartDate?: Timestamp | FieldValue;
-  LocationContractEndDate?: Timestamp | FieldValue;
-  LocationContractAmount?: number;
-  LocationPatrolPerHitRate?: number;
+  LocationContractStartDate: Timestamp | FieldValue;
+  LocationContractEndDate: Timestamp | FieldValue;
+  LocationContractAmount: number;
+  LocationPatrolPerHitRate: number;
+  LocationShiftHourlyRate: number; //!Todo mark it nullable
   LocationPostOrder?: ILocationPostOrderChildCollection | null;
   LocationModifiedAt: Timestamp | FieldValue;
   LocationCreatedAt: Timestamp | FieldValue;
