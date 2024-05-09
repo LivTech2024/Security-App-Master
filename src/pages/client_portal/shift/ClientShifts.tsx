@@ -57,14 +57,14 @@ const ClientShifts = () => {
         })
       );
 
-      return docData;
+      return { docs: snapshot.docs, docData: docData };
     },
     getNextPageParam: (lastPage) => {
-      if (lastPage?.length === 0) {
+      if (lastPage.docs?.length === 0) {
         return null;
       }
-      if (lastPage?.length === DisplayCount.SHIFT_LIST) {
-        return lastPage.at(-1);
+      if (lastPage.docs?.length === DisplayCount.SHIFT_LIST) {
+        return lastPage.docs.at(-1);
       }
       return null;
     },
@@ -75,7 +75,7 @@ const ClientShifts = () => {
     if (snapshotData) {
       const docData: ShiftsCollection[] = [];
       snapshotData.pages?.forEach((page) => {
-        page?.forEach((data) => {
+        page?.docData?.forEach((data) => {
           docData.push(data);
         });
       });

@@ -162,7 +162,8 @@ const EmpDarView = () => {
               ? formatDate(
                   shiftData?.ShiftCurrentStatus.find(
                     (s) => s.StatusReportedById === empDarData?.EmpDarEmpId
-                  )?.StatusReportedTime
+                  )?.StatusReportedTime,
+                  'DD MMM hh:mm A'
                 )
               : 'N/A'}
           </p>
@@ -178,6 +179,9 @@ const EmpDarView = () => {
                     Place/Spot
                   </div>
                   <div className="px-2 py-1">{res?.TileLocation || 'N/A'}</div>
+                  <div className="px-2 py-1 leading-3 text-textSecondary">
+                    {res?.TileTime || 'N/A'}
+                  </div>
                 </div>
                 <div className="flex flex-col ">
                   <div className="bg-primaryGold px-2 py-1 font-semibold">

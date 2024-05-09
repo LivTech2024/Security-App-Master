@@ -67,14 +67,14 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
           docData.push({ ...data, MessageReceiversId: newRecList });
         })
       );
-      return docData;
+      return { docs: snapshot.docs, docData: docData };
     },
     getNextPageParam: (lastPage) => {
-      if (lastPage?.length === 0) {
+      if (lastPage.docs?.length === 0) {
         return null;
       }
-      if (lastPage?.length === DisplayCount.MESSAGE_SENT_LIST) {
-        return lastPage.at(-1);
+      if (lastPage.docs?.length === DisplayCount.MESSAGE_SENT_LIST) {
+        return lastPage.docs.at(-1);
       }
       return null;
     },
@@ -85,7 +85,7 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
     if (snapshotData) {
       const docData: ISentMessagesCollection[] = [];
       snapshotData.pages?.forEach((page) => {
-        page?.forEach(async (data) => {
+        page.docData?.forEach(async (data) => {
           docData.push(data);
         });
       });
