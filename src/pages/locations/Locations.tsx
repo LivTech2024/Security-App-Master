@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import AddLocationModal from '../../component/locations/modal/AddLocationModal';
 import { useAuthState, useEditFormStore } from '../../store';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -22,8 +21,6 @@ import { useNavigate } from 'react-router-dom';
 
 const Locations = () => {
   const navigate = useNavigate();
-
-  const [locationAddModal, setLocationAddModal] = useState(false);
 
   const { company } = useAuthState();
 
@@ -125,13 +122,6 @@ const Locations = () => {
           />
         }
       />
-
-      <div className="hidden">
-        <AddLocationModal
-          opened={locationAddModal}
-          setOpened={setLocationAddModal}
-        />
-      </div>
 
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
