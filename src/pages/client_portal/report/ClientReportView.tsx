@@ -1,5 +1,7 @@
+import ReportView from '../../reports/ReportView';
+
 const ClientReportView = () => {
-  return <div>ClientReportView</div>;
+  return <ReportView />;
 };
 
 export default ClientReportView;
