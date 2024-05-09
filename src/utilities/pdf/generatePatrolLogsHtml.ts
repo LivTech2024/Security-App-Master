@@ -13,6 +13,30 @@ interface GeneratePatrolLogsHtmlArgs {
   endDate: Date | null;
 }
 
+function addOrdinalSuffix(num: number): string {
+  if (num <= 0) {
+    return num.toString();
+  }
+
+  const lastDigit = num % 10;
+  const lastTwoDigits = num % 100;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
+    return num + 'th';
+  }
+
+  switch (lastDigit) {
+    case 1:
+      return num + 'st';
+    case 2:
+      return num + 'nd';
+    case 3:
+      return num + 'rd';
+    default:
+      return num + 'th';
+  }
+}
+
 export const generatePatrolLogsHtml = ({
   companyDetails,
   patrolLogs,
@@ -26,7 +50,7 @@ export const generatePatrolLogsHtml = ({
     <tr>
       <td>${log.PatrolLogGuardName}</td>
       <td>${formatDate(log.PatrolDate)}</td>
-      <td>${log.PatrolLogPatrolCount}</td>
+      <td>${addOrdinalSuffix(log.PatrolLogPatrolCount)}</td>
     </tr>
   `
     )
@@ -83,7 +107,7 @@ export const generatePatrolLogsHtml = ({
         ${
           startDate &&
           endDate &&
-          `<div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+          `<div style="display: flex; justify-content: space-between; ">
           <div style="display: flex; align-items:center; gap:3px;">
             <span>Start Date: </span>
             <span style="font-weight:550;">${formatDate(startDate)}</span>
@@ -95,7 +119,7 @@ export const generatePatrolLogsHtml = ({
         </div>`
         }
 
-        <table>
+        <table style="margin-top: 20px;">
           <thead>
             <tr>
               <th style="width:40%;">Guard Name</th>
@@ -106,13 +130,13 @@ export const generatePatrolLogsHtml = ({
           <tbody>
             ${tableRowHTML}
           </tbody>
-          <tfoot>
+        
             <tr style="font-weight:600;">
               <td>Total Hit</td>
                <td></td>
-               <td>${patrolLogs.reduce((acc, obj) => acc + obj.PatrolLogPatrolCount, 0)}</td>
+               <td>${patrolLogs.length}</td>
             </tr>
-          </tfoot>
+          
         <table>  
       </body>
     </html>
