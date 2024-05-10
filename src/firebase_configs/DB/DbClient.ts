@@ -344,6 +344,42 @@ class DbClient {
     return getDocs(shiftQuery);
   };
 
+  static getClientLocations = (clientId: string) => {
+    const locationRef = collection(db, CollectionName.locations);
+    const clientQuery = query(
+      locationRef,
+      where('LocationClientId', '==', clientId)
+    );
+
+    return getDocs(clientQuery);
+  };
+
+  static getAllShiftsOfLocation = (
+    locationId: string,
+    startDate: Date,
+    endDate: Date
+  ) => {
+    const shiftRef = collection(db, CollectionName.shifts);
+    const shiftQuery = query(
+      shiftRef,
+      where('ShiftLocationId', '==', locationId),
+      where('ShiftDate', '>=', startDate),
+      where('ShiftDate', '<=', endDate)
+    );
+
+    return getDocs(shiftQuery);
+  };
+
+  static getAllPatrolsOfLocation = (locationId: string) => {
+    const patrolRef = collection(db, CollectionName.patrols);
+    const patrolQuery = query(
+      patrolRef,
+      where('PatrolLocationId', '==', locationId)
+    );
+
+    return getDocs(patrolQuery);
+  };
+
   //*For client portal
   static getClientPatrols = async ({
     lmt,

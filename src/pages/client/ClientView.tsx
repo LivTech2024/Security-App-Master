@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import Button from '../../common/button/Button';
 import { useEditFormStore } from '../../store';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { IClientsCollection } from '../../@types/database';
+import {
+  IClientsCollection,
+  ILocationsCollection,
+  IPatrolsCollection,
+  IShiftsCollection,
+} from '../../@types/database';
 import DbClient from '../../firebase_configs/DB/DbClient';
 import NoSearchResult from '../../common/NoSearchResult';
 import { PageRoutes } from '../../@types/enum';
@@ -12,6 +17,19 @@ import { numberFormatter } from '../../utilities/NumberFormater';
 import PageHeader from '../../common/PageHeader';
 import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
 import dayjs from 'dayjs';
+import { formatDate, getHoursDiffInTwoTimeString } from '../../utilities/misc';
+import DbEmployee from '../../firebase_configs/DB/DbEmployee';
+import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
+import DbPatrol from '../../firebase_configs/DB/DbPatrol';
+
+interface ILocationCostDetails {
+  LocationId: string;
+  LocationTotalCompletedShift: number;
+  LocationTotalShiftCostToCompany: number;
+  LocationTotalShiftCostToClient: number;
+  LocationTotalCompletedPatrol: number;
+  LocationTotalPatrolCostToClient: number;
+}
 
 const ClientView = () => {
   const { setClientEditData } = useEditFormStore();
@@ -30,9 +48,13 @@ const ClientView = () => {
     dayjs().endOf('M').toDate()
   );
 
-  const [isLifeTime, setIsLifeTime] = useState(false);
-
   const [data, setData] = useState<IClientsCollection | null>(null);
+
+  const [locationCostDetails, setLocationCostDetails] = useState<
+    ILocationCostDetails[]
+  >([]);
+
+  const [locations, setLocations] = useState<ILocationsCollection[]>([]);
 
   const navigate = useNavigate();
 
@@ -43,9 +65,109 @@ const ClientView = () => {
       if (clientData) {
         setData(clientData);
       }
+      const locationSnapshot = await DbClient.getClientLocations(clientId);
+      const locationData = locationSnapshot.docs.map(
+        (doc) => doc.data() as ILocationsCollection
+      );
+      setLocations(locationData);
       setLoading(false);
     });
   }, [clientId]);
+
+  const getLocationCostDetails = async (
+    locationId: string,
+    shiftHourlyRate: number,
+    patrolPerHitRate: number
+  ) => {
+    if (!startDate || !endDate) return;
+    try {
+      showModalLoader({});
+      //* Fetch Shift Data
+
+      const shiftSnapshot = await DbClient.getAllShiftsOfLocation(
+        locationId,
+        startDate as Date,
+        endDate as Date
+      );
+      const shifts = shiftSnapshot.docs.map(
+        (doc) => doc.data() as IShiftsCollection
+      );
+
+      let totalShiftCostToCompany = 0;
+      let totalShiftCostToClient = 0;
+
+      await Promise.all(
+        shifts?.map(async (shift) => {
+          const {
+            ShiftAssignedUserId,
+            ShiftStartTime,
+            ShiftEndTime,
+            ShiftCurrentStatus,
+          } = shift;
+
+          if (
+            ShiftCurrentStatus.some((status) => status.Status === 'completed')
+          ) {
+            const shiftHours = getHoursDiffInTwoTimeString(
+              ShiftStartTime,
+              ShiftEndTime
+            );
+
+            totalShiftCostToClient += shiftHours * shiftHourlyRate;
+
+            await Promise.all(
+              ShiftAssignedUserId?.map(async (empId) => {
+                const empData = await DbEmployee.getEmpById(empId);
+                if (empData) {
+                  const { EmployeePayRate } = empData;
+                  totalShiftCostToCompany += EmployeePayRate * shiftHours;
+                }
+              })
+            );
+          }
+        })
+      );
+
+      //*Fetch Patrol Data
+      const patrolSnapshot = await DbClient.getAllPatrolsOfLocation(locationId);
+      const patrolData = patrolSnapshot.docs.map(
+        (doc) => doc.data() as IPatrolsCollection
+      );
+
+      let totalPatrols = 0;
+
+      await Promise.all(
+        patrolData.map(async (res) => {
+          const patrolLogsSnapshot = await DbPatrol.getPatrolLogs({
+            patrolId: res.PatrolId,
+            startDate,
+            endDate,
+          });
+          totalPatrols += patrolLogsSnapshot.size;
+        })
+      );
+
+      const totalPatrolCostToClient = totalPatrols * patrolPerHitRate;
+
+      setLocationCostDetails((prev) => [
+        ...prev,
+        {
+          LocationId: locationId,
+          LocationTotalCompletedPatrol: totalPatrols,
+          LocationTotalCompletedShift: shifts.length,
+          LocationTotalPatrolCostToClient: totalPatrolCostToClient,
+          LocationTotalShiftCostToClient: totalShiftCostToClient,
+          LocationTotalShiftCostToCompany: totalShiftCostToCompany,
+        },
+      ]);
+
+      closeModalLoader();
+      console.log(locationId);
+    } catch (error) {
+      console.log(error);
+      closeModalLoader();
+    }
+  };
 
   if (!data && !loading) {
     return (
@@ -83,17 +205,7 @@ const ClientView = () => {
           }
         />
 
-        <div className="bg-surface shadow rounded p-4 flex gap-4">
-          <DateFilterDropdown
-            endDate={endDate}
-            isLifetime={isLifeTime}
-            setEndDate={setEndDate}
-            setIsLifetime={setIsLifeTime}
-            setStartDate={setStartDate}
-            startDate={startDate}
-          />
-        </div>
-        <div className="bg-surface shadow rounded p-4">
+        <div className="bg-surface shadow rounded p-4 flex flex-col gap-4">
           <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="font-semibold">Client Name:</p>
@@ -116,6 +228,147 @@ const ClientView = () => {
               <p className="font-semibold">Client Balance To Date:</p>
               <p>{numberFormatter(data?.ClientBalance, true)}</p>
             </div>
+          </div>
+        </div>
+        <div className="bg-surface shadow rounded p-4 flex flex-col gap-4">
+          <div className="flex items-center justify-between w-full gap-4">
+            <div className="font-semibold text-lg mt-2">Client Locations</div>
+            <DateFilterDropdown
+              endDate={endDate}
+              setEndDate={setEndDate}
+              setStartDate={setStartDate}
+              startDate={startDate}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {locations.map((loc) => {
+              const costDetails = locationCostDetails.find(
+                (res) => res.LocationId === loc.LocationId
+              );
+              return (
+                <div className="grid grid-cols-2 bg-onHoverBg rounded shadow p-4 gap-x-4 gap-y-2">
+                  <div className="flex gap-1 items-center even:justify-end">
+                    <span className="font-semibold">Location Name: </span>
+                    <span>{loc.LocationName}</span>
+                  </div>
+                  <div className="flex gap-1 items-center even:justify-end">
+                    <span className="font-semibold">Contract Amount: </span>
+                    <span>
+                      {numberFormatter(loc.LocationContractAmount, true)}
+                    </span>
+                  </div>
+                  <div className="flex gap-1 items-center even:justify-end">
+                    <span className="font-semibold">Contract Start Date: </span>
+                    <span>{formatDate(loc.LocationContractStartDate)}</span>
+                  </div>
+                  <div className="flex gap-1 items-center even:justify-end">
+                    <span className="font-semibold">Contract Start Date: </span>
+                    <span>{formatDate(loc.LocationContractEndDate)}</span>
+                  </div>
+                  <div className="flex gap-1 items-center even:justify-end">
+                    <span className="font-semibold">Patrol Per Hit Rate: </span>
+                    <span>
+                      {numberFormatter(loc.LocationPatrolPerHitRate, true)}
+                    </span>
+                  </div>
+                  <div className="flex gap-1 items-center even:justify-end">
+                    <span className="font-semibold">Shift Hourly Rate: </span>
+                    <span>
+                      {numberFormatter(loc.LocationShiftHourlyRate, true)}
+                    </span>
+                  </div>
+                  {costDetails ? (
+                    <div className="flex flex-col gap-4 col-span-2">
+                      <div className="grid grid-cols-3 mt-4 bg-primaryGold/50 p-4 rounded gap-2 col-span-2">
+                        <div className="flex gap-1 items-center even:justify-end col-span-3">
+                          <span className="font-semibold">
+                            Total Shifts Done:{' '}
+                          </span>
+                          <span>
+                            {numberFormatter(
+                              costDetails.LocationTotalCompletedShift,
+                              false,
+                              1
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex gap-1 items-center">
+                          <span className="font-semibold">
+                            Cost To Company:{' '}
+                          </span>
+                          <span>
+                            {numberFormatter(
+                              costDetails.LocationTotalShiftCostToCompany,
+                              true
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex gap-1 items-center justify-center">
+                          <span className="font-semibold">
+                            Cost To Client:{' '}
+                          </span>
+                          <span>
+                            {numberFormatter(
+                              costDetails.LocationTotalShiftCostToClient,
+                              true
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex gap-1 items-center justify-end">
+                          <span className="font-semibold">Profit: </span>
+                          <span>
+                            {numberFormatter(
+                              costDetails.LocationTotalShiftCostToClient -
+                                costDetails.LocationTotalShiftCostToCompany,
+                              true
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 mt-4 bg-primaryGold/50 p-4 rounded gap-2 col-span-2">
+                        <div className="flex gap-1 items-center even:justify-end col-span-3">
+                          <span className="font-semibold">
+                            Total Patrol Done:{' '}
+                          </span>
+                          <span>
+                            {numberFormatter(
+                              costDetails.LocationTotalCompletedPatrol,
+                              false,
+                              1
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex gap-1 items-center">
+                          <span className="font-semibold">
+                            Cost To Client:{' '}
+                          </span>
+                          <span>
+                            {numberFormatter(
+                              costDetails.LocationTotalPatrolCostToClient,
+                              true
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button
+                      label="View Cost Details"
+                      onClick={() =>
+                        getLocationCostDetails(
+                          loc.LocationId,
+                          loc.LocationShiftHourlyRate,
+                          loc.LocationPatrolPerHitRate
+                        )
+                      }
+                      type="black"
+                      className="mt-4"
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
