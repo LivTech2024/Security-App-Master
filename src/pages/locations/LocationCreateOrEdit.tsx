@@ -329,9 +329,9 @@ const LocationCreateOrEdit = () => {
             label="Shift Hourly Rate"
             className="mx-0"
             register={methods.register}
-            name="LocationPatrolPerHitRate"
+            name="LocationShiftHourlyRate"
             decimalCount={2}
-            error={methods.formState.errors.LocationPatrolPerHitRate?.message}
+            error={methods.formState.errors.LocationShiftHourlyRate?.message}
             leadingIcon={<div>$</div>}
           />
         </div>
