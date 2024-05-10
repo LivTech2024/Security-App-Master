@@ -99,7 +99,9 @@ const ClientPatrolsList = () => {
       <PageHeader title="Patrols" />
 
       <PatrolListTable
-        data={data}
+        data={data?.sort((a, b) =>
+          a.PatrolLocationName.localeCompare(b.PatrolLocationName)
+        )}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}
         redirectOnClick={PageRoutes.CLIENT_PORTAL_PATROL_LOGS}
