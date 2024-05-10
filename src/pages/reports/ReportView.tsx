@@ -117,7 +117,7 @@ const ReportView = () => {
                     ? data?.ReportImage?.map((img) => {
                         return (
                           <a href={img} target="_blank">
-                            <LazyLoad height={100} unmountIfInvisible>
+                            <LazyLoad height={100}>
                               <img
                                 src={img}
                                 alt=""

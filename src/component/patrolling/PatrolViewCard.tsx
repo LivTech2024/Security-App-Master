@@ -92,7 +92,7 @@ const PatrolViewCard = ({
                                 target="_blank"
                                 className="text-textPrimaryBlue"
                               >
-                                <LazyLoad height={100} unmountIfInvisible>
+                                <LazyLoad height={100}>
                                   <img
                                     src={img}
                                     alt=""

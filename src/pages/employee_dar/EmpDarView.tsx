@@ -40,6 +40,7 @@ const EmpDarView = () => {
         const { EmpDarShiftId } = data;
         const shiftSnapsShot = await DbShift.getShiftById(EmpDarShiftId);
         const shiftData = shiftSnapsShot.data() as IShiftsCollection;
+        console.log(shiftData);
         setShiftData(shiftData || null);
       }
       setLoading(false);
@@ -92,8 +93,6 @@ const EmpDarView = () => {
           : 'N/A',
       });
 
-      console.log(html);
-
       const response = await htmlToPdf({ file_name: 'emp_dar.pdf', html });
       const blob = new Blob([response.data], { type: 'application/pdf' });
 
@@ -131,15 +130,15 @@ const EmpDarView = () => {
       />
 
       <div className="grid grid-cols-2 gap-4 p-4 rounded shadow">
-        <div>
-          <p className="font-semibold">Employee Name:</p>
+        <div className="flex gap-1">
+          <p className="font-semibold">Employee Name: </p>
           <p>{empDarData?.EmpDarEmpName || 'N/A'}</p>
         </div>
-        <div>
+        <div className="flex gap-1">
           <p className="font-semibold">Date:</p>
           <p>{formatDate(empDarData?.EmpDarDate)}</p>
         </div>
-        <div>
+        <div className="flex gap-1">
           <p className="font-semibold">Shift Start Time:</p>
           <p>
             {shiftData?.ShiftCurrentStatus.find(
@@ -148,12 +147,13 @@ const EmpDarView = () => {
               ? formatDate(
                   shiftData?.ShiftCurrentStatus.find(
                     (s) => s.StatusReportedById === empDarData?.EmpDarEmpId
-                  )?.StatusStartedTime
+                  )?.StatusStartedTime,
+                  'DD MMM hh:mm A'
                 )
               : 'N/A'}
           </p>
         </div>
-        <div>
+        <div className="flex gap-1">
           <p className="font-semibold">Shift End Time:</p>
           <p>
             {shiftData?.ShiftCurrentStatus.find(
@@ -201,7 +201,7 @@ const EmpDarView = () => {
                           target="_blank"
                           className="text-textPrimaryBlue"
                         >
-                          <LazyLoad height={100} unmountIfInvisible>
+                          <LazyLoad height={100}>
                             <img
                               src={src}
                               alt=""
