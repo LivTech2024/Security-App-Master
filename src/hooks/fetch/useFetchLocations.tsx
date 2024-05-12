@@ -5,18 +5,17 @@ import { MinimumQueryCharacter } from '../../@types/enum';
 import DbCompany from '../../firebase_configs/DB/DbCompany';
 
 interface Props {
-  limit: number;
+  limit?: number;
   searchQuery?: string | null;
+  clientId?: string | null;
 }
 
-const useFetchLocations = ({ limit, searchQuery }: Props) => {
+const useFetchLocations = ({ limit, searchQuery, clientId }: Props) => {
   const [data, setData] = useState<ILocationsCollection[]>([]);
 
-  const { company } = useAuthState();
+  const { company, client } = useAuthState();
 
   useEffect(() => {
-    if (!company) return;
-
     if (
       searchQuery &&
       searchQuery.trim().length > 0 &&
@@ -33,7 +32,8 @@ const useFetchLocations = ({ limit, searchQuery }: Props) => {
           searchQuery.trim().length > MinimumQueryCharacter.LOCATION
             ? searchQuery.trim()
             : undefined,
-        cmpId: company.CompanyId,
+        cmpId: company?.CompanyId || null,
+        clientId: clientId || null,
       });
       return snapshot.docs
         .map((doc) => {
@@ -53,7 +53,7 @@ const useFetchLocations = ({ limit, searchQuery }: Props) => {
     } catch (error) {
       console.log(error);
     }
-  }, [limit, company, searchQuery]);
+  }, [limit, company, searchQuery, clientId, client]);
 
   return { data };
 };

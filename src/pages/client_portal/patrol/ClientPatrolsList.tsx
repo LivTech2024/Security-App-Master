@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import PatrolListTable from '../../../component/patrolling/PatrolListTable';
 import PageHeader from '../../../common/PageHeader';
+import SelectLocation from '../../../common/SelectLocation';
 
 const ClientPatrolsList = () => {
   const { client } = useAuthState();
@@ -21,6 +22,8 @@ const ClientPatrolsList = () => {
   //const [query, setQuery] = useState("");
 
   const [debouncedQuery] = useDebouncedValue('', 200);
+
+  const [selectedLocation, setSelectedLocation] = useState('');
 
   const {
     data: snapshotData,
@@ -31,13 +34,19 @@ const ClientPatrolsList = () => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.PATROL_LIST, debouncedQuery, client!.ClientId],
+    queryKey: [
+      REACT_QUERY_KEYS.PATROL_LIST,
+      debouncedQuery,
+      client!.ClientId,
+      selectedLocation,
+    ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbClient.getClientPatrols({
         lmt: DisplayCount.PATROL_LIST,
         lastDoc: pageParam,
         searchQuery: debouncedQuery,
         clientId: client!.ClientId,
+        locationId: selectedLocation,
       });
       return snapshot.docs;
     },
@@ -97,6 +106,13 @@ const ClientPatrolsList = () => {
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader title="Patrols" />
+
+      <div className="flex justify-between w-full p-4 rounded bg-surface shadow items-center">
+        <SelectLocation
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+        />
+      </div>
 
       <PatrolListTable
         data={data?.sort((a, b) =>

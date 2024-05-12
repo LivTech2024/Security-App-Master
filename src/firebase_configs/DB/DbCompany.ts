@@ -557,18 +557,25 @@ class DbCompany {
     lastDoc,
     searchQuery,
     cmpId,
+    clientId,
   }: {
-    lmt: number;
+    lmt?: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
-    cmpId: string;
+    cmpId?: string | null;
+    clientId?: string | null;
   }) => {
     const locationRef = collection(db, CollectionName.locations);
 
-    let queryParams: QueryConstraint[] = [
-      where('LocationCompanyId', '==', cmpId),
-      orderBy('LocationCreatedAt', 'desc'),
-    ];
+    let queryParams: QueryConstraint[] = [orderBy('LocationCreatedAt', 'desc')];
+
+    if (cmpId) {
+      queryParams = [...queryParams, where('LocationCompanyId', '==', cmpId)];
+    }
+
+    if (clientId) {
+      queryParams = [...queryParams, where('LocationClientId', '==', clientId)];
+    }
 
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [

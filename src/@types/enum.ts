@@ -163,6 +163,7 @@ export const PageRoutes = {
 export const LocalStorageKey = {
   LOGGEDIN_USER: 'loggedInUser',
   SELECTED_BRANCH: 'selectedBranch',
+  SELECTED_LOCATION: 'selectedLocation',
 };
 
 export enum IUserType {

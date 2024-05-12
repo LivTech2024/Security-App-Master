@@ -386,11 +386,13 @@ class DbClient {
     lastDoc,
     searchQuery,
     clientId,
+    locationId,
   }: {
     lmt?: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     clientId: string;
+    locationId?: string;
   }) => {
     const patrolRef = collection(db, CollectionName.patrols);
 
@@ -398,6 +400,13 @@ class DbClient {
       where('PatrolClientId', '==', clientId),
       orderBy('PatrolCreatedAt', 'desc'),
     ];
+
+    if (locationId && locationId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where('PatrolLocationId', '==', locationId),
+      ];
+    }
 
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [
