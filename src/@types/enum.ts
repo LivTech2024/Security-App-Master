@@ -164,12 +164,14 @@ export const LocalStorageKey = {
   LOGGEDIN_USER: 'loggedInUser',
   SELECTED_BRANCH: 'selectedBranch',
   SELECTED_LOCATION: 'selectedLocation',
+  FCM_TOKEN: 'fcm_token',
 };
 
 export enum IUserType {
   ADMIN = 'admin',
   SUPER_ADMIN = 'super_admin',
   CLIENT = 'client',
+  EMPLOYEE = 'employee',
 }
 
 export interface LocalStorageLoggedInUserData {

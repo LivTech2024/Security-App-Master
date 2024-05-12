@@ -302,6 +302,8 @@ export interface ILoggedInUsersCollection {
   LoggedInCrypt: string;
   LoggedInUserType: IUserType;
   LoggedInCreatedAt: Timestamp | FieldValue;
+  LoggedInNotifyFcmToken?: string;
+  LoggedInPlatform: 'web' | 'android' | 'ios';
 }
 
 export interface IInvoiceItems {

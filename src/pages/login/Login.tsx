@@ -104,6 +104,7 @@ const Login = () => {
         LoggedInCreatedAt: serverTimestamp(),
         LoggedInCrypt: loggedInCrypt,
         LoggedInUserType: userType,
+        LoggedInPlatform: 'web',
       };
       const loggedInDocRef = doc(db, CollectionName.loggedInUsers, loggedInId);
 
