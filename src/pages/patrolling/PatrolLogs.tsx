@@ -12,7 +12,7 @@ import { DocumentData } from 'firebase/firestore';
 import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
 import { useInView } from 'react-intersection-observer';
 import NoSearchResult from '../../common/NoSearchResult';
-import { formatDate } from '../../utilities/misc';
+import { formatDate, toDate } from '../../utilities/misc';
 import { PatrolStatus } from '../../component/patrolling/PatrolStatus';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import { useAuthState } from '../../store';
@@ -227,7 +227,9 @@ const PatrolLogs = () => {
             <th className="uppercase px-4 py-2 w-[30%] text-start">
               Guard Name
             </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">Date</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
+              Shift Date
+            </th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">
               Started At
             </th>
@@ -247,48 +249,63 @@ const PatrolLogs = () => {
               </td>
             </tr>
           ) : (
-            data.map((patrol) => {
-              return (
-                <tr
-                  key={patrol.PatrolLogId}
-                  onClick={() => {
-                    if (admin && company) {
-                      navigate(
-                        PageRoutes.PATROLLING_VIEW + `?id=${patrol.PatrolLogId}`
-                      );
-                    } else {
-                      navigate(
-                        PageRoutes.CLIENT_PORTAL_PATROL_VIEW +
-                          `?id=${patrol.PatrolLogId}`
-                      );
-                    }
-                  }}
-                  className="cursor-pointer"
-                >
-                  <td className="px-4 py-2 text-start align-top">
-                    <span className="line-clamp-2">
-                      {patrol.PatrolLogGuardName}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2 text-start align-top ">
-                    {formatDate(patrol.PatrolDate)}
-                  </td>
-                  <td className="px-4 py-2 text-start align-top ">
-                    {formatDate(patrol.PatrolLogStartedAt, 'hh:mm A')}
-                  </td>
+            data
+              .sort((a, b) => {
+                const dateComparison =
+                  toDate(b.PatrolDate).getTime() -
+                  toDate(a.PatrolDate).getTime();
+                if (dateComparison !== 0) {
+                  return dateComparison; // Sort by PatrolDate first
+                }
+                // If PatrolDate is the same, sort by PatrolLogStartedAt
+                return (
+                  toDate(b.PatrolLogStartedAt).getTime() -
+                  toDate(a.PatrolLogStartedAt).getTime()
+                );
+              })
+              .map((patrol) => {
+                return (
+                  <tr
+                    key={patrol.PatrolLogId}
+                    onClick={() => {
+                      if (admin && company) {
+                        navigate(
+                          PageRoutes.PATROLLING_VIEW +
+                            `?id=${patrol.PatrolLogId}`
+                        );
+                      } else {
+                        navigate(
+                          PageRoutes.CLIENT_PORTAL_PATROL_VIEW +
+                            `?id=${patrol.PatrolLogId}`
+                        );
+                      }
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <td className="px-4 py-2 text-start align-top">
+                      <span className="line-clamp-2">
+                        {patrol.PatrolLogGuardName}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-start align-top ">
+                      {formatDate(patrol.PatrolDate)}
+                    </td>
+                    <td className="px-4 py-2 text-start align-top ">
+                      {formatDate(patrol.PatrolLogStartedAt, 'DD MMM-hh:mm A')}
+                    </td>
 
-                  <td className="px-4 py-2 text-start align-top">
-                    {formatDate(patrol.PatrolLogEndedAt, 'hh:mm A')}
-                  </td>
-                  <td className="px-4 py-2 text-center align-top">
-                    {patrol.PatrolLogPatrolCount}
-                  </td>
-                  <td className="px-4 py-2 text-end capitalize align-top">
-                    <PatrolStatus status={patrol.PatrolLogStatus} />
-                  </td>
-                </tr>
-              );
-            })
+                    <td className="px-4 py-2 text-start align-top">
+                      {formatDate(patrol.PatrolLogEndedAt, 'DD MMM-hh:mm A')}
+                    </td>
+                    <td className="px-4 py-2 text-center align-top">
+                      {patrol.PatrolLogPatrolCount}
+                    </td>
+                    <td className="px-4 py-2 text-end capitalize align-top">
+                      <PatrolStatus status={patrol.PatrolLogStatus} />
+                    </td>
+                  </tr>
+                );
+              })
           )}
           <tr ref={ref}>
             <td colSpan={7}>
