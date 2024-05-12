@@ -109,15 +109,10 @@ class DbPatrol {
       const oldPatrolData = patrolSnapshot.data() as IPatrolsCollection;
 
       if (
-        oldPatrolData.PatrolCurrentStatus.some(
-          (s) => s.Status === 'pending' || s.Status === 'started'
-        ) ||
-        oldPatrolData.PatrolCheckPoints.some((ch) =>
-          ch.CheckPointStatus.some((s) => s.Status === 'not_checked')
-        )
+        oldPatrolData.PatrolCurrentStatus.some((s) => s.Status === 'started')
       ) {
         throw new CustomError(
-          "Can't edit this patrol as its being assigned to some employees"
+          "Can't edit this patrol as its being started but by some employees"
         );
       }
 
