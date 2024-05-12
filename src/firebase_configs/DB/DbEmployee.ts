@@ -720,6 +720,7 @@ class DbEmployee {
     isLifeTime,
     startDate,
     empId,
+    locationId,
   }: {
     cmpId: string;
     lastDoc?: DocumentData | null;
@@ -728,6 +729,7 @@ class DbEmployee {
     endDate?: Date | string | null;
     isLifeTime?: boolean;
     empId?: string;
+    locationId?: string;
   }) => {
     const reportRef = collection(db, CollectionName.employeesDAR);
 
@@ -735,6 +737,13 @@ class DbEmployee {
       where('EmpDarCompanyId', '==', cmpId),
       orderBy('EmpDarDate', 'desc'),
     ];
+
+    if (locationId && locationId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where('EmpDarLocationId', '==', locationId),
+      ];
+    }
 
     if (!isLifeTime) {
       queryParams = [
