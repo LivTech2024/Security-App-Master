@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import empDefaultPlaceHolder from '../../../../public/assets/avatar.png';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { PageRoutes, REACT_QUERY_KEYS } from '../../../@types/enum';
 import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
@@ -30,6 +30,7 @@ import AssignShiftModal from '../modal/AssignShiftModal';
 import SelectBranch from '../../../common/SelectBranch';
 import { Accordion } from '@mantine/core';
 import { sendEmail } from '../../../API/SendEmail';
+import { useNavigate } from 'react-router-dom';
 //import { Accordion } from "@mantine/core";
 
 interface CalendarViewProps {
@@ -37,6 +38,8 @@ interface CalendarViewProps {
 }
 
 const CalendarView = ({ datesArray }: CalendarViewProps) => {
+  const navigate = useNavigate();
+
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
   const { company, empRoles } = useAuthState();
@@ -363,6 +366,12 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                               key={idx}
                             >
                               <div
+                                onDoubleClick={() =>
+                                  navigate(
+                                    PageRoutes.SHIFT_VIEW +
+                                      `?id=${data.shift.ShiftId}`
+                                  )
+                                }
                                 onClick={() => {
                                   setSelectedSchedule(data);
                                   if (data.shift.ShiftRequiredEmp > 1) {
