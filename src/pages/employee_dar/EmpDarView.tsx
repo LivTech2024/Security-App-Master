@@ -120,6 +120,36 @@ const EmpDarView = () => {
     }
   };
 
+  const getShiftStartAndEndTime = () => {
+    let shiftStartTime = 'N/A';
+    let shiftEndTime = 'N/A';
+
+    if (shiftData) {
+      if (
+        shiftData?.ShiftCurrentStatus.find(
+          (s) => s.StatusReportedById === empDarData?.EmpDarEmpId
+        )?.StatusEndReason
+      ) {
+        shiftStartTime = shiftData?.ShiftStartTime;
+        shiftEndTime = shiftData?.ShiftCurrentStatus.find(
+          (s) => s.StatusReportedById === empDarData?.EmpDarEmpId
+        )?.StatusReportedTime
+          ? formatDate(
+              shiftData?.ShiftCurrentStatus.find(
+                (s) => s.StatusReportedById === empDarData?.EmpDarEmpId
+              )?.StatusStartedTime,
+              'hh:mm'
+            )
+          : 'N/A';
+      } else {
+        shiftStartTime = shiftData?.ShiftStartTime;
+        shiftEndTime = shiftData?.ShiftEndTime;
+      }
+    }
+
+    return { shiftStartTime, shiftEndTime };
+  };
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
@@ -140,33 +170,11 @@ const EmpDarView = () => {
         </div>
         <div className="flex gap-1">
           <p className="font-semibold">Shift Start Time:</p>
-          <p>
-            {shiftData?.ShiftCurrentStatus.find(
-              (s) => s.StatusReportedById === empDarData?.EmpDarEmpId
-            )?.StatusStartedTime
-              ? formatDate(
-                  shiftData?.ShiftCurrentStatus.find(
-                    (s) => s.StatusReportedById === empDarData?.EmpDarEmpId
-                  )?.StatusStartedTime,
-                  'DD MMM hh:mm A'
-                )
-              : 'N/A'}
-          </p>
+          <p>{getShiftStartAndEndTime().shiftStartTime}</p>
         </div>
         <div className="flex gap-1">
           <p className="font-semibold">Shift End Time:</p>
-          <p>
-            {shiftData?.ShiftCurrentStatus.find(
-              (s) => s.StatusReportedById === empDarData?.EmpDarEmpId
-            )?.StatusReportedTime
-              ? formatDate(
-                  shiftData?.ShiftCurrentStatus.find(
-                    (s) => s.StatusReportedById === empDarData?.EmpDarEmpId
-                  )?.StatusReportedTime,
-                  'DD MMM hh:mm A'
-                )
-              : 'N/A'}
-          </p>
+          <p>{getShiftStartAndEndTime().shiftEndTime}</p>
         </div>
 
         <div className="flex flex-col w-full col-span-2 gap-4">

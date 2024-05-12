@@ -65,9 +65,16 @@ const ShiftViewCard = ({
             data?.ShiftCurrentStatus?.length > 0 ? (
               data?.ShiftCurrentStatus?.map((data, idx) => {
                 return (
-                  <li key={idx} className="capitalize list-decimal">
-                    {data.Status} by {data.StatusReportedByName}
-                  </li>
+                  <div key={idx} className="flex flex-col">
+                    <li className="capitalize list-decimal">
+                      {data.Status} by {data.StatusReportedByName}
+                    </li>
+                    {data.StatusEndReason && (
+                      <li className="text-sm mt-1 text-textSecondary">
+                        End Reason: {data.StatusEndReason}
+                      </li>
+                    )}
+                  </div>
                 );
               })
             ) : (
