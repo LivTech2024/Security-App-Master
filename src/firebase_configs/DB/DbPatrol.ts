@@ -31,7 +31,6 @@ import {
   getRandomNumbers,
   removeTimeFromDate,
 } from '../../utilities/misc';
-import CustomError from '../../utilities/CustomError';
 
 class DbPatrol {
   static createPatrol = async ({
@@ -105,17 +104,6 @@ class DbPatrol {
     const patrolRef = doc(db, CollectionName.patrols, patrolId);
 
     await runTransaction(db, async (transaction) => {
-      const patrolSnapshot = await transaction.get(patrolRef);
-      const oldPatrolData = patrolSnapshot.data() as IPatrolsCollection;
-
-      if (
-        oldPatrolData.PatrolCurrentStatus.some((s) => s.Status === 'started')
-      ) {
-        throw new CustomError(
-          "Can't edit this patrol as its being started but by some employees"
-        );
-      }
-
       const PatrolCheckPoints: IPatrolCheckPointsChild[] = [];
 
       data.PatrolCheckPoints.map((ch, idx) => {
