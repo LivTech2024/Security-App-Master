@@ -138,6 +138,7 @@ export interface IShiftsCollection {
     StatusStartedTime?: Timestamp | FieldValue;
     StatusReportedTime?: Timestamp | FieldValue;
     StatusShiftTotalHrs?: number;
+    StatusEndReason?: string;
   }[];
   ShiftLinkedPatrolIds: string[];
   ShiftIsSpecialShift: boolean;
