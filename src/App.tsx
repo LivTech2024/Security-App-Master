@@ -67,6 +67,7 @@ import PerformanceAssurance from './pages/performance_assurance/PerformanceAssur
 import TaskList from './pages/task_and_tracking/TaskList';
 import TaskLogs from './pages/task_and_tracking/TaskLogs';
 import LocationCreateOrEdit from './pages/locations/LocationCreateOrEdit';
+import { useTitle } from './hooks/useTitle';
 
 function App() {
   useOnAuthStateChanged();
@@ -78,6 +79,8 @@ function App() {
   const location = useLocation();
 
   const queryClient = useQueryClient();
+
+  useTitle(`Tacttik - ${client ? 'Client Portal' : 'Admin App'}`);
 
   useEffect(() => {
     if (message && (client || (admin && company))) {

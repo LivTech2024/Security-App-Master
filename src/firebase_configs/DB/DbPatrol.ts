@@ -267,7 +267,7 @@ class DbPatrol {
 
     let queryParams: QueryConstraint[] = [
       where('PatrolId', '==', patrolId),
-      orderBy('PatrolLogCreatedAt', 'desc'),
+      orderBy('PatrolDate', 'desc'),
     ];
 
     if (!isLifeTime) {
