@@ -242,10 +242,18 @@ class DbShift {
     lmt,
     lastDoc,
     cmpId,
+    endDate,
+    isLifeTime,
+    locationId,
+    startDate,
   }: {
     lmt: number;
     lastDoc?: DocumentData | null;
     cmpId: string;
+    locationId?: string | null;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
   }) => {
     const shiftRef = collection(db, CollectionName.shifts);
 
@@ -253,6 +261,22 @@ class DbShift {
       where('ShiftCompanyId', '==', cmpId),
       orderBy('ShiftDate', 'desc'),
     ];
+
+    if (locationId && locationId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where('ShiftLocationId', '==', locationId),
+      ];
+    }
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('ShiftDate', '>=', startDate),
+        where('ShiftDate', '<=', endDate),
+      ];
+    }
+
     if (lmt) {
       queryParams = [...queryParams, limit(lmt)];
     }

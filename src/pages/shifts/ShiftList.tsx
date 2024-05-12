@@ -10,11 +10,26 @@ import { useNavigate } from 'react-router-dom';
 import ShiftListTable from '../../component/shifts/ShiftListTable';
 import PageHeader from '../../common/PageHeader';
 import Button from '../../common/button/Button';
+import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
+import SelectLocation from '../../common/SelectLocation';
+import dayjs from 'dayjs';
 
 const ShiftList = () => {
   const { setShiftEditData } = useEditFormStore();
 
   const { company } = useAuthState();
+
+  const [selectedLocation, setSelectedLocation] = useState('');
+
+  const [startDate, setStartDate] = useState<Date | string | null>(
+    dayjs().startOf('M').toDate()
+  );
+
+  const [endDate, setEndDate] = useState<Date | string | null>(
+    dayjs().endOf('M').toDate()
+  );
+
+  const [isLifeTime, setIsLifeTime] = useState(false);
 
   const {
     data: snapshotData,
@@ -25,12 +40,23 @@ const ShiftList = () => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.SHIFT_LIST, company!.CompanyId],
+    queryKey: [
+      REACT_QUERY_KEYS.SHIFT_LIST,
+      company!.CompanyId,
+      selectedLocation,
+      isLifeTime,
+      startDate,
+      endDate,
+    ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbShift.getShifts({
         lmt: DisplayCount.SHIFT_LIST,
         lastDoc: pageParam,
         cmpId: company!.CompanyId,
+        endDate,
+        isLifeTime,
+        startDate,
+        locationId: selectedLocation,
       });
       return snapshot.docs;
     },
@@ -100,6 +126,21 @@ const ShiftList = () => {
           />
         }
       />
+
+      <div className="flex justify-between w-full p-4 rounded bg-surface shadow items-center">
+        <DateFilterDropdown
+          endDate={endDate}
+          isLifetime={isLifeTime}
+          setEndDate={setEndDate}
+          setIsLifetime={setIsLifeTime}
+          setStartDate={setStartDate}
+          startDate={startDate}
+        />
+        <SelectLocation
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+        />
+      </div>
 
       <ShiftListTable
         data={data}
