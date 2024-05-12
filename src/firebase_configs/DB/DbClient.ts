@@ -502,10 +502,18 @@ class DbClient {
     lmt,
     lastDoc,
     clientId,
+    locationId,
+    endDate,
+    isLifeTime,
+    startDate,
   }: {
     lmt: number;
     lastDoc?: DocumentData | null;
     clientId: string;
+    locationId?: string | null;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
   }) => {
     const shiftRef = collection(db, CollectionName.shifts);
 
@@ -518,6 +526,22 @@ class DbClient {
       ),
       orderBy('ShiftDate', 'desc'),
     ];
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('ShiftDate', '>=', startDate),
+        where('ShiftDate', '<=', endDate),
+      ];
+    }
+
+    if (locationId && locationId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where('ShiftLocationId', '==', locationId),
+      ];
+    }
+
     if (lmt) {
       queryParams = [...queryParams, limit(lmt)];
     }

@@ -11,6 +11,9 @@ import { formatDate, toDate } from '../../../utilities/misc';
 import TableShimmer from '../../../common/shimmer/TableShimmer';
 import DbEmployee from '../../../firebase_configs/DB/DbEmployee';
 import PageHeader from '../../../common/PageHeader';
+import SelectLocation from '../../../common/SelectLocation';
+import DateFilterDropdown from '../../../common/dropdown/DateFilterDropdown';
+import dayjs from 'dayjs';
 
 interface ShiftsCollection
   extends Omit<IShiftsCollection, 'ShiftAssignedUserId'> {
@@ -19,6 +22,18 @@ interface ShiftsCollection
 
 const ClientShifts = () => {
   const { client } = useAuthState();
+
+  const [selectedLocation, setSelectedLocation] = useState('');
+
+  const [startDate, setStartDate] = useState<Date | string | null>(
+    dayjs().startOf('M').toDate()
+  );
+
+  const [endDate, setEndDate] = useState<Date | string | null>(
+    dayjs().endOf('M').toDate()
+  );
+
+  const [isLifeTime, setIsLifeTime] = useState(false);
 
   const {
     data: snapshotData,
@@ -29,12 +44,23 @@ const ClientShifts = () => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.SHIFT_LIST, client!.ClientId],
+    queryKey: [
+      REACT_QUERY_KEYS.SHIFT_LIST,
+      client!.ClientId,
+      selectedLocation,
+      isLifeTime,
+      startDate,
+      endDate,
+    ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbClient.getClientShifts({
         lmt: DisplayCount.SHIFT_LIST,
         lastDoc: pageParam,
         clientId: client!.ClientId,
+        locationId: selectedLocation,
+        isLifeTime,
+        startDate,
+        endDate,
       });
 
       const docData: ShiftsCollection[] = [];
@@ -110,6 +136,21 @@ const ClientShifts = () => {
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader title="Shifts" />
+
+      <div className="flex justify-between w-full p-4 rounded bg-surface shadow items-center">
+        <DateFilterDropdown
+          endDate={endDate}
+          isLifetime={isLifeTime}
+          setEndDate={setEndDate}
+          setIsLifetime={setIsLifeTime}
+          setStartDate={setStartDate}
+          startDate={startDate}
+        />
+        <SelectLocation
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+        />
+      </div>
 
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">

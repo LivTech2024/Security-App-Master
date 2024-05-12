@@ -16,6 +16,7 @@ import { useInView } from 'react-intersection-observer';
 import PatrolListTable from '../../component/patrolling/PatrolListTable';
 import PageHeader from '../../common/PageHeader';
 import Button from '../../common/button/Button';
+import SelectLocation from '../../common/SelectLocation';
 
 export const PatrolStatus = ({
   status,
@@ -55,6 +56,8 @@ const PatrollingList = () => {
 
   const [debouncedQuery] = useDebouncedValue('', 200);
 
+  const [selectedLocation, setSelectedLocation] = useState('');
+
   const {
     data: snapshotData,
     fetchNextPage,
@@ -68,6 +71,7 @@ const PatrollingList = () => {
       REACT_QUERY_KEYS.PATROL_LIST,
       debouncedQuery,
       company!.CompanyId,
+      selectedLocation,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbPatrol.getPatrols({
@@ -75,6 +79,7 @@ const PatrollingList = () => {
         lastDoc: pageParam,
         searchQuery: debouncedQuery,
         cmpId: company!.CompanyId,
+        locationId: selectedLocation,
       });
       return snapshot.docs;
     },
@@ -146,6 +151,13 @@ const PatrollingList = () => {
           />
         }
       />
+
+      <div className="flex justify-between w-full p-4 rounded bg-surface shadow items-center">
+        <SelectLocation
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+        />
+      </div>
 
       <PatrolListTable
         data={data}
