@@ -11,7 +11,7 @@ const Layout = ({ children, userType }: LayoutProps) => {
   return (
     <div className="flex flex-col w-full h-full">
       <Nav userType={userType} />
-      <div className="min-h-[calc(100vh-4rem)] w-full bg-[#f7f7f7]">
+      <div className="min-h-[calc(100vh-4rem)] w-full bg-background">
         {children}
       </div>
       <Footer />

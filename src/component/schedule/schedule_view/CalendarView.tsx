@@ -251,7 +251,6 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
       await Promise.all(
         aggregatedEmails.map(async (res) => {
-          console.log(res, 'res');
           return sendEmail({
             to_email: res.empEmail,
             text: res.message,
@@ -343,11 +342,11 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                 return (
                   <div
                     key={index}
-                    className="flex flex-col h-full justify-start min-w-[180px] w-[14.23%] text-center"
+                    className="flex flex-col h-full justify-start min-w-[180px] w-[14.23%] text-center max-h-[350px] overflow-auto remove-vertical-scrollbar "
                   >
                     <div
                       onClick={() => setSelectedDate(date)}
-                      className="font-semibold cursor-pointer text-textPrimaryBlue"
+                      className="font-semibold cursor-pointer text-textPrimaryBlue sticky top-0 bg-background"
                     >
                       {dayjs(date).format('ddd MMM-DD')}
                     </div>
@@ -376,15 +375,15 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                   'cursor-pointer'
                                 }`}
                               >
-                                <div className="h-[30px] bg-gray-200 py-1 text-sm font-semibold ">
+                                <div className="h-[30px] bg-gray-200 py-1 text-sm font-semibold line-clamp-1">
                                   {data.shift.ShiftPosition}
                                 </div>
 
                                 <div className="bg-[#5e5c5c23] p-2 rounded  min-w-full items-center text-sm">
-                                  <div className="text-base font-medium">
+                                  <div className="text-sm font-medium line-clamp-1">
                                     {data.shift.ShiftName}
                                   </div>
-                                  <div className="font-semibold">
+                                  <div className="font-semibold line-clamp-1">
                                     {data.shift.ShiftStartTime}-
                                     {data.shift.ShiftEndTime}
                                   </div>
@@ -395,7 +394,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                         .join(',')}
                                     </div>
                                   ) : (
-                                    <div className="bg-[#ffff64] py-[2px] rounded w-full text-center">
+                                    <div className="bg-[#ffff64] py-[2px] rounded w-full text-center line-clamp-1">
                                       (Unassigned)
                                     </div>
                                   )}
