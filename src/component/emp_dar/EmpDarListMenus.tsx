@@ -4,6 +4,7 @@ import InputSelect from '../../common/inputs/InputSelect';
 import useFetchEmployees from '../../hooks/fetch/useFetchEmployees';
 import { useAuthState } from '../../store';
 import useFetchClientEmployees from '../../hooks/fetch/useFetchClientEmployees';
+import SelectLocation from '../../common/SelectLocation';
 
 interface EmpDarListMenusProps {
   startDate: Date | string | null;
@@ -14,6 +15,8 @@ interface EmpDarListMenusProps {
   setIsLifeTime?: React.Dispatch<React.SetStateAction<boolean>>;
   selectedEmpId: string;
   setSelectedEmpId: React.Dispatch<React.SetStateAction<string>>;
+  selectedLocation: string;
+  setSelectedLocation: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const EmpDarListMenus = ({
@@ -25,6 +28,8 @@ const EmpDarListMenus = ({
   setIsLifeTime,
   selectedEmpId,
   setSelectedEmpId,
+  selectedLocation,
+  setSelectedLocation,
 }: EmpDarListMenusProps) => {
   const { admin, company } = useAuthState();
 
@@ -48,18 +53,24 @@ const EmpDarListMenus = ({
         startDate={startDate}
       />
 
-      <InputSelect
-        value={selectedEmpId}
-        onChange={(e) => setSelectedEmpId(e as string)}
-        data={(admin && company ? employees : clientEmployees).map((emp) => {
-          return { label: emp.EmployeeName, value: emp.EmployeeId };
-        })}
-        searchValue={empSearchQuery}
-        onSearchChange={setEmpSearchQuery}
-        searchable
-        clearable
-        placeholder="Select employee"
-      />
+      <div className="flex items-center gap-4">
+        <SelectLocation
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+        />
+        <InputSelect
+          value={selectedEmpId}
+          onChange={(e) => setSelectedEmpId(e as string)}
+          data={(admin && company ? employees : clientEmployees).map((emp) => {
+            return { label: emp.EmployeeName, value: emp.EmployeeId };
+          })}
+          searchValue={empSearchQuery}
+          onSearchChange={setEmpSearchQuery}
+          searchable
+          clearable
+          placeholder="Select employee"
+        />
+      </div>
     </div>
   );
 };

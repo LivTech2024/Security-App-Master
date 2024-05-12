@@ -443,6 +443,7 @@ class DbClient {
     startDate,
     categoryId,
     searchQuery,
+    locationId,
   }: {
     clientId: string;
     lastDoc?: DocumentData | null;
@@ -452,6 +453,7 @@ class DbClient {
     isLifeTime?: boolean;
     categoryId?: string | null;
     searchQuery?: string | null;
+    locationId?: string | null;
   }) => {
     const reportRef = collection(db, CollectionName.reports);
 
@@ -459,6 +461,12 @@ class DbClient {
       where('ReportClientId', '==', clientId),
     ];
 
+    if (locationId && locationId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where('ReportLocationId', '==', locationId),
+      ];
+    }
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [
         ...queryParams,
@@ -609,6 +617,7 @@ class DbClient {
     startDate,
     searchQuery,
     empId,
+    locationId,
   }: {
     clientId: string;
     lastDoc?: DocumentData | null;
@@ -618,6 +627,7 @@ class DbClient {
     isLifeTime?: boolean;
     searchQuery?: string | null;
     empId?: string | null;
+    locationId?: string | null;
   }) => {
     const reportRef = collection(db, CollectionName.employeesDAR);
 
@@ -625,6 +635,13 @@ class DbClient {
       where('EmpDarClientId', '==', clientId),
       orderBy('EmpDarDate', 'desc'),
     ];
+
+    if (locationId && locationId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where('EmpDarLocationId', '==', locationId),
+      ];
+    }
 
     if (searchQuery && searchQuery.length > 0) {
       queryParams = [

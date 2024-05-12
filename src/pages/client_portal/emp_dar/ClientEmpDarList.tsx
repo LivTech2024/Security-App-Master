@@ -35,6 +35,8 @@ const ClientEmpDarList = () => {
 
   const { client } = useAuthState();
 
+  const [selectedLocation, setSelectedLocation] = useState('');
+
   const {
     data: snapshotData,
     fetchNextPage,
@@ -51,6 +53,7 @@ const ClientEmpDarList = () => {
       startDate,
       endDate,
       selectedEmpId,
+      selectedLocation,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbClient.getClientEmpDar({
@@ -61,6 +64,7 @@ const ClientEmpDarList = () => {
         startDate,
         endDate,
         empId: selectedEmpId,
+        locationId: selectedLocation,
       });
       return snapshot.docs;
     },
@@ -124,6 +128,8 @@ const ClientEmpDarList = () => {
         startDate={startDate}
         selectedEmpId={selectedEmpId}
         setSelectedEmpId={setSelectedEmpId}
+        selectedLocation={selectedLocation}
+        setSelectedLocation={setSelectedLocation}
       />
 
       <table className="rounded overflow-hidden w-full">

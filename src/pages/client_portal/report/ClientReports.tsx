@@ -16,6 +16,7 @@ import DateFilterDropdown from '../../../common/dropdown/DateFilterDropdown';
 import SearchBar from '../../../common/inputs/SearchBar';
 import { useDebouncedValue } from '@mantine/hooks';
 import PageHeader from '../../../common/PageHeader';
+import SelectLocation from '../../../common/SelectLocation';
 
 const ClientReports = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -34,6 +35,8 @@ const ClientReports = () => {
 
   const [debouncedQuery] = useDebouncedValue(query, 200);
 
+  const [selectedLocation, setSelectedLocation] = useState('');
+
   const {
     data: snapshotData,
     fetchNextPage,
@@ -50,6 +53,7 @@ const ClientReports = () => {
       startDate,
       endDate,
       debouncedQuery,
+      selectedLocation,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbClient.getClientReports({
@@ -60,6 +64,7 @@ const ClientReports = () => {
         startDate,
         endDate,
         searchQuery: debouncedQuery,
+        locationId: selectedLocation,
       });
       return snapshot.docs;
     },
@@ -122,14 +127,21 @@ const ClientReports = () => {
           setValue={setQuery}
           placeholder="Search report by name"
         />
-        <DateFilterDropdown
-          endDate={endDate}
-          isLifetime={isLifeTime}
-          setEndDate={setEndDate}
-          setIsLifetime={setIsLifeTime}
-          setStartDate={setStartDate}
-          startDate={startDate}
-        />
+
+        <div className="flex gap-4 items-center w-full justify-end">
+          <SelectLocation
+            selectedLocation={selectedLocation}
+            setSelectedLocation={setSelectedLocation}
+          />
+          <DateFilterDropdown
+            endDate={endDate}
+            isLifetime={isLifeTime}
+            setEndDate={setEndDate}
+            setIsLifetime={setIsLifeTime}
+            setStartDate={setStartDate}
+            startDate={startDate}
+          />
+        </div>
       </div>
 
       <ReportListTable
