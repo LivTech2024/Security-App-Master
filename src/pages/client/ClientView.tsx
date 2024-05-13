@@ -74,6 +74,10 @@ const ClientView = () => {
     });
   }, [clientId]);
 
+  useEffect(() => {
+    setLocationCostDetails([]);
+  }, [startDate, endDate]);
+
   const getLocationCostDetails = async (
     locationId: string,
     shiftHourlyRate: number,
@@ -107,6 +111,7 @@ const ClientView = () => {
           } = shift;
 
           if (
+            Array.isArray(ShiftCurrentStatus) &&
             ShiftCurrentStatus.some((status) => status.Status === 'completed')
           ) {
             totalShifts += 1;
@@ -170,6 +175,8 @@ const ClientView = () => {
       closeModalLoader();
     }
   };
+
+  console.log(locationCostDetails, 'cost details');
 
   if (!data && !loading) {
     return (
