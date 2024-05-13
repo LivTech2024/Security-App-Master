@@ -28,9 +28,11 @@ import { errorHandler } from '../../../utilities/CustomError';
 import { useAuthState } from '../../../store';
 import AssignShiftModal from '../modal/AssignShiftModal';
 import SelectBranch from '../../../common/SelectBranch';
-import { Accordion } from '@mantine/core';
+import { Accordion, Tooltip } from '@mantine/core';
 import { sendEmail } from '../../../API/SendEmail';
 import { useNavigate } from 'react-router-dom';
+import { getColorAccToShiftStatus } from '../../../utilities/scheduleHelper';
+import { MdOutlineInfo } from 'react-icons/md';
 //import { Accordion } from "@mantine/core";
 
 interface CalendarViewProps {
@@ -317,10 +319,44 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
       <DndProvider backend={HTML5Backend}>
         <div className="flex flex-col gap-4 overflow-hidden">
           <div className="flex items-center gap-4 justify-between">
-            <SelectBranch
-              selectedBranch={branch}
-              setSelectedBranch={setBranch}
-            />
+            <div className="flex items-center gap-6">
+              <SelectBranch
+                selectedBranch={branch}
+                setSelectedBranch={setBranch}
+              />
+              <Tooltip
+                styles={{ tooltip: { padding: 0 } }}
+                label={
+                  <div className="bg-surface shadow p-4 rounded text-primary flex flex-col gap-2">
+                    <div className="flex items-center gap-4 text-base">
+                      <span className="size-6 bg-orange-200"></span>
+                      <span className="mt-1">Pending</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-base">
+                      <span className="size-6 bg-pink-200"></span>
+                      <span className="mt-1">Started</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-base">
+                      <span className="size-6 bg-green-400"></span>
+                      <span className="mt-1">Completed</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-base">
+                      <span className="size-6 bg-red-400"></span>
+                      <span className="mt-1">Ended Early</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-base">
+                      <span className="size-6 bg-blue-400"></span>
+                      <span className="mt-1">Ended Late</span>
+                    </div>
+                  </div>
+                }
+              >
+                <div className="flex items-center gap-2 mt-1 cursor-pointer font-semibold">
+                  <MdOutlineInfo />
+                  Colors pellet info
+                </div>
+              </Tooltip>
+            </div>
             <div className="flex items-center gap-4">
               <button
                 disabled={resultToBePublished.length === 0}
@@ -384,7 +420,9 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                   'cursor-pointer'
                                 }`}
                               >
-                                <div className="h-[30px] bg-gray-200 py-1 text-sm font-semibold line-clamp-1">
+                                <div
+                                  className={`h-[30px] ${getColorAccToShiftStatus(data.shift)}  py-1 text-sm font-semibold line-clamp-1`}
+                                >
                                   {data.shift.ShiftPosition}
                                 </div>
 
