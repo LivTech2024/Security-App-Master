@@ -1,5 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
+import {
+  LocalStorageKey,
+  PageRoutes,
+  REACT_QUERY_KEYS,
+} from '../../@types/enum';
 import {
   AddShiftFormFields,
   addShiftFormSchema,
@@ -250,7 +254,16 @@ const ShiftCreateOrEdit = () => {
     setEndTime('17:00');
     setLocationSearchQuery('');
     setShiftPosition('');
-    setCompanyBranch(null);
+    if (localStorage.getItem(LocalStorageKey.SELECTED_BRANCH)) {
+      const branchName = companyBranches.find(
+        (b) =>
+          b.CompanyBranchId ===
+          localStorage.getItem(LocalStorageKey.SELECTED_BRANCH)
+      )?.CompanyBranchName;
+      setCompanyBranch(branchName || null);
+    } else {
+      setCompanyBranch(null);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, shiftEditData]);
 
@@ -476,7 +489,7 @@ const ShiftCreateOrEdit = () => {
 
             <InputTime label="End time" value={endTime} onChange={setEndTime} />
             <InputSelect
-              label="Shift location (Optional for mobile guard)"
+              label="Shift location (Not required for mobile guard)"
               data={locations.map((loc) => {
                 return { label: loc.LocationName, value: loc.LocationId };
               })}
@@ -502,7 +515,7 @@ const ShiftCreateOrEdit = () => {
             />
 
             <InputSelect
-              label="Client (Optional for mobile guard)"
+              label="Client (Not required for mobile guard)"
               value={methods.watch('ShiftClientId') || ''}
               onChange={(e) => methods.setValue('ShiftClientId', e || '')}
               data={clients.map((client) => {
