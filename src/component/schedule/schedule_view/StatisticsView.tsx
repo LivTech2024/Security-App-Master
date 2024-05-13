@@ -80,12 +80,23 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
     schedule.forEach((sch) => {
       const { employee, shift } = sch;
 
-      const shiftHours = getHoursDiffInTwoTimeString(
+      let shiftHours = getHoursDiffInTwoTimeString(
         shift.ShiftStartTime,
         shift.ShiftEndTime
       );
 
       allShiftsCost += employee.reduce((acc, obj) => {
+        if (
+          shift?.ShiftCurrentStatus &&
+          Array.isArray(shift?.ShiftCurrentStatus)
+        ) {
+          const empShiftStatus = shift?.ShiftCurrentStatus?.find(
+            (status) => status.StatusReportedById === obj.EmployeeId
+          );
+          if (empShiftStatus && empShiftStatus.StatusShiftTotalHrs) {
+            shiftHours = empShiftStatus.StatusShiftTotalHrs;
+          }
+        }
         return acc + obj.EmployeePayRate * shiftHours;
       }, 0);
     });
@@ -106,25 +117,11 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
 
       unAssignedShiftTotal += unAssigned.length;
 
-      unAssignedShiftHours += unAssigned.reduce((acc, obj) => {
-        const shiftHours = getHoursDiffInTwoTimeString(
-          obj.shift.ShiftStartTime,
-          obj.shift.ShiftEndTime
-        );
-
-        return acc + shiftHours;
-      }, 0);
+      unAssignedShiftHours += getShiftHours(unAssigned);
 
       assignedShiftTotal += assigned.length;
 
-      assignedShiftHours += assigned.reduce((acc, obj) => {
-        const shiftHours = getHoursDiffInTwoTimeString(
-          obj.shift.ShiftStartTime,
-          obj.shift.ShiftEndTime
-        );
-
-        return acc + shiftHours;
-      }, 0);
+      assignedShiftHours += getShiftHours(assigned);
 
       totalCost += getShiftsCost(assigned);
     });
@@ -153,12 +150,24 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
     schedules?.forEach((schedule) => {
       if (schedule?.employee?.length > 0) {
         const { employee, shift } = schedule;
-        const shiftHours = getHoursDiffInTwoTimeString(
+        let shiftHours = getHoursDiffInTwoTimeString(
           shift.ShiftStartTime,
           shift.ShiftEndTime
         );
 
         employee.forEach((emp) => {
+          if (
+            shift?.ShiftCurrentStatus &&
+            Array.isArray(shift?.ShiftCurrentStatus)
+          ) {
+            const empShiftStatus = shift?.ShiftCurrentStatus?.find(
+              (status) => status.StatusReportedById === emp.EmployeeId
+            );
+            if (empShiftStatus && empShiftStatus.StatusShiftTotalHrs) {
+              shiftHours = empShiftStatus.StatusShiftTotalHrs;
+            }
+          }
+
           const existingEmpIndex = updatedEmpHavingShifts.findIndex(
             (e) => e.empId === emp.EmployeeId
           );
@@ -189,6 +198,35 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
 
     setEmpHavingShifts(updatedEmpHavingShifts); // Update state with the accumulated changes
   }, [schedules]);
+
+  const getShiftHours = (schedule: ISchedule[]) => {
+    return schedule.reduce((acc, obj) => {
+      let shiftTotalHrsSpentByAllEmp = 0;
+
+      if (
+        obj?.shift?.ShiftCurrentStatus &&
+        Array.isArray(obj?.shift?.ShiftCurrentStatus) &&
+        obj?.shift?.ShiftCurrentStatus.length > 0
+      ) {
+        shiftTotalHrsSpentByAllEmp = obj?.shift?.ShiftCurrentStatus?.reduce(
+          (acc, obj) => acc + (obj.StatusShiftTotalHrs || 0),
+          0
+        );
+      }
+
+      const shiftHours =
+        getHoursDiffInTwoTimeString(
+          obj.shift.ShiftStartTime,
+          obj.shift.ShiftEndTime
+        ) * obj.shift.ShiftAssignedUserId.length;
+
+      if (shiftTotalHrsSpentByAllEmp) {
+        return acc + shiftTotalHrsSpentByAllEmp;
+      }
+
+      return acc + shiftHours;
+    }, 0);
+  };
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -271,16 +309,7 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
                       {assigned.length.toFixed(2)}
                     </td>
                     <td className="px-2 py-2 text-center">
-                      {assigned
-                        .reduce((acc, obj) => {
-                          const shiftHours = getHoursDiffInTwoTimeString(
-                            obj.shift.ShiftStartTime,
-                            obj.shift.ShiftEndTime
-                          );
-
-                          return acc + shiftHours;
-                        }, 0)
-                        .toFixed(2)}
+                      {numberFormatter(getShiftHours(assigned), false)}
                     </td>
                     <td className="px-2 py-2 text-end">
                       {numberFormatter(getShiftsCost(assigned), true)}
@@ -336,7 +365,7 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
                     <td className="px-2 py-2 text-start">{data.empName}</td>
                     <td className="px-2 py-2 text-center">{data.empShifts}</td>
                     <td className="px-2 py-2 text-center">
-                      {data.empHours.toFixed(2)}
+                      {numberFormatter(data.empHours)}
                     </td>
                     <td className="px-2 py-2 text-center">
                       {numberFormatter(data.empPayRate, true)}
