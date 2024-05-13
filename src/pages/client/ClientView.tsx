@@ -95,6 +95,7 @@ const ClientView = () => {
 
       let totalShiftCostToCompany = 0;
       let totalShiftCostToClient = 0;
+      let totalShifts = 0;
 
       await Promise.all(
         shifts?.map(async (shift) => {
@@ -108,6 +109,7 @@ const ClientView = () => {
           if (
             ShiftCurrentStatus.some((status) => status.Status === 'completed')
           ) {
+            totalShifts += 1;
             const shiftHours = getHoursDiffInTwoTimeString(
               ShiftStartTime,
               ShiftEndTime
@@ -154,7 +156,7 @@ const ClientView = () => {
         {
           LocationId: locationId,
           LocationTotalCompletedPatrol: totalPatrols,
-          LocationTotalCompletedShift: shifts.length,
+          LocationTotalCompletedShift: totalShifts,
           LocationTotalPatrolCostToClient: totalPatrolCostToClient,
           LocationTotalShiftCostToClient: totalShiftCostToClient,
           LocationTotalShiftCostToCompany: totalShiftCostToCompany,
