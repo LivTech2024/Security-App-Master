@@ -85,7 +85,7 @@ function App() {
 
   const queryClient = useQueryClient();
 
-  //*Messaging part
+  //*Foreground message
   onMessage(messaging, (payload) => {
     showSnackbar({ message: payload.notification?.body, type: 'info' });
   });
