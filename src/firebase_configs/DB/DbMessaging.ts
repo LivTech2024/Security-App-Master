@@ -16,10 +16,10 @@ import {
 import { db } from '../config';
 import { CollectionName } from '../../@types/enum';
 import { getNewDocId } from './utils';
-import { IMessagesCollection } from '../../@types/database';
+import { IAdminsCollection, IMessagesCollection } from '../../@types/database';
 
 class DbMessaging {
-  static createMessage = ({
+  static createMessage = async ({
     cmpId,
     data,
     senderId,
@@ -34,6 +34,25 @@ class DbMessaging {
   }) => {
     const messageId = getNewDocId(CollectionName.messages);
     const messageRef = doc(db, CollectionName.messages, messageId);
+
+    if (receiversId.includes(cmpId)) {
+      const adminsRef = collection(db, CollectionName.admins);
+      const adminsQuery = query(
+        adminsRef,
+        where('AdminCompanyId', '==', cmpId)
+      );
+      const adminsSnapshot = await getDocs(adminsQuery);
+      const adminsId: string[] = [];
+      adminsSnapshot.forEach((doc) => {
+        const data = doc.data() as IAdminsCollection;
+        const { AdminId } = data;
+        if (!adminsId.includes(AdminId)) {
+          adminsId.push(AdminId);
+        }
+
+        receiversId = receiversId.filter((id) => id !== cmpId).concat(adminsId);
+      });
+    }
 
     const newMessage: IMessagesCollection = {
       MessageId: messageId,
