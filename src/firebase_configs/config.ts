@@ -6,6 +6,7 @@ import {
   persistentLocalCache,
   persistentSingleTabManager,
 } from 'firebase/firestore';
+import { getMessaging } from 'firebase/messaging';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -32,3 +33,5 @@ export const db = firestore;
 export const auth = getAuth();
 
 export const storage = getStorage();
+
+export const messaging = getMessaging(app);

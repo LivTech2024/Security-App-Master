@@ -68,9 +68,14 @@ import TaskList from './pages/task_and_tracking/TaskList';
 import TaskLogs from './pages/task_and_tracking/TaskLogs';
 import LocationCreateOrEdit from './pages/locations/LocationCreateOrEdit';
 import { useTitle } from './hooks/useTitle';
+import useFirebaseMessaging from './hooks/useFirebaseMessaging';
+import { onMessage } from 'firebase/messaging';
+import { messaging } from './firebase_configs/config';
 
 function App() {
   useOnAuthStateChanged();
+
+  useFirebaseMessaging();
 
   const { company, admin, loading, superAdmin, client } = useAuthState();
 
@@ -79,6 +84,11 @@ function App() {
   const location = useLocation();
 
   const queryClient = useQueryClient();
+
+  //*Messaging part
+  onMessage(messaging, (payload) => {
+    showSnackbar({ message: payload.notification?.body, type: 'info' });
+  });
 
   useTitle(`Tacttik - ${client ? 'Client Portal' : 'Admin App'}`);
 
