@@ -11,11 +11,11 @@ import Schedule from './pages/schedule/Schedule';
 import LoaderModal from './common/modals/LoaderModal';
 import { ContextConfirmModal } from './common/modals/ContextConfirmModal';
 import { ToastContainer } from 'react-toastify';
-import { PageRoutes, REACT_QUERY_KEYS } from './@types/enum';
+import { PageRoutes } from './@types/enum';
 import PatrollingList from './pages/patrolling/PatrollingList';
 import PatrollingCreateOrEdit from './pages/patrolling/PatrollingCreateOrEdit';
 import PatrollingView from './pages/patrolling/PatrollingView';
-import { useEffect } from 'react';
+
 import { showSnackbar } from './utilities/TsxUtils';
 import { useAuthState } from './store';
 import Login from './pages/login/Login';
@@ -48,9 +48,7 @@ import ClientPatrolView from './pages/client_portal/patrol/ClientPatrolView';
 import ClientReportView from './pages/client_portal/report/ClientReportView';
 import ClientShifts from './pages/client_portal/shift/ClientShifts';
 import ClientShiftView from './pages/client_portal/shift/ClientShiftView';
-import useListenMessage from './hooks/listeners/useListenMessage';
 import Messaging from './pages/messaging/Messaging';
-import { useQueryClient } from '@tanstack/react-query';
 import ClientMessaging from './pages/client_portal/ClientMessaging';
 import PatrolLogs from './pages/patrolling/PatrolLogs';
 import ClientPatrolLog from './pages/client_portal/patrol/ClientPatrolLog';
@@ -79,11 +77,7 @@ function App() {
 
   const { company, admin, loading, superAdmin, client } = useAuthState();
 
-  const { message } = useListenMessage();
-
   const location = useLocation();
-
-  const queryClient = useQueryClient();
 
   //*Foreground message
   onMessage(messaging, (payload) => {
@@ -91,21 +85,6 @@ function App() {
   });
 
   useTitle(`Tacttik - ${client ? 'Client Portal' : 'Admin App'}`);
-
-  useEffect(() => {
-    if (message && (client || (admin && company))) {
-      const { MessageData } = message;
-      showSnackbar({
-        message: MessageData,
-        type: 'info',
-      });
-      queryClient
-        .invalidateQueries({
-          queryKey: [REACT_QUERY_KEYS.MESSAGE_RECEIVED_LIST],
-        })
-        .then(() => console.log('new message updated'));
-    }
-  }, [message]);
 
   if (loading) {
     return <SplashScreen />;
