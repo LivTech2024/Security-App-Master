@@ -4,7 +4,7 @@ import {
   IPatrolsCollection,
 } from '../../@types/database';
 import TimelineVertical from '../../common/TimelineVertical';
-import { formatDate } from '../../utilities/misc';
+import { formatDate, toDate } from '../../utilities/misc';
 
 const PatrolViewCard = ({
   patrolData,
@@ -65,7 +65,11 @@ const PatrolViewCard = ({
 
         <div className="flex gap-4 flex-wrap">
           <TimelineVertical
-            timelineItems={patrolLogData.PatrolLogCheckPoints.map((ch) => {
+            timelineItems={patrolLogData.PatrolLogCheckPoints.sort(
+              (a, b) =>
+                toDate(a?.CheckPointReportedAt)?.getTime() -
+                toDate(b?.CheckPointReportedAt)?.getTime()
+            ).map((ch) => {
               return {
                 icon: '',
                 text: ch.CheckPointName,
