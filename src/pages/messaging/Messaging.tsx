@@ -9,7 +9,7 @@ import PageHeader from '../../common/PageHeader';
 const Messaging = () => {
   const [sendMessageModal, setSendMessageModal] = useState(false);
 
-  const { company } = useAuthState();
+  const { company, admin } = useAuthState();
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
@@ -30,7 +30,7 @@ const Messaging = () => {
         setOpened={setSendMessageModal}
       />
       <div className="grid grid-cols-2 gap-4">
-        <ReceivedMessageList receiverId={company!.CompanyId} />
+        <ReceivedMessageList receiverId={admin!.AdminId} />
         <SentMessageList senderId={company!.CompanyId} />
       </div>
     </div>

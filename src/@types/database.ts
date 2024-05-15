@@ -83,6 +83,7 @@ export interface IEmployeesCollection {
   EmployeePostalCode?: string | null;
   EmployeeCity?: string | null;
   EmployeeProvince?: string | null;
+  EmployeeCurrentLocation?: GeoPoint;
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;
 }
