@@ -325,6 +325,7 @@ export interface IInvoicesCollection {
   InvoiceClientName: string;
   InvoiceClientPhone: string;
   InvoiceClientAddress: string | null;
+  InvoiceLocationId: string;
   InvoiceNumber: string;
   InvoiceDate: Timestamp | FieldValue;
   InvoiceDueDate: Timestamp | FieldValue;

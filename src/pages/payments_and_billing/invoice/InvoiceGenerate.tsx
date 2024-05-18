@@ -28,6 +28,8 @@ import InputAutoComplete from '../../../common/inputs/InputAutocomplete';
 import PageHeader from '../../../common/PageHeader';
 import { toDate } from '../../../utilities/misc';
 import { openContextModal } from '@mantine/modals';
+import InputSelect from '../../../common/inputs/InputSelect';
+import useFetchLocations from '../../../hooks/fetch/useFetchLocations';
 
 const numberToString = (value: number) => {
   return String(value) as unknown as number;
@@ -282,6 +284,15 @@ const InvoiceGenerate = () => {
     return () => closeModalLoader();
   }, [loading]);
 
+  const clientId = methods.watch('InvoiceClientId');
+
+  const [locationSearchQuery, setLocationSearchQuery] = useState('');
+  const { data: locations } = useFetchLocations({
+    clientId: clientId,
+    searchQuery: locationSearchQuery,
+    limit: 5,
+  });
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
@@ -341,6 +352,23 @@ const InvoiceGenerate = () => {
                   return { label: data.ClientName, value: data.ClientName };
                 })}
               />
+
+              {clientId && (
+                <InputSelect
+                  label="Select Location"
+                  value={methods.watch('InvoiceLocationId')}
+                  onChange={(e) =>
+                    methods.setValue('InvoiceLocationId', e as string)
+                  }
+                  data={locations.map((res) => {
+                    return { label: res.LocationName, value: res.LocationId };
+                  })}
+                  searchValue={locationSearchQuery}
+                  onSearchChange={setLocationSearchQuery}
+                  searchable
+                  clearable
+                />
+              )}
             </div>
             <div className="flex flex-col bg-surface shadow p-4 rounded gap-4 w-[40%] max-w-xl justify-start">
               <div className="font-semibold">Transaction details</div>
