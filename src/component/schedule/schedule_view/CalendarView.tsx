@@ -104,8 +104,8 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(datesArray[0]);
 
   useEffect(() => {
-    setSelectedDate(datesArray[0]);
-  }, [datesArray]);
+    setSelectedDate(new Date());
+  }, []);
 
   useEffect(() => {
     const fetchEmpSchedule = async () => {
@@ -392,7 +392,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                         label={dayjs(date).format('ddd MMM-DD')}
                         type="blue"
                         onClick={() => setSelectedDate(date)}
-                        className="w-full text-sm"
+                        className="w-full text-sm rounded-full  border-[1px] border-[#02829b] bg-gradient-to-b from-[#7ed7df] to-[#00a9d0] hover:scale-[1.02] duration-200"
                       />
                     </div>
 
