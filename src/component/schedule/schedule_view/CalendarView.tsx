@@ -505,6 +505,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                         }`}
                                         callback={dropResult}
                                         canDrag={data.EmpIsAvailable}
+                                        key={data.EmpId}
                                       >
                                         <div
                                           className={`flex items-center gap-2  p-2 rounded text-sm  ${

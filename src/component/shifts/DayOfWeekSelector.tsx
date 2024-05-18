@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { removeTimeFromDate } from '../../utilities/misc';
+import { FaCircleChevronLeft, FaCircleChevronRight } from 'react-icons/fa6';
+import { DatePickerInput } from '@mantine/dates';
+import { MdCalendarToday } from 'react-icons/md';
 
 const DaysOfWeekSelector = ({
   selectedDays,
@@ -13,15 +16,19 @@ const DaysOfWeekSelector = ({
 }) => {
   const [daysOfWeek, setDaysOfWeek] = useState<Date[]>([]);
 
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   useEffect(() => {
-    const today = dayjs();
-    const days: Date[] = [];
-    for (let i = 0; i < 7; i++) {
-      const day = today.add(i, 'day').toDate();
-      days.push(removeTimeFromDate(day));
+    setDaysOfWeek([]);
+
+    for (
+      let i = dayjs(selectedDate).startOf('week');
+      i.isBefore(dayjs(selectedDate).endOf('week'));
+      i = dayjs(i).add(1, 'day')
+    ) {
+      setDaysOfWeek((prev) => [...prev, removeTimeFromDate(i.toDate())]);
     }
-    setDaysOfWeek(days);
-  }, []);
+  }, [selectedDate]);
 
   const toggleDay = (day: Date) => {
     if (isMultipleSelectable) {
@@ -37,7 +44,47 @@ const DaysOfWeekSelector = ({
 
   return (
     <div className="p-4 bg-onHoverBg flex flex-col w-full gap-2">
-      <div className="font-semibold">Add to</div>
+      <div className="flex justify-between w-full gap-4">
+        <div className="font-semibold">Add to</div>
+        <div className="flex items-center gap-4">
+          <FaCircleChevronLeft
+            className="text-2xl cursor-pointer"
+            onClick={() =>
+              setSelectedDate((prev) =>
+                dayjs(prev).subtract(1, 'week').toDate()
+              )
+            }
+          />
+          <label
+            htmlFor="date_picker"
+            className="flex items-center gap-4 cursor-pointer justify-center w-full"
+          >
+            <div className="font-semibold">
+              Week of {dayjs(selectedDate).format('MMM DD, YYYY')}
+            </div>
+
+            <DatePickerInput
+              type="default"
+              id="date_picker"
+              className="font-semibold"
+              rightSection={
+                <label>
+                  <MdCalendarToday size={16} className="cursor-pointer" />
+                </label>
+              }
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e as Date)}
+            />
+          </label>
+          <FaCircleChevronRight
+            className="text-2xl cursor-pointer"
+            onClick={() =>
+              setSelectedDate((prev) => dayjs(prev).add(1, 'week').toDate())
+            }
+          />
+        </div>
+        <div>&nbsp;</div>
+      </div>
       <div className="flex items-center gap-4 w-full">
         {daysOfWeek.map((day) => (
           <label
