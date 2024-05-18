@@ -20,7 +20,9 @@ const useFirebaseMessaging = () => {
         DbUser.updateLoggedInUserNotificationToken(
           loggedInUser.LoggedInId,
           token
-        );
+        ).catch((err) => {
+          console.log(err, 'Error while updating firebase fcm token');
+        });
       }
     };
 
