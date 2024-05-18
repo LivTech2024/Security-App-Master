@@ -33,6 +33,7 @@ import { sendEmail } from '../../../API/SendEmail';
 import { useNavigate } from 'react-router-dom';
 import { getColorAccToShiftStatus } from '../../../utilities/scheduleHelper';
 import { MdOutlineInfo } from 'react-icons/md';
+import Button from '../../../common/button/Button';
 //import { Accordion } from "@mantine/core";
 
 interface CalendarViewProps {
@@ -376,7 +377,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
           </div>
 
           <div className="flex items-start gap-6 w-full justify-between">
-            <div className="flex w-full flex-wrap overflow-hidden">
+            <div className="flex w-full flex-wrap max-h-[80vh] overflow-auto remove-vertical-scrollbar">
               {datesArray.map((date, index) => {
                 return (
                   <div
@@ -385,9 +386,14 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                   >
                     <div
                       onClick={() => setSelectedDate(date)}
-                      className="font-semibold cursor-pointer text-textPrimaryBlue sticky top-0 bg-background"
+                      className="font-semibold cursor-pointer text-textPrimaryBlue sticky top-0 bg-background justify-center flex w-full px-2 pt-4"
                     >
-                      {dayjs(date).format('ddd MMM-DD')}
+                      <Button
+                        label={dayjs(date).format('ddd MMM-DD')}
+                        type="blue"
+                        onClick={() => setSelectedDate(date)}
+                        className="w-full text-sm"
+                      />
                     </div>
 
                     {getScheduleForDay(datesArray[index], schedules).length >
@@ -423,12 +429,12 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                 <div
                                   className={`h-[30px] ${getColorAccToShiftStatus(data.shift)}  py-1 text-sm font-semibold line-clamp-1`}
                                 >
-                                  {data.shift.ShiftPosition}
+                                  {data.shift.ShiftName}
                                 </div>
 
                                 <div className="bg-[#5e5c5c23] p-2 rounded  min-w-full items-center text-sm">
                                   <div className="text-sm font-medium line-clamp-1">
-                                    {data.shift.ShiftName}
+                                    {data.shift.ShiftPosition}
                                   </div>
                                   <div className="font-semibold line-clamp-1">
                                     {data.shift.ShiftStartTime}-
@@ -461,7 +467,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
               })}
             </div>
             {selectedDate && (
-              <div className="flex flex-col gap-4 p-4 bg-onHoverBg rounded shadow w-[30%]">
+              <div className="flex flex-col gap-4 p-4 bg-onHoverBg rounded shadow w-[30%] sticky top-0">
                 <div className="font-semibold">
                   Available Employees ({dayjs(selectedDate).format('ddd MMM-D')}
                   )
@@ -481,7 +487,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                             {role.EmployeeRoleName}
                           </Accordion.Control>
                           <Accordion.Panel>
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-4 max-h-[50vh] overflow-auto remove-vertical-scrollbar">
                               {empAvailableForShift.filter(
                                 (emp) => emp.EmpRole === role.EmployeeRoleName
                               ).length > 0 && !isEmpLoading ? (
@@ -519,23 +525,25 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                             key={data.EmpId}
                                             className="flex flex-col "
                                           >
-                                            <div className="flex items-center gap-2">
-                                              Name:{' '}
-                                              <span className="font-semibold">
+                                            <div className="flex items-center gap-2 ">
+                                              <span className="text-nowrap">
+                                                Name:
+                                              </span>
+                                              <span className="font-semibold line-clamp-1">
                                                 {data.EmpName}
-                                              </span>{' '}
+                                              </span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                              Week shifts:{' '}
+                                              <span>Week shifts:</span>
                                               <span className="font-semibold">
                                                 {data.EmpWeekShifts}
-                                              </span>{' '}
+                                              </span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                              Week hours:{' '}
+                                              <span>Week hours:</span>
                                               <span className="font-semibold">
                                                 {data.EmpWeekHours.toFixed(1)}
-                                              </span>{' '}
+                                              </span>
                                             </div>
                                           </div>
                                         </div>
@@ -547,7 +555,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                   return (
                                     <div
                                       key={idx}
-                                      className="bg-shimmerColor animate-pulse w-[150px] h-[80px]"
+                                      className="bg-shimmerColor animate-pulse w-full h-[80px]"
                                     ></div>
                                   );
                                 })
