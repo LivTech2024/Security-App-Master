@@ -42,6 +42,10 @@ const Schedule = () => {
     }
   }, [selectedDate, selectedTenure]);
 
+  useEffect(() => {
+    setSelectedTenure('weekly');
+  }, [selectedView]);
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <TopSection

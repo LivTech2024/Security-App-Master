@@ -318,92 +318,95 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
           </div>
         </div>
 
-        <div className="flex items-start gap-4 w-full">
-          <table className="w-[80%]">
-            <thead>
-              <tr className="border-b border-gray-400 bg-gray-200 border-x border-x-gray-200">
-                <th className="w-[15%] px-2 py-1">&nbsp;</th>
-                {datesArray.map((date) => {
+        <div className="flex items-start gap-4 w-full ">
+          <div className="w-[80%] max-h-[80vh] overflow-auto remove-vertical-scrollbar">
+            <table className="w-full">
+              <thead className="sticky top-0">
+                <tr className="border-b border-gray-400 bg-gray-200 border-x border-x-gray-200">
+                  <th className="w-[15%] px-2 py-1">&nbsp;</th>
+                  {datesArray.map((date) => {
+                    return (
+                      <th className="w- text-center px-2 py-1">
+                        <span className="line-clamp-1">
+                          {dayjs(date).format('ddd MMM-DD')}
+                        </span>
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {employees.map((emp) => {
+                  const empShifts = getEmpShiftForWeek(emp.EmployeeId);
                   return (
-                    <th className="w- text-center px-2 py-1">
-                      <span className="line-clamp-1">
-                        {dayjs(date).format('ddd MMM-DD')}
-                      </span>
-                    </th>
+                    <tr className="border-b border-gray-400">
+                      <td className="py-4 px-2 border-l border-gray-400">
+                        <div className="flex flex-col">
+                          <span>{emp.EmployeeName}</span>
+                          <span className="font-semibold pl-1 text-sm">
+                            {empShifts.length > 0 ? (
+                              <div>
+                                {' '}
+                                {empShifts.length} shift -{' '}
+                                {empShifts.reduce((acc, shift) => {
+                                  const shiftHours =
+                                    getHoursDiffInTwoTimeString(
+                                      shift.ShiftStartTime,
+                                      shift.ShiftEndTime
+                                    );
+                                  return acc + shiftHours;
+                                }, 0)}
+                                {' hours'}
+                              </div>
+                            ) : (
+                              <div className="">Not Scheduled</div>
+                            )}
+                          </span>
+                          {emp.EmployeeIsAvailable !== 'available' && (
+                            <span>
+                              {emp.EmployeeIsAvailable === 'on_vacation'
+                                ? 'On vacation'
+                                : emp.EmployeeIsAvailable === 'out_of_reach'
+                                  ? 'Out of reach'
+                                  : 'Available'}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      {datesArray.map((date, idx) => {
+                        const shift = getEmpShiftForDay(emp.EmployeeId, date);
+                        return (
+                          <td
+                            className={`text-center px-2 border-l ${
+                              datesArray.length === idx + 1 && 'border-r'
+                            } border-gray-400`}
+                          >
+                            {shift ? (
+                              <div className="flex flex-col text-sm items-center">
+                                <span>{shift.ShiftName}</span>
+                                <span className="font-semibold">
+                                  {shift.ShiftStartTime} -{shift.ShiftEndTime}
+                                </span>
+                                <span>{shift.ShiftPosition}</span>
+                              </div>
+                            ) : (
+                              <DropPoint
+                                accept={`${formatDate(date, 'DDMMYYYY')}${emp.EmployeeRole}`}
+                                id={emp.EmployeeId}
+                                className="min-h-[60px]"
+                              >
+                                <div>&nbsp;</div>
+                              </DropPoint>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
                   );
                 })}
-              </tr>
-            </thead>
-            <tbody>
-              {employees.map((emp) => {
-                const empShifts = getEmpShiftForWeek(emp.EmployeeId);
-                return (
-                  <tr className="border-b border-gray-400">
-                    <td className="py-4 px-2 border-l border-gray-400">
-                      <div className="flex flex-col">
-                        <span>{emp.EmployeeName}</span>
-                        <span className="font-semibold pl-1 text-sm">
-                          {empShifts.length > 0 ? (
-                            <div>
-                              {' '}
-                              {empShifts.length} shift -{' '}
-                              {empShifts.reduce((acc, shift) => {
-                                const shiftHours = getHoursDiffInTwoTimeString(
-                                  shift.ShiftStartTime,
-                                  shift.ShiftEndTime
-                                );
-                                return acc + shiftHours;
-                              }, 0)}
-                              {' hours'}
-                            </div>
-                          ) : (
-                            <div className="">Not Scheduled</div>
-                          )}
-                        </span>
-                        {emp.EmployeeIsAvailable !== 'available' && (
-                          <span>
-                            {emp.EmployeeIsAvailable === 'on_vacation'
-                              ? 'On vacation'
-                              : emp.EmployeeIsAvailable === 'out_of_reach'
-                                ? 'Out of reach'
-                                : 'Available'}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    {datesArray.map((date, idx) => {
-                      const shift = getEmpShiftForDay(emp.EmployeeId, date);
-                      return (
-                        <td
-                          className={`text-center px-2 border-l ${
-                            datesArray.length === idx + 1 && 'border-r'
-                          } border-gray-400`}
-                        >
-                          {shift ? (
-                            <div className="flex flex-col text-sm items-center">
-                              <span>{shift.ShiftName}</span>
-                              <span className="font-semibold">
-                                {shift.ShiftStartTime} -{shift.ShiftEndTime}
-                              </span>
-                              <span>{shift.ShiftPosition}</span>
-                            </div>
-                          ) : (
-                            <DropPoint
-                              accept={`${formatDate(date, 'DDMMYYYY')}${emp.EmployeeRole}`}
-                              id={emp.EmployeeId}
-                              className="min-h-[60px]"
-                            >
-                              <div>&nbsp;</div>
-                            </DropPoint>
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
           <div className="flex flex-col gap-1 p-4 bg-gray-200 rounded w-[18%] max-h-[80vh] overflow-scroll remove-vertical-scrollbar">
             <div className="font-semibold text-lg">Unassigned shifts</div>
             {datesArray.map((date) => {
