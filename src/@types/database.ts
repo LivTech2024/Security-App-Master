@@ -88,7 +88,7 @@ export interface IEmployeesCollection {
   EmployeeModifiedAt: Timestamp | FieldValue;
 }
 
-export interface IEmployeeRoute {
+export interface IEmployeeRouteCollection {
   EmpRouteId: string;
   EmpRouteDate: Timestamp | FieldValue; //*Same as Shift Date
   EmpRouteLocations: {
@@ -189,7 +189,6 @@ export interface IPatrolsCollection {
   PatrolLocation: GeoPoint;
   PatrolLocationId: string;
   PatrolLocationName: string;
-  PatrolRequiredCount: number;
   PatrolCheckPoints: IPatrolCheckPointsChild[];
   PatrolCurrentStatus: {
     Status: 'pending' | 'started' | 'completed';
@@ -197,6 +196,7 @@ export interface IPatrolsCollection {
     StatusReportedById?: string;
     StatusReportedByName?: string;
     StatusReportedTime?: Timestamp | FieldValue;
+    StatusShiftId?: string;
   }[];
   PatrolFailureReason?: string;
   PatrolClientId: string;

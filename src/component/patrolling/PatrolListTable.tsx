@@ -42,9 +42,6 @@ const PatrolListTable = ({
           <th className="uppercase px-4 py-2 w-[10%] text-center">
             Checkpoints
           </th>
-          <th className="uppercase px-4 py-2 w-[15%] text-center">
-            Required Times
-          </th>
 
           {admin && company && (
             <th className="uppercase px-4 py-2 w-[5%] text-end">&nbsp;</th>
@@ -83,12 +80,7 @@ const PatrolListTable = ({
                 >
                   {patrol.PatrolCheckPoints.length.toFixed(1)}
                 </td>
-                <td
-                  onClick={() => handleRowClicked(patrol.PatrolId)}
-                  className="px-4 py-2 text-center align-top"
-                >
-                  {patrol.PatrolRequiredCount}
-                </td>
+
                 {admin && company && (
                   <td
                     onClick={() => {

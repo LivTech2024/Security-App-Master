@@ -37,7 +37,6 @@ const PatrollingCreateOrEdit = () => {
     defaultValues: isEdit
       ? {
           PatrolName: patrolEditData.PatrolName,
-          PatrolRequiredCount: patrolEditData.PatrolRequiredCount,
           PatrolReminderInMinutes: patrolEditData.PatrolReminderInMinutes,
           PatrolRestrictedRadius: patrolEditData.PatrolRestrictedRadius,
           PatrolKeepGuardInRadiusOfLocation:
@@ -329,38 +328,12 @@ const PatrollingCreateOrEdit = () => {
 
           <InputWithTopHeader
             className="mx-0"
-            label="Patrolling Required Count"
-            register={methods.register}
-            name="PatrolRequiredCount"
-            decimalCount={0}
-            error={methods.formState.errors.PatrolRequiredCount?.message}
-          />
-
-          <InputWithTopHeader
-            className="mx-0"
             label="Patrolling reminder to guard in minutes"
             register={methods.register}
             name="PatrolReminderInMinutes"
             decimalCount={0}
             error={methods.formState.errors.PatrolReminderInMinutes?.message}
           />
-
-          <div className="md:col-span-2 flex items-end w-full gap-4">
-            <InputWithTopHeader
-              className="mx-0 w-full"
-              label="Restricted Radius (In Meters)"
-              register={methods.register}
-              name="PatrolRestrictedRadius"
-              decimalCount={2}
-              error={methods.formState.errors.PatrolRestrictedRadius?.message}
-            />
-            <SwitchWithSideHeader
-              register={methods.register}
-              name="PatrolKeepGuardInRadiusOfLocation"
-              className="w-full mb-2 font-medium"
-              label="Restrict guard from moving out from this radius while patrolling"
-            />
-          </div>
 
           <InputSelect
             label="Client"
@@ -388,6 +361,23 @@ const PatrollingCreateOrEdit = () => {
               </div>
             }
           />
+
+          <div className="md:col-span-2 flex items-end w-full gap-4">
+            <InputWithTopHeader
+              className="mx-0 w-full"
+              label="Restricted Radius (In Meters)"
+              register={methods.register}
+              name="PatrolRestrictedRadius"
+              decimalCount={2}
+              error={methods.formState.errors.PatrolRestrictedRadius?.message}
+            />
+            <SwitchWithSideHeader
+              register={methods.register}
+              name="PatrolKeepGuardInRadiusOfLocation"
+              className="w-full mb-2 font-medium"
+              label="Restrict guard from moving out from this radius while patrolling"
+            />
+          </div>
 
           <div className="col-span-2 w-full gap-4 flex flex-col">
             <div className="font-medium text-lg ">Create checkpoints</div>

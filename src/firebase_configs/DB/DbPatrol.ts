@@ -74,7 +74,6 @@ class DbPatrol {
       PatrolReminderInMinutes: data.PatrolReminderInMinutes,
       PatrolLocationId: data.PatrolLocationId,
       PatrolLocationName: data.PatrolLocationName,
-      PatrolRequiredCount: Number(data.PatrolRequiredCount),
       PatrolCheckPoints,
       PatrolCurrentStatus: [],
       PatrolRestrictedRadius: data.PatrolRestrictedRadius || null,
@@ -138,7 +137,6 @@ class DbPatrol {
         PatrolReminderInMinutes: data.PatrolReminderInMinutes,
         PatrolLocationId: data.PatrolLocationId,
         PatrolLocationName: data.PatrolLocationName,
-        PatrolRequiredCount: Number(data.PatrolRequiredCount),
         PatrolCheckPoints,
         PatrolRestrictedRadius: data.PatrolRestrictedRadius || null,
         PatrolKeepGuardInRadiusOfLocation:

@@ -21,11 +21,7 @@ const PatrolViewCard = ({
           {patrolData.PatrolLocationName}
         </span>
       </div>
-      <div className="mb-4">
-        <p className="text-textSecondary">
-          Required count: {patrolData.PatrolRequiredCount}
-        </p>
-      </div>
+
       <div className="mb-4">
         <div className="flex flex-col">
           <div className="text-textSecondary capitalize">Status:</div>
@@ -41,8 +37,7 @@ const PatrolViewCard = ({
             </div>
             <div className="capitalize">
               {patrolLogData.PatrolLogStatus}{' '}
-              {patrolLogData.PatrolLogPatrolCount}/
-              {patrolData.PatrolRequiredCount} .
+              {patrolLogData.PatrolLogPatrolCount} .
             </div>
 
             <span className="mt-[2px]">Guard: </span>

@@ -193,10 +193,6 @@ export const patrollingSchema = z.object({
   ),
   PatrolRestrictedRadius: z.coerce.number().nullable().optional(),
   PatrolKeepGuardInRadiusOfLocation: z.boolean(),
-  PatrolRequiredCount: z.coerce
-    .number()
-    .min(1, { message: 'Required count is required' })
-    .max(50, { message: 'Required count cannot be more than 50' }),
   PatrolReminderInMinutes: z.coerce
     .number()
     .min(1, { message: 'Patrol reminder in minutes is required' })
