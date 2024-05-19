@@ -396,7 +396,7 @@ const InvoiceGenerate = () => {
             <div className="font-semibold">Enter items details</div>
             <div className="grid grid-cols-4 gap-4 bg-onHoverBg p-2 rounded">
               <div className="font-semibold">Description</div>
-              <div className="font-semibold">Quantity/Hours</div>
+              <div className="font-semibold">Quantity / Hours / Hits</div>
               <div className="font-semibold">Rate</div>
               <div className="font-semibold">Amount</div>
             </div>
