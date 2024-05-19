@@ -115,6 +115,12 @@ export interface IShiftTasksChild {
   }[];
 }
 
+export interface IShiftLinkedPatrolsChildCollection {
+  LinkedPatrolName: string;
+  LinkedPatrolId: string;
+  LinkedPatrolReqHitCount: number;
+}
+
 export interface IShiftsCollection {
   ShiftId: string;
   ShiftName: string;
@@ -153,7 +159,7 @@ export interface IShiftsCollection {
     StatusShiftTotalHrs?: number;
     StatusEndReason?: string;
   }[];
-  ShiftLinkedPatrolIds: string[];
+  ShiftLinkedPatrols: IShiftLinkedPatrolsChildCollection[];
   ShiftIsSpecialShift: boolean;
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;

@@ -20,19 +20,30 @@ import {
 import { CollectionName } from '../../@types/enum';
 import { db } from '../config';
 import CloudStorageImageHandler, { getNewDocId } from './utils';
-import { IShiftTasksChild, IShiftsCollection } from '../../@types/database';
+import {
+  IShiftLinkedPatrolsChildCollection,
+  IShiftTasksChild,
+  IShiftsCollection,
+} from '../../@types/database';
 import { getRandomNumbers, removeTimeFromDate } from '../../utilities/misc';
 import { AddShiftFormFields } from '../../utilities/zod/schema';
 import { ShiftTask } from '../../component/shifts/ShiftTaskForm';
 import { generateBarcodesAndDownloadPDF } from '../../utilities/pdf/generateBarcodesAndDownloadPdf';
 
 class DbShift {
-  static addShift = async (
-    shiftData: AddShiftFormFields,
-    cmpId: string,
-    tasks: ShiftTask[],
-    selectedDays: Date[]
-  ) => {
+  static addShift = async ({
+    cmpId,
+    selectedDays,
+    shiftData,
+    tasks,
+    shiftLinkedPatrols,
+  }: {
+    shiftData: AddShiftFormFields;
+    cmpId: string;
+    tasks: ShiftTask[];
+    selectedDays: Date[];
+    shiftLinkedPatrols: IShiftLinkedPatrolsChildCollection[];
+  }) => {
     let shiftTasks: IShiftTasksChild[] = [];
 
     const shiftCreatePromise = selectedDays.map(async (day) => {
@@ -84,7 +95,7 @@ class DbShift {
         ShiftLocationAddress: shiftData.ShiftLocationAddress ?? null,
         ShiftLocationName: shiftData.ShiftLocationName ?? null,
         ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
-        ShiftLinkedPatrolIds: shiftData.ShiftLinkedPatrolIds ?? [],
+        ShiftLinkedPatrols: shiftLinkedPatrols,
         ShiftIsSpecialShift: shiftData.ShiftIsSpecialShift,
         ShiftCreatedAt: serverTimestamp(),
         ShiftModifiedAt: serverTimestamp(),
@@ -109,13 +120,21 @@ class DbShift {
     }
   };
 
-  static updateShift = async (
-    shiftData: AddShiftFormFields,
-    shiftId: string,
-    cmpId: string,
-    tasks: ShiftTask[],
-    shiftDate: Date
-  ) => {
+  static updateShift = async ({
+    cmpId,
+    shiftData,
+    shiftDate,
+    shiftId,
+    tasks,
+    shiftLinkedPatrols,
+  }: {
+    shiftData: AddShiftFormFields;
+    shiftId: string;
+    cmpId: string;
+    tasks: ShiftTask[];
+    shiftDate: Date;
+    shiftLinkedPatrols: IShiftLinkedPatrolsChildCollection[];
+  }) => {
     await runTransaction(db, async (transaction) => {
       const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
       /*const shiftSnapshot = await transaction.get(shiftDocRef);
@@ -172,7 +191,7 @@ class DbShift {
         ShiftLocationId: shiftData.ShiftLocationId ?? null,
         ShiftLocationAddress: shiftData.ShiftLocationAddress ?? null,
         ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
-        ShiftLinkedPatrolIds: shiftData.ShiftLinkedPatrolIds ?? [],
+        ShiftLinkedPatrols: shiftLinkedPatrols,
         ShiftAssignedUserId: shiftData.ShiftAssignedUserId,
         ShiftIsSpecialShift: shiftData.ShiftIsSpecialShift,
         ShiftModifiedAt: serverTimestamp(),

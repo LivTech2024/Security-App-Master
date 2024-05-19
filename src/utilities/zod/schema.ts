@@ -147,7 +147,6 @@ export const addShiftFormSchema = z
     }),
     ShiftPhotoUploadIntervalInMinutes: z.coerce.number().nullable().optional(),
     ShiftAssignedUserId: z.array(z.string()).default([]).optional(),
-    ShiftLinkedPatrolIds: z.array(z.string()).default([]).optional(),
     ShiftIsSpecialShift: z.boolean(),
   })
   .superRefine(

@@ -40,8 +40,9 @@ import { MultiSelect } from '@mantine/core';
 import useFetchEmployees from '../../hooks/fetch/useFetchEmployees';
 import InputHeader from '../../common/inputs/InputHeader';
 import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
-import useFetchPatrols from '../../hooks/fetch/useFetchPatrols';
 import { sendShiftDetailsEmail } from '../../utilities/scheduleHelper';
+import { IShiftLinkedPatrolsChildCollection } from '../../@types/database';
+import ShiftLinkPatrolForm from '../../component/shifts/ShiftLinkPatrolForm';
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -79,7 +80,6 @@ const ShiftCreateOrEdit = () => {
           ShiftAssignedUserId: shiftEditData.ShiftAssignedUserId,
           ShiftPhotoUploadIntervalInMinutes:
             shiftEditData.ShiftPhotoUploadIntervalInMinutes,
-          ShiftLinkedPatrolIds: shiftEditData.ShiftLinkedPatrolIds,
         }
       : { ShiftRequiredEmp: String(1) as unknown as number },
   });
@@ -116,6 +116,10 @@ const ShiftCreateOrEdit = () => {
     },
   ]);
 
+  const [shiftLinkedPatrols, setShiftLinkedPatrols] = useState<
+    IShiftLinkedPatrolsChildCollection[]
+  >([]);
+
   const [selectedDays, setSelectedDays] = useState<Date[]>([]);
 
   const { data: locations } = useFetchLocations({
@@ -141,12 +145,6 @@ const ShiftCreateOrEdit = () => {
   const { data: employees } = useFetchEmployees({
     empRole: isSpecialShift ? null : shiftPosition || null,
     searchQuery: empSearchQuery,
-  });
-
-  const [patrolSearchQuery, setPatrolSearchQuery] = useState('');
-
-  const { data: patrols } = useFetchPatrols({
-    searchQuery: patrolSearchQuery,
   });
 
   useEffect(() => {
@@ -190,24 +188,11 @@ const ShiftCreateOrEdit = () => {
           'ShiftLocationAddress',
           selectedLocation.LocationAddress
         );
-
-        const patrolsOnLocation = patrols.filter(
-          (p) => p.PatrolLocationId === selectedLocation?.LocationId
-        );
-
-        methods.setValue(
-          'ShiftLinkedPatrolIds',
-          patrolsOnLocation.map((patrol) => patrol.PatrolId)
-        );
       }
     } else {
       methods.setValue('ShiftLocationId', null);
       methods.setValue('ShiftLocationName', null);
       methods.setValue('ShiftLocationAddress', null);
-      methods.setValue(
-        'ShiftLinkedPatrolIds',
-        shiftEditData?.ShiftLinkedPatrolIds ?? []
-      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationId]);
@@ -247,6 +232,12 @@ const ShiftCreateOrEdit = () => {
           })
         );
       }
+      if (
+        shiftEditData?.ShiftLinkedPatrols &&
+        shiftEditData?.ShiftLinkedPatrols?.length
+      ) {
+        setShiftLinkedPatrols(shiftEditData.ShiftLinkedPatrols);
+      }
       return;
     }
     setSelectedDays([]);
@@ -254,6 +245,7 @@ const ShiftCreateOrEdit = () => {
     setEndTime('17:00');
     setLocationSearchQuery('');
     setShiftPosition('');
+    setShiftLinkedPatrols([]);
     if (localStorage.getItem(LocalStorageKey.SELECTED_BRANCH)) {
       const branchName = companyBranches.find(
         (b) =>
@@ -284,23 +276,35 @@ const ShiftCreateOrEdit = () => {
       if (selectedDays.length === 0) {
         throw new CustomError('Please select at least one day');
       }
+      if (
+        shiftLinkedPatrols.some(
+          (res) =>
+            !res.LinkedPatrolReqHitCount || res.LinkedPatrolReqHitCount === 0
+        )
+      ) {
+        throw new CustomError(
+          'Please enter patrol required count or remove the patrol'
+        );
+      }
       setLoading(true);
 
       if (isEdit) {
-        await DbShift.updateShift(
-          data,
-          shiftEditData.ShiftId,
-          company.CompanyId,
-          shiftTasks,
-          selectedDays[0]
-        );
+        await DbShift.updateShift({
+          shiftData: data,
+          shiftId: shiftEditData.ShiftId,
+          cmpId: company.CompanyId,
+          tasks: shiftTasks,
+          shiftDate: selectedDays[0],
+          shiftLinkedPatrols,
+        });
       } else {
-        await DbShift.addShift(
-          data,
-          company.CompanyId,
-          shiftTasks,
-          selectedDays
-        );
+        await DbShift.addShift({
+          shiftData: data,
+          cmpId: company.CompanyId,
+          tasks: shiftTasks,
+          selectedDays,
+          shiftLinkedPatrols,
+        });
       }
 
       //* Send emails to assigned employees
@@ -440,7 +444,7 @@ const ShiftCreateOrEdit = () => {
               <SwitchWithSideHeader
                 checked={isSpecialShift}
                 onChange={() => setIsSpecialShift(!isSpecialShift)}
-                className="w-1/2 mb-2 font-medium text-base bg-gray-200 px-[10px] py-1 rounded"
+                className="w-1/2 mb-2 font-medium text-base bg-onHoverBg px-[10px] py-1 rounded"
                 label="Is this special shift"
               />
             </div>
@@ -564,7 +568,7 @@ const ShiftCreateOrEdit = () => {
             <div className="col-span-2 flex items-end justify-end w-full gap-4">
               <InputWithTopHeader
                 label="Restricted radius (in meters)"
-                className="mx-0 w-full"
+                className="mx-0 w-1/2"
                 decimalCount={2}
                 register={methods.register}
                 name="ShiftRestrictedRadius"
@@ -573,33 +577,8 @@ const ShiftCreateOrEdit = () => {
               <SwitchWithSideHeader
                 register={methods.register}
                 name="ShiftEnableRestrictedRadius"
-                className="w-full mb-2 font-medium"
+                className="w-1/2 font-medium bg-onHoverBg rounded px-4 py-[10px]"
                 label="Enable restricted radius"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1 col-span-2">
-              <InputHeader title="Assign patrols (Optional)" />
-              <MultiSelect
-                searchable
-                data={patrols.map((patrol) => {
-                  return { label: patrol.PatrolName, value: patrol.PatrolId };
-                })}
-                value={methods.watch('ShiftLinkedPatrolIds')}
-                onChange={(e) => methods.setValue('ShiftLinkedPatrolIds', e)}
-                searchValue={patrolSearchQuery}
-                onSearchChange={setPatrolSearchQuery}
-                styles={{
-                  input: {
-                    border: `1px solid #0000001A`,
-                    fontWeight: 'normal',
-                    fontSize: '18px',
-                    borderRadius: '4px',
-                    background: '#FFFFFF',
-                    color: '#000000',
-                    padding: '8px 8px',
-                  },
-                }}
               />
             </div>
 
@@ -666,6 +645,13 @@ const ShiftCreateOrEdit = () => {
               register={methods.register}
               name="ShiftDescription"
             />
+
+            <div className="col-span-2">
+              <ShiftLinkPatrolForm
+                shiftLinkedPatrols={shiftLinkedPatrols}
+                setShiftLinkedPatrols={setShiftLinkedPatrols}
+              />
+            </div>
 
             <div className="col-span-2">
               <DaysOfWeekSelector
