@@ -88,6 +88,18 @@ export interface IEmployeesCollection {
   EmployeeModifiedAt: Timestamp | FieldValue;
 }
 
+export interface IEmployeeRoute {
+  EmpRouteId: string;
+  EmpRouteDate: Timestamp | FieldValue; //*Same as Shift Date
+  EmpRouteLocations: {
+    LocationCoordinates: GeoPoint;
+    LocationReportedAt: Timestamp | FieldValue;
+  }[];
+  EmpRouteEmpId: string;
+  EmpRouteShiftId: string;
+  EmpRouteCreatedAt: string;
+}
+
 export interface IShiftTasksChild {
   ShiftTaskId: string;
   ShiftTask: string;
