@@ -117,10 +117,12 @@ const ClientView = () => {
             ShiftCurrentStatus.some((status) => status.Status === 'completed')
           ) {
             totalShifts += 1;
-            const shiftHours = getHoursDiffInTwoTimeString(
+            let shiftHours = getHoursDiffInTwoTimeString(
               ShiftStartTime,
               ShiftEndTime
             );
+
+            shiftHours = shiftHours * (ShiftAssignedUserId.length || 1);
 
             totalShiftCostToClient += shiftHours * shiftHourlyRate;
             totalShiftHours += shiftHours;

@@ -28,8 +28,7 @@ import InputAutoComplete from '../../../common/inputs/InputAutocomplete';
 import PageHeader from '../../../common/PageHeader';
 import { toDate } from '../../../utilities/misc';
 import { openContextModal } from '@mantine/modals';
-import InputSelect from '../../../common/inputs/InputSelect';
-import useFetchLocations from '../../../hooks/fetch/useFetchLocations';
+import ClientCostCalculationModal from '../../../component/payments_and_billing/modal/ClientCostCalculationModal';
 
 const numberToString = (value: number) => {
   return String(value) as unknown as number;
@@ -286,12 +285,8 @@ const InvoiceGenerate = () => {
 
   const clientId = methods.watch('InvoiceClientId');
 
-  const [locationSearchQuery, setLocationSearchQuery] = useState('');
-  const { data: locations } = useFetchLocations({
-    clientId: clientId,
-    searchQuery: locationSearchQuery,
-    limit: 5,
-  });
+  const [clientCostCalculationModal, setClientCostCalculationModal] =
+    useState(false);
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -354,21 +349,19 @@ const InvoiceGenerate = () => {
               />
 
               {clientId && (
-                <InputSelect
-                  label="Select Location"
-                  value={methods.watch('InvoiceLocationId')}
-                  onChange={(e) =>
-                    methods.setValue('InvoiceLocationId', e as string)
-                  }
-                  data={locations.map((res) => {
-                    return { label: res.LocationName, value: res.LocationId };
-                  })}
-                  searchValue={locationSearchQuery}
-                  onSearchChange={setLocationSearchQuery}
-                  searchable
-                  clearable
+                <Button
+                  label="Calculate Client Cost"
+                  type="black"
+                  onClick={() => setClientCostCalculationModal(true)}
                 />
               )}
+
+              <ClientCostCalculationModal
+                opened={clientCostCalculationModal}
+                setOpened={setClientCostCalculationModal}
+                clientId={clientId}
+                setInvoiceItems={setInvoiceItems}
+              />
             </div>
             <div className="flex flex-col bg-surface shadow p-4 rounded gap-4 w-[40%] max-w-xl justify-start">
               <div className="font-semibold">Transaction details</div>
@@ -403,7 +396,7 @@ const InvoiceGenerate = () => {
             <div className="font-semibold">Enter items details</div>
             <div className="grid grid-cols-4 gap-4 bg-onHoverBg p-2 rounded">
               <div className="font-semibold">Description</div>
-              <div className="font-semibold">Quantity</div>
+              <div className="font-semibold">Quantity/Hours</div>
               <div className="font-semibold">Rate</div>
               <div className="font-semibold">Amount</div>
             </div>
