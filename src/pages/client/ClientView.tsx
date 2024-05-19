@@ -25,6 +25,7 @@ import DbPatrol from '../../firebase_configs/DB/DbPatrol';
 interface ILocationCostDetails {
   LocationId: string;
   LocationTotalCompletedShift: number;
+  LocationTotalCompletedShiftHours: number;
   LocationTotalShiftCostToCompany: number;
   LocationTotalShiftCostToClient: number;
   LocationTotalCompletedPatrol: number;
@@ -100,6 +101,7 @@ const ClientView = () => {
       let totalShiftCostToCompany = 0;
       let totalShiftCostToClient = 0;
       let totalShifts = 0;
+      let totalShiftHours = 0;
 
       await Promise.all(
         shifts?.map(async (shift) => {
@@ -121,6 +123,7 @@ const ClientView = () => {
             );
 
             totalShiftCostToClient += shiftHours * shiftHourlyRate;
+            totalShiftHours += shiftHours;
 
             await Promise.all(
               ShiftAssignedUserId?.map(async (empId) => {
@@ -162,6 +165,7 @@ const ClientView = () => {
           LocationId: locationId,
           LocationTotalCompletedPatrol: totalPatrols,
           LocationTotalCompletedShift: totalShifts,
+          LocationTotalCompletedShiftHours: totalShiftHours,
           LocationTotalPatrolCostToClient: totalPatrolCostToClient,
           LocationTotalShiftCostToClient: totalShiftCostToClient,
           LocationTotalShiftCostToCompany: totalShiftCostToCompany,
@@ -175,8 +179,6 @@ const ClientView = () => {
       closeModalLoader();
     }
   };
-
-  console.log(locationCostDetails, 'cost details');
 
   if (!data && !loading) {
     return (
@@ -290,13 +292,25 @@ const ClientView = () => {
                   {costDetails ? (
                     <div className="flex flex-col gap-4 col-span-2">
                       <div className="grid grid-cols-3 mt-4 bg-primaryGold/50 p-4 rounded gap-2 col-span-2">
-                        <div className="flex gap-1 items-center even:justify-end col-span-3">
+                        <div className="flex gap-1 items-center justify-start">
                           <span className="font-semibold">
                             Total Shifts Done:{' '}
                           </span>
                           <span>
                             {numberFormatter(
                               costDetails.LocationTotalCompletedShift,
+                              false,
+                              1
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex gap-1 items-center justify-end col-span-2">
+                          <span className="font-semibold">
+                            Total Shifts Hours:{' '}
+                          </span>
+                          <span>
+                            {numberFormatter(
+                              costDetails.LocationTotalCompletedShiftHours,
                               false,
                               1
                             )}
