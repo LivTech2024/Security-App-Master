@@ -31,7 +31,7 @@ const useFetchPatrols = ({ limit, searchQuery, locationId }: Props) => {
         lastDoc: null,
         searchQuery:
           searchQuery &&
-          searchQuery.trim().length > MinimumQueryCharacter.PATROL
+          searchQuery.trim().length >= MinimumQueryCharacter.PATROL
             ? searchQuery.trim()
             : undefined,
         cmpId: company.CompanyId,

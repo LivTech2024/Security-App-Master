@@ -30,7 +30,7 @@ const useFetchClients = ({ limit, searchQuery }: Props) => {
         lastDoc: null,
         searchQuery:
           searchQuery &&
-          searchQuery.trim().length > MinimumQueryCharacter.LOCATION
+          searchQuery.trim().length >= MinimumQueryCharacter.LOCATION
             ? searchQuery.trim()
             : undefined,
         cmpId: company.CompanyId,

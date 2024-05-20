@@ -27,7 +27,7 @@ const useFetchEquipments = ({ limit, searchQuery }: Props) => {
         lmt: limit,
         lastDoc: null,
         searchQuery:
-          searchQuery && searchQuery.trim().length > 1
+          searchQuery && searchQuery.trim().length >= 1
             ? searchQuery.trim()
             : undefined,
         cmpId: company.CompanyId,
