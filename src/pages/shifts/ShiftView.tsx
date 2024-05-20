@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { IShiftsCollection } from '../../@types/database';
+import {
+  IEmployeeRouteCollection,
+  IShiftsCollection,
+} from '../../@types/database';
 import { useEditFormStore } from '../../store';
 import { firebaseDataToObject } from '../../utilities/misc';
 import { Shift } from '../../store/slice/editForm.slice';
@@ -23,9 +26,13 @@ const ShiftView = () => {
 
   const [data, setData] = useState<IShiftsCollection | null>(null);
 
-  const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
+  const [assignedUsers, setAssignedUsers] = useState<
+    { EmpName: string; EmpId: string }[]
+  >([]);
 
   const [acknowledgedUsers, setAcknowledgedUsers] = useState<string[]>([]);
+
+  const [empRoutes, setEmpRoutes] = useState<IEmployeeRouteCollection[]>([]);
 
   const navigate = useNavigate();
 
@@ -36,15 +43,30 @@ const ShiftView = () => {
       if (shiftData) {
         setData(shiftData);
 
-        const { ShiftAssignedUserId, ShiftAcknowledgedByEmpId } = shiftData;
+        const { ShiftAssignedUserId, ShiftAcknowledgedByEmpId, ShiftId } =
+          shiftData;
+
+        DbShift.getShiftEmpRoutes(ShiftId)
+          .then((snap) => {
+            const data = snap.docs.map(
+              (doc) => doc.data() as IEmployeeRouteCollection
+            );
+            setEmpRoutes(data);
+          })
+          .catch((err) =>
+            console.log(`Error while fetching employees route-> ${err}`)
+          );
 
         await Promise.all(
           ShiftAssignedUserId.map(async (id) => {
             const empData = await DbEmployee.getEmpById(id);
 
             setAssignedUsers((prev) => {
-              if (!prev.includes(empData.EmployeeName)) {
-                return [...prev, empData.EmployeeName];
+              if (!prev.find((res) => res.EmpId === empData.EmployeeId)) {
+                return [
+                  ...prev,
+                  { EmpName: empData.EmployeeName, EmpId: empData.EmployeeId },
+                ];
               }
               return prev;
             });
@@ -112,6 +134,7 @@ const ShiftView = () => {
           data={data}
           assignedUsers={assignedUsers}
           acknowledgedUsers={acknowledgedUsers}
+          empRoutes={empRoutes}
         />
       </div>
     );

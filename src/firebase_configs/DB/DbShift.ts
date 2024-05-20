@@ -319,6 +319,17 @@ class DbShift {
 
     return updateDoc(docRef, { ShiftDate: newDate as unknown as Timestamp });
   };
+
+  static getShiftEmpRoutes = (shiftId: string) => {
+    const empRouteRef = collection(db, CollectionName.employeeRoutes);
+
+    const empRouteQuery = query(
+      empRouteRef,
+      where('EmpRouteShiftId', '==', shiftId)
+    );
+
+    return getDocs(empRouteQuery);
+  };
 }
 
 export default DbShift;
