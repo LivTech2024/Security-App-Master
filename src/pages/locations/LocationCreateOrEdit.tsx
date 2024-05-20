@@ -19,7 +19,6 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
-import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import InputDate from '../../common/inputs/InputDate';
 import InputHeader from '../../common/inputs/InputHeader';
 import InputSelect from '../../common/inputs/InputSelect';
@@ -29,6 +28,11 @@ import { removeTimeFromDate, toDate } from '../../utilities/misc';
 import DbClient from '../../firebase_configs/DB/DbClient';
 import { IClientsCollection } from '../../@types/database';
 import { useNavigate } from 'react-router-dom';
+import PlacesAutocomplete, {
+  geocodeByAddress,
+  getLatLng,
+} from 'react-places-autocomplete';
+import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 
 const LocationCreateOrEdit = () => {
   const { company } = useAuthState();
@@ -207,6 +211,21 @@ const LocationCreateOrEdit = () => {
     }
     return () => closeModalLoader();
   }, [loading]);
+
+  const handleSelect = async (selectedAddress: string) => {
+    try {
+      methods.setValue('LocationAddress', selectedAddress);
+      const results = await geocodeByAddress(selectedAddress);
+      const latLng = await getLatLng(results[0]);
+      const { lat, lng } = latLng;
+      methods.setValue('LocationCoordinates', {
+        lat: String(lat),
+        lng: String(lng),
+      });
+    } catch (error) {
+      console.error('Error selecting address', error);
+    }
+  };
   return (
     <div className="flex flex-col gap-4 p-6">
       <PageHeader
@@ -271,13 +290,52 @@ const LocationCreateOrEdit = () => {
           name="LocationCoordinates.lng"
           error={methods.formState.errors.LocationCoordinates?.lng?.message}
         />
-        <TextareaWithTopHeader
-          title="Address"
-          className="mx-0"
-          register={methods.register}
-          name="LocationAddress"
-          error={methods.formState.errors.LocationAddress?.message}
-        />
+        <PlacesAutocomplete
+          value={methods.watch('LocationAddress')}
+          onChange={(val) => methods.setValue('LocationAddress', val)}
+          onSelect={handleSelect}
+        >
+          {({
+            getInputProps,
+            suggestions,
+            getSuggestionItemProps,
+            loading,
+          }) => (
+            <div className="flex flex-col gap-1 ">
+              <TextareaWithTopHeader
+                title="Address"
+                className="mx-0"
+                value={getInputProps().value}
+                onChange={getInputProps().onChange}
+                error={methods.formState.errors.LocationAddress?.message}
+              />
+              {suggestions.length > 0 && (
+                <div className="relative">
+                  <div className="autocomplete-dropdown-container rounded-b-2xl border absolute max-h-[200px] w-full overflow-scroll remove-vertical-scrollbar">
+                    {loading && (
+                      <div className="cursor-pointer py-2 px-2 bg-white">
+                        Loading...
+                      </div>
+                    )}
+                    {suggestions.map((suggestion) => {
+                      const style = {
+                        backgroundColor: suggestion.active ? '#DAC0A3' : '#fff',
+                      };
+                      return (
+                        <div
+                          className="cursor-pointer py-2 px-2"
+                          {...getSuggestionItemProps(suggestion, { style })}
+                        >
+                          {suggestion.description}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </PlacesAutocomplete>
         <div className="flex flex-col gap-4 justify-between">
           <InputDate
             label="Contract Start Date"
