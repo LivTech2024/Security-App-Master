@@ -71,6 +71,23 @@ class DbPayment {
       throw new CustomError('This invoice number already exist');
     }
 
+    items = items.map((item) => {
+      return {
+        ...item,
+        ItemPrice: Number(item.ItemPrice),
+        ItemQuantity: Number(item.ItemQuantity),
+        ItemTotal: Number(item.ItemTotal),
+      };
+    });
+
+    taxes = taxes.map((tax) => {
+      return {
+        ...tax,
+        TaxAmount: Number(tax.TaxAmount),
+        TaxPercentage: Number(tax.TaxPercentage),
+      };
+    });
+
     await runTransaction(db, async (transaction) => {
       const invoiceId = getNewDocId(CollectionName.invoices);
 
@@ -137,6 +154,25 @@ class DbPayment {
     if (invoiceNoExist) {
       throw new CustomError('This invoice number already exist');
     }
+
+    items = items.map((item) => {
+      return {
+        ...item,
+        ItemPrice: Number(item.ItemPrice),
+        ItemQuantity: Number(item.ItemQuantity),
+        ItemTotal: Number(item.ItemTotal),
+      };
+    });
+
+    taxes = taxes.map((tax) => {
+      return {
+        ...tax,
+        TaxAmount: Number(tax.TaxAmount),
+        TaxPercentage: Number(tax.TaxPercentage),
+      };
+    });
+
+    console.log(taxes, 'taxes');
 
     await runTransaction(db, async (transaction) => {
       const invoiceRef = doc(db, CollectionName.invoices, invoiceId);

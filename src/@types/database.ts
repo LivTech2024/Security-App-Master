@@ -334,6 +334,7 @@ export interface IInvoiceItems {
 
 export interface IInvoiceTaxList {
   TaxName: string;
+  TaxPercentage: number;
   TaxAmount: number;
 }
 export interface IInvoicesCollection {

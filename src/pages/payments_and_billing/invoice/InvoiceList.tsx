@@ -28,6 +28,7 @@ import { generateInvoiceHTML } from '../../../utilities/pdf/generateInvoiceHtml'
 import DbClient from '../../../firebase_configs/DB/DbClient';
 import { htmlToPdf } from '../../../API/HtmlToPdf';
 import PageHeader from '../../../common/PageHeader';
+import useUpdateRecentTransactionNumbers from '../../../hooks/useUpdateRecentTransactionNumbers';
 
 const InvoiceList = () => {
   const navigate = useNavigate();
@@ -165,6 +166,9 @@ const InvoiceList = () => {
       closeModalLoader();
     }
   };
+
+  //*Hook to fetch recent invoice number
+  useUpdateRecentTransactionNumbers();
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">

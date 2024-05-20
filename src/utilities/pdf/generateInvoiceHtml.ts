@@ -30,7 +30,7 @@ export async function generateInvoiceHTML({
   const taxesHTML = InvoiceTaxList.map(
     (tax) => `
     <tr>
-      <td>${tax.TaxName}</td>
+      <td>${tax.TaxName}@${tax.TaxPercentage}%</td>
       <td>${numberFormatter(tax.TaxAmount, true)}</td>
     </tr>
   `
@@ -95,7 +95,7 @@ export async function generateInvoiceHTML({
           <thead>
             <tr>
               <th style="width:40%;">Description</th>
-              <th style="width:20%;">Quantity / Hours / Hits</th>
+              <th style="width:20%;">Qty / Hours / Hits</th>
               <th style="width:20%;">Rate</th>
               <th style="width:20%;">Total</th>
             </tr>

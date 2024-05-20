@@ -30,7 +30,7 @@ import { PageRoutes } from '../../../@types/enum';
 import useFetchClients from '../../../hooks/fetch/useFetchClients';
 import InputAutoComplete from '../../../common/inputs/InputAutocomplete';
 import PageHeader from '../../../common/PageHeader';
-import { toDate } from '../../../utilities/misc';
+import { roundNumber, toDate } from '../../../utilities/misc';
 import { openContextModal } from '@mantine/modals';
 import ClientCostCalculationModal from '../../../component/payments_and_billing/modal/ClientCostCalculationModal';
 
@@ -143,13 +143,16 @@ const InvoiceGenerate = () => {
     setInvoiceItems((prevItems) => {
       const updatedItems = [...prevItems];
       (updatedItems[index] as any)[field] = value;
-      updatedItems[index].ItemTotal =
+      updatedItems[index].ItemTotal = roundNumber(
         Number(updatedItems[index].ItemQuantity) *
-        Number(updatedItems[index].ItemPrice);
+          Number(updatedItems[index].ItemPrice)
+      );
 
       return updatedItems;
     });
   };
+
+  const subtotal = methods.watch('InvoiceSubtotal');
 
   const handleTaxChange = (
     index: number,
@@ -158,6 +161,12 @@ const InvoiceGenerate = () => {
   ) => {
     setInvoiceTaxList((prevTaxList) => {
       const updatedTaxList = [...prevTaxList];
+
+      if (field === 'TaxPercentage') {
+        const amount = (subtotal * Number(value)) / 100;
+        updatedTaxList[index].TaxAmount = roundNumber(amount);
+      }
+
       (updatedTaxList[index] as any)[field] = value;
 
       return updatedTaxList;
@@ -185,17 +194,20 @@ const InvoiceGenerate = () => {
   };
 
   const handleAddTax = () => {
-    setInvoiceTaxList((prev) => [...prev, { TaxName: '', TaxAmount: 0 }]);
+    setInvoiceTaxList((prev) => [
+      ...prev,
+      { TaxName: '', TaxAmount: 0, TaxPercentage: 0 },
+    ]);
   };
 
   useEffect(() => {
-    const subTotal = invoiceItems.reduce(
-      (acc, obj) => acc + Number(obj.ItemTotal),
-      0
+    const subTotal = roundNumber(
+      invoiceItems.reduce((acc, obj) => acc + Number(obj.ItemTotal), 0)
     );
 
-    const totalTaxAmt =
-      invoiceTaxList.reduce((acc, obj) => acc + Number(obj.TaxAmount), 0) || 0;
+    const totalTaxAmt = roundNumber(
+      invoiceTaxList.reduce((acc, obj) => acc + Number(obj.TaxAmount), 0) || 0
+    );
 
     methods.setValue('InvoiceSubtotal', numberToString(subTotal));
 
@@ -354,6 +366,7 @@ const InvoiceGenerate = () => {
                 data={clients.map((data) => {
                   return { label: data.ClientName, value: data.ClientName };
                 })}
+                error={methods.formState.errors.InvoiceClientName?.message}
               />
 
               {clientId && (
@@ -489,7 +502,7 @@ const InvoiceGenerate = () => {
               />
             </div>
 
-            <div className="flex flex-col gap-4 bg-surface shadow rounded p-4 w-full max-w-lg">
+            <div className="flex flex-col gap-4 bg-surface shadow rounded p-4 w-full max-w-2xl">
               <div className="font-semibold">Pricing details</div>
               <InputWithTopHeader
                 className="mx-0"
@@ -507,16 +520,31 @@ const InvoiceGenerate = () => {
                   <div key={index} className="flex items-end gap-2">
                     <InputWithTopHeader
                       label="Tax name"
-                      className="mx-0"
+                      className="mx-0 w-full"
                       value={tax.TaxName}
                       onChange={(e) =>
                         handleTaxChange(index, 'TaxName', e.target.value)
                       }
                     />
                     <InputWithTopHeader
-                      label="Tax amount"
                       className="mx-0"
+                      value={tax.TaxPercentage}
+                      leadingIcon={<span>@</span>}
+                      tailIcon={<span>%</span>}
+                      decimalCount={2}
+                      onChange={(e) => {
+                        if (Number(e.target.value) > 100) {
+                          return;
+                        }
+                        handleTaxChange(index, 'TaxPercentage', e.target.value);
+                      }}
+                    />
+
+                    <InputWithTopHeader
+                      label="Amount"
+                      className="mx-0 w-full"
                       value={tax.TaxAmount}
+                      disabled
                       onChange={(e) =>
                         handleTaxChange(index, 'TaxAmount', e.target.value)
                       }
@@ -528,7 +556,7 @@ const InvoiceGenerate = () => {
                           prev.filter((_, idx) => idx !== index)
                         )
                       }
-                      className="text-3xl cursor-pointer mb-1"
+                      className="text-3xl min-w-[36px] cursor-pointer mb-1"
                     />
                   </div>
                 ))}
@@ -541,6 +569,7 @@ const InvoiceGenerate = () => {
                 label="Total Amount"
                 register={methods.register}
                 name="InvoiceTotalAmount"
+                decimalCount={2}
                 error={methods.formState.errors.InvoiceTotalAmount?.message}
                 leadingIcon={<div>$</div>}
               />
@@ -548,8 +577,19 @@ const InvoiceGenerate = () => {
               <InputWithTopHeader
                 className="mx-0"
                 label="Received Amount"
-                register={methods.register}
-                name="InvoiceReceivedAmount"
+                value={methods.watch('InvoiceReceivedAmount')}
+                onChange={(e) => {
+                  if (
+                    Number(e.target.value) > methods.watch('InvoiceTotalAmount')
+                  ) {
+                    return;
+                  }
+                  methods.setValue(
+                    'InvoiceReceivedAmount',
+                    e.target.value as unknown as number
+                  );
+                }}
+                decimalCount={2}
                 error={methods.formState.errors.InvoiceReceivedAmount?.message}
                 leadingIcon={<div>$</div>}
               />

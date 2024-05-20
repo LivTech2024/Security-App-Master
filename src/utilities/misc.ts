@@ -189,3 +189,10 @@ export const getRandomNumbers = () => {
   const ms = new Date().getMilliseconds();
   return Number(`${random}${ms}`);
 };
+
+export const roundNumber = (num: number, precision?: number) => {
+  if (!precision) {
+    precision = 2;
+  }
+  return Math.round(num * Math.pow(10, precision)) / Math.pow(10, precision);
+};
