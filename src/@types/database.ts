@@ -97,7 +97,7 @@ export interface IEmployeeRouteCollection {
   }[];
   EmpRouteEmpId: string;
   EmpRouteShiftId: string;
-  EmpRouteCreatedAt: string;
+  EmpRouteCreatedAt: Timestamp;
 }
 
 export interface IShiftTasksChild {
