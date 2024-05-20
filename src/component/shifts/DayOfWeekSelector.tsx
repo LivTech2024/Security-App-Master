@@ -42,6 +42,11 @@ const DaysOfWeekSelector = ({
     }
   };
 
+  useEffect(() => {
+    if (isMultipleSelectable) return;
+    setSelectedDate(selectedDays[0]);
+  }, [isMultipleSelectable, selectedDays]);
+
   return (
     <div className="p-4 bg-onHoverBg flex flex-col w-full gap-2">
       <div className="flex justify-between w-full gap-4">
