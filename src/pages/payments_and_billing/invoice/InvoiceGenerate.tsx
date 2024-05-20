@@ -19,7 +19,11 @@ import {
   showSnackbar,
 } from '../../../utilities/TsxUtils';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import { useAuthState, useEditFormStore } from '../../../store';
+import {
+  useAuthState,
+  useEditFormStore,
+  usePaymentState,
+} from '../../../store';
 import DbPayment from '../../../firebase_configs/DB/DbPayment';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../../@types/enum';
@@ -38,6 +42,8 @@ const InvoiceGenerate = () => {
   const { company } = useAuthState();
 
   const { invoiceEditData } = useEditFormStore();
+
+  const { recentInvoiceNumber } = usePaymentState();
 
   const isEdit = !!invoiceEditData;
 
@@ -58,7 +64,9 @@ const InvoiceGenerate = () => {
           InvoiceTerms: invoiceEditData.InvoiceTerms,
           InvoiceTotalAmount: invoiceEditData.InvoiceTotalAmount,
         }
-      : undefined,
+      : {
+          InvoiceNumber: String(recentInvoiceNumber + 1),
+        },
   });
 
   const [invoiceItems, setInvoiceItems] = useState<IInvoiceItems[]>([

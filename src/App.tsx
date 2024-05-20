@@ -69,9 +69,12 @@ import { useTitle } from './hooks/useTitle';
 import useFirebaseMessaging from './hooks/useFirebaseMessaging';
 import { onMessage } from 'firebase/messaging';
 import { messaging } from './firebase_configs/config';
+import useUpdateRecentTransactionNumbers from './hooks/useUpdateRecentTransactionNumbers';
 
 function App() {
   useOnAuthStateChanged();
+
+  useUpdateRecentTransactionNumbers();
 
   useFirebaseMessaging();
 

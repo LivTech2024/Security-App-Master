@@ -282,6 +282,21 @@ class DbPayment {
       });
     });
   };
+
+  static getRecentInvNumber = async (cmpId: string) => {
+    const invoiceRef = collection(db, CollectionName.invoices);
+    const invoiceQuery = query(
+      invoiceRef,
+      where('InvoiceCompanyId', '==', cmpId),
+      orderBy('InvoiceNumber', 'desc'),
+      limit(1)
+    );
+
+    const invoiceSnapshot = await getDocs(invoiceQuery);
+    const invoiceData = invoiceSnapshot.docs[0]?.data() as IInvoicesCollection;
+
+    return invoiceData;
+  };
 }
 
 export default DbPayment;
