@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import {
   IEmployeeRouteCollection,
   IShiftsCollection,
 } from '../../@types/database';
 import { formatDate } from '../../utilities/misc';
+import EmpRouteModal from './modal/EmpRouteModal';
 
 const ShiftViewCard = ({
   data,
@@ -15,6 +17,7 @@ const ShiftViewCard = ({
   acknowledgedUsers: string[];
   empRoutes: IEmployeeRouteCollection[];
 }) => {
+  const [empRouteModal, setEmpRouteModal] = useState(false);
   return (
     <div className="bg-surface shadow-md rounded-lg p-4">
       <div className="grid grid-cols-2 gap-4">
@@ -190,7 +193,10 @@ const ShiftViewCard = ({
               if (empRoutes.find((route) => route.EmpRouteEmpId === res.EmpId))
                 return (
                   <div key={res.EmpId} className="flex flex-col">
-                    <div className="text-textPrimaryBlue cursor-pointer underline">
+                    <div
+                      onClick={() => setEmpRouteModal(true)}
+                      className="text-textPrimaryBlue cursor-pointer underline"
+                    >
                       {res.EmpName}
                     </div>
                   </div>
@@ -199,6 +205,16 @@ const ShiftViewCard = ({
           </div>
         </div>
       ) : null}
+
+      <EmpRouteModal
+        coordinates={[
+          { lat: 19.4237, lng: 72.8114 }, // Nallasopara, Palghar
+          { lat: 19.3734, lng: 72.8278 }, // Mumbai Central, Mumbai
+          { lat: 19.3551, lng: 72.8272 },
+        ]}
+        opened={empRouteModal}
+        setOpened={setEmpRouteModal}
+      />
     </div>
   );
 };
