@@ -150,7 +150,7 @@ const TimeAndAttendance = () => {
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
-          {(data.length === 0 && !isLoading) || !selectedEmpId ? (
+          {(data.length === 0 || !selectedEmpId) && !isLoading ? (
             <tr>
               <td colSpan={6}>
                 <NoSearchResult
