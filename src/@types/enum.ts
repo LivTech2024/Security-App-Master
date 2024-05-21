@@ -159,6 +159,8 @@ export const PageRoutes = {
   CLIENT_PORTAL_SHIFTS: '/client_portal/shifts',
   CLIENT_PORTAL_SHIFT_VIEW: '/client_portal/shift_view',
   CLIENT_PORTAL_MESSAGING: '/client_portal/messaging',
+
+  HRM_HOME: '/hrm_home',
 };
 
 export const LocalStorageKey = {

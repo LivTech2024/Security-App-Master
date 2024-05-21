@@ -69,6 +69,7 @@ import { useTitle } from './hooks/useTitle';
 import useFirebaseMessaging from './hooks/useFirebaseMessaging';
 import { onMessage } from 'firebase/messaging';
 import { messaging } from './firebase_configs/config';
+import HrmHome from './pages/hrm/HrmHome';
 
 function App() {
   useOnAuthStateChanged();
@@ -294,6 +295,8 @@ function App() {
               path={PageRoutes.TASK_AND_TRACKING_LOGS}
               Component={TaskLogs}
             />
+
+            <Route path={PageRoutes.HRM_HOME} Component={HrmHome} />
           </Routes>
         </Layout>
       </ModalsProvider>
