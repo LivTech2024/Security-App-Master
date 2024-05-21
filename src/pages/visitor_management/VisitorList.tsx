@@ -175,12 +175,19 @@ const VisitorList = () => {
 
                   <td className="align-top px-4 py-2 text-start">
                     <span className="line-clamp-2">
-                      {formatDate(visitor.VisitorInTime, 'DD MMM-YY hh:mm A')}
+                      {visitor.VisitorInTime
+                        ? formatDate(visitor.VisitorInTime, 'DD MMM-YY hh:mm A')
+                        : 'N/A'}
                     </span>
                   </td>
                   <td className="align-top px-4 py-2 text-start ">
                     <span className="line-clamp-2">
-                      {formatDate(visitor.VisitorOutTime, 'DD MMM-YY hh:mm A')}
+                      {visitor.VisitorOutTime
+                        ? formatDate(
+                            visitor.VisitorOutTime,
+                            'DD MMM-YY hh:mm A'
+                          )
+                        : 'N/A'}
                     </span>
                   </td>
                   <td className="align-top px-4 py-2 text-start ">
@@ -190,7 +197,7 @@ const VisitorList = () => {
                   </td>
                   <td className="align-top px-4 py-2 text-end">
                     <span className="line-clamp-2">
-                      {visitor.VisitorAssetHandover}
+                      {visitor.VisitorAssetHandover || 'N/A'}
                     </span>
                   </td>
                 </tr>
