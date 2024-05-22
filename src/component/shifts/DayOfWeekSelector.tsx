@@ -4,6 +4,13 @@ import { removeTimeFromDate } from '../../utilities/misc';
 import { FaCircleChevronLeft, FaCircleChevronRight } from 'react-icons/fa6';
 import { DatePickerInput } from '@mantine/dates';
 import { MdCalendarToday } from 'react-icons/md';
+import InputRadio from '../../common/inputs/InputRadio';
+
+function arrayContainsAll(subset: Date[], superset: Date[]): boolean {
+  const subsetStrings = subset.map((date) => date.toISOString());
+  const supersetStrings = superset.map((date) => date.toISOString());
+  return subsetStrings.every((date) => supersetStrings.includes(date));
+}
 
 const DaysOfWeekSelector = ({
   selectedDays,
@@ -88,7 +95,23 @@ const DaysOfWeekSelector = ({
             }
           />
         </div>
-        <div>&nbsp;</div>
+        <InputRadio
+          type="checkbox"
+          label="Select all"
+          checked={arrayContainsAll(daysOfWeek, selectedDays)}
+          onChange={() => {
+            if (arrayContainsAll(daysOfWeek, selectedDays)) {
+              // Remove only the daysOfWeek dates from selectedDays
+              setSelectedDays((prev) =>
+                prev.filter(
+                  (d) => !daysOfWeek.some((day) => dayjs(day).isSame(d))
+                )
+              );
+            } else {
+              setSelectedDays((prev) => [...prev, ...daysOfWeek.map((d) => d)]);
+            }
+          }}
+        />
       </div>
       <div className="flex items-center gap-4 w-full">
         {daysOfWeek.map((day) => (
