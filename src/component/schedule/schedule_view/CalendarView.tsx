@@ -45,7 +45,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
-  const { company, empRoles } = useAuthState();
+  const { company, empRoles, settings } = useAuthState();
 
   const [branch, setBranch] = useState('');
 
@@ -342,7 +342,11 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                       <span className="mt-1">Completed</span>
                     </div>
                     <div className="flex items-center gap-4 text-base">
-                      <span className="size-6 bg-red-400"></span>
+                      <span className="size-6 bg-purple-500"></span>
+                      <span className="mt-1">Started Late</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-base">
+                      <span className="size-6 bg-red-500"></span>
                       <span className="mt-1">Ended Early</span>
                     </div>
                     <div className="flex items-center gap-4 text-base">
@@ -427,7 +431,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                 }`}
                               >
                                 <div
-                                  className={`h-[30px] ${getColorAccToShiftStatus(data.shift)}  py-1 text-sm font-semibold line-clamp-1`}
+                                  className={`h-[30px] ${getColorAccToShiftStatus(data.shift, settings?.SettingEmpShiftTimeMarginInMins || 10)}  py-1 text-sm font-semibold line-clamp-1`}
                                 >
                                   {data.shift.ShiftName}
                                 </div>

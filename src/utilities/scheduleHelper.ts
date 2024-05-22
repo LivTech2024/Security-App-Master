@@ -1,6 +1,7 @@
+import dayjs from 'dayjs';
 import { IShiftsCollection } from '../@types/database';
 import { sendEmail } from '../API/SendEmail';
-import { getHoursDiffInTwoTimeString } from './misc';
+import { getHoursDiffInTwoTimeString, toDate } from './misc';
 
 interface SendShiftDetailsEmailArgs {
   empEmail: string;
@@ -29,7 +30,10 @@ export const sendShiftDetailsEmail = ({
   });
 };
 
-export const getColorAccToShiftStatus = (shift: IShiftsCollection) => {
+export const getColorAccToShiftStatus = (
+  shift: IShiftsCollection,
+  timeMarginInMins: number
+) => {
   let color = 'bg-gray-200';
 
   try {
@@ -42,11 +46,6 @@ export const getColorAccToShiftStatus = (shift: IShiftsCollection) => {
       Array.isArray(shift.ShiftCurrentStatus) &&
       shift.ShiftCurrentStatus.length > 0
     ) {
-      const shiftHours = getHoursDiffInTwoTimeString(
-        shift.ShiftStartTime,
-        shift.ShiftEndTime
-      );
-
       if (shift.ShiftCurrentStatus.some((s) => s.Status === 'started')) {
         color = 'bg-pink-200';
       }
@@ -57,16 +56,44 @@ export const getColorAccToShiftStatus = (shift: IShiftsCollection) => {
       if (shift.ShiftCurrentStatus.every((s) => s.Status === 'completed')) {
         color = 'bg-green-400';
       }
+
+      //*Started Late
       if (
         shift.ShiftCurrentStatus.some(
-          (s) => s.StatusShiftTotalHrs && s.StatusShiftTotalHrs < shiftHours
+          (s) =>
+            s.StatusStartedTime &&
+            getHoursDiffInTwoTimeString(
+              shift.ShiftStartTime,
+              dayjs(toDate(s.StatusStartedTime)).get('hour').toString()
+            ) > timeMarginInMins
         )
       ) {
-        color = 'bg-red-400';
+        color = 'bg-purple-500';
       }
+
+      //*Ended Early
       if (
         shift.ShiftCurrentStatus.some(
-          (s) => s.StatusShiftTotalHrs && s.StatusShiftTotalHrs > shiftHours
+          (s) =>
+            s.StatusReportedTime &&
+            getHoursDiffInTwoTimeString(
+              dayjs(toDate(s.StatusReportedTime)).get('hour').toString(),
+              shift.ShiftEndTime
+            ) > timeMarginInMins
+        )
+      ) {
+        color = 'bg-red-500';
+      }
+
+      //*Ended Late
+      if (
+        shift.ShiftCurrentStatus.some(
+          (s) =>
+            s.StatusReportedTime &&
+            getHoursDiffInTwoTimeString(
+              shift.ShiftEndTime,
+              dayjs(toDate(s.StatusReportedTime)).get('hour').toString()
+            ) > timeMarginInMins
         )
       ) {
         color = 'bg-blue-400';
