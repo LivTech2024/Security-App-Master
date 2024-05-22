@@ -10,7 +10,6 @@ import {
 } from '../../utilities/zod/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
-import { IoArrowBackCircle } from 'react-icons/io5';
 import { useAuthState, useEditFormStore } from '../../store';
 import { openContextModal } from '@mantine/modals';
 import Button from '../../common/button/Button';
@@ -43,6 +42,7 @@ import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import { sendShiftDetailsEmail } from '../../utilities/scheduleHelper';
 import { IShiftLinkedPatrolsChildCollection } from '../../@types/database';
 import ShiftLinkPatrolForm from '../../component/shifts/ShiftLinkPatrolForm';
+import PageHeader from '../../common/PageHeader';
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -344,7 +344,7 @@ const ShiftCreateOrEdit = () => {
         type: 'success',
       });
       methods.reset();
-      navigate(PageRoutes.SHIFT_LIST);
+      navigate(-1);
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -370,7 +370,7 @@ const ShiftCreateOrEdit = () => {
 
       setLoading(false);
       methods.reset();
-      navigate(PageRoutes.SHIFT_LIST);
+      navigate(-1);
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -380,51 +380,45 @@ const ShiftCreateOrEdit = () => {
 
   return (
     <div className="flex flex-col gap-4 p-6">
-      <div className="flex items-center justify-between w-full bg-primaryGold rounded p-4 shadow">
-        <div
-          onClick={() => navigate(PageRoutes.SHIFT_LIST)}
-          className="flex items-center gap-4 cursor-pointer "
-        >
-          <div className="cursor-pointer">
-            <IoArrowBackCircle className="h-6 w-6" />
-          </div>
-          <div className="font-semibold text-lg">Create shift</div>
-        </div>
-        <div className="flex items-center gap-4">
-          {isEdit && (
-            <Button
-              label="Delete"
-              type="white"
-              onClick={() =>
-                openContextModal({
-                  modal: 'confirmModal',
-                  withCloseButton: false,
-                  centered: true,
-                  closeOnClickOutside: true,
-                  innerProps: {
-                    title: 'Confirm',
-                    body: 'Are you sure to delete this shift',
-                    onConfirm: () => {
-                      onDelete();
+      <PageHeader
+        title="Create Shift"
+        rightSection={
+          <div className="flex items-center gap-4">
+            {isEdit && (
+              <Button
+                label="Delete"
+                type="white"
+                onClick={() =>
+                  openContextModal({
+                    modal: 'confirmModal',
+                    withCloseButton: false,
+                    centered: true,
+                    closeOnClickOutside: true,
+                    innerProps: {
+                      title: 'Confirm',
+                      body: 'Are you sure to delete this shift',
+                      onConfirm: () => {
+                        onDelete();
+                      },
                     },
-                  },
-                  size: '30%',
-                  styles: {
-                    body: { padding: '0px' },
-                  },
-                })
-              }
+                    size: '30%',
+                    styles: {
+                      body: { padding: '0px' },
+                    },
+                  })
+                }
+                className="px-14 py-2"
+              />
+            )}
+            <Button
+              label="Save"
+              type="black"
+              onClick={methods.handleSubmit(onSubmit)}
               className="px-14 py-2"
             />
-          )}
-          <Button
-            label="Save"
-            type="black"
-            onClick={methods.handleSubmit(onSubmit)}
-            className="px-14 py-2"
-          />
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       {/* Form */}
       <FormProvider {...methods}>
