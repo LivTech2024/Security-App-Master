@@ -366,6 +366,7 @@ export type KeyAllocationFormFields = z.infer<typeof keyAllocationSchema>;
 //*Settings Schema
 export const settingsSchema = z.object({
   SettingEmpWellnessIntervalInMins: z.coerce.number().min(1),
+  SettingEmpShiftTimeMarginInMins: z.coerce.number().min(1),
 });
 
 export type SettingsFormFields = z.infer<typeof settingsSchema>;

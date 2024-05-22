@@ -379,6 +379,7 @@ export interface ISettingsCollection {
   SettingId: string;
   SettingCompanyId: string;
   SettingEmpWellnessIntervalInMins: number;
+  SettingEmpShiftTimeMarginInMins: number;
 }
 
 export interface IEquipmentsCollection {

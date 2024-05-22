@@ -20,6 +20,8 @@ const AccountSettings = () => {
     defaultValues: {
       SettingEmpWellnessIntervalInMins:
         settings?.SettingEmpWellnessIntervalInMins || 10,
+      SettingEmpShiftTimeMarginInMins:
+        settings?.SettingEmpShiftTimeMarginInMins || 10,
     },
   });
 
@@ -70,6 +72,16 @@ const AccountSettings = () => {
           name="SettingEmpWellnessIntervalInMins"
           error={
             methods.formState.errors?.SettingEmpWellnessIntervalInMins?.message
+          }
+        />
+
+        <InputWithTopHeader
+          className="mx-0 w-fit"
+          label="Shift Time Margin (in minutes)"
+          register={methods.register}
+          name="SettingEmpShiftTimeMarginInMins"
+          error={
+            methods.formState.errors?.SettingEmpShiftTimeMarginInMins?.message
           }
         />
       </form>

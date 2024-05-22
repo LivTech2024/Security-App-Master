@@ -675,6 +675,7 @@ class DbCompany {
       SettingId: settingId,
       SettingCompanyId: cmpId,
       SettingEmpWellnessIntervalInMins: 60,
+      SettingEmpShiftTimeMarginInMins: 10,
     };
 
     return setDoc(settingRef, newSetting);
