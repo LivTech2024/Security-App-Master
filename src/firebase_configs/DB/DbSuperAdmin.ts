@@ -131,6 +131,7 @@ class DbSuperAdmin {
           SettingId: settingId,
           SettingCompanyId: companyId,
           SettingEmpWellnessIntervalInMins: 60,
+          SettingEmpShiftTimeMarginInMins: 10,
         };
 
         transaction.set(settingRef, newSetting);
