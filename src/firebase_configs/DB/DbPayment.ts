@@ -172,8 +172,6 @@ class DbPayment {
       };
     });
 
-    console.log(taxes, 'taxes');
-
     await runTransaction(db, async (transaction) => {
       const invoiceRef = doc(db, CollectionName.invoices, invoiceId);
 

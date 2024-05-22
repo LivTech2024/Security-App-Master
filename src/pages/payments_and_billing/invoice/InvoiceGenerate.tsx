@@ -243,7 +243,9 @@ const InvoiceGenerate = () => {
           invoiceId: invoiceEditData.InvoiceId,
           data,
           items: invoiceItems,
-          taxes: invoiceTaxList,
+          taxes: invoiceTaxList.filter(
+            (tax) => tax.TaxAmount && tax.TaxAmount > 0
+          ),
         });
 
         showSnackbar({
