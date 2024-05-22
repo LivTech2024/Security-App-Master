@@ -80,12 +80,12 @@ export async function generateInvoiceHTML({
           </div>
         </div>
         <div class="invoice-details">
-          <div>
+          <div style="max-width:50%">
             <p>Customer Name: ${invoiceData.InvoiceClientName}</p>
             <p>Customer Phone: ${invoiceData.InvoiceClientPhone}</p>
-            ${invoiceData.InvoiceClientAddress ? '<p>Customer Address: ${invoiceData.InvoiceClientAddress}</p>' : ''}
+            ${invoiceData.InvoiceClientAddress ? `<p>Customer Address: ${invoiceData.InvoiceClientAddress}</p>` : ''}
           </div>
-          <div style="text-align: end;">
+          <div style="text-align: end; max-width:50%;">
             <p>Invoice Number: ${invoiceData.InvoiceNumber}</p>
             <p>Invoice Date: ${formatDate(invoiceData.InvoiceDate)}</p>
             <p>Invoice Due Date: ${formatDate(invoiceData.InvoiceDueDate)}</p>
