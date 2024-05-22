@@ -34,11 +34,11 @@ export const getColorAccToShiftStatus = (
   shift: IShiftsCollection,
   timeMarginInMins: number
 ) => {
-  let color = 'bg-gray-200';
+  let color = ['#e5e7eb'];
 
   try {
     if (!shift.ShiftCurrentStatus || shift.ShiftCurrentStatus.length === 0) {
-      color = 'bg-orange-200';
+      color = ['#fed7aa'];
     }
 
     if (
@@ -47,14 +47,14 @@ export const getColorAccToShiftStatus = (
       shift.ShiftCurrentStatus.length > 0
     ) {
       if (shift.ShiftCurrentStatus.some((s) => s.Status === 'started')) {
-        color = 'bg-pink-200';
+        color = ['#fbcfe8'];
       }
 
       if (shift.ShiftCurrentStatus.some((s) => s.Status === 'pending')) {
-        color = 'bg-orange-200';
+        color = ['#fed7aa'];
       }
       if (shift.ShiftCurrentStatus.every((s) => s.Status === 'completed')) {
-        color = 'bg-green-400';
+        color = ['#4ade80'];
       }
 
       //*Started Late
@@ -68,7 +68,7 @@ export const getColorAccToShiftStatus = (
             ) > timeMarginInMins
         )
       ) {
-        color = 'bg-purple-500';
+        color = ['#a855f7'];
       }
 
       //*Ended Early
@@ -82,7 +82,7 @@ export const getColorAccToShiftStatus = (
             ) > timeMarginInMins
         )
       ) {
-        color = 'bg-red-500';
+        color = ['#ef4444'];
       }
 
       //*Ended Late
@@ -96,7 +96,7 @@ export const getColorAccToShiftStatus = (
             ) > timeMarginInMins
         )
       ) {
-        color = 'bg-blue-400';
+        color = [...color, '#60a5fa'];
       }
     }
 

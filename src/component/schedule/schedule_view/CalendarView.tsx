@@ -353,6 +353,10 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                       <span className="size-6 bg-blue-400"></span>
                       <span className="mt-1">Ended Late</span>
                     </div>
+                    <div className="flex items-center gap-4 text-base">
+                      <span className="size-6 bg-gradient-to-r from-purple-500 to-blue-400"></span>
+                      <span className="mt-1">Started Late-Ended Late</span>
+                    </div>
                   </div>
                 }
               >
@@ -404,6 +408,18 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                     0 ? (
                       getScheduleForDay(datesArray[index], schedules).map(
                         (data, idx) => {
+                          const colors = getColorAccToShiftStatus(
+                            data.shift,
+                            settings?.SettingEmpShiftTimeMarginInMins || 10
+                          );
+
+                          const backgroundStyle =
+                            colors.length > 1
+                              ? {
+                                  background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
+                                }
+                              : { backgroundColor: colors[0] };
+
                           return (
                             <DropPoint
                               accept={`${formatDate(data.shift.ShiftDate, 'DDMMYYYY')}${data.shift.ShiftPosition}`}
@@ -431,7 +447,8 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                 }`}
                               >
                                 <div
-                                  className={`h-[30px] ${getColorAccToShiftStatus(data.shift, settings?.SettingEmpShiftTimeMarginInMins || 10)}  py-1 text-sm font-semibold line-clamp-1`}
+                                  className={`h-[30px] py-1 text-sm font-semibold line-clamp-1`}
+                                  style={backgroundStyle}
                                 >
                                   {data.shift.ShiftName}
                                 </div>
