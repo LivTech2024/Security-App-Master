@@ -34,6 +34,7 @@ import { useNavigate } from 'react-router-dom';
 import { getColorAccToShiftStatus } from '../../../utilities/scheduleHelper';
 import { MdOutlineInfo } from 'react-icons/md';
 import Button from '../../../common/button/Button';
+import { AiOutlineClose } from 'react-icons/ai';
 //import { Accordion } from "@mantine/core";
 
 interface CalendarViewProps {
@@ -280,17 +281,33 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     }
   };
 
-  const onUndo = () => {
-    if (resultToBePublished.length === 0) return;
+  const onUndo = (shiftId?: string, empId?: string) => {
+    if (resultToBePublished.length === 0) {
+      console.log('returnnn');
+      return;
+    }
+
     const lastResultIndex = resultToBePublished.length - 1;
 
-    const resultToBeUndo = resultToBePublished[lastResultIndex];
+    let resultToBeUndo;
+
+    if (shiftId && empId) {
+      resultToBeUndo = resultToBePublished.find(
+        (res) => res.shift.ShiftId === shiftId
+      );
+      setResultToBePublished((prev) =>
+        prev.filter((res) => res.shift.ShiftId !== shiftId)
+      );
+    } else {
+      resultToBeUndo = resultToBePublished[lastResultIndex];
+      setResultToBePublished((prev) => prev.slice(0, -1));
+    }
+
+    if (!resultToBeUndo) return;
 
     setSelectedDate(toDate(resultToBeUndo.shift.ShiftDate));
 
     const { emp, shift } = resultToBeUndo;
-
-    setResultToBePublished((prev) => prev.slice(0, -1));
 
     if (!empAvailableForShift.find((e) => e.EmpId === emp.EmpId)) {
       setEmpAvailableForShift((prev) => [...prev, emp]);
@@ -370,7 +387,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
               <button
                 disabled={resultToBePublished.length === 0}
                 className="rounded bg-gray-200 py-2 px-10 text-sm"
-                onClick={onUndo}
+                onClick={() => onUndo()}
               >
                 UNDO Drag/Drop
               </button>
@@ -462,11 +479,42 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                     {data.shift.ShiftEndTime}
                                   </div>
                                   {data.employee.length > 0 ? (
-                                    <div className=" py-[2px] rounded w-full text-center line-clamp-1">
-                                      {data.employee
-                                        .map((emp) => emp?.EmployeeName)
-                                        .join(',')}
-                                    </div>
+                                    data.employee.every(
+                                      (emp) => emp.EmployeeCreatedAt
+                                    ) ? (
+                                      <Tooltip
+                                        label={
+                                          <div className=" py-[2px] rounded w-full text-center">
+                                            {data.employee
+                                              .map((emp) => emp?.EmployeeName)
+                                              .join(',')}
+                                          </div>
+                                        }
+                                      >
+                                        <div className=" py-[2px] rounded w-full text-center line-clamp-1">
+                                          {data.employee
+                                            .map((emp) => emp?.EmployeeName)
+                                            .join(',')}
+                                        </div>
+                                      </Tooltip>
+                                    ) : (
+                                      <div className="py-[2px] rounded w-full flex items-center gap-2">
+                                        <AiOutlineClose
+                                          onClick={() =>
+                                            onUndo(
+                                              data.shift.ShiftId,
+                                              data.employee[0].EmployeeId
+                                            )
+                                          }
+                                          className="text-textPrimaryRed font-semibold cursor-pointer text-lg hover:scale-[1.1] duration-200"
+                                        />
+                                        <span className="line-clamp-1">
+                                          {data.employee
+                                            .map((emp) => emp?.EmployeeName)
+                                            .join(',')}
+                                        </span>
+                                      </div>
+                                    )
                                   ) : (
                                     <div className="bg-[#ffff64] py-[2px] rounded w-full text-center line-clamp-1">
                                       (Unassigned)
