@@ -14,6 +14,7 @@ import { numberFormatter } from '../../../utilities/NumberFormater';
 import Button from '../../../common/button/Button';
 import { generateStatsViewHtml } from '../../../utilities/pdf/genrateStatsViewHtml';
 import { htmlStringToPdf } from '../../../utilities/htmlStringToPdf';
+import DateFilterDropdown from '../../../common/dropdown/DateFilterDropdown';
 
 const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
@@ -29,6 +30,14 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
     }[]
   >([]);
 
+  const [startDate, setStartDate] = useState<Date | string | null>(
+    dayjs().startOf('M').toDate()
+  );
+
+  const [endDate, setEndDate] = useState<Date | string | null>(
+    dayjs().endOf('M').toDate()
+  );
+
   const { company } = useAuthState();
 
   const [branch, setBranch] = useState('');
@@ -37,13 +46,15 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
     queryKey: [
       REACT_QUERY_KEYS.SCHEDULES,
       datesArray,
+      startDate,
+      endDate,
       branch,
       company!.CompanyId,
     ],
     queryFn: async () => {
       const data = await DbSchedule.getSchedules(
-        datesArray[0],
-        datesArray[datesArray.length - 1],
+        startDate as Date,
+        endDate as Date,
         company!.CompanyId,
         branch
       );
@@ -230,27 +241,35 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
 
   return (
     <div className="flex flex-col gap-4 w-full">
-      <div className="flex items-center gap-4 justify-between">
+      <div className="flex items-center gap-4 justify-between bg-surface p-4 rounded shadow">
         <SelectBranch selectedBranch={branch} setSelectedBranch={setBranch} />
-        <Button
-          label="Print"
-          onClick={async () => {
-            const shiftsSummaryHtml =
-              document.getElementById('shiftsSummary')?.outerHTML || '';
-            const employeesScheduledHtml =
-              document.getElementById('employeesScheduled')?.outerHTML || '';
+        <div className="flex items-center gap-4 w-full justify-end">
+          <DateFilterDropdown
+            endDate={endDate}
+            setEndDate={setEndDate}
+            setStartDate={setStartDate}
+            startDate={startDate}
+          />
+          <Button
+            label="Print"
+            onClick={async () => {
+              const shiftsSummaryHtml =
+                document.getElementById('shiftsSummary')?.outerHTML || '';
+              const employeesScheduledHtml =
+                document.getElementById('employeesScheduled')?.outerHTML || '';
 
-            const pdfHtml = generateStatsViewHtml(
-              shiftsSummaryHtml as unknown as JSX.Element,
-              employeesScheduledHtml as unknown as JSX.Element,
-              company!.CompanyName,
-              datesArray[0]
-            );
-            await htmlStringToPdf('test.pdf', pdfHtml);
-          }}
-          type="black"
-          className="px-12 py-2"
-        />
+              const pdfHtml = generateStatsViewHtml(
+                shiftsSummaryHtml as unknown as JSX.Element,
+                employeesScheduledHtml as unknown as JSX.Element,
+                company!.CompanyName,
+                datesArray[0]
+              );
+              await htmlStringToPdf('test.pdf', pdfHtml);
+            }}
+            type="black"
+            className="px-12 py-2"
+          />
+        </div>
       </div>
       <div className="flex w-full justify-between items-start gap-8">
         <div

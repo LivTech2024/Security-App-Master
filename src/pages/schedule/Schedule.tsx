@@ -55,7 +55,10 @@ const Schedule = () => {
         setSelectedTenure={setSelectedTenure}
         selectedView={selectedView}
         setSelectedView={setSelectedView}
-        isSelectTenureDisabled={selectedView === ScheduleView.BY_EMPLOYEE_VIEW}
+        isSelectTenureDisabled={
+          selectedView === ScheduleView.BY_EMPLOYEE_VIEW ||
+          selectedView === ScheduleView.STATISTICS_VIEW
+        }
       />
       {selectedView === ScheduleView.CALENDAR_VIEW ? (
         <CalendarView datesArray={datesArray} />
