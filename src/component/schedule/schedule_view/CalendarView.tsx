@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import empDefaultPlaceHolder from '../../../../public/assets/avatar.png';
@@ -35,7 +35,8 @@ import { getColorAccToShiftStatus } from '../../../utilities/scheduleHelper';
 import { MdOutlineInfo } from 'react-icons/md';
 import Button from '../../../common/button/Button';
 import { AiOutlineClose } from 'react-icons/ai';
-//import { Accordion } from "@mantine/core";
+import { FaRegTrashAlt, FaUndo } from 'react-icons/fa';
+import DbShift from '../../../firebase_configs/DB/DbShift';
 
 interface CalendarViewProps {
   datesArray: Date[];
@@ -49,6 +50,8 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
   const { company, empRoles, settings } = useAuthState();
 
   const [branch, setBranch] = useState('');
+
+  const queryClient = useQueryClient();
 
   const { data, error } = useQuery({
     queryKey: [
@@ -141,6 +144,8 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     }[]
   >([]);
 
+  const [shiftToBeDeleted, setShiftToBeDeleted] = useState<string[]>([]);
+
   const dropResult = (draggableId: string, dropPointId: string) => {
     const selectedEmp = empAvailableForShift.find(
       (emp) => emp.EmpId === draggableId
@@ -216,58 +221,74 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     try {
       showModalLoader({});
 
-      const shiftAssignPromise = resultToBePublished.map(async (result) => {
-        return DbSchedule.assignShiftToEmp(result.shift.ShiftId, [
-          result.emp.EmpId,
-        ]);
-      });
+      if (resultToBePublished.length > 0) {
+        const shiftAssignPromise = resultToBePublished.map(async (result) => {
+          return DbSchedule.assignShiftToEmp(result.shift.ShiftId, [
+            result.emp.EmpId,
+          ]);
+        });
 
-      await Promise.all(shiftAssignPromise);
+        await Promise.all(shiftAssignPromise);
 
-      const aggregatedEmails: {
-        empEmail: string;
-        empName: string;
-        message: string;
-      }[] = [];
+        const aggregatedEmails: {
+          empEmail: string;
+          empName: string;
+          message: string;
+        }[] = [];
 
-      resultToBePublished.forEach((data) => {
-        const { emp, shift } = data;
-        const isExistIndex = aggregatedEmails.findIndex(
-          (d) => d.empEmail === emp.EmpEmail
+        resultToBePublished.forEach((data) => {
+          const { emp, shift } = data;
+          const isExistIndex = aggregatedEmails.findIndex(
+            (d) => d.empEmail === emp.EmpEmail
+          );
+          if (isExistIndex !== -1) {
+            const prevMessage = aggregatedEmails[isExistIndex].message;
+            aggregatedEmails[isExistIndex].message =
+              `${prevMessage}\n\nShift Name: ${
+                shift.ShiftName
+              } \n Date: ${formatDate(shift.ShiftDate)} \nTiming: ${
+                shift.ShiftStartTime
+              }-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
+          } else {
+            aggregatedEmails.push({
+              empEmail: emp.EmpEmail,
+              empName: emp.EmpName,
+              message: `You have been assigned for the following shift.\n\n Shift Name: ${
+                shift.ShiftName
+              } \n Date: ${formatDate(shift.ShiftDate)} \n Timing: ${
+                shift.ShiftStartTime
+              }-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
+            });
+          }
+        });
+
+        await Promise.all(
+          aggregatedEmails.map(async (res) => {
+            return sendEmail({
+              to_email: res.empEmail,
+              text: res.message,
+              subject: 'Your schedule update',
+              from_name: company!.CompanyName,
+            });
+          })
         );
-        if (isExistIndex !== -1) {
-          const prevMessage = aggregatedEmails[isExistIndex].message;
-          aggregatedEmails[isExistIndex].message =
-            `${prevMessage}\n\nShift Name: ${
-              shift.ShiftName
-            } \n Date: ${formatDate(shift.ShiftDate)} \nTiming: ${
-              shift.ShiftStartTime
-            }-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
-        } else {
-          aggregatedEmails.push({
-            empEmail: emp.EmpEmail,
-            empName: emp.EmpName,
-            message: `You have been assigned for the following shift.\n\n Shift Name: ${
-              shift.ShiftName
-            } \n Date: ${formatDate(shift.ShiftDate)} \n Timing: ${
-              shift.ShiftStartTime
-            }-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
-          });
-        }
+
+        setResultToBePublished([]);
+      }
+
+      if (shiftToBeDeleted.length > 0) {
+        const shiftDeletePromise = shiftToBeDeleted.map(async (result) => {
+          return DbShift.deleteShift(result);
+        });
+
+        await Promise.all(shiftDeletePromise);
+
+        setShiftToBeDeleted([]);
+      }
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.SCHEDULES],
       });
-
-      await Promise.all(
-        aggregatedEmails.map(async (res) => {
-          return sendEmail({
-            to_email: res.empEmail,
-            text: res.message,
-            subject: 'Your schedule update',
-            from_name: company!.CompanyName,
-          });
-        })
-      );
-
-      setResultToBePublished([]);
 
       showSnackbar({
         message: 'Schedule published successfully',
@@ -283,7 +304,6 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
   const onUndo = (shiftId?: string, empId?: string) => {
     if (resultToBePublished.length === 0) {
-      console.log('returnnn');
       return;
     }
 
@@ -326,6 +346,14 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
       return updatedSchedules as ISchedule[];
     });
+  };
+
+  const onDeleteClick = (shiftId: string) => {
+    setShiftToBeDeleted((prev) => [...prev, shiftId]);
+  };
+
+  const onDeleteUndo = (shiftId: string) => {
+    setShiftToBeDeleted((prev) => prev.filter((s) => s !== shiftId));
   };
 
   /****************For multiple employee assignation to single shift****************/
@@ -393,7 +421,10 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
               </button>
               <button
                 onClick={onPublish}
-                disabled={resultToBePublished.length === 0}
+                disabled={
+                  resultToBePublished.length === 0 &&
+                  shiftToBeDeleted.length === 0
+                }
                 className="bg-secondary py-2 px-[88px] rounded text-sm text-surface font-semibold hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg disabled:bg-secondaryBlueBg"
               >
                 Publish
@@ -437,7 +468,20 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                 }
                               : { backgroundColor: colors[0] };
 
-                          return (
+                          return shiftToBeDeleted.includes(
+                            data.shift.ShiftId
+                          ) ? (
+                            <div className="flex flex-col w-full h-full min-h-[140px] justify-center items-center py-4">
+                              <div>This Shift is Deleted</div>
+                              <div
+                                onClick={() => onDeleteUndo(data.shift.ShiftId)}
+                                className="flex items-center gap-1 text-sm mt-1 text-textPrimaryBlue cursor-pointer hover:underline"
+                              >
+                                <span>Click to undo</span>
+                                <FaUndo />
+                              </div>
+                            </div>
+                          ) : (
                             <DropPoint
                               accept={`${formatDate(data.shift.ShiftDate, 'DDMMYYYY')}${data.shift.ShiftPosition}`}
                               className="h-full"
@@ -464,12 +508,33 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                 }`}
                               >
                                 <div
-                                  className={`h-[30px] py-1 text-sm font-semibold line-clamp-1`}
+                                  className={`h-[30px] py-1 text-sm font-semibold  px-2 flex ${data.employee.length === 0 ? 'justify-between' : 'justify-center'}`}
                                   style={backgroundStyle}
                                 >
-                                  {data.shift.ShiftName}
+                                  {data.employee.length === 0 && (
+                                    <span>&nbsp;</span>
+                                  )}
+                                  <span className="line-clamp-1 text-center">
+                                    {data.shift.ShiftName}
+                                  </span>
+                                  {data.employee.length === 0 && (
+                                    <span className="relative">
+                                      <FaRegTrashAlt
+                                        onClick={() => {
+                                          if (
+                                            data.shift?.ShiftAssignedUserId
+                                              ?.length > 0 ||
+                                            data?.employee?.length > 0
+                                          ) {
+                                            return;
+                                          }
+                                          onDeleteClick(data.shift.ShiftId);
+                                        }}
+                                        className="text-lg font-semibold text-textPrimaryRed ml-1 cursor-pointer"
+                                      />
+                                    </span>
+                                  )}
                                 </div>
-
                                 <div className="bg-[#5e5c5c23] p-2 rounded  min-w-full items-center text-sm">
                                   <div className="text-sm font-medium line-clamp-1">
                                     {data.shift.ShiftPosition}

@@ -370,7 +370,7 @@ const ShiftCreateOrEdit = () => {
 
       setLoading(false);
       methods.reset();
-      navigate(-1);
+      navigate(PageRoutes.SHIFT_LIST);
     } catch (error) {
       console.log(error);
       setLoading(false);
