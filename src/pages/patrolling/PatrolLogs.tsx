@@ -251,17 +251,18 @@ const PatrolLogs = () => {
           ) : (
             data
               .sort((a, b) => {
-                const dateComparison =
+                /* const dateComparison =
                   toDate(b.PatrolDate).getTime() -
-                  toDate(a.PatrolDate).getTime();
-                if (dateComparison !== 0) {
-                  return dateComparison; // Sort by PatrolDate first
-                }
-                // If PatrolDate is the same, sort by PatrolLogStartedAt
-                return (
+                  toDate(a.PatrolDate).getTime(); */
+
+                const startedAtTimeComparison =
                   toDate(b.PatrolLogStartedAt).getTime() -
-                  toDate(a.PatrolLogStartedAt).getTime()
-                );
+                  toDate(a.PatrolLogStartedAt).getTime();
+                /* if (dateComparison !== 0) {
+                  return dateComparison; // Sort by PatrolDate first
+                } */
+                // If PatrolDate is the same, sort by PatrolLogStartedAt
+                return startedAtTimeComparison;
               })
               .map((patrol) => {
                 return (
