@@ -18,6 +18,7 @@ const TopSection = ({
   selectedView,
   setSelectedView,
   isSelectTenureDisabled = false,
+  isWeekSelectorReq = true,
 }: {
   selectedDate: Date;
   setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
@@ -26,12 +27,13 @@ const TopSection = ({
   setSelectedTenure: React.Dispatch<React.SetStateAction<'weekly' | 'monthly'>>;
   selectedView: ScheduleView;
   setSelectedView: React.Dispatch<React.SetStateAction<ScheduleView>>;
+  isWeekSelectorReq?: boolean;
 }) => {
   const { setShiftEditData } = useEditFormStore();
 
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col w-full gap-4">
+    <div className="flex flex-col w-full gap-4 ">
       <PageHeader
         title="Schedule"
         rightSection={
@@ -56,7 +58,7 @@ const TopSection = ({
       />
 
       {/* Top section */}
-      <div className="flex items-center justify-between w-full">
+      <div className="flex items-center justify-between w-full bg-surface shadow p-4 rounded">
         <Select
           allowDeselect={false}
           value={selectedView}
@@ -83,43 +85,45 @@ const TopSection = ({
           }}
         />
 
-        <div className="flex items-center gap-4">
-          <FaCircleChevronLeft
-            className="text-2xl cursor-pointer"
-            onClick={() =>
-              setSelectedDate((prev) =>
-                dayjs(prev).subtract(1, 'week').toDate()
-              )
-            }
-          />
-          <label
-            htmlFor="date_picker"
-            className="flex items-center gap-4 cursor-pointer justify-center w-full"
-          >
-            <div className="font-semibold">
-              Week of {dayjs(selectedDate).format('MMM DD, YYYY')}
-            </div>
-
-            <DatePickerInput
-              type="default"
-              id="date_picker"
-              className="font-semibold"
-              rightSection={
-                <label>
-                  <MdCalendarToday size={16} className="cursor-pointer" />
-                </label>
+        {isWeekSelectorReq && (
+          <div className="flex items-center gap-4">
+            <FaCircleChevronLeft
+              className="text-2xl cursor-pointer"
+              onClick={() =>
+                setSelectedDate((prev) =>
+                  dayjs(prev).subtract(1, 'week').toDate()
+                )
               }
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e as Date)}
             />
-          </label>
-          <FaCircleChevronRight
-            className="text-2xl cursor-pointer"
-            onClick={() =>
-              setSelectedDate((prev) => dayjs(prev).add(1, 'week').toDate())
-            }
-          />
-        </div>
+            <label
+              htmlFor="date_picker"
+              className="flex items-center gap-4 cursor-pointer justify-center w-full"
+            >
+              <div className="font-semibold">
+                Week of {dayjs(selectedDate).format('MMM DD, YYYY')}
+              </div>
+
+              <DatePickerInput
+                type="default"
+                id="date_picker"
+                className="font-semibold"
+                rightSection={
+                  <label>
+                    <MdCalendarToday size={16} className="cursor-pointer" />
+                  </label>
+                }
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e as Date)}
+              />
+            </label>
+            <FaCircleChevronRight
+              className="text-2xl cursor-pointer"
+              onClick={() =>
+                setSelectedDate((prev) => dayjs(prev).add(1, 'week').toDate())
+              }
+            />
+          </div>
+        )}
         <div>
           {!isSelectTenureDisabled ? (
             <Select

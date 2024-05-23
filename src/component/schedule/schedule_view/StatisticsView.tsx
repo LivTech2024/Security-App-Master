@@ -16,7 +16,7 @@ import { generateStatsViewHtml } from '../../../utilities/pdf/genrateStatsViewHt
 import { htmlStringToPdf } from '../../../utilities/htmlStringToPdf';
 import DateFilterDropdown from '../../../common/dropdown/DateFilterDropdown';
 
-const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
+const StatisticsView = () => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
   const [empHavingShifts, setEmpHavingShifts] = useState<
@@ -31,12 +31,26 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
   >([]);
 
   const [startDate, setStartDate] = useState<Date | string | null>(
-    dayjs().startOf('M').toDate()
+    dayjs().startOf('week').toDate()
   );
 
   const [endDate, setEndDate] = useState<Date | string | null>(
-    dayjs().endOf('M').toDate()
+    dayjs().endOf('week').toDate()
   );
+
+  const [datesArray, setDatesArray] = useState<Date[]>([]);
+
+  useEffect(() => {
+    setDatesArray([]);
+
+    for (
+      let i = dayjs(startDate).startOf('day');
+      i.isBefore(dayjs(endDate).endOf('day'));
+      i = dayjs(i).add(1, 'day')
+    ) {
+      setDatesArray((prev) => [...prev, i.toDate()]);
+    }
+  }, [startDate, endDate]);
 
   const { company } = useAuthState();
 
@@ -308,7 +322,11 @@ const StatisticsView = ({ datesArray }: { datesArray: Date[] }) => {
                 const assigned = getAssignedShiftForDay(date);
                 return (
                   <tr key={idx}>
-                    <td className="px-2 py-2">{formatDate(date, 'dddd')}</td>
+                    <td className="px-2 py-2">
+                      {datesArray.length > 7
+                        ? formatDate(date, 'DD-MMM ddd')
+                        : formatDate(date, 'dddd')}
+                    </td>
                     <td className="px-2 py-2 text-center">
                       {unAssigned.length.toFixed(2)}
                     </td>

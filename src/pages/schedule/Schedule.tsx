@@ -59,13 +59,16 @@ const Schedule = () => {
           selectedView === ScheduleView.BY_EMPLOYEE_VIEW ||
           selectedView === ScheduleView.STATISTICS_VIEW
         }
+        isWeekSelectorReq={
+          selectedView === ScheduleView.STATISTICS_VIEW ? false : true
+        }
       />
       {selectedView === ScheduleView.CALENDAR_VIEW ? (
         <CalendarView datesArray={datesArray} />
       ) : selectedView === ScheduleView.BY_EMPLOYEE_VIEW ? (
         <ByEmployeeView datesArray={datesArray} />
       ) : (
-        <StatisticsView datesArray={datesArray} />
+        <StatisticsView />
       )}
     </div>
   );
