@@ -25,3 +25,17 @@
   border: 2px solid #262f3d;
   cursor: pointer;
 }
+
+.shift-emp-scrollbar::-webkit-scrollbar {
+  display: block;
+  background-color: #5e5c5c23;
+  height: 15px;
+}
+
+.shift-emp-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #5e5c5c23;
+  border-radius: 8px;
+  border: 2px solid #0000001a;
+  cursor: pointer;
+  min-width: 50px;
+}

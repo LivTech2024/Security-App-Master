@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import TopSection from '../../component/schedule/TopSection';
 import { ScheduleView } from '../../@types/enum';
 import ByEmployeeView from '../../component/schedule/schedule_view/ByEmployeeView';
-import CalendarView from '../../component/schedule/schedule_view/CalendarView';
+import CalendarView from '../../component/schedule/schedule_view/calendar_view/CalendarView';
 import StatisticsView from '../../component/schedule/schedule_view/StatisticsView';
 
 const Schedule = () => {

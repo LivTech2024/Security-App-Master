@@ -4,50 +4,44 @@ import { useEffect, useState } from 'react';
 import empDefaultPlaceHolder from '../../../../public/assets/avatar.png';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { PageRoutes, REACT_QUERY_KEYS } from '../../../@types/enum';
+import { REACT_QUERY_KEYS } from '../../../../@types/enum';
 import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
-} from '../../../firebase_configs/DB/DbSchedule';
+} from '../../../../firebase_configs/DB/DbSchedule';
 import {
   formatDate,
   getHoursDiffInTwoTimeString,
   toDate,
-} from '../../../utilities/misc';
-import { Draggable, DropPoint } from '../../../utilities/DragAndDropHelper';
+} from '../../../../utilities/misc';
+import { Draggable } from '../../../../utilities/DragAndDropHelper';
 import {
   IEmployeesCollection,
   IShiftsCollection,
-} from '../../../@types/database';
+} from '../../../../@types/database';
 import {
   closeModalLoader,
   showModalLoader,
   showSnackbar,
-} from '../../../utilities/TsxUtils';
-import { errorHandler } from '../../../utilities/CustomError';
-import { useAuthState } from '../../../store';
-import AssignShiftModal from '../modal/AssignShiftModal';
-import SelectBranch from '../../../common/SelectBranch';
+} from '../../../../utilities/TsxUtils';
+import { errorHandler } from '../../../../utilities/CustomError';
+import { useAuthState } from '../../../../store';
+import AssignShiftModal from '../../modal/AssignShiftModal';
+import SelectBranch from '../../../../common/SelectBranch';
 import { Accordion, Tooltip } from '@mantine/core';
-import { sendEmail } from '../../../API/SendEmail';
-import { useNavigate } from 'react-router-dom';
-import { getColorAccToShiftStatus } from '../../../utilities/scheduleHelper';
+import { sendEmail } from '../../../../API/SendEmail';
 import { MdOutlineInfo } from 'react-icons/md';
-import Button from '../../../common/button/Button';
-import { AiOutlineClose } from 'react-icons/ai';
-import { FaRegTrashAlt, FaUndo } from 'react-icons/fa';
-import DbShift from '../../../firebase_configs/DB/DbShift';
+import DbShift from '../../../../firebase_configs/DB/DbShift';
+import ShiftDropPoint from './ShiftDropPoint';
 
 interface CalendarViewProps {
   datesArray: Date[];
 }
 
 const CalendarView = ({ datesArray }: CalendarViewProps) => {
-  const navigate = useNavigate();
-
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
-  const { company, empRoles, settings } = useAuthState();
+  const { company, empRoles } = useAuthState();
 
   const [branch, setBranch] = useState('');
 
@@ -75,25 +69,6 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     console.log(error);
     setSchedules(data || []);
   }, [data, error]);
-
-  const getScheduleForDay = (date: Date, schedules?: ISchedule[]) => {
-    if (!schedules) return [];
-    return schedules
-      .filter((schedule) =>
-        dayjs(toDate(schedule.shift.ShiftDate)).isSame(date, 'date')
-      )
-      ?.sort(
-        (a, b) =>
-          Number(
-            a?.shift.ShiftStartTime?.split(':')[0] +
-              a?.shift.ShiftStartTime?.split(':')[1] || 0
-          ) -
-          Number(
-            b?.shift.ShiftStartTime?.split(':')[0] +
-              b?.shift.ShiftStartTime?.split(':')[1] || 0
-          )
-      );
-  };
 
   const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(
     null
@@ -436,167 +411,19 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
             <div className="flex w-full flex-wrap max-h-[80vh] overflow-auto remove-vertical-scrollbar">
               {datesArray.map((date, index) => {
                 return (
-                  <div
-                    key={index}
-                    className="flex flex-col h-full justify-start min-w-[180px] w-[14.23%] text-center max-h-[350px] overflow-auto remove-vertical-scrollbar "
-                  >
-                    <div
-                      onClick={() => setSelectedDate(date)}
-                      className="font-semibold cursor-pointer text-textPrimaryBlue sticky top-0 bg-background justify-center flex w-full px-2 pt-4"
-                    >
-                      <Button
-                        label={dayjs(date).format('ddd MMM-DD')}
-                        type="blue"
-                        onClick={() => setSelectedDate(date)}
-                        className="w-full text-sm rounded-full  border-[1px] border-[#02829b] bg-gradient-to-b from-[#7ed7df] to-[#00a9d0] hover:scale-[1.02] duration-200"
-                      />
-                    </div>
-
-                    {getScheduleForDay(datesArray[index], schedules).length >
-                    0 ? (
-                      getScheduleForDay(datesArray[index], schedules).map(
-                        (data, idx) => {
-                          const colors = getColorAccToShiftStatus(
-                            data.shift,
-                            settings?.SettingEmpShiftTimeMarginInMins || 10
-                          );
-
-                          const backgroundStyle =
-                            colors.length > 1
-                              ? {
-                                  background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
-                                }
-                              : { backgroundColor: colors[0] };
-
-                          return shiftToBeDeleted.includes(
-                            data.shift.ShiftId
-                          ) ? (
-                            <div className="flex flex-col w-full h-full min-h-[140px] justify-center items-center py-4">
-                              <div>This Shift is Deleted</div>
-                              <div
-                                onClick={() => onDeleteUndo(data.shift.ShiftId)}
-                                className="flex items-center gap-1 text-sm mt-1 text-textPrimaryBlue cursor-pointer hover:underline"
-                              >
-                                <span>Click to undo</span>
-                                <FaUndo />
-                              </div>
-                            </div>
-                          ) : (
-                            <DropPoint
-                              accept={`${formatDate(data.shift.ShiftDate, 'DDMMYYYY')}${data.shift.ShiftPosition}`}
-                              className="h-full"
-                              id={data.shift.ShiftId}
-                              key={idx}
-                            >
-                              <div
-                                onDoubleClick={() =>
-                                  navigate(
-                                    PageRoutes.SHIFT_VIEW +
-                                      `?id=${data.shift.ShiftId}`
-                                  )
-                                }
-                                onClick={() => {
-                                  setSelectedSchedule(data);
-                                  if (data.shift.ShiftRequiredEmp > 1) {
-                                    setAssignMultipleEmpModal(true);
-                                  }
-                                }}
-                                key={data.shift.ShiftId + idx}
-                                className={`flex flex-col p-2 ${
-                                  data.shift.ShiftRequiredEmp > 1 &&
-                                  'cursor-pointer'
-                                }`}
-                              >
-                                <div
-                                  className={`h-[30px] py-1 text-sm font-semibold  px-2 flex ${data.employee.length === 0 ? 'justify-between' : 'justify-center'}`}
-                                  style={backgroundStyle}
-                                >
-                                  {data.employee.length === 0 && (
-                                    <span>&nbsp;</span>
-                                  )}
-                                  <span className="line-clamp-1 text-center">
-                                    {data.shift.ShiftName}
-                                  </span>
-                                  {data.employee.length === 0 && (
-                                    <span className="relative">
-                                      <FaRegTrashAlt
-                                        onClick={() => {
-                                          if (
-                                            data.shift?.ShiftAssignedUserId
-                                              ?.length > 0 ||
-                                            data?.employee?.length > 0
-                                          ) {
-                                            return;
-                                          }
-                                          onDeleteClick(data.shift.ShiftId);
-                                        }}
-                                        className="text-lg font-semibold text-textPrimaryRed ml-1 cursor-pointer"
-                                      />
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="bg-[#5e5c5c23] p-2 rounded  min-w-full items-center text-sm">
-                                  <div className="text-sm font-medium line-clamp-1">
-                                    {data.shift.ShiftPosition}
-                                  </div>
-                                  <div className="font-semibold line-clamp-1">
-                                    {data.shift.ShiftStartTime}-
-                                    {data.shift.ShiftEndTime}
-                                  </div>
-                                  {data.employee.length > 0 ? (
-                                    data.employee.every(
-                                      (emp) => emp.EmployeeCreatedAt
-                                    ) ? (
-                                      <Tooltip
-                                        label={
-                                          <div className=" py-[2px] rounded w-full text-center">
-                                            {data.employee
-                                              .map((emp) => emp?.EmployeeName)
-                                              .join(',')}
-                                          </div>
-                                        }
-                                      >
-                                        <div className=" py-[2px] rounded w-full text-center line-clamp-1">
-                                          {data.employee
-                                            .map((emp) => emp?.EmployeeName)
-                                            .join(',')}
-                                        </div>
-                                      </Tooltip>
-                                    ) : (
-                                      <div className="py-[2px] rounded w-full flex items-center gap-2">
-                                        <AiOutlineClose
-                                          onClick={() =>
-                                            onUndo(
-                                              data.shift.ShiftId,
-                                              data.employee[0].EmployeeId
-                                            )
-                                          }
-                                          className="text-textPrimaryRed font-semibold cursor-pointer text-lg hover:scale-[1.1] duration-200"
-                                        />
-                                        <span className="line-clamp-1">
-                                          {data.employee
-                                            .map((emp) => emp?.EmployeeName)
-                                            .join(',')}
-                                        </span>
-                                      </div>
-                                    )
-                                  ) : (
-                                    <div className="bg-[#ffff64] py-[2px] rounded w-full text-center line-clamp-1">
-                                      (Unassigned)
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </DropPoint>
-                          );
-                        }
-                      )
-                    ) : (
-                      <div className="flex flex-col">
-                        <div className="h-[40px] "></div>
-                      </div>
-                    )}
-                  </div>
+                  <ShiftDropPoint
+                    index={index}
+                    date={date}
+                    datesArray={datesArray}
+                    onDeleteClick={onDeleteClick}
+                    onDeleteUndo={onDeleteUndo}
+                    onUndo={onUndo}
+                    schedules={schedules}
+                    setAssignMultipleEmpModal={setAssignMultipleEmpModal}
+                    setSelectedDate={setSelectedDate}
+                    setSelectedSchedule={setSelectedSchedule}
+                    shiftToBeDeleted={shiftToBeDeleted}
+                  />
                 );
               })}
             </div>
