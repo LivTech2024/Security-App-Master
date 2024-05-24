@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../../../@types/enum';
 import { Tooltip } from '@mantine/core';
 import { AiOutlineClose } from 'react-icons/ai';
-import empDefaultPlaceHolder from '../../../../public/assets/avatar.png';
+import empDefaultPlaceHolder from '../../../../../public/assets/avatar.png';
 
 interface ShiftDropPointProps {
   index: number;

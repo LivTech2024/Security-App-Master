@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import empDefaultPlaceHolder from '../../../../public/assets/avatar.png';
+import empDefaultPlaceHolder from '../../../../../public/assets/avatar.png';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { REACT_QUERY_KEYS } from '../../../../@types/enum';
