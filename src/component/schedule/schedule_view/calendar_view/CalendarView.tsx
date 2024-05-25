@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import empDefaultPlaceHolder from '../../../../../public/assets/avatar.png';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { REACT_QUERY_KEYS } from '../../../../@types/enum';
+import { CollectionName, REACT_QUERY_KEYS } from '../../../../@types/enum';
 import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
@@ -12,11 +12,14 @@ import DbSchedule, {
 import {
   formatDate,
   getHoursDiffInTwoTimeString,
+  getRandomNumbers,
+  removeTimeFromDate,
   toDate,
 } from '../../../../utilities/misc';
 import { Draggable } from '../../../../utilities/DragAndDropHelper';
 import {
   IEmployeesCollection,
+  IShiftTasksChild,
   IShiftsCollection,
 } from '../../../../@types/database';
 import {
@@ -33,6 +36,11 @@ import { sendEmail } from '../../../../API/SendEmail';
 import { MdOutlineInfo } from 'react-icons/md';
 import DbShift from '../../../../firebase_configs/DB/DbShift';
 import ShiftDropPoint from './ShiftDropPoint';
+import Button from '../../../../common/button/Button';
+import { openContextModal } from '@mantine/modals';
+import { Timestamp, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { getNewDocId } from '../../../../firebase_configs/DB/utils';
+import { db } from '../../../../firebase_configs/config';
 
 interface CalendarViewProps {
   datesArray: Date[];
@@ -179,6 +187,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
           const updatedEmp: Partial<IEmployeesCollection> = {
             EmployeeId: selectedEmp?.EmpId,
             EmployeeName: selectedEmp?.EmpName,
+            EmployeeImg: selectedEmp?.EmpImg,
           };
           return {
             ...schedule,
@@ -335,6 +344,86 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
   const [assignMultipleEmpModal, setAssignMultipleEmpModal] = useState(false);
 
+  /***************Shift Copy Feature********************* */
+
+  const [loading, setLoading] = useState(false);
+
+  const onCopyShiftCopy = async () => {
+    const isWeekly = datesArray.length === 7;
+    try {
+      setLoading(true);
+      const shiftCreatePromise = schedules.map(async (data) => {
+        const { ShiftDate, ShiftTask } = data.shift;
+
+        const shiftId = getNewDocId(CollectionName.shifts);
+        const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
+        const shiftTasks: IShiftTasksChild[] = [];
+
+        ShiftTask.map((task, idx) => {
+          if (task.ShiftTask && task.ShiftTask.length > 0) {
+            const random = getRandomNumbers();
+            const shiftTaskId = `${shiftId}${random}${idx}`;
+
+            shiftTasks.push({
+              ShiftTaskId: shiftTaskId,
+              ShiftTask: task.ShiftTask,
+              ShiftTaskQrCodeReq: task.ShiftTaskQrCodeReq,
+              ShiftTaskReturnReq: task.ShiftTaskReturnReq,
+              ShiftTaskStatus: [],
+            });
+          }
+        });
+
+        const newShiftDate = isWeekly
+          ? (removeTimeFromDate(
+              dayjs(toDate(ShiftDate)).add(7, 'days').toDate()
+            ) as unknown as Timestamp)
+          : (removeTimeFromDate(
+              dayjs(toDate(ShiftDate))
+                .add(dayjs().daysInMonth(), 'day')
+                .toDate()
+            ) as unknown as Timestamp);
+
+        const newShiftData: IShiftsCollection = {
+          ...data.shift,
+          ShiftId: shiftId,
+          ShiftAcknowledgedByEmpId: [],
+          ShiftAssignedUserId: [],
+          ShiftCurrentStatus: [],
+          ShiftGuardWellnessReport: [],
+          ShiftDate: newShiftDate,
+          ShiftTask: shiftTasks,
+          ShiftCreatedAt: serverTimestamp(),
+          ShiftModifiedAt: serverTimestamp(),
+        };
+
+        await setDoc(shiftDocRef, newShiftData);
+      });
+
+      await Promise.all(shiftCreatePromise);
+
+      setLoading(false);
+
+      showSnackbar({
+        message: 'All shifts copied successfully',
+        type: 'success',
+      });
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      errorHandler(error);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
+
   return (
     <>
       <DndProvider backend={HTML5Backend}>
@@ -344,6 +433,40 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
               <SelectBranch
                 selectedBranch={branch}
                 setSelectedBranch={setBranch}
+              />
+              <Button
+                type="black"
+                onClick={() => {
+                  openContextModal({
+                    modal: 'confirmModal',
+                    withCloseButton: false,
+                    centered: true,
+                    closeOnClickOutside: true,
+                    innerProps: {
+                      title: 'Confirm',
+                      body: (
+                        <div className="flex flex-col">
+                          <div className="font-semibold text-base leading-5">
+                            Are you sure to copy all the shifts to next{' '}
+                            {datesArray.length === 7 ? 'Week' : 'Month'}?
+                          </div>
+                          <div className="mt-4">
+                            This will create a heavy load on your system, make
+                            sure you have stable internet connection
+                          </div>
+                        </div>
+                      ),
+                      onConfirm: () => {
+                        onCopyShiftCopy();
+                      },
+                    },
+                    size: '30%',
+                    styles: {
+                      body: { padding: '0px' },
+                    },
+                  });
+                }}
+                label={`Copy All Shifts To Next ${datesArray.length === 7 ? 'Week' : 'Month'}`}
               />
               <Tooltip
                 styles={{ tooltip: { padding: 0 } }}

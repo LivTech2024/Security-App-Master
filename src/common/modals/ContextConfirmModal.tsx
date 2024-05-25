@@ -38,7 +38,7 @@ export const ContextConfirmModal = ({
               innerProps.onCancel && innerProps.onCancel();
               closeAllModals();
             }}
-            className="bg-surface font-medium px-5 py-1 rounded hover:bg-onHoverBgLight active:bg-onSecondary duration-200 dark:text-textPrimaryLight"
+            className="bg-surface font-medium px-5 py-1 rounded hover:bg-onHoverBg duration-200"
           >
             {'Cancel'}
           </button>
