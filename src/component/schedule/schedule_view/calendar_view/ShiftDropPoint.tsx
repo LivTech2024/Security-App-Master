@@ -2,15 +2,27 @@ import dayjs from 'dayjs';
 import Button from '../../../../common/button/Button';
 import { DropPoint } from '../../../../utilities/DragAndDropHelper';
 import { formatDate, toDate } from '../../../../utilities/misc';
-import { ISchedule } from '../../../../firebase_configs/DB/DbSchedule';
+import DbSchedule, {
+  ISchedule,
+} from '../../../../firebase_configs/DB/DbSchedule';
 import { getColorAccToShiftStatus } from '../../../../utilities/scheduleHelper';
 import { useAuthState } from '../../../../store';
 import { FaRegTrashAlt, FaUndo } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { PageRoutes } from '../../../../@types/enum';
+import { PageRoutes, REACT_QUERY_KEYS } from '../../../../@types/enum';
 import { Tooltip } from '@mantine/core';
 import { AiOutlineClose } from 'react-icons/ai';
 import empDefaultPlaceHolder from '../../../../../public/assets/avatar.png';
+import { openContextModal } from '@mantine/modals';
+import { IEmployeesCollection } from '../../../../@types/database';
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from '../../../../utilities/TsxUtils';
+import { useQueryClient } from '@tanstack/react-query';
+import { errorHandler } from '../../../../utilities/CustomError';
+import { useEffect, useState } from 'react';
 
 interface ShiftDropPointProps {
   index: number;
@@ -43,6 +55,10 @@ const ShiftDropPoint = ({
 
   const navigate = useNavigate();
 
+  const queryClient = useQueryClient();
+
+  const [loading, setLoading] = useState(false);
+
   const getScheduleForDay = (date: Date, schedules?: ISchedule[]) => {
     if (!schedules) return [];
     return schedules
@@ -61,6 +77,71 @@ const ShiftDropPoint = ({
           )
       );
   };
+
+  const removeEmpFromPublishedShift = async (
+    shiftId: string,
+    empId: string
+  ) => {
+    try {
+      if (!shiftId || !empId) return;
+      setLoading(true);
+
+      await DbSchedule.removeEmpFromShift(shiftId, empId);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.SCHEDULES],
+      });
+
+      showSnackbar({
+        message: 'Employee removed from the shift successfully',
+        type: 'success',
+      });
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      setLoading(false);
+    }
+  };
+
+  const onEmpRemoveClick = (data: ISchedule, emp: IEmployeesCollection) => {
+    if (emp.EmployeeCreatedAt) {
+      openContextModal({
+        modal: 'confirmModal',
+        withCloseButton: false,
+        centered: true,
+        closeOnClickOutside: true,
+        innerProps: {
+          title: 'Confirm',
+          body: (
+            <div className="">
+              Are you sure to remove{' '}
+              <span className="font-semibold">{emp.EmployeeName}</span> from
+              this shift
+            </div>
+          ),
+          onConfirm: () => {
+            removeEmpFromPublishedShift(data.shift.ShiftId, emp.EmployeeId);
+          },
+        },
+        size: '30%',
+        styles: {
+          body: { padding: '0px' },
+        },
+      });
+    } else {
+      onUndo(data.shift.ShiftId, emp.EmployeeId);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
   return (
     <div
       key={index}
@@ -111,13 +192,13 @@ const ShiftDropPoint = ({
               key={idx}
             >
               <div
-                onDoubleClick={() =>
-                  navigate(PageRoutes.SHIFT_VIEW + `?id=${data.shift.ShiftId}`)
-                }
+                onDoubleClick={() => {
+                  navigate(PageRoutes.SHIFT_VIEW + `?id=${data.shift.ShiftId}`);
+                }}
                 onClick={() => {
                   setSelectedSchedule(data);
                   if (data.shift.ShiftRequiredEmp > 1) {
-                    setAssignMultipleEmpModal(true);
+                    setTimeout(() => setAssignMultipleEmpModal(true), 500);
                   }
                 }}
                 key={data.shift.ShiftId + idx}
@@ -134,9 +215,10 @@ const ShiftDropPoint = ({
                     {data.shift.ShiftName}
                   </span>
                   {data.employee.length === 0 && (
-                    <span className="relative">
+                    <span className="">
                       <FaRegTrashAlt
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           if (
                             data.shift?.ShiftAssignedUserId?.length > 0 ||
                             data?.employee?.length > 0
@@ -187,12 +269,10 @@ const ShiftDropPoint = ({
                               </span>
 
                               <AiOutlineClose
-                                onClick={() =>
-                                  onUndo(
-                                    data.shift.ShiftId,
-                                    data.employee[0].EmployeeId
-                                  )
-                                }
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onEmpRemoveClick(data, emp);
+                                }}
                                 className="text-textPrimaryRed font-bold cursor-pointer min-w-[18px] text-xl hover:scale-[1.1] duration-200"
                               />
                             </div>

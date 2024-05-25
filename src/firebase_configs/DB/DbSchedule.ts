@@ -1,10 +1,12 @@
 import {
   QueryConstraint,
+  Timestamp,
   collection,
   doc,
   getDoc,
   getDocs,
   query,
+  runTransaction,
   updateDoc,
   where,
 } from 'firebase/firestore';
@@ -181,6 +183,48 @@ class DbSchedule {
     const shiftRef = doc(db, CollectionName.shifts, shiftId);
 
     return updateDoc(shiftRef, { ShiftAssignedUserId: empId });
+  };
+
+  static removeEmpFromShift = async (
+    shiftId: string,
+    empIdToBeRemoved: string
+  ) => {
+    const shiftRef = doc(db, CollectionName.shifts, shiftId);
+
+    await runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(shiftRef);
+      const shiftData = snapshot.data() as IShiftsCollection;
+
+      const { ShiftAssignedUserId, ShiftCurrentStatus } = shiftData;
+
+      const updatedShiftAssignedUserId = ShiftAssignedUserId.filter(
+        (id) => id !== empIdToBeRemoved
+      );
+
+      const updatedShiftCurrentStatus = [...ShiftCurrentStatus];
+
+      const index = updatedShiftCurrentStatus.findIndex(
+        (s) => s?.StatusReportedById === empIdToBeRemoved
+      );
+
+      if (index !== -1) {
+        const statusToBeUpdated = updatedShiftCurrentStatus[index];
+
+        if (statusToBeUpdated?.Status === 'started') {
+          updatedShiftCurrentStatus[index] = {
+            ...statusToBeUpdated,
+            Status: 'completed',
+            StatusEndReason: 'Removed from shift by admin',
+            StatusReportedTime: Timestamp.now(),
+          };
+        }
+      }
+
+      transaction.update(shiftRef, {
+        ShiftAssignedUserId: updatedShiftAssignedUserId,
+        ShiftCurrentStatus: updatedShiftCurrentStatus,
+      });
+    });
   };
 }
 
