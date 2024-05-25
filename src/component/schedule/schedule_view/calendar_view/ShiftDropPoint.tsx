@@ -36,6 +36,7 @@ interface ShiftDropPointProps {
   setAssignMultipleEmpModal: React.Dispatch<React.SetStateAction<boolean>>;
   onDeleteClick: (shiftId: string) => void;
   onUndo: (shiftId?: string, empId?: string) => void;
+  isLoading: boolean;
 }
 
 const ShiftDropPoint = ({
@@ -50,6 +51,7 @@ const ShiftDropPoint = ({
   setAssignMultipleEmpModal,
   onDeleteClick,
   onUndo,
+  isLoading,
 }: ShiftDropPointProps) => {
   const { settings } = useAuthState();
 
@@ -159,7 +161,11 @@ const ShiftDropPoint = ({
         />
       </div>
 
-      {getScheduleForDay(datesArray[index], schedules).length > 0 ? (
+      {isLoading ? (
+        <div className="p-2 h-full w-full">
+          <div className="w-full min-h-[140px] bg-shimmerColor animate-pulse"></div>
+        </div>
+      ) : getScheduleForDay(datesArray[index], schedules).length > 0 ? (
         getScheduleForDay(datesArray[index], schedules).map((data, idx) => {
           const colors = getColorAccToShiftStatus(
             data.shift,

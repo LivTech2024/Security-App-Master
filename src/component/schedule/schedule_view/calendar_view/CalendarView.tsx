@@ -47,7 +47,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
   const queryClient = useQueryClient();
 
-  const { data, error } = useQuery({
+  const { data, error, isLoading } = useQuery({
     queryKey: [
       REACT_QUERY_KEYS.SCHEDULES,
       datesArray,
@@ -423,6 +423,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                     setSelectedDate={setSelectedDate}
                     setSelectedSchedule={setSelectedSchedule}
                     shiftToBeDeleted={shiftToBeDeleted}
+                    isLoading={isLoading}
                   />
                 );
               })}
