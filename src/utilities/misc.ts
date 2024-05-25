@@ -196,3 +196,9 @@ export const roundNumber = (num: number, precision?: number) => {
   }
   return Math.round(num * Math.pow(10, precision)) / Math.pow(10, precision);
 };
+
+export function findRemovedElements<T>(oldArray: T[], newArray: T[]): T[] {
+  const newSet = new Set(newArray);
+  const removedElements = oldArray.filter((element) => !newSet.has(element));
+  return removedElements;
+}
