@@ -99,7 +99,7 @@ const ShiftViewCard = ({
                         Started At:
                       </span>
                       {data.StatusStartedTime &&
-                        formatDate(data.StatusStartedTime, 'hh:mm A')}
+                        formatDate(data.StatusStartedTime, 'DD MMM-YY HH:mm')}
                     </div>
 
                     {data.Status === 'completed' && (
@@ -108,7 +108,10 @@ const ShiftViewCard = ({
                           Ended At:
                         </span>
                         {data.StatusReportedTime &&
-                          formatDate(data.StatusReportedTime, 'hh:mm A')}
+                          formatDate(
+                            data.StatusReportedTime,
+                            'DD MMM-YY HH:mm'
+                          )}
                       </div>
                     )}
 
@@ -205,7 +208,7 @@ const ShiftViewCard = ({
                   {res.WellnessReportedAt && (
                     <div>
                       Reported At:{' '}
-                      {formatDate(res?.WellnessReportedAt, 'DD MMM-YY hh:mm A')}
+                      {formatDate(res?.WellnessReportedAt, 'DD MMM-YY HH:mm')}
                     </div>
                   )}
                   {res.WellnessComment && (

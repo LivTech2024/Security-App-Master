@@ -208,7 +208,7 @@ const ClientShiftView = () => {
                             Reported At:{' '}
                             {formatDate(
                               res?.WellnessReportedAt,
-                              'DD MMM-YY hh:mm A'
+                              'DD MMM-YY HH:mm'
                             )}
                           </div>
                         )}

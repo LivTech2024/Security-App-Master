@@ -110,7 +110,7 @@ const PatrolViewCard = ({
                       </span>
                     )}
                     <span className="text-textTertiary">
-                      {formatDate(ch.CheckPointReportedAt, 'hh:mm A')}
+                      {formatDate(ch.CheckPointReportedAt, 'HH:mm')}
                     </span>
                   </div>
                 ),
@@ -122,7 +122,7 @@ const PatrolViewCard = ({
 
       <div className="mb-4 text-textTertiary">
         Last updated:{' '}
-        {formatDate(patrolLogData.PatrolLogCreatedAt, 'DD MMM-YY hh:mm A')}
+        {formatDate(patrolLogData.PatrolLogCreatedAt, 'DD MMM-YY HH:mm')}
       </div>
     </div>
   );

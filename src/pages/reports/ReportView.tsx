@@ -72,7 +72,7 @@ const ReportView = () => {
             </div>
             <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2">Report Date:</p>
-              <p>{formatDate(data.ReportCreatedAt, 'DD MMM-YY hh:mm A')}</p>
+              <p>{formatDate(data.ReportCreatedAt, 'DD MMM-YY HH:mm')}</p>
             </div>
             {data.ReportLocationName && (
               <div className="flex items-center gap-4">

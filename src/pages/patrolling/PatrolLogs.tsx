@@ -292,11 +292,11 @@ const PatrolLogs = () => {
                       {formatDate(patrol.PatrolDate)}
                     </td>
                     <td className="px-4 py-2 text-start align-top ">
-                      {formatDate(patrol.PatrolLogStartedAt, 'DD MMM-hh:mm A')}
+                      {formatDate(patrol.PatrolLogStartedAt, 'DD MMM-HH:mm')}
                     </td>
 
                     <td className="px-4 py-2 text-start align-top">
-                      {formatDate(patrol.PatrolLogEndedAt, 'DD MMM-hh:mm A')}
+                      {formatDate(patrol.PatrolLogEndedAt, 'DD MMM-HH:mm')}
                     </td>
                     <td className="px-4 py-2 text-center align-top">
                       {patrol.PatrolLogPatrolCount}

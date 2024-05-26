@@ -138,7 +138,7 @@ const EmpDarView = () => {
               shiftData?.ShiftCurrentStatus.find(
                 (s) => s.StatusReportedById === empDarData?.EmpDarEmpId
               )?.StatusStartedTime,
-              'hh:mm'
+              'HH:mm'
             )
           : 'N/A';
       } else {

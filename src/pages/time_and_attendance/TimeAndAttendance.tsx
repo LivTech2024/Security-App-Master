@@ -189,7 +189,7 @@ const TimeAndAttendance = () => {
                             shift.ShiftCurrentStatus.find(
                               (s) => s.StatusReportedById === selectedEmpId
                             )?.StatusStartedTime,
-                            'DD MMM-YY hh:mm A'
+                            'DD MMM-YY HH:mm'
                           )
                         : 'N/A'}
                     </span>
@@ -203,7 +203,7 @@ const TimeAndAttendance = () => {
                             shift.ShiftCurrentStatus.find(
                               (s) => s.StatusReportedById === selectedEmpId
                             )?.StatusReportedTime,
-                            'DD MMM-YY hh:mm A'
+                            'DD MMM-YY HH:mm'
                           )
                         : 'N/A'}
                     </span>

@@ -100,7 +100,7 @@ const ReceivedMessageList = ({ receiverId }: { receiverId: string }) => {
 
                 <span>{msg.MessageData}</span>
                 <span className="text-sm mt-2 font-medium">
-                  {formatDate(msg.MessageCreatedAt, 'hh:mm A - DD MMM')}
+                  {formatDate(msg.MessageCreatedAt, 'HH:mm - DD MMM')}
                 </span>
               </div>
             );

@@ -75,11 +75,11 @@ const VisitorView = () => {
             </div>
             <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2"> In Time:</p>
-              <p>{formatDate(data.VisitorInTime, 'DD MMM-YY hh:mm A')}</p>
+              <p>{formatDate(data.VisitorInTime, 'DD MMM-YY HH:mm')}</p>
             </div>
             <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2"> Out Time:</p>
-              <p>{formatDate(data.VisitorOutTime, 'DD MMM-YY hh:mm A')}</p>
+              <p>{formatDate(data.VisitorOutTime, 'DD MMM-YY HH:mm')}</p>
             </div>
             <div className="flex items-center gap-4 col-span-1">
               <p className="font-semibold flex gap-2">Assets Handover:</p>

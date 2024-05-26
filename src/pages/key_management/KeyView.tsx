@@ -323,7 +323,7 @@ const KeyView = () => {
                       >
                         {formatDate(
                           keyAlloc.KeyAllocationStartTime,
-                          'DD MMM hh:mm A'
+                          'DD MMM HH:mm'
                         )}
                       </td>
                       <td
@@ -337,7 +337,7 @@ const KeyView = () => {
                       >
                         {formatDate(
                           keyAlloc.KeyAllocationEndTime,
-                          'DD MMM hh:mm A'
+                          'DD MMM HH:mm'
                         )}
                       </td>
 
@@ -346,7 +346,7 @@ const KeyView = () => {
                         <td className="align-top px-4 py-2 text-end ">
                           {formatDate(
                             keyAlloc?.KeyAllocationReturnedAt,
-                            'DD MMM hh:mm A'
+                            'DD MMM HH:mm'
                           )}
                         </td>
                       ) : (

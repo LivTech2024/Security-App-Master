@@ -265,7 +265,7 @@ const DocumentRepository = () => {
                     className="align-top px-4 py-2 text-end"
                   >
                     <span className="line-clamp-2">
-                      {formatDate(doc.DocumentCreatedAt, 'DD MMM-YY hh:mm A')}
+                      {formatDate(doc.DocumentCreatedAt, 'DD MMM-YY HH:mm')}
                     </span>
                   </td>
                 </tr>
