@@ -184,6 +184,41 @@ export const getHoursDiffInTwoTimeString = (
   return Number(diff.toFixed(2));
 };
 
+export const getMinutesDiffInTwoTimeString = (
+  time1: string,
+  time2: string
+): number => {
+  const parseTime = (time: string) => {
+    const [hourStr, minuteStr] = time.split(':');
+    let hour = parseInt(hourStr, 10);
+    const minute = parseInt(minuteStr.replace(/\D/g, ''), 10); // Remove any non-digit characters (AM/PM)
+    if (time.includes('PM') && hour !== 12) {
+      hour += 12;
+    } else if (time.includes('AM') && hour === 12) {
+      hour = 0;
+    }
+    return { hour, minute };
+  };
+
+  const is24HourFormat = (time: string) =>
+    !time.includes('AM') && !time.includes('PM');
+
+  const { hour: hour1, minute: minute1 } = parseTime(time1);
+  const { hour: hour2, minute: minute2 } = parseTime(time2);
+
+  const dateTime1 = is24HourFormat(time1)
+    ? dayjs().hour(hour1).minute(minute1)
+    : dayjs(`${dayjs().format('YYYY-MM-DD')} ${time1}`, ['hh:mm A', 'HH:mm']);
+
+  const dateTime2 = is24HourFormat(time2)
+    ? dayjs().hour(hour2).minute(minute2)
+    : dayjs(`${dayjs().format('YYYY-MM-DD')} ${time2}`, ['hh:mm A', 'HH:mm']);
+
+  const diff = dateTime2.diff(dateTime1, 'minutes');
+
+  return diff;
+};
+
 export const getRandomNumbers = () => {
   const random = Math.floor(Math.random() * (9999 - 1111 + 1)) + 1111;
   const ms = new Date().getMilliseconds();

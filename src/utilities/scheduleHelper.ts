@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { IShiftsCollection } from '../@types/database';
 import { sendEmail } from '../API/SendEmail';
-import { getHoursDiffInTwoTimeString, toDate } from './misc';
+import { getMinutesDiffInTwoTimeString, toDate } from './misc';
 
 interface SendShiftDetailsEmailArgs {
   empEmail: string;
@@ -62,7 +62,7 @@ export const getColorAccToShiftStatus = (
         shift.ShiftCurrentStatus.some(
           (s) =>
             s.StatusStartedTime &&
-            getHoursDiffInTwoTimeString(
+            getMinutesDiffInTwoTimeString(
               shift.ShiftStartTime,
               dayjs(toDate(s.StatusStartedTime)).format('HH:mm')
             ) > timeMarginInMins
@@ -77,7 +77,7 @@ export const getColorAccToShiftStatus = (
           (s) =>
             s.Status === 'completed' &&
             s.StatusReportedTime &&
-            getHoursDiffInTwoTimeString(
+            getMinutesDiffInTwoTimeString(
               dayjs(toDate(s.StatusReportedTime)).format('HH:mm'),
               shift.ShiftEndTime
             ) > timeMarginInMins
@@ -91,7 +91,7 @@ export const getColorAccToShiftStatus = (
         shift.ShiftCurrentStatus.some(
           (s) =>
             s.StatusReportedTime &&
-            getHoursDiffInTwoTimeString(
+            getMinutesDiffInTwoTimeString(
               shift.ShiftEndTime,
               dayjs(toDate(s.StatusReportedTime)).get('hour').toString()
             ) > timeMarginInMins
