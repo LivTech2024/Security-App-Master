@@ -54,6 +54,9 @@ const PerformanceAssurance = () => {
       try {
         setLoading(true);
 
+        setEmpPatrolLogs([]);
+        setEmpShifts([]);
+
         //* Fetch all the shifts of employee
         const shiftSnapshot = await DbEmployee.getEmpShifts({
           companyId: company.CompanyId,

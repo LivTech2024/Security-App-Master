@@ -64,7 +64,7 @@ export const getColorAccToShiftStatus = (
             s.StatusStartedTime &&
             getHoursDiffInTwoTimeString(
               shift.ShiftStartTime,
-              dayjs(toDate(s.StatusStartedTime)).get('hour').toString()
+              dayjs(toDate(s.StatusStartedTime)).format('hh:mm')
             ) > timeMarginInMins
         )
       ) {
@@ -75,9 +75,10 @@ export const getColorAccToShiftStatus = (
       if (
         shift.ShiftCurrentStatus.some(
           (s) =>
+            s.Status === 'completed' &&
             s.StatusReportedTime &&
             getHoursDiffInTwoTimeString(
-              dayjs(toDate(s.StatusReportedTime)).get('hour').toString(),
+              dayjs(toDate(s.StatusReportedTime)).format('hh:mm'),
               shift.ShiftEndTime
             ) > timeMarginInMins
         )

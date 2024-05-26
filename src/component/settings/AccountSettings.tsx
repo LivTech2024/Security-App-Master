@@ -35,6 +35,7 @@ const AccountSettings = () => {
       setSettings({
         ...settings,
         SettingEmpWellnessIntervalInMins: data.SettingEmpWellnessIntervalInMins,
+        SettingEmpShiftTimeMarginInMins: data.SettingEmpShiftTimeMarginInMins,
       });
 
       showSnackbar({
