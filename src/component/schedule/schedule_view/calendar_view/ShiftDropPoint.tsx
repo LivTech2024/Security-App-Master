@@ -147,7 +147,7 @@ const ShiftDropPoint = ({
   return (
     <div
       key={index}
-      className="flex flex-col h-full justify-start min-w-[180px] w-[14.23%] text-center max-h-[350px] overflow-auto remove-vertical-scrollbar "
+      className="flex flex-col h-full justify-start min-w-[180px] w-[14.23%] text-center max-h-[420px] overflow-auto remove-vertical-scrollbar "
     >
       <div
         onClick={() => setSelectedDate(date)}

@@ -5,6 +5,7 @@ import empDefaultPlaceHolder from '../../../../../public/assets/avatar.png';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { CollectionName, REACT_QUERY_KEYS } from '../../../../@types/enum';
+import Fuse from 'fuse.js';
 import DbSchedule, {
   IEmpScheduleForWeek,
   ISchedule,
@@ -41,6 +42,7 @@ import { openContextModal } from '@mantine/modals';
 import { Timestamp, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { getNewDocId } from '../../../../firebase_configs/DB/utils';
 import { db } from '../../../../firebase_configs/config';
+import SearchBar from '../../../../common/inputs/SearchBar';
 
 interface CalendarViewProps {
   datesArray: Date[];
@@ -424,6 +426,25 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     return () => closeModalLoader();
   }, [loading]);
 
+  //* Emp search feature
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredEmployees, setFilteredEmployees] =
+    useState(empAvailableForShift);
+
+  useEffect(() => {
+    const fuse = new Fuse(empAvailableForShift, {
+      keys: ['EmpName', 'EmpRole'],
+      threshold: 0.3,
+    });
+
+    if (searchQuery) {
+      const result = fuse.search(searchQuery).map(({ item }) => item);
+      setFilteredEmployees(result);
+    } else {
+      setFilteredEmployees(empAvailableForShift);
+    }
+  }, [searchQuery, empAvailableForShift]);
+
   return (
     <>
       <DndProvider backend={HTML5Backend}>
@@ -572,85 +593,91 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                             {role.EmployeeRoleName}
                           </Accordion.Control>
                           <Accordion.Panel>
-                            <div className="flex flex-col gap-4 max-h-[50vh] overflow-auto remove-vertical-scrollbar">
-                              {empAvailableForShift.filter(
-                                (emp) => emp.EmpRole === role.EmployeeRoleName
-                              ).length > 0 && !isEmpLoading ? (
-                                empAvailableForShift
-                                  .filter(
-                                    (emp) =>
-                                      emp.EmpRole === role.EmployeeRoleName
-                                  )
-                                  .map((data) => {
-                                    return (
-                                      <Draggable
-                                        draggableId={data.EmpId}
-                                        type={`${formatDate(selectedDate, 'DDMMYYYY')}${
-                                          data.EmpRole
-                                        }`}
-                                        callback={dropResult}
-                                        canDrag={data.EmpIsAvailable}
-                                        key={data.EmpId}
-                                      >
-                                        <div
-                                          className={`flex items-center gap-2  p-2 rounded text-sm  ${
-                                            data.EmpIsAvailable
-                                              ? 'bg-primaryGold text-surface'
-                                              : 'bg-gray-200 cursor-not-allowed'
+                            <div className="flex flex-col gap-4">
+                              <SearchBar
+                                value={searchQuery}
+                                setValue={setSearchQuery}
+                              />
+                              <div className="flex flex-col gap-4 max-h-[50vh] overflow-y-auto shift-emp-scrollbar">
+                                {filteredEmployees.filter(
+                                  (emp) => emp.EmpRole === role.EmployeeRoleName
+                                ).length > 0 && !isEmpLoading ? (
+                                  filteredEmployees
+                                    .filter(
+                                      (emp) =>
+                                        emp.EmpRole === role.EmployeeRoleName
+                                    )
+                                    .map((data) => {
+                                      return (
+                                        <Draggable
+                                          draggableId={data.EmpId}
+                                          type={`${formatDate(selectedDate, 'DDMMYYYY')}${
+                                            data.EmpRole
                                           }`}
+                                          callback={dropResult}
+                                          canDrag={data.EmpIsAvailable}
+                                          key={data.EmpId}
                                         >
-                                          <img
-                                            src={
-                                              data.EmpImg ??
-                                              empDefaultPlaceHolder
-                                            }
-                                            alt=""
-                                            className="w-12 h-12 rounded-full object-cover"
-                                          />
                                           <div
-                                            key={data.EmpId}
-                                            className="flex flex-col "
+                                            className={`flex items-center gap-2  p-2 rounded text-sm  ${
+                                              data.EmpIsAvailable
+                                                ? 'bg-primaryGold text-surface'
+                                                : 'bg-gray-200 cursor-not-allowed'
+                                            }`}
                                           >
-                                            <div className="flex items-center gap-2 ">
-                                              <span className="text-nowrap">
-                                                Name:
-                                              </span>
-                                              <span className="font-semibold line-clamp-1">
-                                                {data.EmpName}
-                                              </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                              <span>Week shifts:</span>
-                                              <span className="font-semibold">
-                                                {data.EmpWeekShifts}
-                                              </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                              <span>Week hours:</span>
-                                              <span className="font-semibold">
-                                                {data.EmpWeekHours.toFixed(1)}
-                                              </span>
+                                            <img
+                                              src={
+                                                data.EmpImg ??
+                                                empDefaultPlaceHolder
+                                              }
+                                              alt=""
+                                              className="w-12 h-12 rounded-full object-cover"
+                                            />
+                                            <div
+                                              key={data.EmpId}
+                                              className="flex flex-col "
+                                            >
+                                              <div className="flex items-center gap-2 ">
+                                                <span className="text-nowrap">
+                                                  Name:
+                                                </span>
+                                                <span className="font-semibold line-clamp-1">
+                                                  {data.EmpName}
+                                                </span>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <span>Week shifts:</span>
+                                                <span className="font-semibold">
+                                                  {data.EmpWeekShifts}
+                                                </span>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <span>Week hours:</span>
+                                                <span className="font-semibold">
+                                                  {data.EmpWeekHours.toFixed(1)}
+                                                </span>
+                                              </div>
                                             </div>
                                           </div>
-                                        </div>
-                                      </Draggable>
+                                        </Draggable>
+                                      );
+                                    })
+                                ) : isEmpLoading ? (
+                                  Array.from({ length: 5 }).map((_, idx) => {
+                                    return (
+                                      <div
+                                        key={idx}
+                                        className="bg-shimmerColor animate-pulse w-full h-[80px]"
+                                      ></div>
                                     );
                                   })
-                              ) : isEmpLoading ? (
-                                Array.from({ length: 5 }).map((_, idx) => {
-                                  return (
-                                    <div
-                                      key={idx}
-                                      className="bg-shimmerColor animate-pulse w-full h-[80px]"
-                                    ></div>
-                                  );
-                                })
-                              ) : (
-                                <div className="bg-primaryGold font-bold py-1 px-2 rounded">
-                                  No {role.EmployeeRoleName} available for{' '}
-                                  {dayjs(selectedDate).format('ddd MMM-DD')}
-                                </div>
-                              )}
+                                ) : (
+                                  <div className="bg-primaryGold font-bold py-1 px-2 rounded">
+                                    No {role.EmployeeRoleName} available for{' '}
+                                    {dayjs(selectedDate).format('ddd MMM-DD')}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </Accordion.Panel>
                         </Accordion.Item>
