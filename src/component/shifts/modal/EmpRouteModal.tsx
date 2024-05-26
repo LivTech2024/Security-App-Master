@@ -15,7 +15,7 @@ const EmpRouteModal = ({
   setOpened,
   coordinates,
 }: EmpRouteModalProps) => {
-  const center: LatLngExpression = [coordinates[0].lat, coordinates[0].lng];
+  const center: LatLngExpression = [coordinates[0]?.lat, coordinates[0]?.lng];
   return (
     <Dialog
       opened={opened}

@@ -18,6 +18,10 @@ const ShiftViewCard = ({
   empRoutes: IEmployeeRouteCollection[];
 }) => {
   const [empRouteModal, setEmpRouteModal] = useState(false);
+
+  const [coordinates, setCoordinates] = useState<
+    { lat: number; lng: number }[]
+  >([]);
   return (
     <div className="bg-surface shadow-md rounded-lg p-4">
       <div className="grid grid-cols-2 gap-4">
@@ -66,21 +70,52 @@ const ShiftViewCard = ({
           <p className="font-semibold">Shift Acknowledged By Employees:</p>
           <ul>{acknowledgedUsers.join(' , ') || 'N/A'}</ul>
         </div>
+        {/* Show Shift Current Status */}
         <div>
           <p className="font-semibold">Shift Current Status</p>
-          <ul className="px-4">
+          <div className="flex gap-4 overflow-x-auto shift-emp-scrollbar">
             {data?.ShiftCurrentStatus &&
             data?.ShiftCurrentStatus?.length > 0 ? (
               data?.ShiftCurrentStatus?.map((data, idx) => {
                 return (
-                  <div key={idx} className="flex flex-col">
-                    <li className="capitalize list-decimal">
-                      {data.Status} by {data.StatusReportedByName}
-                    </li>
+                  <div
+                    key={idx}
+                    className="flex flex-col bg-onHoverBg p-4 rounded-md"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold capitalize">
+                        Employee:
+                      </span>
+                      {data.StatusReportedByName}
+                    </div>
+                    <div className="flex items-center gap-2 capitalize">
+                      <span className="font-semibold capitalize">
+                        Current Status:
+                      </span>
+                      {data.Status}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold capitalize">
+                        Started At:
+                      </span>
+                      {data.StatusStartedTime &&
+                        formatDate(data.StatusStartedTime, 'hh:mm A')}
+                    </div>
+
+                    {data.Status === 'completed' && (
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold capitalize">
+                          Ended At:
+                        </span>
+                        {data.StatusReportedTime &&
+                          formatDate(data.StatusReportedTime, 'hh:mm A')}
+                      </div>
+                    )}
+
                     {data.StatusEndReason && (
-                      <li className="text-sm mt-1 text-textSecondary">
+                      <div className="text-sm mt-1 text-textSecondary">
                         End Reason: {data.StatusEndReason}
-                      </li>
+                      </div>
                     )}
                   </div>
                 );
@@ -88,17 +123,18 @@ const ShiftViewCard = ({
             ) : (
               <li className="capitalize list-decimal">Pending</li>
             )}
-          </ul>
+          </div>
         </div>
       </div>
 
+      {/* Show all the tasks */}
       {data.ShiftTask.length > 0 ? (
         <div className="flex flex-col gap-1 mt-4">
           <p className="font-semibold">Shift Tasks</p>
-          <div className="flex flex-wrap gap-6">
+          <div className="flex gap-6 overflow-x-auto shift-emp-scrollbar">
             {data.ShiftTask.map((task, idx) => {
               return (
-                <div className="flex flex-col ">
+                <div className="flex flex-col w-full min-w-[400px] max-w-[30%]">
                   <span className="text-lg font-semibold">
                     {idx + 1}. {task.ShiftTask}
                   </span>
@@ -122,18 +158,24 @@ const ShiftViewCard = ({
                               {s.TaskPhotos?.length ? (
                                 <span>Images: </span>
                               ) : null}
-                              {s.TaskPhotos?.map((img, idx) => {
-                                return (
-                                  <a
-                                    key={img}
-                                    href={img}
-                                    target="_blank"
-                                    className="cursor-pointer text-textPrimaryBlue"
-                                  >
-                                    {idx + 1}. {img.slice(0, 30)}...
-                                  </a>
-                                );
-                              })}
+                              <div className="flex gap-4 overflow-x-auto shift-emp-scrollbar">
+                                {s.TaskPhotos?.map((img) => {
+                                  return (
+                                    <a
+                                      key={idx}
+                                      href={img}
+                                      target="_blank"
+                                      className="cursor-pointer text-textPrimaryBlue"
+                                    >
+                                      <img
+                                        src={img}
+                                        alt=""
+                                        className="w-[100px] h-[100px] rounded object-cover"
+                                      />
+                                    </a>
+                                  );
+                                })}
+                              </div>
                             </div>
                           </div>
                         );
@@ -148,6 +190,8 @@ const ShiftViewCard = ({
           </div>
         </div>
       ) : null}
+
+      {/* Show wellness report data */}
       {data?.ShiftGuardWellnessReport.length ? (
         <div className="flex flex-col gap-1 mt-4">
           <p className="font-semibold">Wellness report</p>
@@ -174,7 +218,11 @@ const ShiftViewCard = ({
                         href={res?.WellnessImg}
                         className="text-textPrimaryBlue cursor-pointer"
                       >
-                        {res?.WellnessImg?.slice(0, 30)}...
+                        <img
+                          src={res.WellnessImg}
+                          alt=""
+                          className="w-[100px] h-[100px] rounded"
+                        />
                       </a>{' '}
                     </div>
                   )}
@@ -185,16 +233,30 @@ const ShiftViewCard = ({
         </div>
       ) : null}
 
+      {/* Show Emp route details */}
       {empRoutes.length ? (
         <div className="flex flex-col gap-1 mt-4">
           <p className="font-semibold">Employees Route</p>
           <div className="flex flex-wrap gap-4">
             {assignedUsers?.map((res) => {
-              if (empRoutes.find((route) => route.EmpRouteEmpId === res.EmpId))
+              const empRoute = empRoutes.find(
+                (route) => route.EmpRouteEmpId === res.EmpId
+              );
+              if (empRoute && empRoute.EmpRouteLocations?.length > 0)
                 return (
                   <div key={res.EmpId} className="flex flex-col">
                     <div
-                      onClick={() => setEmpRouteModal(true)}
+                      onClick={() => {
+                        setCoordinates(
+                          empRoute.EmpRouteLocations.map((loc) => {
+                            return {
+                              lat: loc.LocationCoordinates.latitude,
+                              lng: loc.LocationCoordinates.longitude,
+                            };
+                          })
+                        );
+                        setEmpRouteModal(true);
+                      }}
                       className="text-textPrimaryBlue cursor-pointer underline"
                     >
                       {res.EmpName}
@@ -207,11 +269,7 @@ const ShiftViewCard = ({
       ) : null}
 
       <EmpRouteModal
-        coordinates={[
-          { lat: 19.4237, lng: 72.8114 }, // Nallasopara, Palghar
-          { lat: 19.3734, lng: 72.8278 }, // Mumbai Central, Mumbai
-          { lat: 19.3551, lng: 72.8272 },
-        ]}
+        coordinates={coordinates}
         opened={empRouteModal}
         setOpened={setEmpRouteModal}
       />
