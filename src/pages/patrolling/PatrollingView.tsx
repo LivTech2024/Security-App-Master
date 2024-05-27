@@ -13,6 +13,10 @@ import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
 import { openContextModal } from '@mantine/modals';
 import { useAuthState } from '../../store';
 import PageHeader from '../../common/PageHeader';
+import { generatePatrolLogPdf } from '../../utilities/pdf/generatePatrolLogPdf';
+import { formatDate } from '../../utilities/misc';
+//import { htmlToPdf } from '../../API/HtmlToPdf';
+import { htmlStringToPdf } from '../../utilities/htmlStringToPdf';
 
 const PatrollingView = () => {
   const { admin, company } = useAuthState();
@@ -102,42 +106,98 @@ const PatrollingView = () => {
       }
     };
 
+    const downloadPdf = async () => {
+      try {
+        showModalLoader({});
+        const patrolViewCardHtml =
+          document.getElementById('patrolViewCard')?.outerHTML || '';
+
+        const patrolLogHtml = generatePatrolLogPdf(
+          patrolViewCardHtml,
+          formatDate(logData.PatrolDate)
+        );
+
+        await htmlStringToPdf('patrol_logs.pdf', patrolLogHtml);
+
+        /* const response = await htmlToPdf({
+          file_name: 'invoice.pdf',
+          html: patrolLogHtml,
+        });
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+
+        // Create a link element
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+
+        const invName = 'patrol_log.pdf';
+
+        link.download = invName; // Specify the filename for the downloaded file
+
+        // Append the link to the body
+        document.body.appendChild(link);
+
+        // Trigger a click on the link to start the download
+        link.click();
+
+        // Remove the link from the DOM
+        document.body.removeChild(link); */
+
+        closeModalLoader();
+      } catch (error) {
+        closeModalLoader();
+        errorHandler(error);
+        console.log(error);
+      }
+    };
+
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
         <PageHeader
           title="Patrol log data"
           rightSection={
-            admin &&
-            company && (
+            <div className="flex items-center gap-4">
               <Button
-                label="Delete"
+                label="Download"
                 onClick={() => {
-                  openContextModal({
-                    modal: 'confirmModal',
-                    withCloseButton: false,
-                    centered: true,
-                    closeOnClickOutside: true,
-                    innerProps: {
-                      title: 'Confirm',
-                      body: 'Are you sure to delete this patrol log',
-                      onConfirm: () => {
-                        onDelete();
-                      },
-                    },
-                    size: '30%',
-                    styles: {
-                      body: { padding: '0px' },
-                    },
-                  });
+                  downloadPdf();
                 }}
-                type="black"
-                className="px-4 py-2"
+                type="white"
               />
-            )
+              {admin && company && (
+                <Button
+                  label="Delete"
+                  onClick={() => {
+                    openContextModal({
+                      modal: 'confirmModal',
+                      withCloseButton: false,
+                      centered: true,
+                      closeOnClickOutside: true,
+                      innerProps: {
+                        title: 'Confirm',
+                        body: 'Are you sure to delete this patrol log',
+                        onConfirm: () => {
+                          onDelete();
+                        },
+                      },
+                      size: '30%',
+                      styles: {
+                        body: { padding: '0px' },
+                      },
+                    });
+                  }}
+                  type="black"
+                  className="px-4 py-2"
+                />
+              )}
+            </div>
           }
         />
 
-        <PatrolViewCard patrolLogData={logData} patrolData={patrolData} />
+        <PatrolViewCard
+          patrolLogData={logData}
+          patrolData={patrolData}
+          id="patrolViewCard"
+        />
       </div>
     );
   }
