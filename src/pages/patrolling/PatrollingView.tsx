@@ -13,10 +13,8 @@ import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
 import { openContextModal } from '@mantine/modals';
 import { useAuthState } from '../../store';
 import PageHeader from '../../common/PageHeader';
-import { generatePatrolLogPdf } from '../../utilities/pdf/generatePatrolLogPdf';
-import { formatDate } from '../../utilities/misc';
-//import { htmlToPdf } from '../../API/HtmlToPdf';
-import { htmlStringToPdf } from '../../utilities/htmlStringToPdf';
+import { generatePatrolReportHTML } from '../../utilities/pdf/generatePatrolPdf';
+import { htmlToPdf } from '../../API/HtmlToPdf';
 
 const PatrollingView = () => {
   const { admin, company } = useAuthState();
@@ -109,17 +107,10 @@ const PatrollingView = () => {
     const downloadPdf = async () => {
       try {
         showModalLoader({});
-        const patrolViewCardHtml =
-          document.getElementById('patrolViewCard')?.outerHTML || '';
 
-        const patrolLogHtml = generatePatrolLogPdf(
-          patrolViewCardHtml,
-          formatDate(logData.PatrolDate)
-        );
+        const patrolLogHtml = generatePatrolReportHTML({ logData, patrolData });
 
-        await htmlStringToPdf('patrol_logs.pdf', patrolLogHtml);
-
-        /* const response = await htmlToPdf({
+        const response = await htmlToPdf({
           file_name: 'invoice.pdf',
           html: patrolLogHtml,
         });
@@ -140,7 +131,7 @@ const PatrollingView = () => {
         link.click();
 
         // Remove the link from the DOM
-        document.body.removeChild(link); */
+        document.body.removeChild(link);
 
         closeModalLoader();
       } catch (error) {
@@ -193,11 +184,7 @@ const PatrollingView = () => {
           }
         />
 
-        <PatrolViewCard
-          patrolLogData={logData}
-          patrolData={patrolData}
-          id="patrolViewCard"
-        />
+        <PatrolViewCard patrolLogData={logData} patrolData={patrolData} />
       </div>
     );
   }

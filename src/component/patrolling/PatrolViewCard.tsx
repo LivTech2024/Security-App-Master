@@ -9,17 +9,12 @@ import { formatDate, toDate } from '../../utilities/misc';
 const PatrolViewCard = ({
   patrolData,
   patrolLogData,
-  id,
 }: {
   patrolLogData: IPatrolLogsCollection;
   patrolData: IPatrolsCollection;
-  id: string;
 }) => {
   return (
-    <div
-      id={id}
-      className="bg-surface border border-gray-300 shadow-md rounded-lg px-4 pt-4 mb-4"
-    >
+    <div className="bg-surface border border-gray-300 shadow-md rounded-lg px-4 pt-4 mb-4">
       <div className="mb-2 flex flex-col">
         <div className="text-xl font-semibold">{patrolData.PatrolName}</div>
         <span className="text-textTertiary">
