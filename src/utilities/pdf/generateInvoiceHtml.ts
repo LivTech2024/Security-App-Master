@@ -44,11 +44,11 @@ export async function generateInvoiceHTML({
         <style>
           body {
             font-family: Arial, sans-serif;
-            padding:20px;
+            padding:10px;
           }
           .invoice-details {
-            display: flex;
-            justify-content: space-between;
+            display: -webkit-box;
+            -webkit-box-pack: justify;
             margin-bottom: 20px;
           }
           table {
@@ -63,14 +63,20 @@ export async function generateInvoiceHTML({
           th {
             background-color: #f2f2f2;
           }
+          /* Styles specifically for printing (PDF) */
+         @media print {
+           body {
+            font-size: 12px; /* Adjust font size for print */
+           }
+         }
         </style>
       </head>
       <body>
-        <div style="display: flex;justify-content: space-between;margin-bottom: 20px;">
+        <div style="display: -webkit-box; -webkit-box-pack: justify; margin-bottom: 20px;">
          
         <img src="${
           companyDetails.CompanyLogo
-        }" style="width:140px; object-fit: cover;" alt="Company Logo">
+        }" style="width:100px; object-fit: cover;" alt="Company Logo">
 
           <div style="text-align: end;">
             <p>${companyDetails.CompanyName}</p>
@@ -94,8 +100,8 @@ export async function generateInvoiceHTML({
         <table>
           <thead>
             <tr>
-              <th style="width:40%;">Description</th>
-              <th style="width:20%;">Qty / Hours / Hits</th>
+              <th style="width:35%;">Description</th>
+              <th style="width:25%;">Qty / Hrs / Hits</th>
               <th style="width:20%;">Rate</th>
               <th style="width:20%;">Total</th>
             </tr>

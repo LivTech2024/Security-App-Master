@@ -1,0 +1,57 @@
+<div style="margin-top: 40px; display: -webkit-box; flex-direction: column">
+  <div style="display: -webkit-box">
+    <div style="display: -webkit-box; flex-direction: column">
+      <div style="background: #fbbf39; padding: 8px; font-weight: 600">
+        Place/Spot
+      </div>
+      <div style="padding: 8px; display: -webkit-box; flex-direction: column">
+        <span>${data.TileLocation ?? 'N/A'}</span>
+        <span style="color: #3e3f43; font-size: 14px; margin-top: 2px"
+          >${data.TileTime ?? 'N/A'}</span
+        >
+      </div>
+    </div>
+
+    <div style="display: -webkit-box; flex-direction: column">
+      <div style="background: #fbbf39; padding: 8px; font-weight: 600">
+        Description
+      </div>
+      <div style="padding: 8px">${data.TileContent ?? 'N/A'}</div>
+    </div>
+  </div>
+
+  ${ data.TileImages.length > 0 ? `
+  <div
+    style="
+      display: -webkit-box;
+      flex-direction: column;
+      grid-column: span 2 / span 2;
+    "
+  >
+    <div style="background: #fbbf39; padding: 8px; font-weight: 600">
+      Images
+    </div>
+
+    <div
+      style="
+        display: -webkit-box;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding: 16px 0px;
+      "
+    >
+      ${data.TileImages.map((src) => { return `<img
+        src="${src}"
+        style="
+          width: 100px;
+          height: 100px;
+          object-fit: cover;
+          border-radius: 0.25rem;
+        "
+        alt="dar images"
+      />`; }).join('')}
+    </div>
+  </div>
+  ` : `<span></span>` }
+</div>

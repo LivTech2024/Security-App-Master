@@ -23,8 +23,14 @@ export const generateEmpDarHtml = ({
         <style>
           body {
             font-family: Arial, sans-serif;
-            padding:20px;
+            padding:10px;
           }
+           /* Styles specifically for printing (PDF) */
+         @media print {
+           body {
+            font-size: 12px; /* Adjust font size for print */
+           }
+         }
         </style>
       </head>
       <body>

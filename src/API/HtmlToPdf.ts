@@ -14,13 +14,14 @@ export const htmlToPdf = ({
     orientation: 'portrait' | 'landscape';
   };
 }) => {
-  console.log(pdf_options, 'in frontend');
   return axios.post(
     `${baseUrl}/api/html_to_pdf`,
     {
       html,
       file_name,
-      pdf_options,
+      pdf_options: pdf_options
+        ? pdf_options
+        : { format: 'A4', orientation: 'portrait' },
     },
     { responseType: 'blob' }
   );

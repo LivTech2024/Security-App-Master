@@ -43,6 +43,12 @@ export function generatePatrolReportHTML({
           .header { margin-bottom: 20px; }
           .header div { margin-bottom: 5px; }
           .checkpoints { margin-top: 20px; }
+
+           @media print {
+           body {
+            font-size: 12px; /* Adjust font size for print */
+           }
+         }
         </style>
       </head>
       <body>
