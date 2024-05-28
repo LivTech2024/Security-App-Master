@@ -28,7 +28,7 @@ export function generatePatrolReportHTML({
       <div><strong>${checkpoint.CheckPointName}</strong></div>
       <div>Status: ${checkpoint.CheckPointStatus}</div>
       ${checkpoint.CheckPointComment ? `<div>Comment: ${checkpoint.CheckPointComment}</div>` : ''}
-      ${checkpoint.CheckPointImage ? `<div><img src="${checkpoint.CheckPointImage}" alt="Checkpoint image" style="width: 100px; height: 100px; border-radius:4px;"></div>` : ''}
+      ${checkpoint.CheckPointImage?.length ? `<div style="display:flex; align-items:center; gap:16px; flex-wrap: wrap;"> ${checkpoint.CheckPointImage.map((img) => `<img src="${img}" alt="Checkpoint image" style="width: 100px; height: 100px; border-radius:4px;">`).join('')} </div>` : ''}
       <div>Time: ${formatDate(checkpoint.CheckPointReportedAt, 'HH:mm')}</div>
     </div>
   `
