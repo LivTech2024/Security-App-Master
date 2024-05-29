@@ -26,23 +26,25 @@ const useFirebaseMessaging = () => {
       }
     };
 
-    Notification.requestPermission().then(async (permission) => {
-      if (permission === 'granted') {
-        getToken(messaging, {
-          vapidKey: import.meta.env.VITE_FIREBASE_VAPID,
-        }).then((currentToken) => {
-          if (currentToken) {
-            saveTokenToDB(currentToken);
-          } else {
-            console.log(
-              'No registration token available. Request permission to generate one.'
-            );
-          }
-        });
-      } else {
-        console.log('Permission not granted');
-      }
-    });
+    if ('Notification' in window) {
+      Notification.requestPermission().then(async (permission) => {
+        if (permission === 'granted') {
+          getToken(messaging, {
+            vapidKey: import.meta.env.VITE_FIREBASE_VAPID,
+          }).then((currentToken) => {
+            if (currentToken) {
+              saveTokenToDB(currentToken);
+            } else {
+              console.log(
+                'No registration token available. Request permission to generate one.'
+              );
+            }
+          });
+        } else {
+          console.log('Permission not granted');
+        }
+      });
+    }
   }, [loggedInUser]);
 };
 
