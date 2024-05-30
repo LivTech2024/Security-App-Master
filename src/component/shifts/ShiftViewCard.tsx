@@ -71,16 +71,16 @@ const ShiftViewCard = ({
           <ul>{acknowledgedUsers.join(' , ') || 'N/A'}</ul>
         </div>
         {/* Show Shift Current Status */}
-        <div>
+        <div className="w-full flex flex-col col-span-2">
           <p className="font-semibold">Shift Current Status</p>
-          <div className="flex gap-4 overflow-x-auto shift-emp-scrollbar">
+          <div className="flex gap-4 overflow-x-auto shift-emp-scrollbar w-full">
             {data?.ShiftCurrentStatus &&
             data?.ShiftCurrentStatus?.length > 0 ? (
               data?.ShiftCurrentStatus?.map((data, idx) => {
                 return (
                   <div
                     key={idx}
-                    className="flex flex-col bg-onHoverBg p-4 rounded-md"
+                    className="flex flex-col bg-onHoverBg p-4 rounded-md w-full min-w-[300px]"
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-semibold capitalize">

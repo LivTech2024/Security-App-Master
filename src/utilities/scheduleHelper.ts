@@ -46,13 +46,17 @@ export const getColorAccToShiftStatus = (
       Array.isArray(shift.ShiftCurrentStatus) &&
       shift.ShiftCurrentStatus.length > 0
     ) {
+      //*Pending
+      if (shift.ShiftCurrentStatus.some((s) => s.Status === 'pending')) {
+        color = ['#fed7aa'];
+      }
+
+      //*Started
       if (shift.ShiftCurrentStatus.some((s) => s.Status === 'started')) {
         color = ['#fbcfe8'];
       }
 
-      if (shift.ShiftCurrentStatus.some((s) => s.Status === 'pending')) {
-        color = ['#fed7aa'];
-      }
+      //*Completed
       if (shift.ShiftCurrentStatus.every((s) => s.Status === 'completed')) {
         color = ['#4ade80'];
       }
@@ -61,14 +65,19 @@ export const getColorAccToShiftStatus = (
       if (
         shift.ShiftCurrentStatus.some(
           (s) =>
-            s.StatusStartedTime &&
+            toDate(s.StatusStartedTime) &&
             getMinutesDiffInTwoTimeString(
               shift.ShiftStartTime,
               dayjs(toDate(s.StatusStartedTime)).format('HH:mm')
             ) > timeMarginInMins
         )
       ) {
-        color = ['#a855f7'];
+        color = [
+          ...color.filter(
+            (c) => c !== '#4ade80' && c !== '#fbcfe8' && c !== '#fed7aa'
+          ),
+          '#a855f7',
+        ];
       }
 
       //*Ended Early
@@ -76,34 +85,45 @@ export const getColorAccToShiftStatus = (
         shift.ShiftCurrentStatus.some(
           (s) =>
             s.Status === 'completed' &&
-            s.StatusReportedTime &&
+            toDate(s.StatusReportedTime) &&
             getMinutesDiffInTwoTimeString(
               dayjs(toDate(s.StatusReportedTime)).format('HH:mm'),
               shift.ShiftEndTime
             ) > timeMarginInMins
         )
       ) {
-        color = ['#ef4444'];
+        color = [
+          ...color.filter(
+            (c) => c !== '#4ade80' && c !== '#fbcfe8' && c !== '#fed7aa'
+          ),
+          '#ef4444',
+        ];
       }
 
       //*Ended Late
       if (
         shift.ShiftCurrentStatus.some(
           (s) =>
-            s.StatusReportedTime &&
+            s.Status === 'completed' &&
+            toDate(s.StatusReportedTime) &&
             getMinutesDiffInTwoTimeString(
               shift.ShiftEndTime,
-              dayjs(toDate(s.StatusReportedTime)).get('hour').toString()
+              dayjs(toDate(s.StatusReportedTime)).format('HH:mm')
             ) > timeMarginInMins
         )
       ) {
-        color = [...color, '#60a5fa'];
+        color = [
+          ...color.filter(
+            (c) => c !== '#4ade80' && c !== '#fbcfe8' && c !== '#fed7aa'
+          ),
+          '#60a5fa',
+        ];
       }
     }
 
     return color;
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return color;
   }
 };
