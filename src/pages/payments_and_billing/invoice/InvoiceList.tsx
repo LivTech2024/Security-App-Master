@@ -21,7 +21,12 @@ import TableShimmer from '../../../common/shimmer/TableShimmer';
 import NoSearchResult from '../../../common/NoSearchResult';
 import { formatDate } from '../../../utilities/misc';
 import { numberFormatter } from '../../../utilities/NumberFormater';
-import { MdOutlinePrint } from 'react-icons/md';
+import {
+  MdClear,
+  MdIncompleteCircle,
+  MdOutlineDone,
+  MdOutlinePrint,
+} from 'react-icons/md';
 import { errorHandler } from '../../../utilities/CustomError';
 import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils';
 import { generateInvoiceHTML } from '../../../utilities/pdf/generateInvoiceHtml';
@@ -195,6 +200,14 @@ const InvoiceList = () => {
           setStartDate={setStartDate}
           startDate={startDate}
         />
+
+        <div className="flex font-semibold gap-2 items-center">
+          <span className="text-textSecondary"> Total Invoice Amount: </span>
+          {numberFormatter(
+            data.reduce((acc, obj) => acc + obj.InvoiceTotalAmount, 0),
+            true
+          )}
+        </div>
       </div>
 
       <table className="rounded overflow-hidden w-full">
@@ -206,12 +219,11 @@ const InvoiceList = () => {
             <th className="uppercase px-4 py-2 w-[10%] text-start">
               Invoice No.
             </th>
-            <th className="uppercase px-4 py-2 w-[35%] text-start">Items</th>
+            <th className="uppercase px-4 py-2 w-[25%] text-start">Items</th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">Date</th>
 
-            <th className="uppercase px-4 py-2 w-[15%] text-start">
-              Total Amount
-            </th>
+            <th className="uppercase px-4 py-2 w-[10%] text-start">Total</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">Received</th>
             <th className="uppercase px-4 py-2 w-[5%] text-end"></th>
           </tr>
         </thead>
@@ -277,6 +289,38 @@ const InvoiceList = () => {
                     className="align-top cursor-pointer px-4 py-2 text-start "
                   >
                     {numberFormatter(invoice.InvoiceTotalAmount, true)}
+                  </td>
+                  <td
+                    onClick={() => {
+                      setInvoiceEditData(invoice);
+                      navigate(PageRoutes.INVOICE_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start "
+                  >
+                    <div className="flex items-center gap-4">
+                      <span>
+                        {numberFormatter(invoice.InvoiceReceivedAmount, true)}
+                      </span>
+
+                      {invoice.InvoiceTotalAmount ===
+                        invoice.InvoiceReceivedAmount && (
+                        <span className="bg-primaryGreen rounded-full size-6 p-2 flex items-center justify-center">
+                          <MdOutlineDone className="font-bold min-w-[20px] text-surface" />
+                        </span>
+                      )}
+
+                      {invoice.InvoiceReceivedAmount === 0 && (
+                        <span className="bg-primaryRed rounded-full size-6 p-2 flex items-center justify-center">
+                          <MdClear className="font-bold min-w-[20px] text-surface" />
+                        </span>
+                      )}
+
+                      {invoice.InvoiceReceivedAmount > 0 &&
+                        invoice.InvoiceReceivedAmount !==
+                          invoice.InvoiceTotalAmount && (
+                          <MdIncompleteCircle className="size-6 text-textPrimaryBlue" />
+                        )}
+                    </div>
                   </td>
                   <td
                     onClick={() => downloadInvoice(invoice)}
