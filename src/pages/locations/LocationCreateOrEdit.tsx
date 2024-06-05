@@ -33,6 +33,11 @@ import PlacesAutocomplete, {
   getLatLng,
 } from 'react-places-autocomplete';
 import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
+import { useJsApiLoader } from '@react-google-maps/api';
+import { Library } from '@googlemaps/js-api-loader';
+import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader';
+
+const libraries: Library[] = ['places'];
 
 const LocationCreateOrEdit = () => {
   const { company } = useAuthState();
@@ -57,8 +62,19 @@ const LocationCreateOrEdit = () => {
             lat: String(locationEditData?.LocationCoordinates.latitude),
             lng: String(locationEditData?.LocationCoordinates.longitude),
           },
+          LocationManagerName: locationEditData.LocationManagerName,
+          LocationManagerEmail: locationEditData.LocationManagerEmail,
+          LocationSendEmailToClient: locationEditData.LocationSendEmailToClient,
+          LocationSendEmailForEachPatrol:
+            locationEditData.LocationSendEmailForEachPatrol,
+          LocationSendEmailForEachShift:
+            locationEditData.LocationSendEmailForEachShift,
         }
-      : undefined,
+      : {
+          LocationSendEmailForEachPatrol: true,
+          LocationSendEmailForEachShift: true,
+          LocationSendEmailToClient: true,
+        },
   });
 
   const queryClient = useQueryClient();
@@ -226,154 +242,165 @@ const LocationCreateOrEdit = () => {
       console.error('Error selecting address', error);
     }
   };
-  return (
-    <div className="flex flex-col gap-4 p-6">
-      <PageHeader
-        title="Create location"
-        rightSection={
-          <div className="flex items-center gap-4">
-            {isEdit && (
-              <Button
-                label="Delete"
-                type="white"
-                onClick={() =>
-                  openContextModal({
-                    modal: 'confirmModal',
-                    withCloseButton: false,
-                    centered: true,
-                    closeOnClickOutside: true,
-                    innerProps: {
-                      title: 'Confirm',
-                      body: 'Are you sure to delete this location',
-                      onConfirm: () => {
-                        onDelete();
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_JAVASCRIPT_API,
+    libraries,
+  });
+
+  if (isLoaded)
+    return (
+      <div className="flex flex-col gap-4 p-6">
+        <PageHeader
+          title="Create location"
+          rightSection={
+            <div className="flex items-center gap-4">
+              {isEdit && (
+                <Button
+                  label="Delete"
+                  type="white"
+                  onClick={() =>
+                    openContextModal({
+                      modal: 'confirmModal',
+                      withCloseButton: false,
+                      centered: true,
+                      closeOnClickOutside: true,
+                      innerProps: {
+                        title: 'Confirm',
+                        body: 'Are you sure to delete this location',
+                        onConfirm: () => {
+                          onDelete();
+                        },
                       },
-                    },
-                    size: '30%',
-                    styles: {
-                      body: { padding: '0px' },
-                    },
-                  })
-                }
+                      size: '30%',
+                      styles: {
+                        body: { padding: '0px' },
+                      },
+                    })
+                  }
+                  className="px-14 py-2"
+                />
+              )}
+              <Button
+                label="Save"
+                type="black"
+                onClick={methods.handleSubmit(onSubmit)}
                 className="px-14 py-2"
               />
-            )}
-            <Button
-              label="Save"
-              type="black"
-              onClick={methods.handleSubmit(onSubmit)}
-              className="px-14 py-2"
-            />
-          </div>
-        }
-      />
-
-      <div className="grid grid-cols-3 gap-4 p-4 bg-surface shadow rounded">
-        <InputWithTopHeader
-          className="mx-0"
-          label="Name (It should be unique)"
-          register={methods.register}
-          name="LocationName"
-          error={methods.formState.errors.LocationName?.message}
-        />
-        <InputWithTopHeader
-          className="mx-0"
-          label="Latitude"
-          register={methods.register}
-          name="LocationCoordinates.lat"
-          error={methods.formState.errors.LocationCoordinates?.lat?.message}
-        />
-        <InputWithTopHeader
-          className="mx-0"
-          label="Longitude"
-          register={methods.register}
-          name="LocationCoordinates.lng"
-          error={methods.formState.errors.LocationCoordinates?.lng?.message}
-        />
-        <PlacesAutocomplete
-          value={methods.watch('LocationAddress')}
-          onChange={(val) => methods.setValue('LocationAddress', val)}
-          onSelect={handleSelect}
-        >
-          {({
-            getInputProps,
-            suggestions,
-            getSuggestionItemProps,
-            loading,
-          }) => (
-            <div className="flex flex-col gap-1 ">
-              <TextareaWithTopHeader
-                title="Address"
-                className="mx-0"
-                value={getInputProps().value}
-                onChange={getInputProps().onChange}
-                error={methods.formState.errors.LocationAddress?.message}
-              />
-              {suggestions.length > 0 && (
-                <div className="relative">
-                  <div className="autocomplete-dropdown-container rounded-b-2xl border absolute max-h-[200px] w-full overflow-scroll remove-vertical-scrollbar">
-                    {loading && (
-                      <div className="cursor-pointer py-2 px-2 bg-white">
-                        Loading...
-                      </div>
-                    )}
-                    {suggestions.map((suggestion) => {
-                      const style = {
-                        backgroundColor: suggestion.active ? '#DAC0A3' : '#fff',
-                      };
-                      return (
-                        <div
-                          className="cursor-pointer py-2 px-2"
-                          {...getSuggestionItemProps(suggestion, { style })}
-                        >
-                          {suggestion.description}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
             </div>
-          )}
-        </PlacesAutocomplete>
-        <div className="flex flex-col gap-4 justify-between">
-          <InputDate
-            label="Contract Start Date"
-            value={contractStartDate}
-            setValue={setContractStartDate}
-          />
-          <InputSelect
-            label="Select Client"
-            data={clients.map((res) => {
-              return { label: res.ClientName, value: res.ClientId };
-            })}
-            value={methods.watch('LocationClientId')}
-            onChange={(e) => methods.setValue('LocationClientId', e as string)}
-            searchable
-            searchValue={clientSearchQuery}
-            onSearchChange={setClientSearchQuery}
-            error={methods.formState.errors.LocationClientId?.message}
-          />
-        </div>
+          }
+        />
 
-        <div className="flex flex-col gap-4 justify-between">
-          <InputDate
-            label="Contract End Date"
-            value={contractEndDate}
-            setValue={setContractEndDate}
+        <div className="grid grid-cols-3 items-end gap-4 p-4 bg-surface shadow rounded">
+          <InputWithTopHeader
+            className="mx-0"
+            label="Name (It should be unique)"
+            register={methods.register}
+            name="LocationName"
+            error={methods.formState.errors.LocationName?.message}
           />
           <InputWithTopHeader
-            label="Contract Amount"
             className="mx-0"
+            label="Latitude"
             register={methods.register}
-            name="LocationContractAmount"
-            decimalCount={2}
-            error={methods.formState.errors.LocationContractAmount?.message}
-            leadingIcon={<div>$</div>}
+            name="LocationCoordinates.lat"
+            error={methods.formState.errors.LocationCoordinates?.lat?.message}
           />
-        </div>
+          <InputWithTopHeader
+            className="mx-0"
+            label="Longitude"
+            register={methods.register}
+            name="LocationCoordinates.lng"
+            error={methods.formState.errors.LocationCoordinates?.lng?.message}
+          />
+          <PlacesAutocomplete
+            value={methods.watch('LocationAddress')}
+            onChange={(val) => methods.setValue('LocationAddress', val)}
+            onSelect={handleSelect}
+          >
+            {({
+              getInputProps,
+              suggestions,
+              getSuggestionItemProps,
+              loading,
+            }) => (
+              <div className="flex flex-col gap-1 ">
+                <TextareaWithTopHeader
+                  title="Address"
+                  className="mx-0"
+                  value={getInputProps().value}
+                  onChange={getInputProps().onChange}
+                  error={methods.formState.errors.LocationAddress?.message}
+                />
+                {suggestions.length > 0 && (
+                  <div className="relative">
+                    <div className="autocomplete-dropdown-container rounded-b-2xl border absolute max-h-[200px] w-full overflow-scroll remove-vertical-scrollbar">
+                      {loading && (
+                        <div className="cursor-pointer py-2 px-2 bg-white">
+                          Loading...
+                        </div>
+                      )}
+                      {suggestions.map((suggestion) => {
+                        const style = {
+                          backgroundColor: suggestion.active
+                            ? '#DAC0A3'
+                            : '#fff',
+                        };
+                        return (
+                          <div
+                            className="cursor-pointer py-2 px-2"
+                            {...getSuggestionItemProps(suggestion, { style })}
+                          >
+                            {suggestion.description}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </PlacesAutocomplete>
+          <div className="flex flex-col gap-4 justify-between">
+            <InputDate
+              label="Contract Start Date"
+              value={contractStartDate}
+              setValue={setContractStartDate}
+            />
+            <InputSelect
+              label="Select Client"
+              data={clients.map((res) => {
+                return { label: res.ClientName, value: res.ClientId };
+              })}
+              value={methods.watch('LocationClientId')}
+              onChange={(e) =>
+                methods.setValue('LocationClientId', e as string)
+              }
+              searchable
+              searchValue={clientSearchQuery}
+              onSearchChange={setClientSearchQuery}
+              error={methods.formState.errors.LocationClientId?.message}
+            />
+          </div>
 
-        <div className="flex flex-col gap-4 justify-between">
+          <div className="flex flex-col gap-4 justify-between">
+            <InputDate
+              label="Contract End Date"
+              value={contractEndDate}
+              setValue={setContractEndDate}
+            />
+            <InputWithTopHeader
+              label="Contract Amount"
+              className="mx-0"
+              register={methods.register}
+              name="LocationContractAmount"
+              decimalCount={2}
+              error={methods.formState.errors.LocationContractAmount?.message}
+              leadingIcon={<div>$</div>}
+            />
+          </div>
+
           <InputWithTopHeader
             label="Patrol Per Hit Rate"
             className="mx-0"
@@ -392,58 +419,106 @@ const LocationCreateOrEdit = () => {
             error={methods.formState.errors.LocationShiftHourlyRate?.message}
             leadingIcon={<div>$</div>}
           />
-        </div>
 
-        <div className="flex flex-col gap-4 col-span-2 bg-onHoverBg p-4 rounded">
-          <div className="font-semibold">Post Order Details</div>
-          <div className="flex gap-4 items-center">
-            <label
-              htmlFor="fileUpload"
-              className="flex flex-col gap-1 cursor-pointer w-full"
-            >
-              <InputHeader title="Upload post order pdf" fontClassName="" />
-              <div className="flex gap-4 items-center w-full">
-                {typeof postOrderData?.PostOrderPdf === 'string' &&
-                  postOrderData?.PostOrderPdf.startsWith('https') && (
-                    <a
-                      href={postOrderData?.PostOrderPdf}
-                      target="_blank"
-                      className=" text-textPrimaryBlue cursor-pointer"
-                    >
-                      View Post Order
-                    </a>
-                  )}
-                <input
-                  id="fileUpload"
-                  type="file"
-                  accept="application/pdf"
-                  className={`border border-gray-300 p-2 rounded cursor-pointer w-full`}
-                  onChange={(e) => handlePdfChange(e.target.files?.[0] as File)}
-                />
-              </div>
-            </label>
-            {/* Post Order Title Input */}
-            <InputWithTopHeader
-              className="mx-0 w-full"
-              label="Post Order Title"
-              value={postOrderData?.PostOrderTitle}
-              onChange={(e) =>
-                setPostOrderData((prev) => {
-                  if (prev) {
-                    return { ...prev, PostOrderTitle: e.target.value };
-                  }
-                  return {
-                    PostOrderTitle: e.target.value,
-                    PostOrderPdf: '',
-                  };
-                })
-              }
-            />
+          <div>&nbsp;</div>
+
+          <InputWithTopHeader
+            label="Location Manager Name"
+            className="mx-0"
+            register={methods.register}
+            name="LocationManagerName"
+            error={methods.formState.errors.LocationManagerName?.message}
+          />
+          <InputWithTopHeader
+            label="Location Manager Email"
+            className="mx-0"
+            register={methods.register}
+            name="LocationManagerEmail"
+            error={methods.formState.errors.LocationManagerEmail?.message}
+          />
+          <div>&nbsp;</div>
+          <SwitchWithSideHeader
+            label="Send email for each patrol"
+            className="bg-onHoverBg px-4 py-2 h-fit align-bottom rounded w-full"
+            register={methods.register}
+            name="LocationSendEmailForEachPatrol"
+            errors={
+              methods.formState.errors?.LocationSendEmailForEachPatrol?.message
+            }
+          />
+
+          <SwitchWithSideHeader
+            label="Send email for each shift"
+            className="bg-onHoverBg px-4 py-2 h-fit align-bottom rounded w-full"
+            register={methods.register}
+            name="LocationSendEmailForEachShift"
+            errors={
+              methods.formState.errors?.LocationSendEmailForEachShift?.message
+            }
+          />
+
+          <SwitchWithSideHeader
+            label="Send email to client"
+            className="bg-onHoverBg px-4 py-2 h-fit align-bottom rounded w-full"
+            register={methods.register}
+            name="LocationSendEmailToClient"
+            errors={
+              methods.formState.errors?.LocationSendEmailToClient?.message
+            }
+          />
+
+          <div className="flex flex-col gap-4 col-span-3 bg-onHoverBg p-4 rounded">
+            <div className="font-semibold">Post Order Details</div>
+            <div className="flex gap-4 items-center">
+              <label
+                htmlFor="fileUpload"
+                className="flex flex-col gap-1 cursor-pointer w-full"
+              >
+                <InputHeader title="Upload post order pdf" fontClassName="" />
+                <div className="flex gap-4 items-center w-full">
+                  {typeof postOrderData?.PostOrderPdf === 'string' &&
+                    postOrderData?.PostOrderPdf.startsWith('https') && (
+                      <a
+                        href={postOrderData?.PostOrderPdf}
+                        target="_blank"
+                        className=" text-textPrimaryBlue cursor-pointer"
+                      >
+                        View Post Order
+                      </a>
+                    )}
+                  <input
+                    id="fileUpload"
+                    type="file"
+                    accept="application/pdf"
+                    className={`border border-gray-300 p-2 rounded cursor-pointer w-full`}
+                    onChange={(e) =>
+                      handlePdfChange(e.target.files?.[0] as File)
+                    }
+                  />
+                </div>
+              </label>
+              {/* Post Order Title Input */}
+              <InputWithTopHeader
+                className="mx-0 w-full"
+                label="Post Order Title"
+                value={postOrderData?.PostOrderTitle}
+                onChange={(e) =>
+                  setPostOrderData((prev) => {
+                    if (prev) {
+                      return { ...prev, PostOrderTitle: e.target.value };
+                    }
+                    return {
+                      PostOrderTitle: e.target.value,
+                      PostOrderPdf: '',
+                    };
+                  })
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default LocationCreateOrEdit;

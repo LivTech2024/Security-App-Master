@@ -123,8 +123,6 @@ class DbClient {
         ClientAddress: data.ClientAddress || null,
         ClientBalance: 0,
         ClientPassword: data.ClientPassword,
-        ClientSendEmailForEachShift: data.ClientSendEmailForEachShift,
-        ClientSendEmailForEachPatrol: data.ClientSendEmailForEachPatrol,
         ClientHomePageBgImg: clientHomeBgImageUrl,
         ClientCreatedAt: serverTimestamp(),
         ClientModifiedAt: serverTimestamp(),
@@ -216,8 +214,6 @@ class DbClient {
           ClientPhone: data.ClientPhone,
           ClientAddress: data.ClientAddress || null,
           ClientModifiedAt: serverTimestamp(),
-          ClientSendEmailForEachShift: data.ClientSendEmailForEachShift,
-          ClientSendEmailForEachPatrol: data.ClientSendEmailForEachPatrol,
           ClientHomePageBgImg: clientHomeBgImageUrl,
         };
 

@@ -18,7 +18,6 @@ import { openContextModal } from '@mantine/modals';
 import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
 import { ChangeEvent, useEffect, useState } from 'react';
-import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader';
 import { FaImage } from 'react-icons/fa';
 
 const ClientCreateOrEdit = () => {
@@ -37,10 +36,6 @@ const ClientCreateOrEdit = () => {
           ClientName: clientEditData.ClientName,
           ClientPassword: clientEditData.ClientPassword,
           ClientPhone: clientEditData.ClientPhone,
-          ClientSendEmailForEachPatrol:
-            clientEditData.ClientSendEmailForEachPatrol,
-          ClientSendEmailForEachShift:
-            clientEditData.ClientSendEmailForEachShift,
         }
       : undefined,
   });
@@ -246,24 +241,6 @@ const ClientCreateOrEdit = () => {
               error={methods.formState.errors.ClientPassword?.message}
               disabled={isEdit}
             />
-
-            <div className="flex items-end col-span-2 gap-4 w-full">
-              <SwitchWithSideHeader
-                label="Send email for each patrol"
-                className="bg-onHoverBg px-4 py-2 rounded w-full"
-                register={methods.register}
-                name="ClientSendEmailForEachPatrol"
-                errors={methods.formState.errors}
-              />
-
-              <SwitchWithSideHeader
-                label="Send email for each shift"
-                className="bg-onHoverBg px-4 py-2 rounded w-full"
-                register={methods.register}
-                name="ClientSendEmailForEachShift"
-                errors={methods.formState.errors}
-              />
-            </div>
 
             <TextareaWithTopHeader
               title="Client Address (Optional)"

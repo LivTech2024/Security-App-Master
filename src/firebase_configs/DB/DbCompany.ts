@@ -354,6 +354,11 @@ class DbCompany {
         LocationName,
         LocationClientId,
         LocationShiftHourlyRate,
+        LocationManagerEmail,
+        LocationManagerName,
+        LocationSendEmailForEachPatrol,
+        LocationSendEmailForEachShift,
+        LocationSendEmailToClient,
       } = data;
 
       const nameSearchIndex = fullTextSearchIndex(
@@ -391,6 +396,11 @@ class DbCompany {
         LocationPatrolPerHitRate,
         LocationPostOrder: null,
         LocationShiftHourlyRate,
+        LocationManagerEmail,
+        LocationManagerName,
+        LocationSendEmailForEachPatrol,
+        LocationSendEmailForEachShift,
+        LocationSendEmailToClient,
         LocationModifiedAt: serverTimestamp(),
         LocationCreatedAt: serverTimestamp(),
       };
@@ -433,6 +443,11 @@ class DbCompany {
       LocationName,
       LocationClientId,
       LocationShiftHourlyRate,
+      LocationManagerEmail,
+      LocationManagerName,
+      LocationSendEmailForEachPatrol,
+      LocationSendEmailForEachShift,
+      LocationSendEmailToClient,
     } = data;
 
     const nameSearchIndex = fullTextSearchIndex(
@@ -481,6 +496,11 @@ class DbCompany {
           LocationContractStartDate as unknown as Timestamp,
         LocationPatrolPerHitRate,
         LocationShiftHourlyRate,
+        LocationManagerEmail,
+        LocationManagerName,
+        LocationSendEmailForEachPatrol,
+        LocationSendEmailForEachShift,
+        LocationSendEmailToClient,
         LocationModifiedAt: serverTimestamp(),
       };
 

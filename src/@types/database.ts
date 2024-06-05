@@ -310,6 +310,11 @@ export interface ILocationsCollection {
   LocationPatrolPerHitRate: number;
   LocationShiftHourlyRate: number;
   LocationPostOrder?: ILocationPostOrderChildCollection | null;
+  LocationManagerName: string;
+  LocationManagerEmail: string; //*All the email report will be sent to this email id
+  LocationSendEmailToClient: boolean; //*by default true
+  LocationSendEmailForEachPatrol: boolean; //*by default true
+  LocationSendEmailForEachShift: boolean; //*by default true
   LocationModifiedAt: Timestamp | FieldValue;
   LocationCreatedAt: Timestamp | FieldValue;
 }
@@ -369,8 +374,6 @@ export interface IClientsCollection {
   ClientPassword: string; //* This will be used for client portal login
   ClientAddress: string | null;
   ClientBalance: number;
-  ClientSendEmailForEachPatrol: boolean; //*by default true
-  ClientSendEmailForEachShift: boolean; //*by default true
   ClientCreatedAt: Timestamp | FieldValue;
   ClientModifiedAt: Timestamp | FieldValue;
 }

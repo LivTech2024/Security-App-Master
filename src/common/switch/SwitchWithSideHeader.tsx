@@ -10,7 +10,7 @@ interface SwitchWithSideHeaderProps<
   register?: UseFormRegister<FormFields>;
   name?: Path<FormFields>;
   disabled?: boolean;
-  errors?: Partial<DeepMap<FormFields, FieldError>>;
+  errors?: Partial<DeepMap<FormFields, FieldError>> | string;
 }
 const SwitchWithSideHeader = <FormFields extends Record<string, unknown>>({
   label,

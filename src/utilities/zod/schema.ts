@@ -36,6 +36,18 @@ export const locationCreateSchema = z.object({
   LocationContractAmount: z.coerce.number(),
   LocationPatrolPerHitRate: z.coerce.number(),
   LocationShiftHourlyRate: z.coerce.number(),
+  LocationManagerName: z
+    .string()
+    .min(3, { message: 'Manager name should be at least 3 characters' }),
+  LocationManagerEmail: z
+    .string()
+    .min(1, { message: 'Email id is required' })
+    .regex(ConstRegex.EMAIL_OPTIONAL, {
+      message: 'Please enter a valid email id',
+    }),
+  LocationSendEmailToClient: z.boolean(),
+  LocationSendEmailForEachPatrol: z.boolean(),
+  LocationSendEmailForEachShift: z.boolean(),
 });
 
 export type LocationCreateFormFields = z.infer<typeof locationCreateSchema>;
@@ -285,8 +297,6 @@ export const clientSchema = z.object({
     .string()
     .min(6, { message: 'Client password should be at least 6 characters' }),
   ClientAddress: z.string().nullable().optional(),
-  ClientSendEmailForEachPatrol: z.boolean(),
-  ClientSendEmailForEachShift: z.boolean(),
 });
 
 export type ClientFormFields = z.infer<typeof clientSchema>;
