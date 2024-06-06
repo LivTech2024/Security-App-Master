@@ -570,3 +570,13 @@ export interface ICalloutsCollection {
   CalloutCreatedAt: Timestamp | FieldValue;
   CalloutModifiedAt: Timestamp | FieldValue;
 }
+
+export interface IShiftExchangeRequestsCollection {
+  ShiftExchReqId: string;
+  ShiftExchReqSenderId: string;
+  ShiftExchReqReceiverId: string;
+  ShiftExchReqShiftId: string;
+  ShiftExchReqStatus: 'pending' | 'accepted' | 'rejected';
+  ShiftExchReqCreatedAt: Timestamp | FieldValue;
+  ShiftExchReqModifiedAt: Timestamp | FieldValue;
+}
