@@ -7,6 +7,7 @@ import { formatDate } from '../../utilities/misc';
 import { PageRoutes } from '../../@types/enum';
 import LazyLoad from 'react-lazyload';
 import PageHeader from '../../common/PageHeader';
+import Button from '../../common/button/Button';
 
 const ReportView = () => {
   const [searchParam] = useSearchParams();
@@ -50,7 +51,12 @@ const ReportView = () => {
   if (data)
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
-        <PageHeader title="Report data" />
+        <PageHeader
+          title="Report data"
+          rightSection={
+            <Button label="Download" onClick={() => {}} type="black" />
+          }
+        />
 
         <div className="bg-surface shadow-md rounded-lg p-4">
           <div className="grid grid-cols-2 gap-4 text-lg">

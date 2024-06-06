@@ -38,10 +38,12 @@ const EmpDarView = () => {
       if (data) {
         setEmpDarData(data);
         const { EmpDarShiftId } = data;
-        const shiftSnapsShot = await DbShift.getShiftById(EmpDarShiftId);
-        const shiftData = shiftSnapsShot.data() as IShiftsCollection;
-        console.log(shiftData);
-        setShiftData(shiftData || null);
+        if (EmpDarShiftId) {
+          const shiftSnapsShot = await DbShift.getShiftById(EmpDarShiftId);
+          const shiftData = shiftSnapsShot.data() as IShiftsCollection;
+          console.log(shiftData);
+          setShiftData(shiftData || null);
+        }
       }
       setLoading(false);
     });
