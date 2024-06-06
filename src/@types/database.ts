@@ -251,8 +251,9 @@ export interface IReportsCollection {
   ReportCategoryName: string;
   ReportCategoryId: string;
   ReportData: string;
-  ReportShiftId?: string;
-  ReportPatrolId?: string;
+  ReportShiftId?: string | null;
+  ReportCalloutId?: string | null;
+  ReportPatrolId?: string | null;
   ReportImage?: string[];
   ReportVideo?: string[];
   ReportStatus: 'pending' | 'started' | 'completed';
@@ -427,7 +428,8 @@ export interface IEmployeeDARCollection {
   EmpDarClientName: string;
   EmpDarLocationId: string;
   EmpDarLocationName: string;
-  EmpDarShiftId: string;
+  EmpDarShiftId?: string | null;
+  EmpDarCalloutId?: string | null;
   EmpDarCompanyId: string;
   EmpDarCompanyBranchId: string | null;
   EmpDarMedias: string[];
@@ -437,6 +439,17 @@ export interface IEmployeeDARCollection {
     TileTime: string;
     TileImages: string[];
     TileLocation: string;
+    TileReport: {
+      TileReportId: string;
+      TileReportName: string;
+      TileReportSearchId: string;
+    }[];
+    TilePatrol: {
+      TilePatrolData: string; //include start and end time
+      TilePatrolId: string; // PatrolLog id for link it in pdf
+      TilePatrolImage: [];
+      TilePatrolName: string;
+    }[];
   }[];
   EmpDarCreatedAt: Timestamp | FieldValue;
 }
@@ -536,4 +549,24 @@ export interface ITaskLogsCollection {
   TaskLogStatus: 'pending' | 'completed';
   TaskLogCompletionTime: Timestamp | FieldValue;
   TaskLogCreatedAt: Timestamp | FieldValue;
+}
+
+//*Callout structure
+export interface ICalloutsCollection {
+  CalloutId: string;
+  CalloutLocation: GeoPoint;
+  CalloutLocationId: string;
+  CalloutLocationName: string;
+  CalloutLocationAddress: string;
+  CalloutDateTime: Timestamp | FieldValue;
+  CalloutAssignedEmpsId: string[]; //* Assigned Emp Ids
+  CalloutStatus: {
+    Status: 'pending' | 'started' | 'completed';
+    StatusEmpId: string;
+    StatusEmpName: string;
+    StatusStartedTime: Timestamp | FieldValue;
+    StatusEndedTime: Timestamp | FieldValue;
+  }[];
+  CalloutCreatedAt: Timestamp | FieldValue;
+  CalloutModifiedAt: Timestamp | FieldValue;
 }
