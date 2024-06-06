@@ -34,6 +34,14 @@ import DbClient from '../../../firebase_configs/DB/DbClient';
 import { htmlToPdf } from '../../../API/HtmlToPdf';
 import PageHeader from '../../../common/PageHeader';
 import useUpdateRecentTransactionNumbers from '../../../hooks/useUpdateRecentTransactionNumbers';
+import InputSelect from '../../../common/inputs/InputSelect';
+import useFetchClients from '../../../hooks/fetch/useFetchClients';
+
+enum InvoiceStatus {
+  settled = 'settled',
+  outstanding = 'outstanding',
+  partially_settled = 'partially_settled',
+}
 
 const InvoiceList = () => {
   const navigate = useNavigate();
@@ -49,6 +57,17 @@ const InvoiceList = () => {
   );
 
   const [isLifeTime, setIsLifeTime] = useState(false);
+
+  const [clientId, setClientId] = useState('');
+
+  const [clientSearchQuery, setClientSearchQuery] = useState('');
+
+  const { data: clients } = useFetchClients({
+    limit: 5,
+    searchQuery: clientSearchQuery,
+  });
+
+  const [selectedStatus, setSelectedStatus] = useState<InvoiceStatus | ''>('');
 
   const { company } = useAuthState();
 
@@ -67,6 +86,7 @@ const InvoiceList = () => {
       isLifeTime,
       startDate,
       endDate,
+      clientId,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbPayment.getInvoices({
@@ -76,6 +96,7 @@ const InvoiceList = () => {
         isLifeTime,
         startDate,
         endDate,
+        clientId,
       });
       return snapshot.docs;
     },
@@ -114,9 +135,39 @@ const InvoiceList = () => {
           docData.push(data);
         });
       });
-      setData(docData);
+
+      //*Set data according to selected status
+
+      if (!selectedStatus || selectedStatus?.length === 0) {
+        setData(docData);
+        return;
+      }
+
+      if (selectedStatus === 'outstanding') {
+        setData(docData.filter((res) => res.InvoiceReceivedAmount === 0));
+      }
+
+      if (selectedStatus === 'partially_settled') {
+        setData(
+          docData.filter(
+            (res) =>
+              res.InvoiceReceivedAmount &&
+              res.InvoiceReceivedAmount !== res.InvoiceTotalAmount
+          )
+        );
+      }
+
+      if (selectedStatus === 'settled') {
+        setData(
+          docData.filter(
+            (res) =>
+              res.InvoiceReceivedAmount &&
+              res.InvoiceReceivedAmount === res.InvoiceTotalAmount
+          )
+        );
+      }
     }
-  }, [snapshotData]);
+  }, [snapshotData, selectedStatus]);
 
   // hook for pagination
   const { ref, inView } = useInView();
@@ -191,22 +242,58 @@ const InvoiceList = () => {
           />
         }
       />
-      <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
-        <DateFilterDropdown
-          endDate={endDate}
-          isLifetime={isLifeTime}
-          setEndDate={setEndDate}
-          setIsLifetime={setIsLifeTime}
-          setStartDate={setStartDate}
-          startDate={startDate}
-        />
-
-        <div className="flex font-semibold gap-2 items-center">
-          <span className="text-textSecondary"> Total Invoice Amount: </span>
-          {numberFormatter(
-            data.reduce((acc, obj) => acc + obj.InvoiceTotalAmount, 0),
-            true
-          )}
+      <div className="flex items-start justify-between w-full gap-4 p-4 rounded bg-surface shadow">
+        <div className="flex flex-col gap-4 w-full">
+          <DateFilterDropdown
+            endDate={endDate}
+            isLifetime={isLifeTime}
+            setEndDate={setEndDate}
+            setIsLifetime={setIsLifeTime}
+            setStartDate={setStartDate}
+            startDate={startDate}
+          />
+          <div className="flex font-semibold gap-2 items-center">
+            <span className="text-textSecondary"> Total Invoice Amount: </span>
+            {numberFormatter(
+              data.reduce((acc, obj) => acc + obj.InvoiceTotalAmount, 0),
+              true
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-4 w-full justify-end">
+          <InputSelect
+            placeholder="Select Client"
+            searchable
+            searchValue={clientSearchQuery}
+            onSearchChange={(e) => {
+              setClientSearchQuery(e);
+              const selectedClient = clients.find((c) => c.ClientName === e);
+              if (selectedClient) {
+                setClientId(selectedClient.ClientId);
+              } else {
+                setClientId('');
+              }
+            }}
+            clearable
+            data={clients.map((res) => {
+              return { label: res.ClientName, value: res.ClientId };
+            })}
+          />
+          <InputSelect
+            placeholder="Status"
+            searchable
+            clearable
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e as InvoiceStatus)}
+            data={[
+              { label: 'Settled', value: InvoiceStatus.settled },
+              { label: 'Outstanding', value: InvoiceStatus.outstanding },
+              {
+                label: 'Partially Settled',
+                value: InvoiceStatus.partially_settled,
+              },
+            ]}
+          />
         </div>
       </div>
 
@@ -230,7 +317,7 @@ const InvoiceList = () => {
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={6}>
+              <td colSpan={7}>
                 <NoSearchResult />
               </td>
             </tr>
@@ -333,7 +420,7 @@ const InvoiceList = () => {
             })
           )}
           <tr ref={ref}>
-            <td colSpan={6}>
+            <td colSpan={7}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />

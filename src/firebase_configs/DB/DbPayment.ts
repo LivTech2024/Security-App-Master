@@ -258,6 +258,7 @@ class DbPayment {
     endDate,
     isLifeTime,
     startDate,
+    clientId,
   }: {
     cmpId: string;
     lastDoc?: DocumentData | null;
@@ -265,6 +266,7 @@ class DbPayment {
     startDate?: Date | string | null;
     endDate?: Date | string | null;
     isLifeTime?: boolean;
+    clientId?: string;
   }) => {
     const invoiceRef = collection(db, CollectionName.invoices);
 
@@ -279,6 +281,10 @@ class DbPayment {
         where('InvoiceDate', '>=', startDate),
         where('InvoiceDate', '<=', endDate),
       ];
+    }
+
+    if (clientId) {
+      queryParams = [...queryParams, where('InvoiceClientId', '==', clientId)];
     }
 
     if (lastDoc) {
