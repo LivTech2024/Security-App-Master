@@ -21,6 +21,7 @@ import { CollectionName } from '../../@types/enum';
 import { db } from '../config';
 import CloudStorageImageHandler, { getNewDocId } from './utils';
 import {
+  ICalloutsCollection,
   IShiftLinkedPatrolsChildCollection,
   IShiftTasksChild,
   IShiftsCollection,
@@ -61,6 +62,7 @@ class DbShift {
             ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
             ShiftTaskReturnReq: task.TaskReturnReq,
             ShiftTaskStatus: [],
+            ShiftReturnTaskStatus: [],
           });
         }
       });
@@ -163,6 +165,7 @@ class DbShift {
             ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
             ShiftTaskReturnReq: task.TaskReturnReq,
             ShiftTaskStatus: [],
+            ShiftReturnTaskStatus: [],
           });
         }
       });
@@ -329,6 +332,53 @@ class DbShift {
     );
 
     return getDocs(empRouteQuery);
+  };
+
+  //*Callouts
+  static createCallout = ({
+    cmpId,
+    data,
+  }: {
+    cmpId: string;
+    data: {
+      CalloutLocation: GeoPoint;
+      CalloutLocationId: string;
+      CalloutLocationName: string;
+      CalloutLocationAddress: string;
+      CalloutAssignedEmpsId: string[];
+      CalloutDateTime: Date;
+    };
+  }) => {
+    const calloutId = getNewDocId(CollectionName.callouts);
+    const calloutRef = doc(db, CollectionName.callouts, calloutId);
+
+    const {
+      CalloutAssignedEmpsId,
+      CalloutDateTime,
+      CalloutLocation,
+      CalloutLocationAddress,
+      CalloutLocationId,
+      CalloutLocationName,
+    } = data;
+
+    const newCallout: ICalloutsCollection = {
+      CalloutId: calloutId,
+      CalloutCompanyId: cmpId,
+      CalloutLocation: new GeoPoint(
+        CalloutLocation.latitude,
+        CalloutLocation.longitude
+      ),
+      CalloutLocationId,
+      CalloutLocationName,
+      CalloutLocationAddress,
+      CalloutDateTime: CalloutDateTime as unknown as Timestamp,
+      CalloutAssignedEmpsId,
+      CalloutStatus: [],
+      CalloutCreatedAt: serverTimestamp(),
+      CalloutModifiedAt: serverTimestamp(),
+    };
+
+    return setDoc(calloutRef, newCallout);
   };
 }
 

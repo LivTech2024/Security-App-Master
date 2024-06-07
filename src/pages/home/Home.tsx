@@ -4,6 +4,7 @@ import {
   MdOutlineSensors,
   MdPeople,
 } from 'react-icons/md';
+import { VscCallOutgoing } from 'react-icons/vsc';
 import { LuActivitySquare } from 'react-icons/lu';
 import { useAuthState } from '../../store';
 import { useNavigate } from 'react-router-dom';
@@ -101,6 +102,11 @@ const Home = () => {
           path={PageRoutes.SCHEDULES}
           icon={<AiOutlineSchedule className="text-3xl text-primaryGold" />}
           name="Shift Scheduling"
+        />
+        <HomeItem
+          path={PageRoutes.CALL_OUT_LIST}
+          icon={<VscCallOutgoing className="text-3xl text-primaryGold" />}
+          name="Callouts"
         />
 
         <HomeItem

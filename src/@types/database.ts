@@ -562,6 +562,7 @@ export interface ITaskLogsCollection {
 //*Callout structure
 export interface ICalloutsCollection {
   CalloutId: string;
+  CalloutCompanyId: string;
   CalloutLocation: GeoPoint;
   CalloutLocationId: string;
   CalloutLocationName: string;

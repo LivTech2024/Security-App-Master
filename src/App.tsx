@@ -70,6 +70,8 @@ import useFirebaseMessaging from './hooks/useFirebaseMessaging';
 import { onMessage } from 'firebase/messaging';
 import { messaging } from './firebase_configs/config';
 import HrmHome from './pages/hrm/HrmHome';
+import CalloutList from './pages/callout/CalloutList';
+import CalloutView from './pages/callout/CalloutView';
 
 function App() {
   useOnAuthStateChanged();
@@ -295,6 +297,10 @@ function App() {
               path={PageRoutes.TASK_AND_TRACKING_LOGS}
               Component={TaskLogs}
             />
+
+            <Route path={PageRoutes.CALL_OUT_LIST} Component={CalloutList} />
+
+            <Route path={PageRoutes.CALL_OUT_VIEW} Component={CalloutView} />
 
             <Route path={PageRoutes.HRM_HOME} Component={HrmHome} />
           </Routes>
