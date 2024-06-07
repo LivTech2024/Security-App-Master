@@ -50,7 +50,7 @@ const ReportView = () => {
 
   if (data)
     return (
-      <div className="flex flex-col w-full h-full p-6 gap-6">
+      <div className="flex flex-col w-full h-full p-6 gap-6 justify-between">
         <PageHeader
           title="Report data"
           rightSection={

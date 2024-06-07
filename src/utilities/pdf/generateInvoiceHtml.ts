@@ -2,6 +2,7 @@ import { IInvoicesCollection } from '../../@types/database';
 import { Company } from '../../store/slice/auth.slice';
 import { numberFormatter } from '../NumberFormater';
 import { formatDate } from '../misc';
+import { getPdfHeader } from './common/getPdfHeader';
 
 interface GenerateInvoiceHTMLArgs {
   invoiceData: IInvoicesCollection;
@@ -72,19 +73,7 @@ export async function generateInvoiceHTML({
         </style>
       </head>
       <body>
-        <div style="display: -webkit-box; -webkit-box-pack: justify; margin-bottom: 20px;">
-         
-        <img src="${
-          companyDetails.CompanyLogo
-        }" style="width:100px; object-fit: cover;" alt="Company Logo">
-
-          <div style="text-align: end;">
-            <p>${companyDetails.CompanyName}</p>
-            <p>${companyDetails.CompanyPhone}</p>
-            <p>${companyDetails.CompanyEmail}</p>
-            <p>${companyDetails.CompanyAddress}</p>
-          </div>
-        </div>
+       ${getPdfHeader(companyDetails)}
         <div class="invoice-details">
           <div style="max-width:50%">
             <p>Customer Name: ${invoiceData.InvoiceClientName}</p>
