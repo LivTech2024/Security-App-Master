@@ -10,7 +10,7 @@ interface GenerateInvoiceHTMLArgs {
   clientBalance: number;
 }
 
-export async function generateInvoiceHTML({
+export function generateInvoiceHTML({
   companyDetails,
   invoiceData,
   clientBalance,
@@ -64,12 +64,6 @@ export async function generateInvoiceHTML({
           th {
             background-color: #f2f2f2;
           }
-          /* Styles specifically for printing (PDF) */
-         @media print {
-           body {
-            font-size: 12px; /* Adjust font size for print */
-           }
-         }
         </style>
       </head>
       <body>

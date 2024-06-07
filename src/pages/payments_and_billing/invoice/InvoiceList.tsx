@@ -36,6 +36,7 @@ import PageHeader from '../../../common/PageHeader';
 import useUpdateRecentTransactionNumbers from '../../../hooks/useUpdateRecentTransactionNumbers';
 import InputSelect from '../../../common/inputs/InputSelect';
 import useFetchClients from '../../../hooks/fetch/useFetchClients';
+import { downloadPdf } from '../../../utilities/pdf/common/downloadPdf';
 
 enum InvoiceStatus {
   settled = 'settled',
@@ -189,31 +190,15 @@ const InvoiceList = () => {
       );
       const clientData = clientSnapshot.data() as IClientsCollection;
 
-      const html = await generateInvoiceHTML({
+      const html = generateInvoiceHTML({
         companyDetails: company,
         invoiceData,
         clientBalance: clientData.ClientBalance,
       });
 
       const response = await htmlToPdf({ file_name: 'invoice.pdf', html });
-      const blob = new Blob([response.data], { type: 'application/pdf' });
 
-      // Create a link element
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-
-      const invName = 'invoice.pdf';
-
-      link.download = invName; // Specify the filename for the downloaded file
-
-      // Append the link to the body
-      document.body.appendChild(link);
-
-      // Trigger a click on the link to start the download
-      link.click();
-
-      // Remove the link from the DOM
-      document.body.removeChild(link);
+      downloadPdf(response, 'invoice.pdf');
 
       closeModalLoader();
     } catch (error) {

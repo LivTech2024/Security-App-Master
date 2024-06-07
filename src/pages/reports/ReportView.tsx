@@ -8,8 +8,16 @@ import { PageRoutes } from '../../@types/enum';
 import LazyLoad from 'react-lazyload';
 import PageHeader from '../../common/PageHeader';
 import Button from '../../common/button/Button';
+import { errorHandler } from '../../utilities/CustomError';
+import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
+import { useAuthState } from '../../store';
+import { generateReportsHtml } from '../../utilities/pdf/generateReportsHtml';
+import { htmlToPdf } from '../../API/HtmlToPdf';
+import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
 
 const ReportView = () => {
+  const { company } = useAuthState();
+
   const [searchParam] = useSearchParams();
 
   const reportId = searchParam.get('id');
@@ -48,13 +56,32 @@ const ReportView = () => {
     );
   }
 
-  if (data)
+  if (data) {
+    const downloadReportPdf = async () => {
+      if (!company) return;
+      try {
+        showModalLoader({});
+
+        const html = generateReportsHtml(company, data);
+
+        const response = await htmlToPdf({ file_name: 'report.pdf', html });
+
+        downloadPdf(response, 'report.pdf');
+
+        closeModalLoader();
+      } catch (error) {
+        errorHandler(error);
+        closeModalLoader();
+        console.log(error);
+      }
+    };
+
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6 justify-between">
         <PageHeader
           title="Report data"
           rightSection={
-            <Button label="Download" onClick={() => {}} type="black" />
+            <Button label="Download" onClick={downloadReportPdf} type="black" />
           }
         />
 
@@ -162,6 +189,7 @@ const ReportView = () => {
         </div>
       </div>
     );
+  }
 };
 
 export default ReportView;
