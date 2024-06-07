@@ -105,6 +105,14 @@ export interface IShiftTasksChild {
   ShiftTask: string;
   ShiftTaskQrCodeReq: boolean;
   ShiftTaskReturnReq: boolean;
+  ShiftReturnTaskStatus: {
+    TaskStatus: 'pending' | 'completed';
+    TaskCompletedById?: string;
+    TaskCompletedByName?: string;
+    TaskCompletionTime?: Timestamp | FieldValue;
+    TaskFailureReason?: string;
+    TaskPhotos?: string[];
+  }[];
   ShiftTaskStatus: {
     TaskStatus: 'pending' | 'completed';
     TaskCompletedById?: string;
