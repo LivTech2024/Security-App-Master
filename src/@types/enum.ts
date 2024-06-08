@@ -50,6 +50,7 @@ export const DisplayCount = {
   KEY_LIST: 20,
   KEY_ALLOCATION: 20,
   TASK_LIST: 20,
+  CALLOUT_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -74,6 +75,7 @@ export const REACT_QUERY_KEYS = {
   KEY_LIST: 'key-list',
   KEY_ALLOCATION: 'key-allocation',
   TASK_LIST: 'task-list',
+  CALLOUT_LIST: 'callout-list',
 } as const;
 
 export const MinimumQueryCharacter = {

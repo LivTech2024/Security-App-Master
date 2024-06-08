@@ -56,7 +56,7 @@ const InputSelect = ({
             borderRadius: '4px',
             background: '#FFFFFF',
             color: '#000000',
-            padding: '22px 12px',
+            padding: '22px 26px 22px 12px',
           },
         }}
         clearable={clearable}

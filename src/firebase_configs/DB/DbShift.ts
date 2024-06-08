@@ -380,6 +380,58 @@ class DbShift {
 
     return setDoc(calloutRef, newCallout);
   };
+
+  static getCallouts = ({
+    lmt,
+    lastDoc,
+    cmpId,
+    endDate,
+    isLifeTime,
+    locationId,
+    startDate,
+  }: {
+    lmt: number;
+    lastDoc?: DocumentData | null;
+    cmpId: string;
+    locationId?: string | null;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+  }) => {
+    const calloutRef = collection(db, CollectionName.callouts);
+
+    let queryParams: QueryConstraint[] = [
+      where('CalloutCompanyId', '==', cmpId),
+      orderBy('CalloutDateTime', 'desc'),
+    ];
+
+    if (locationId && locationId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where('CalloutLocationId', '==', locationId),
+      ];
+    }
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('CalloutDateTime', '>=', startDate),
+        where('CalloutDateTime', '<=', endDate),
+      ];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    const calloutQuery = query(calloutRef, ...queryParams);
+
+    return getDocs(calloutQuery);
+  };
 }
 
 export default DbShift;
