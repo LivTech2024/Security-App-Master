@@ -372,6 +372,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
               ShiftTaskQrCodeReq: task.ShiftTaskQrCodeReq,
               ShiftTaskReturnReq: task.ShiftTaskReturnReq,
               ShiftTaskStatus: [],
+              ShiftReturnTaskStatus: [],
             });
           }
         });
