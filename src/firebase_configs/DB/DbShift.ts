@@ -4,6 +4,7 @@ import {
   QueryConstraint,
   Timestamp,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -431,6 +432,18 @@ class DbShift {
     const calloutQuery = query(calloutRef, ...queryParams);
 
     return getDocs(calloutQuery);
+  };
+
+  static getCalloutById = (calloutId: string) => {
+    const calloutRef = doc(db, CollectionName.callouts, calloutId);
+
+    return getDoc(calloutRef);
+  };
+
+  static deleteCallout = (calloutId: string) => {
+    const calloutRef = doc(db, CollectionName.callouts, calloutId);
+
+    return deleteDoc(calloutRef);
   };
 }
 

@@ -5,7 +5,7 @@ import CreateCalloutModal from '../../component/callout/modal/CreateCalloutModal
 import { useAuthState } from '../../store';
 import dayjs from 'dayjs';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
+import { DisplayCount, PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
 import DbShift from '../../firebase_configs/DB/DbShift';
 import { DocumentData } from 'firebase/firestore';
 import { ICalloutsCollection } from '../../@types/database';
@@ -17,8 +17,11 @@ import { formatDate } from '../../utilities/misc';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import { numberFormatter } from '../../utilities/NumberFormater';
 import { Status } from '../../common/Status';
+import { useNavigate } from 'react-router-dom';
 
 const CalloutList = () => {
+  const navigate = useNavigate();
+
   const { company } = useAuthState();
 
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -170,7 +173,15 @@ const CalloutList = () => {
           ) : (
             data.map((callout) => {
               return (
-                <tr key={callout.CalloutId} className="cursor-pointer ">
+                <tr
+                  onClick={() =>
+                    navigate(
+                      PageRoutes.CALL_OUT_VIEW + `?id=${callout.CalloutId}`
+                    )
+                  }
+                  key={callout.CalloutId}
+                  className="cursor-pointer "
+                >
                   <td className="px-4 py-2 align-top text-start">
                     {callout.CalloutLocationName}
                   </td>
@@ -190,7 +201,7 @@ const CalloutList = () => {
                     )}
                   </td>
 
-                  <td className="px-4 py-2 align-top text-end capitalize">
+                  <td className="px-4 py-2 align-top text-end capitalize flex justify-end">
                     <Status
                       status={
                         callout.CalloutStatus.length === 0
