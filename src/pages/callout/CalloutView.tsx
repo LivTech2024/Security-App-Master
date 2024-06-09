@@ -1,6 +1,10 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DbShift from '../../firebase_configs/DB/DbShift';
-import { ICalloutsCollection } from '../../@types/database';
+import {
+  ICalloutsCollection,
+  IEmployeeDARCollection,
+  IReportsCollection,
+} from '../../@types/database';
 import { useEffect, useState } from 'react';
 import PageHeader from '../../common/PageHeader';
 import Button from '../../common/button/Button';
@@ -33,6 +37,9 @@ const CalloutView = () => {
 
   const [assignedEmps, setAssignedEmps] = useState<string[]>([]);
 
+  const [linkedReportId, setLinkedReportId] = useState<string | null>(null);
+  const [linkedDarId, setLinkedDarId] = useState<string | null>(null);
+
   useEffect(() => {
     if (!calloutId) return;
     DbShift?.getCalloutById(calloutId).then(async (snapshot) => {
@@ -49,8 +56,20 @@ const CalloutView = () => {
             empNames.push(EmployeeName);
           })
         );
-
         setAssignedEmps(empNames);
+
+        const reportSnapshot = await DbShift.getCalloutReport(calloutId);
+        const reportData =
+          reportSnapshot?.docs[0]?.data() as IReportsCollection;
+        if (reportData) {
+          setLinkedReportId(reportData.ReportId);
+        }
+
+        const darSnapshot = await DbShift.getCalloutDar(calloutId);
+        const darData = darSnapshot?.docs[0]?.data() as IEmployeeDARCollection;
+        if (darData) {
+          setLinkedDarId(darData.EmpDarId);
+        }
       }
 
       setLoading(false);
@@ -199,6 +218,34 @@ const CalloutView = () => {
               <Status status="pending" />
             )}
           </div>
+
+          {linkedReportId && (
+            <div>
+              <p className="font-semibold">Linked Report:</p>
+              <p
+                onClick={() =>
+                  navigate(PageRoutes.REPORT_VIEW + `?id=${linkedReportId}`)
+                }
+                className="text-textPrimaryBlue cursor-pointer underline"
+              >
+                Click here to view
+              </p>
+            </div>
+          )}
+
+          {linkedDarId && (
+            <div>
+              <p className="font-semibold">Linked DAR:</p>
+              <p
+                onClick={() =>
+                  navigate(PageRoutes.EMPLOYEE_DAR_VIEW + `?id=${linkedDarId}`)
+                }
+                className="text-textPrimaryBlue cursor-pointer underline"
+              >
+                Click here to view
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

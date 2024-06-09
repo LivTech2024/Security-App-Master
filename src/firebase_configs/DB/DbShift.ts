@@ -445,6 +445,30 @@ class DbShift {
 
     return deleteDoc(calloutRef);
   };
+
+  static getCalloutReport = (calloutId: string) => {
+    const reportRef = collection(db, CollectionName.reports);
+
+    const reportQuery = query(
+      reportRef,
+      where('ReportCalloutId', '==', calloutId),
+      limit(1)
+    );
+
+    return getDocs(reportQuery);
+  };
+
+  static getCalloutDar = (calloutId: string) => {
+    const darRef = collection(db, CollectionName.employeesDAR);
+
+    const darQuery = query(
+      darRef,
+      where('EmpDarCalloutId', '==', calloutId),
+      limit(1)
+    );
+
+    return getDocs(darQuery);
+  };
 }
 
 export default DbShift;
