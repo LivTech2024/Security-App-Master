@@ -319,6 +319,11 @@ export interface ILocationsCollection {
   LocationPatrolPerHitRate: number;
   LocationShiftHourlyRate: number;
   LocationPostOrder?: ILocationPostOrderChildCollection | null;
+  LocationCalloutDetails: {
+    CalloutCostInitialMinutes: number;
+    CalloutCostInitialCost: number;
+    CalloutCostPerHour: number;
+  };
   LocationManagerName: string;
   LocationManagerEmail: string; //*All the email report will be sent to this email id
   LocationSendEmailToClient: boolean; //*by default true

@@ -359,6 +359,7 @@ class DbCompany {
         LocationSendEmailForEachPatrol,
         LocationSendEmailForEachShift,
         LocationSendEmailToClient,
+        LocationCalloutDetails,
       } = data;
 
       const nameSearchIndex = fullTextSearchIndex(
@@ -401,6 +402,7 @@ class DbCompany {
         LocationSendEmailForEachPatrol,
         LocationSendEmailForEachShift,
         LocationSendEmailToClient,
+        LocationCalloutDetails,
         LocationModifiedAt: serverTimestamp(),
         LocationCreatedAt: serverTimestamp(),
       };
@@ -448,6 +450,7 @@ class DbCompany {
       LocationSendEmailForEachPatrol,
       LocationSendEmailForEachShift,
       LocationSendEmailToClient,
+      LocationCalloutDetails,
     } = data;
 
     const nameSearchIndex = fullTextSearchIndex(
@@ -501,6 +504,7 @@ class DbCompany {
         LocationSendEmailForEachPatrol,
         LocationSendEmailForEachShift,
         LocationSendEmailToClient,
+        LocationCalloutDetails,
         LocationModifiedAt: serverTimestamp(),
       };
 

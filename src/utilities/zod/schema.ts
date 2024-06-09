@@ -36,6 +36,11 @@ export const locationCreateSchema = z.object({
   LocationContractAmount: z.coerce.number(),
   LocationPatrolPerHitRate: z.coerce.number(),
   LocationShiftHourlyRate: z.coerce.number(),
+  LocationCalloutDetails: z.object({
+    CalloutCostInitialMinutes: z.coerce.number(),
+    CalloutCostInitialCost: z.coerce.number(),
+    CalloutCostPerHour: z.coerce.number(),
+  }),
   LocationManagerName: z
     .string()
     .min(3, { message: 'Manager name should be at least 3 characters' }),

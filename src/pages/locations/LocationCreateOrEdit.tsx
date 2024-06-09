@@ -36,6 +36,7 @@ import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { Library } from '@googlemaps/js-api-loader';
 import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader';
+import { MdAccessTime, MdKeyboardArrowRight } from 'react-icons/md';
 
 const libraries: Library[] = ['places'];
 
@@ -69,11 +70,27 @@ const LocationCreateOrEdit = () => {
             locationEditData.LocationSendEmailForEachPatrol,
           LocationSendEmailForEachShift:
             locationEditData.LocationSendEmailForEachShift,
+          LocationCalloutDetails: {
+            CalloutCostInitialCost:
+              locationEditData?.LocationCalloutDetails
+                ?.CalloutCostInitialCost || 45,
+            CalloutCostInitialMinutes:
+              locationEditData?.LocationCalloutDetails
+                ?.CalloutCostInitialMinutes || 30,
+            CalloutCostPerHour:
+              locationEditData?.LocationCalloutDetails?.CalloutCostPerHour ||
+              45,
+          },
         }
       : {
           LocationSendEmailForEachPatrol: true,
           LocationSendEmailForEachShift: true,
           LocationSendEmailToClient: true,
+          LocationCalloutDetails: {
+            CalloutCostInitialCost: 45,
+            CalloutCostInitialMinutes: 30,
+            CalloutCostPerHour: 45,
+          },
         },
   });
 
@@ -466,6 +483,55 @@ const LocationCreateOrEdit = () => {
               methods.formState.errors?.LocationSendEmailToClient?.message
             }
           />
+
+          <div className="col-span-3 flex flex-col gap-4">
+            <div className="font-semibold">Callout Details</div>
+            <div className="flex items-center gap-4">
+              <InputWithTopHeader
+                className="mx-0"
+                register={methods.register}
+                name="LocationCalloutDetails.CalloutCostInitialCost"
+                error={
+                  methods.formState.errors.LocationCalloutDetails
+                    ?.CalloutCostInitialCost?.message
+                }
+                leadingIcon={<div>$</div>}
+                tailIcon={<MdKeyboardArrowRight className="w-6 h-6" />}
+                decimalCount={2}
+              />
+              <span className="font-semibold text-textSecondary">
+                For First
+              </span>
+              <InputWithTopHeader
+                className="mx-0"
+                register={methods.register}
+                name="LocationCalloutDetails.CalloutCostInitialMinutes"
+                error={
+                  methods.formState.errors.LocationCalloutDetails
+                    ?.CalloutCostInitialMinutes?.message
+                }
+                leadingIcon={<MdAccessTime className="size-5" />}
+                tailIcon={<MdKeyboardArrowRight className="w-6 h-6" />}
+                decimalCount={2}
+              />
+              <span className="font-semibold text-textSecondary">
+                Minutes, Then
+              </span>
+              <InputWithTopHeader
+                className="mx-0"
+                register={methods.register}
+                name="LocationCalloutDetails.CalloutCostPerHour"
+                error={
+                  methods.formState.errors.LocationCalloutDetails
+                    ?.CalloutCostPerHour?.message
+                }
+                leadingIcon={<div>$</div>}
+                tailIcon={<MdKeyboardArrowRight className="w-6 h-6" />}
+                decimalCount={2}
+              />
+              <span className="font-semibold text-textSecondary">Per Hour</span>
+            </div>
+          </div>
 
           <div className="flex flex-col gap-4 col-span-3 bg-onHoverBg p-4 rounded">
             <div className="font-semibold">Post Order Details</div>
