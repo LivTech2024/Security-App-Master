@@ -209,7 +209,6 @@ function App() {
       (location.pathname.includes('/client_portal') && !client)) &&
     !location.pathname.includes('/unprotected')
   ) {
-    console.log('logged in');
     return (
       <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
         <ModalsProvider

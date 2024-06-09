@@ -594,3 +594,11 @@ export interface IShiftExchangeRequestsCollection {
   ShiftExchReqCreatedAt: Timestamp | FieldValue;
   ShiftExchReqModifiedAt: Timestamp | FieldValue;
 }
+
+export interface IUserDataDeletionRequestsCollection {
+  RequestId: string;
+  RequestUserEmail: string;
+  RequestUserPassword: string;
+  RequestStatus: 'pending' | 'accepted' | 'rejected';
+  RequestCreatedAt: Timestamp | FieldValue;
+}

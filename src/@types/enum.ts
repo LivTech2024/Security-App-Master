@@ -29,6 +29,7 @@ export enum CollectionName {
   employeeRoutes = 'EmployeeRoutes',
   shiftExchangeRequests = 'ShiftExchangeRequests',
   callouts = 'Callouts',
+  userDataDeletionRequests = 'UserDataDeletionRequests',
 }
 
 export const DisplayCount = {
