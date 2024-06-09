@@ -376,6 +376,22 @@ class DbClient {
     return getDocs(patrolQuery);
   };
 
+  static getAllCalloutsOfLocation = (
+    locationId: string,
+    startDate: Date,
+    endDate: Date
+  ) => {
+    const calloutRef = collection(db, CollectionName.callouts);
+    const calloutQuery = query(
+      calloutRef,
+      where('CalloutLocationId', '==', locationId),
+      where('CalloutDateTime', '>=', startDate),
+      where('CalloutDateTime', '<=', endDate)
+    );
+
+    return getDocs(calloutQuery);
+  };
+
   //*For client portal
   static getClientPatrols = async ({
     lmt,

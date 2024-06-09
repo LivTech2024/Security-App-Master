@@ -3,6 +3,7 @@ import Dialog from '../../../common/Dialog';
 import useFetchLocations from '../../../hooks/fetch/useFetchLocations';
 import InputSelect from '../../../common/inputs/InputSelect';
 import {
+  ICalloutsCollection,
   IInvoiceItems,
   IPatrolsCollection,
   IShiftsCollection,
@@ -12,8 +13,13 @@ import InputDate from '../../../common/inputs/InputDate';
 import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils';
 import CustomError, { errorHandler } from '../../../utilities/CustomError';
 import DbClient from '../../../firebase_configs/DB/DbClient';
-import { getHoursDiffInTwoTimeString } from '../../../utilities/misc';
+import {
+  getHoursDiffInTwoTimeString,
+  roundNumber,
+  toDate,
+} from '../../../utilities/misc';
 import DbPatrol from '../../../firebase_configs/DB/DbPatrol';
+import dayjs from 'dayjs';
 
 const ClientCostCalculationModal = ({
   opened,
@@ -45,6 +51,9 @@ const ClientCostCalculationModal = ({
   const [isCalculationReqForShift, setIsCalculationReqForShift] =
     useState(false);
 
+  const [isCalculationReqForCallout, setIsCalculationReqForCallout] =
+    useState(false);
+
   const onSubmit = async () => {
     try {
       if (!startDate || !endDate) {
@@ -63,7 +72,11 @@ const ClientCostCalculationModal = ({
         throw new CustomError('Please select location');
       }
 
-      if (!isCalculationReqForPatrol && !isCalculationReqForShift) {
+      if (
+        !isCalculationReqForPatrol &&
+        !isCalculationReqForShift &&
+        !isCalculationReqForCallout
+      ) {
         throw new CustomError(
           'Please select at least one required calculation'
         );
@@ -72,8 +85,15 @@ const ClientCostCalculationModal = ({
       //*Calculation start
       showModalLoader({});
 
-      const { LocationShiftHourlyRate, LocationPatrolPerHitRate } =
-        selectedLocation;
+      setInvoiceItems((prev) =>
+        prev.filter((item) => item.ItemDescription.length > 0)
+      );
+
+      const {
+        LocationShiftHourlyRate,
+        LocationPatrolPerHitRate,
+        LocationCalloutDetails,
+      } = selectedLocation;
 
       if (isCalculationReqForShift) {
         const shiftSnapshot = await DbClient.getAllShiftsOfLocation(
@@ -118,9 +138,9 @@ const ClientCostCalculationModal = ({
           ...prev,
           {
             ItemDescription: 'Shifts Costs',
-            ItemPrice: LocationShiftHourlyRate,
-            ItemQuantity: totalShiftHours,
-            ItemTotal: totalShiftCostToClient,
+            ItemPrice: roundNumber(LocationShiftHourlyRate),
+            ItemQuantity: roundNumber(totalShiftHours),
+            ItemTotal: roundNumber(totalShiftCostToClient),
           },
         ]);
       }
@@ -151,11 +171,72 @@ const ClientCostCalculationModal = ({
           ...prev,
           {
             ItemDescription: 'Patrol Costs',
-            ItemPrice: LocationPatrolPerHitRate,
-            ItemQuantity: totalPatrols,
-            ItemTotal: totalPatrolCostToClient,
+            ItemPrice: roundNumber(LocationPatrolPerHitRate),
+            ItemQuantity: roundNumber(totalPatrols),
+            ItemTotal: roundNumber(totalPatrolCostToClient),
           },
         ]);
+      }
+
+      if (isCalculationReqForCallout) {
+        const calloutSnapshot = await DbClient.getAllCalloutsOfLocation(
+          locationId,
+          startDate,
+          endDate
+        );
+        const callOutData = calloutSnapshot?.docs?.map(
+          (doc) => doc.data() as ICalloutsCollection
+        );
+
+        if (callOutData && callOutData?.length > 0) {
+          const {
+            CalloutCostInitialCost,
+            CalloutCostInitialMinutes,
+            CalloutCostPerHour,
+          } = LocationCalloutDetails;
+
+          let calloutCost = 0;
+
+          const totalCallouts = callOutData.length;
+
+          callOutData.map((data) => {
+            const { CalloutStatus } = data;
+            CalloutStatus.map((status) => {
+              const { StatusStartedTime, StatusEndedTime, Status } = status;
+              if (
+                Status === 'completed' &&
+                StatusStartedTime &&
+                StatusEndedTime
+              ) {
+                let totalHours = getHoursDiffInTwoTimeString(
+                  dayjs(toDate(StatusStartedTime)).format('HH:mm'),
+                  dayjs(toDate(StatusEndedTime)).format('HH:mm')
+                );
+
+                const CalloutCostInitialHrs = CalloutCostInitialMinutes / 60;
+
+                if (totalHours > CalloutCostInitialHrs) {
+                  calloutCost += CalloutCostInitialCost;
+                  totalHours = totalHours - CalloutCostInitialHrs;
+                }
+
+                calloutCost += totalHours * CalloutCostPerHour;
+              }
+            });
+          });
+
+          if (calloutCost) {
+            setInvoiceItems((prev) => [
+              ...prev,
+              {
+                ItemDescription: 'Callout Costs',
+                ItemPrice: roundNumber(CalloutCostPerHour),
+                ItemQuantity: roundNumber(totalCallouts),
+                ItemTotal: roundNumber(calloutCost),
+              },
+            ]);
+          }
+        }
       }
 
       closeModalLoader();
@@ -213,6 +294,14 @@ const ClientCostCalculationModal = ({
           checked={isCalculationReqForShift}
           onChange={() =>
             setIsCalculationReqForShift(!isCalculationReqForShift)
+          }
+        />
+        <SwitchWithSideHeader
+          label="Generate Callout Cost"
+          className="bg-onHoverBg px-4  py-2 rounded"
+          checked={isCalculationReqForCallout}
+          onChange={() =>
+            setIsCalculationReqForCallout(!isCalculationReqForCallout)
           }
         />
       </div>
