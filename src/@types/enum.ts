@@ -168,6 +168,10 @@ export const PageRoutes = {
   CALL_OUT_VIEW: '/callout_view',
 
   HRM_HOME: '/hrm_home',
+
+  //Unprotected page
+  PRIVACY_POLICY: '/unprotected/privacy_policy',
+  USER_DATA_DELETION_REQUEST: '/unprotected/user_data_deletion_request',
 };
 
 export const LocalStorageKey = {

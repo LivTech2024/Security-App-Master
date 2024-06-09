@@ -4,7 +4,7 @@ import Footer from './Footer';
 
 interface LayoutProps {
   children: React.ReactNode;
-  userType: 'admin' | 'client' | 'super_admin';
+  userType: 'admin' | 'client' | 'super_admin' | 'guest';
 }
 
 const Layout = ({ children, userType }: LayoutProps) => {

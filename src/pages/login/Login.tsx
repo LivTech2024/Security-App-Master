@@ -154,7 +154,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-[100vh]">
-      <div className="bg-surface rounded shadow border border-gray-300 flex flex-col p-6 min-w-[30%]">
+      <div className="bg-surface rounded shadow border border-gray-300 flex flex-col p-6  w-full sm:max-w-[30%]">
         <div className="font-semibold text-lg">Login</div>
         <InputWithTopHeader
           className="mx-0 mt-6"

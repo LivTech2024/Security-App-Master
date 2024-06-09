@@ -80,7 +80,7 @@ const NavItem = ({
 const Nav = ({
   userType,
 }: {
-  userType: 'admin' | 'client' | 'super_admin';
+  userType: 'admin' | 'client' | 'super_admin' | 'guest';
 }) => {
   const { userSignOut } = useAuthState();
   const navigate = useNavigate();
@@ -143,35 +143,48 @@ const Nav = ({
           <NavItem path={PageRoutes.CLIENT_PORTAL_MESSAGING} name="Messaging" />
         </>
       )}
-      <NavItem
-        name="Sign out"
-        callback={() => {
-          openContextModal({
-            modal: 'confirmModal',
-            withCloseButton: false,
-            centered: true,
-            closeOnClickOutside: true,
-            innerProps: {
-              title: 'Confirm',
-              body: 'Are you sure to sign out',
-              onConfirm: () => {
-                navigate(PageRoutes.HOME);
-                userSignOut();
+      {userType !== 'guest' && (
+        <NavItem
+          name="Sign out"
+          callback={() => {
+            openContextModal({
+              modal: 'confirmModal',
+              withCloseButton: false,
+              centered: true,
+              closeOnClickOutside: true,
+              innerProps: {
+                title: 'Confirm',
+                body: 'Are you sure to sign out',
+                onConfirm: () => {
+                  navigate(PageRoutes.HOME);
+                  userSignOut();
+                },
               },
-            },
-            size: '30%',
-            styles: {
-              body: { padding: '0px' },
-            },
-          });
-        }}
-      />
+              size: '30%',
+              styles: {
+                body: { padding: '0px' },
+              },
+            });
+          }}
+        />
+      )}
 
       {userType === 'client' && (
         <div className="flex justify-end ml-auto px-4 text-lg">
           {' '}
           Welcome {client?.ClientName}
         </div>
+      )}
+
+      {userType === 'guest' && (
+        <>
+          <NavItem path={PageRoutes.HOME} name="Home" />
+          <NavItem path={PageRoutes.PRIVACY_POLICY} name="Privacy Policy" />
+          <NavItem
+            path={PageRoutes.USER_DATA_DELETION_REQUEST}
+            name="User Data Deletion Request"
+          />
+        </>
       )}
     </div>
   );

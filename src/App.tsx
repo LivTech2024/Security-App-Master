@@ -72,6 +72,8 @@ import { messaging } from './firebase_configs/config';
 import HrmHome from './pages/hrm/HrmHome';
 import CalloutList from './pages/callout/CalloutList';
 import CalloutView from './pages/callout/CalloutView';
+import PrivacyPolicy from './pages/uprotected_pages/privacy_policy/PrivacyPolicy';
+import UserDataDeletionRequest from './pages/uprotected_pages/user_data_deletion_request/UserDataDeletionRequest';
 
 function App() {
   useOnAuthStateChanged();
@@ -93,6 +95,33 @@ function App() {
     return <SplashScreen />;
   }
 
+  //*Unprotected routes
+  if (location.pathname.includes('/unprotected')) {
+    return (
+      <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
+        <ModalsProvider
+          modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
+        >
+          <Layout userType="guest">
+            <ToastContainer />
+            <Routes>
+              {' '}
+              <Route
+                path={PageRoutes.PRIVACY_POLICY}
+                Component={PrivacyPolicy}
+              />
+              <Route
+                path={PageRoutes.USER_DATA_DELETION_REQUEST}
+                Component={UserDataDeletionRequest}
+              />
+            </Routes>
+          </Layout>
+        </ModalsProvider>
+      </MantineProvider>
+    );
+  }
+
+  //*Client Portal Routes
   if (location.pathname.includes('/client_portal') && client) {
     return (
       <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
@@ -153,6 +182,7 @@ function App() {
     );
   }
 
+  //*Super Admin Routes
   if (location.pathname.includes('/super_admin') && superAdmin) {
     return (
       <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
@@ -173,17 +203,21 @@ function App() {
   }
 
   if (
-    !admin ||
-    !company ||
-    (location.pathname.includes('/super_admin') && !superAdmin) ||
-    (location.pathname.includes('/client_portal') && !client)
+    (!admin ||
+      !company ||
+      (location.pathname.includes('/super_admin') && !superAdmin) ||
+      (location.pathname.includes('/client_portal') && !client)) &&
+    !location.pathname.includes('/unprotected')
   ) {
+    console.log('logged in');
     return (
       <MantineProvider withGlobalClasses withCssVariables withStaticClasses>
         <ModalsProvider
           modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
         >
-          <ToastContainer /> <Login />
+          <Layout userType="guest">
+            <ToastContainer /> <Login />
+          </Layout>
         </ModalsProvider>
       </MantineProvider>
     );
