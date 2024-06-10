@@ -30,7 +30,9 @@ import {
 import { getRandomNumbers, removeTimeFromDate } from '../../utilities/misc';
 import { AddShiftFormFields } from '../../utilities/zod/schema';
 import { ShiftTask } from '../../component/shifts/ShiftTaskForm';
-import { generateBarcodesAndDownloadPDF } from '../../utilities/pdf/generateBarcodesAndDownloadPdf';
+import { generateQrCodesHtml } from '../../utilities/pdf/generateQrCodesHtml';
+import { htmlToPdf } from '../../API/HtmlToPdf';
+import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
 
 class DbShift {
   static addShift = async ({
@@ -114,12 +116,14 @@ class DbShift {
     );
 
     if (barcodesToBeGenerated.length > 0) {
-      await generateBarcodesAndDownloadPDF(
-        shiftData.ShiftName,
+      const fileName = `${shiftData.ShiftName}_qrcodes.pdf`;
+      const html = await generateQrCodesHtml(
         barcodesToBeGenerated.map((task) => {
           return { code: task.ShiftTaskId, label: task.ShiftTask };
         })
       );
+      const response = await htmlToPdf({ file_name: fileName, html });
+      downloadPdf(response, fileName);
     }
   };
 
@@ -208,12 +212,14 @@ class DbShift {
       );
 
       if (barcodesToBeGenerated.length > 0) {
-        await generateBarcodesAndDownloadPDF(
-          shiftData.ShiftName,
+        const fileName = `${shiftData.ShiftName}_qrcodes.pdf`;
+        const html = await generateQrCodesHtml(
           barcodesToBeGenerated.map((task) => {
             return { code: task.ShiftTaskId, label: task.ShiftTask };
           })
         );
+        const response = await htmlToPdf({ file_name: fileName, html });
+        downloadPdf(response, fileName);
       }
     });
   };

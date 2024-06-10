@@ -26,8 +26,6 @@ import { IoMdDocument } from 'react-icons/io';
 import { GrCertificate, GrResources } from 'react-icons/gr';
 import { FaPeopleGroup } from 'react-icons/fa6';
 import { TbReport } from 'react-icons/tb';
-/* import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
-import { generateBarcodesAndDownloadPDF } from '../../utilities/pdf/generateBarcodesAndDownloadPdf'; */
 
 const HomeItem = ({
   name,
@@ -63,61 +61,6 @@ const Home = () => {
   /*  const test = async () => {
     try {
       showModalLoader({});
-
-      await generateBarcodesAndDownloadPDF('test', [
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-        { code: 'tst1', label: 'tst2' },
-      ]);
 
       closeModalLoader();
     } catch (error) {

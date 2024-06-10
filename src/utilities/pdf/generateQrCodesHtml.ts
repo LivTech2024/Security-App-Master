@@ -1,12 +1,10 @@
 import QRCode from 'qrcode';
-import { htmlToPdf } from '../../API/HtmlToPdf';
-import { downloadPdf } from './common/downloadPdf';
 
 interface QrCodeData {
   code: string;
   label: string;
 }
-const qrCodesHtmlString = async (qrCodesData: QrCodeData[]) => {
+export const generateQrCodesHtml = async (qrCodesData: QrCodeData[]) => {
   let html = '';
   const htmlStart =
     '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>';
@@ -43,13 +41,3 @@ const qrCodesHtmlString = async (qrCodesData: QrCodeData[]) => {
 
   return html;
 };
-
-export async function generateBarcodesAndDownloadPDF(
-  patrolName: string,
-  qrCodeData: QrCodeData[]
-) {
-  const fileName = `${patrolName}_qrcodes.pdf`;
-  const html = await qrCodesHtmlString(qrCodeData);
-  const response = await htmlToPdf({ file_name: fileName, html });
-  downloadPdf(response, fileName);
-}

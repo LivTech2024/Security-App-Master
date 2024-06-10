@@ -25,12 +25,14 @@ import {
   IPatrolsCollection,
 } from '../../@types/database';
 import { PatrollingFormFields } from '../../utilities/zod/schema';
-import { generateBarcodesAndDownloadPDF } from '../../utilities/pdf/generateBarcodesAndDownloadPdf';
+import { generateQrCodesHtml } from '../../utilities/pdf/generateQrCodesHtml';
 import {
   fullTextSearchIndex,
   getRandomNumbers,
   removeTimeFromDate,
 } from '../../utilities/misc';
+import { htmlToPdf } from '../../API/HtmlToPdf';
+import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
 
 class DbPatrol {
   static createPatrol = async ({
@@ -85,12 +87,14 @@ class DbPatrol {
 
     await setDoc(patrolRef, newPatrol);
 
-    await generateBarcodesAndDownloadPDF(
-      data.PatrolLocationName,
+    const fileName = `${data.PatrolName}_qrcodes.pdf`;
+    const html = await generateQrCodesHtml(
       PatrolCheckPoints.map((ch) => {
         return { code: ch.CheckPointId, label: ch.CheckPointName };
       })
     );
+    const response = await htmlToPdf({ file_name: fileName, html });
+    downloadPdf(response, fileName);
   };
 
   static updatePatrol = async ({
@@ -147,12 +151,14 @@ class DbPatrol {
 
       transaction.update(patrolRef, newPatrol);
 
-      await generateBarcodesAndDownloadPDF(
-        data.PatrolLocationName,
+      const fileName = `${data.PatrolName}_qrcodes.pdf`;
+      const html = await generateQrCodesHtml(
         PatrolCheckPoints.map((ch) => {
           return { code: ch.CheckPointId, label: ch.CheckPointName };
         })
       );
+      const response = await htmlToPdf({ file_name: fileName, html });
+      downloadPdf(response, fileName);
     });
   };
 
