@@ -1,5 +1,6 @@
 import QRCode from 'qrcode';
-import { htmlStringToPdf } from '../htmlStringToPdf';
+import { htmlToPdf } from '../../API/HtmlToPdf';
+import { downloadPdf } from './common/downloadPdf';
 
 interface QrCodeData {
   code: string;
@@ -18,19 +19,19 @@ const qrCodesHtmlString = async (qrCodesData: QrCodeData[]) => {
 
   html =
     html +
-    '<body> <div style="display: flex; flex-wrap: wrap; vertical-align: top; width: 100%; height:100%; justify-content:between;  column-gap:6px; row-gap:18px;">';
+    '<body> <div style="display: flex; flex-wrap: wrap; vertical-align: top; justify-content:between;  column-gap:8px; row-gap:8px; padding:10px 0px 0px 10px;">';
 
   let barcodeCounter = 0;
   for (const item of qrCodesData) {
     if (barcodeCounter % 20 === 0 && barcodeCounter !== 0) {
       html =
         html +
-        '</div><div style="page-break-after: always;"></div><div style="display: flex; gap: 0px; flex-wrap: wrap; vertical-align: top; width: 100%; height:100%; justify-content:between;  column-gap:6px; row-gap:18px;">';
+        '</div><div style="page-break-after: always;"></div><div style="display: flex; gap: 0px; flex-wrap: wrap; vertical-align: top; width: 100%; height:100%; justify-content:between;  column-gap:8px; row-gap:8px; padding:10px 0px 0px 10px;">';
     }
     const barcodeBase64 = await QRCode.toDataURL(item.code);
 
-    html += `<div style="display: flex; flex-direction: column; align-items:center; height:210px; width:192px; padding:16px; border:1px solid black; border-radius:8px;">
-       <img src=${barcodeBase64} style="width:150px; object-fit:cover;"/>
+    html += `<div style="display: flex; flex-direction: column; align-items:center; height:auto; width:auto; padding:16px; border:1px solid black; border-radius:8px;">
+       <img src=${barcodeBase64} style="width:156px; object-fit:cover;"/>
        <div style="padding-bottom:12px;">${item.label}</div>
     </div>`;
 
@@ -47,6 +48,8 @@ export async function generateBarcodesAndDownloadPDF(
   patrolName: string,
   qrCodeData: QrCodeData[]
 ) {
+  const fileName = `${patrolName}_qrcodes.pdf`;
   const html = await qrCodesHtmlString(qrCodeData);
-  await htmlStringToPdf(`${patrolName}_qrcodes.pdf`, html);
+  const response = await htmlToPdf({ file_name: fileName, html });
+  downloadPdf(response, fileName);
 }

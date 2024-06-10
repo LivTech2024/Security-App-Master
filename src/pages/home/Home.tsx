@@ -26,6 +26,8 @@ import { IoMdDocument } from 'react-icons/io';
 import { GrCertificate, GrResources } from 'react-icons/gr';
 import { FaPeopleGroup } from 'react-icons/fa6';
 import { TbReport } from 'react-icons/tb';
+/* import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
+import { generateBarcodesAndDownloadPDF } from '../../utilities/pdf/generateBarcodesAndDownloadPdf'; */
 
 const HomeItem = ({
   name,
@@ -58,6 +60,72 @@ const Home = () => {
 
   const [selectedBranch, setSelectedBranch] = useState('');
 
+  /*  const test = async () => {
+    try {
+      showModalLoader({});
+
+      await generateBarcodesAndDownloadPDF('test', [
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+        { code: 'tst1', label: 'tst2' },
+      ]);
+
+      closeModalLoader();
+    } catch (error) {
+      console.log(error);
+      closeModalLoader();
+    }
+  }; */
+
   return (
     <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center bg-primary">
       <div className="flex w-full justify-center items-center">
@@ -77,7 +145,7 @@ const Home = () => {
             setSelectedBranch={setSelectedBranch}
           />
         </div>
-        {/* <button onClick={testEmail} className="text-white">
+        {/* <button onClick={test} className="text-white">
           test email
         </button> */}
       </div>
