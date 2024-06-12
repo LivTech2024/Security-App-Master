@@ -12,6 +12,8 @@ import {
   showSnackbar,
 } from '../../utilities/TsxUtils';
 import DbShift from '../../firebase_configs/DB/DbShift';
+import { RxUpdate } from 'react-icons/rx';
+import UpdateShiftTimeModal from './modal/UpdateShiftTimeModal';
 
 const ShiftViewCard = ({
   data,
@@ -52,6 +54,13 @@ const ShiftViewCard = ({
       closeModalLoader();
     }
   };
+
+  const [updateShiftTimeModal, setUpdateShiftTimeModal] = useState(false);
+
+  const [updateShiftTimeArgs, setUpdateShiftTimeArgs] = useState<{
+    empId: string;
+    field: 'start_time' | 'end_time';
+  }>({ empId: '', field: 'start_time' });
 
   return (
     <div className="bg-surface shadow-md rounded-lg p-4">
@@ -131,6 +140,17 @@ const ShiftViewCard = ({
                       </span>
                       {data.StatusStartedTime &&
                         formatDate(data.StatusStartedTime, 'DD MMM-YY HH:mm')}
+                      <RxUpdate
+                        onClick={() => {
+                          if (!data.StatusReportedById) return;
+                          setUpdateShiftTimeModal(true);
+                          setUpdateShiftTimeArgs({
+                            empId: data.StatusReportedById,
+                            field: 'start_time',
+                          });
+                        }}
+                        className="text-textPrimaryBlue cursor-pointer hover:scale-105"
+                      />
                     </div>
 
                     {data.Status === 'completed' ? (
@@ -142,7 +162,18 @@ const ShiftViewCard = ({
                           formatDate(
                             data.StatusReportedTime,
                             'DD MMM-YY HH:mm'
-                          )}
+                          )}{' '}
+                        <RxUpdate
+                          onClick={() => {
+                            if (!data.StatusReportedById) return;
+                            setUpdateShiftTimeModal(true);
+                            setUpdateShiftTimeArgs({
+                              empId: data.StatusReportedById,
+                              field: 'end_time',
+                            });
+                          }}
+                          className="text-textPrimaryBlue cursor-pointer hover:scale-105"
+                        />
                       </div>
                     ) : (
                       <div
@@ -170,6 +201,15 @@ const ShiftViewCard = ({
           </div>
         </div>
       </div>
+
+      <UpdateShiftTimeModal
+        empId={updateShiftTimeArgs.empId}
+        field={updateShiftTimeArgs.field}
+        opened={updateShiftTimeModal}
+        setOpened={setUpdateShiftTimeModal}
+        setShouldRefetch={setShouldRefetch}
+        shiftId={data.ShiftId}
+      />
 
       {/* Show all the tasks */}
       {data.ShiftTask.length > 0 ? (

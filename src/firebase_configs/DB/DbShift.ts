@@ -503,6 +503,53 @@ class DbShift {
       ShiftCurrentStatus: updatedShiftCurrentStatus,
     });
   };
+
+  static updateShiftTime = async ({
+    empId,
+    field,
+    shiftId,
+    updatedTime,
+  }: {
+    shiftId: string;
+    empId: string;
+    field: 'start_time' | 'end_time';
+    updatedTime: Date;
+  }) => {
+    const shiftRef = doc(db, CollectionName.shifts, shiftId);
+
+    const shiftSnapshot = await getDoc(shiftRef);
+    const shiftData = shiftSnapshot.data() as IShiftsCollection;
+
+    // Find the status object to be updated
+    const statusIndex = shiftData.ShiftCurrentStatus.findIndex(
+      (s) => s.StatusReportedById === empId
+    );
+
+    if (statusIndex === -1) {
+      throw new Error('Status not found for the given employee ID');
+    }
+
+    // Create a copy of the ShiftCurrentStatus array and update the specific status object
+    const updatedShiftCurrentStatus = [...shiftData.ShiftCurrentStatus];
+
+    if (field === 'start_time') {
+      updatedShiftCurrentStatus[statusIndex] = {
+        ...updatedShiftCurrentStatus[statusIndex],
+        StatusStartedTime: updatedTime as unknown as Timestamp,
+      };
+    }
+
+    if (field === 'end_time') {
+      updatedShiftCurrentStatus[statusIndex] = {
+        ...updatedShiftCurrentStatus[statusIndex],
+        StatusReportedTime: updatedTime as unknown as Timestamp,
+      };
+    }
+
+    return updateDoc(shiftRef, {
+      ShiftCurrentStatus: updatedShiftCurrentStatus,
+    });
+  };
 }
 
 export default DbShift;
