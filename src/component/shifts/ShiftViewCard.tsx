@@ -5,23 +5,54 @@ import {
 } from '../../@types/database';
 import { formatDate } from '../../utilities/misc';
 import EmpRouteModal from './modal/EmpRouteModal';
+import { errorHandler } from '../../utilities/CustomError';
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from '../../utilities/TsxUtils';
+import DbShift from '../../firebase_configs/DB/DbShift';
 
 const ShiftViewCard = ({
   data,
   assignedUsers,
   acknowledgedUsers,
   empRoutes,
+  setShouldRefetch,
 }: {
   data: IShiftsCollection;
   assignedUsers: { EmpName: string; EmpId: string }[];
   acknowledgedUsers: string[];
   empRoutes: IEmployeeRouteCollection[];
+  setShouldRefetch: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [empRouteModal, setEmpRouteModal] = useState(false);
 
   const [coordinates, setCoordinates] = useState<
     { lat: number; lng: number }[]
   >([]);
+
+  const markShiftEnded = async (empId: string) => {
+    try {
+      showModalLoader({});
+
+      await DbShift.markShiftEnded(data.ShiftId, empId);
+
+      showSnackbar({
+        message: 'Shift marked completed for selected employee',
+        type: 'success',
+      });
+
+      setShouldRefetch((prev) => !prev);
+
+      closeModalLoader();
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      closeModalLoader();
+    }
+  };
+
   return (
     <div className="bg-surface shadow-md rounded-lg p-4">
       <div className="grid grid-cols-2 gap-4">
@@ -102,7 +133,7 @@ const ShiftViewCard = ({
                         formatDate(data.StatusStartedTime, 'DD MMM-YY HH:mm')}
                     </div>
 
-                    {data.Status === 'completed' && (
+                    {data.Status === 'completed' ? (
                       <div className="flex items-center gap-2">
                         <span className="font-semibold capitalize">
                           Ended At:
@@ -112,6 +143,16 @@ const ShiftViewCard = ({
                             data.StatusReportedTime,
                             'DD MMM-YY HH:mm'
                           )}
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() =>
+                          data.StatusReportedById &&
+                          markShiftEnded(data.StatusReportedById)
+                        }
+                        className="flex items-center gap-2 text-textPrimaryBlue cursor-pointer underline"
+                      >
+                        Mark this shift ended
                       </div>
                     )}
 

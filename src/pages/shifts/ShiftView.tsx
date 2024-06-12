@@ -36,6 +36,8 @@ const ShiftView = () => {
 
   const navigate = useNavigate();
 
+  const [shouldRefetch, setShouldRefetch] = useState(false);
+
   useEffect(() => {
     if (!shiftId) return;
     DbShift?.getShiftById(shiftId).then(async (snapshot) => {
@@ -88,7 +90,7 @@ const ShiftView = () => {
       }
       setLoading(false);
     });
-  }, [shiftId]);
+  }, [shiftId, shouldRefetch]);
 
   if (!data && !loading) {
     return (
@@ -135,6 +137,7 @@ const ShiftView = () => {
           assignedUsers={assignedUsers}
           acknowledgedUsers={acknowledgedUsers}
           empRoutes={empRoutes}
+          setShouldRefetch={setShouldRefetch}
         />
       </div>
     );
