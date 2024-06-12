@@ -217,7 +217,9 @@ class DbEmployee {
         );
 
         if (isEmpExist) {
-          throw new CustomError('Employee with this phone already exist');
+          throw new CustomError(
+            'Employee with this email and role already exist'
+          );
         }
 
         const empId = getNewDocId(CollectionName.employees);
@@ -406,7 +408,9 @@ class DbEmployee {
       );
 
       if (isEmpExist) {
-        throw new CustomError('Employee with this phone already exist');
+        throw new CustomError(
+          'Employee with this email and role already exist'
+        );
       }
 
       await runTransaction(db, async (transaction) => {
