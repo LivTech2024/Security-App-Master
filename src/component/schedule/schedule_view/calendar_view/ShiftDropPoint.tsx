@@ -243,7 +243,19 @@ const ShiftDropPoint = ({
                     {data.shift.ShiftPosition}
                   </div>
                   <div className="font-semibold line-clamp-1">
-                    {data.shift.ShiftStartTime}-{data.shift.ShiftEndTime}
+                    {data.shift.ShiftCurrentStatus[0]?.StatusStartedTime
+                      ? formatDate(
+                          data.shift.ShiftCurrentStatus[0]?.StatusStartedTime,
+                          'HH:mm'
+                        )
+                      : data.shift.ShiftStartTime}
+                    -
+                    {data.shift.ShiftCurrentStatus[0]?.StatusReportedTime
+                      ? formatDate(
+                          data.shift.ShiftCurrentStatus[0]?.StatusReportedTime,
+                          'HH:mm'
+                        )
+                      : data.shift.ShiftEndTime}
                   </div>
                   {/* Employees */}
                   <div className="flex w-full overflow-x-auto remove-horizontal-scrollbar shift-emp-scrollbar gap-2">
