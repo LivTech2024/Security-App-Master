@@ -250,7 +250,8 @@ const ShiftDropPoint = ({
                         )
                       : data.shift.ShiftStartTime}
                     -
-                    {data.shift.ShiftCurrentStatus[0]?.StatusReportedTime
+                    {data.shift.ShiftCurrentStatus[0]?.StatusReportedTime &&
+                    data.shift.ShiftCurrentStatus[0]?.Status === 'completed'
                       ? formatDate(
                           data.shift.ShiftCurrentStatus[0]?.StatusReportedTime,
                           'HH:mm'
