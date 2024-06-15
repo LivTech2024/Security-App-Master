@@ -76,7 +76,9 @@ class DbSchedule {
           const empDocRef = doc(db, CollectionName.employees, id);
           const empSnapshot = await getDoc(empDocRef);
           const empData = empSnapshot.data() as IEmployeesCollection;
-          assignedEmps.push(empData);
+          if (empData) {
+            assignedEmps.push(empData);
+          }
         });
 
         await Promise.all(empPromise);
