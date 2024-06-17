@@ -139,6 +139,8 @@ export const PageRoutes = {
   PAYMENTS_AND_BILLING: '/payments_and_billing',
   INVOICE_LIST: '/invoice_list',
   INVOICE_GENERATE: '/invoice_generate',
+  PAY_STUB_LIST: '/paystub_list',
+  PAY_STUB_GENERATE: '/paystub_generate',
   CLIENTS: '/clients',
   CLIENT_VIEW: '/client_view',
   CLIENT_CREATE_OR_EDIT: '/client_create_or_edit',

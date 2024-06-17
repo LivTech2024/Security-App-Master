@@ -74,6 +74,8 @@ import CalloutList from './pages/callout/CalloutList';
 import CalloutView from './pages/callout/CalloutView';
 import PrivacyPolicy from './pages/uprotected_pages/privacy_policy/PrivacyPolicy';
 import UserDataDeletionRequest from './pages/uprotected_pages/user_data_deletion_request/UserDataDeletionRequest';
+import PayStubGenerate from './pages/payments_and_billing/paystub/PayStubGenerate';
+import PayStubList from './pages/payments_and_billing/paystub/PayStubList';
 
 function App() {
   useOnAuthStateChanged();
@@ -287,6 +289,12 @@ function App() {
             <Route
               path={PageRoutes.INVOICE_GENERATE}
               Component={InvoiceGenerate}
+            />
+
+            <Route path={PageRoutes.PAY_STUB_LIST} Component={PayStubList} />
+            <Route
+              path={PageRoutes.PAY_STUB_GENERATE}
+              Component={PayStubGenerate}
             />
 
             <Route path={PageRoutes.CLIENTS} Component={Clients} />
