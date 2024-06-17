@@ -52,7 +52,7 @@ const PayStubGenerate = () => {
     if (!employee) return;
 
     const html = getPaystubHtml({
-      companyName: company.CompanyName,
+      companyDetails: company,
       empHourlyRate: employee.EmployeePayRate,
       empName: employee.EmployeeName,
       empWorkedHours: 25,
@@ -78,7 +78,7 @@ const PayStubGenerate = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-full p-6 gap-6">
+    <div className="flex flex-col w-full h-full p-6 gap-6 text-center">
       <PageHeader
         title="Create new paystub"
         rightSection={<Button label="Save" onClick={onSubmit} type="black" />}

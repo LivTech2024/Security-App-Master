@@ -1,3 +1,7 @@
+import { Company } from '../../store/slice/auth.slice';
+import { numberFormatter } from '../NumberFormater';
+import { getPdfHeader } from './common/getPdfHeader';
+
 //utils function
 function calculateFederalIncomeTax(grossPay: number): number {
   // Calculate federal income tax based on the gross pay
@@ -29,7 +33,7 @@ interface GetPaystubHtmlArgs {
   empName: string;
   empHourlyRate: number;
   empWorkedHours: number;
-  companyName: string;
+  companyDetails: Company;
 }
 
 export const getPaystubHtml = ({
@@ -38,7 +42,7 @@ export const getPaystubHtml = ({
   empWorkedHours,
   endDate,
   startDate,
-  companyName,
+  companyDetails,
 }: GetPaystubHtmlArgs) => {
   const grossPay = empHourlyRate * empWorkedHours;
 
@@ -52,7 +56,7 @@ export const getPaystubHtml = ({
     `<!DOCTYPE html>` +
     `<html>` +
     `<head>` +
-    `<title>Pay Stub</title>` +
+    `<title>Earning Statement</title>` +
     `<style>` +
     `body {` +
     `font-family: Arial, sans-serif;` +
@@ -66,67 +70,69 @@ export const getPaystubHtml = ({
     `border-bottom: 1px solid #ddd;` +
     ` }` +
     `th {` +
-    `text-align: left;` +
+    `text-align: left;  background-color: #f2f2f2;` +
     `}` +
     `</style>` +
     `</head>` +
     `<body>` +
-    `<h2>Pay Stub</h2>` +
+    getPdfHeader(companyDetails) +
+    `<p style="text-align: center; font-size:24px; font-weight:600;">Earning Statement</p>` +
     `<p><strong>Employee Name:</strong> ${empName}</p>` +
     `<p><strong>Pay Period:</strong> ${startDate}, to ${endDate}</p>` +
+    `<p><strong>Pay Date:</strong> ${endDate}</p>` +
     `<table>` +
     `<tr>` +
-    `<th>Description</th>` +
+    `<th>Income</th>` +
     `<th>Rate</th>` +
     `<th>Hours</th>` +
     `<th>Total</th>` +
     `</tr>` +
-    `  <tr>` +
+    `<tbody><tr>` +
     `<td>Regular Hours</td>` +
     ` <td>$${empHourlyRate}</td>` +
     ` <td>${empWorkedHours}</td>` +
-    `<td>$${(empHourlyRate * empWorkedHours).toFixed(2)}</td>` +
+    `<td>${numberFormatter(empHourlyRate * empWorkedHours, true)}</td>` +
     `</tr>` +
     `<tr>` +
-    '<td colspan=`3`><strong>Total Gross Pay:</strong></td>' +
-    `<td><strong>$${grossPay.toFixed(2)}</strong></td>` +
-    `</tr>` +
+    '<td colspan=3><strong>Total Gross Pay:</strong></td>' +
+    `<td><strong>${numberFormatter(grossPay, true)}</strong></td>` +
+    `</tr> </tbody>` +
+    `</table>` +
+    `<table style="margin-top:20px;">` +
     `<tr>` +
-    '<td colspan=`4`><strong>Deductions:</strong></td>' +
+    `<th colspan=3 ><strong>Deductions</strong></th>` +
+    `<th><strong>Total</strong></th>` +
     `</tr>` +
     `<tr>` +
     `<td>Income Tax (Federal)</td>` +
     `<td></td>` +
     `<td></td>` +
-    `<td>-$${calculateFederalIncomeTax(grossPay)}</td>` +
+    `<td>${numberFormatter(calculateFederalIncomeTax(grossPay), true)}</td>` +
     `</tr>` +
     ` <tr>` +
     `<td>Income Tax (Provincial)</td>` +
     `<td></td>` +
     `<td></td>` +
-    `<td>-$${calculateProvincialIncomeTax(grossPay)}</td>` +
+    `<td>${numberFormatter(calculateProvincialIncomeTax(grossPay), true)}</td>` +
     `</tr>` +
     ` <tr>` +
     `<td>CPP Contributions</td>` +
     `<td></td>` +
     `<td></td>` +
-    `<td>-$${calculateCPPContributions(grossPay)}</td>` +
+    `<td>${numberFormatter(calculateCPPContributions(grossPay), true)}</td>` +
     `</tr>` +
     `<tr>` +
     `<td>Employment Insurance (EI) Premiums</td>` +
     `<td></td>` +
     `<td></td>` +
-    `<td>-$${calculateEIContributions(grossPay)}</td>` +
+    `<td>${numberFormatter(calculateEIContributions(grossPay), true)}</td>` +
     `</tr>` +
     `<tr>` +
-    '<td colspan=`3`><strong>Total Deductions:</strong></td>' +
-    ` <td><strong>-$${totalDeduction.toFixed(2)}</strong></td>` +
+    '<td colspan=3><strong>Total Deductions:</strong></td>' +
+    ` <td><strong>${numberFormatter(totalDeduction, true)}</strong></td>` +
     `</tr>` +
     `</table>` +
-    `<p><strong>Net Pay:</strong> $${(grossPay - totalDeduction).toFixed(
-      2
-    )}</p>` +
-    `<p><strong>Employer:</strong> ${companyName}</p>` +
+    `<p style="margin-top:20px;"><strong>Net Pay:</strong> ${numberFormatter(grossPay - totalDeduction, true)}</p>` +
     `</body>` +
     `</html>`;
 
