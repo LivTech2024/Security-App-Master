@@ -602,3 +602,14 @@ export interface IUserDataDeletionRequestsCollection {
   RequestStatus: 'pending' | 'accepted' | 'rejected';
   RequestCreatedAt: Timestamp | FieldValue;
 }
+
+export interface IPayStubsCollection {
+  PayStubId: string;
+  PayStubCompanyId: string;
+  PayStubEmpId: string;
+  PayStubEarnings: { Name: string; Amount: number; Quantity: number }[];
+  PayStubDeductions: { Name: string; Amount: number }[];
+
+  PayStubCreatedAt: Timestamp | FieldValue;
+  PayStubModifiedAt: Timestamp | FieldValue;
+}
