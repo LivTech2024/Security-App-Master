@@ -56,7 +56,7 @@ const GeneratePaystubModal = ({
     if (!employee) return;
 
     const html = getPaystubHtml({
-      companyName: company.CompanyName,
+      companyDetails: company,
       empHourlyRate: employee.EmployeePayRate,
       empName: employee.EmployeeName,
       empWorkedHours: 25,
