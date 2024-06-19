@@ -285,24 +285,28 @@ const InvoiceList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[20%] text-start">
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
               Customer Name
+            </th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
+              Location Name
             </th>
             <th className="uppercase px-4 py-2 w-[10%] text-start">
               Invoice No.
             </th>
-            <th className="uppercase px-4 py-2 w-[25%] text-start">Items</th>
+            <th className="uppercase px-4 py-2 w-[10%] text-start">Items</th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">Date</th>
 
             <th className="uppercase px-4 py-2 w-[10%] text-start">Total</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">Received</th>
+            <th className="uppercase px-4 py-2 w-[10%] text-start">Received</th>
+            <th className="uppercase px-4 py-2 w-[10%] text-start">Pending</th>
             <th className="uppercase px-4 py-2 w-[5%] text-end"></th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={7}>
+              <td colSpan={8}>
                 <NoSearchResult />
               </td>
             </tr>
@@ -326,6 +330,17 @@ const InvoiceList = () => {
                       setInvoiceEditData(invoice);
                       navigate(PageRoutes.INVOICE_GENERATE);
                     }}
+                    className="align-top cursor-pointer px-4 py-2 text-start "
+                  >
+                    <span className="line-clamp-3">
+                      {invoice.InvoiceLocationName ?? 'N/A'}
+                    </span>
+                  </td>
+                  <td
+                    onClick={() => {
+                      setInvoiceEditData(invoice);
+                      navigate(PageRoutes.INVOICE_GENERATE);
+                    }}
                     className="align-top cursor-pointer px-4 py-2 text-start"
                   >
                     {invoice.InvoiceNumber}
@@ -338,7 +353,7 @@ const InvoiceList = () => {
                     }}
                     className="align-top cursor-pointer px-4 py-2 text-start"
                   >
-                    <span className="line-clamp-2">
+                    <span className="line-clamp-4">
                       {invoice.InvoiceItems.map(
                         (item) => item.ItemDescription
                       ).join(',')}
@@ -395,6 +410,19 @@ const InvoiceList = () => {
                     </div>
                   </td>
                   <td
+                    onClick={() => {
+                      setInvoiceEditData(invoice);
+                      navigate(PageRoutes.INVOICE_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start "
+                  >
+                    {numberFormatter(
+                      invoice.InvoiceTotalAmount -
+                        invoice.InvoiceReceivedAmount,
+                      true
+                    )}
+                  </td>
+                  <td
                     onClick={() => downloadInvoice(invoice)}
                     className="align-top px-4 py-2 text-end cursor-pointer text-xl text-textPrimaryBlue "
                   >
@@ -405,7 +433,7 @@ const InvoiceList = () => {
             })
           )}
           <tr ref={ref}>
-            <td colSpan={7}>
+            <td colSpan={8}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />

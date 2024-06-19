@@ -307,6 +307,8 @@ const InvoiceGenerate = () => {
 
   const clientId = methods.watch('InvoiceClientId');
 
+  const locationName = methods.watch('InvoiceLocationName');
+
   const [clientCostCalculationModal, setClientCostCalculationModal] =
     useState(false);
 
@@ -378,6 +380,8 @@ const InvoiceGenerate = () => {
                   onClick={() => setClientCostCalculationModal(true)}
                 />
               )}
+
+              {locationName && <div>Location: {locationName}</div>}
 
               <ClientCostCalculationModal
                 opened={clientCostCalculationModal}

@@ -256,6 +256,8 @@ export const invoiceSchema = z
         message: 'Client phone number should be at most 16 characters',
       }),
     InvoiceClientAddress: z.string().optional().nullable(),
+    InvoiceLocationId: z.string().nullable().optional(),
+    InvoiceLocationName: z.string().nullable().optional(),
     InvoiceNumber: z
       .string()
       .min(1, { message: 'Invoice number should be at least 1 character' })

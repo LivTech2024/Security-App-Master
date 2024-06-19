@@ -100,6 +100,8 @@ class DbPayment {
         InvoiceClientName: data.InvoiceClientName,
         InvoiceClientPhone: data.InvoiceClientPhone,
         InvoiceClientAddress: data.InvoiceClientAddress || null,
+        InvoiceLocationId: data.InvoiceLocationId || null,
+        InvoiceLocationName: data.InvoiceLocationName || null,
         InvoiceNumber: data.InvoiceNumber,
         InvoiceDate: removeTimeFromDate(
           data.InvoiceDate
@@ -183,6 +185,8 @@ class DbPayment {
         InvoiceClientName: data.InvoiceClientName,
         InvoiceClientPhone: data.InvoiceClientPhone,
         InvoiceClientAddress: data.InvoiceClientAddress || null,
+        InvoiceLocationId: data.InvoiceLocationId || null,
+        InvoiceLocationName: data.InvoiceLocationName || null,
         InvoiceNumber: data.InvoiceNumber,
         InvoiceDate: removeTimeFromDate(
           data.InvoiceDate

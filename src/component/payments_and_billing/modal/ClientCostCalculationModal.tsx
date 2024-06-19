@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Dialog from '../../../common/Dialog';
 import useFetchLocations from '../../../hooks/fetch/useFetchLocations';
 import InputSelect from '../../../common/inputs/InputSelect';
@@ -20,6 +20,8 @@ import {
 } from '../../../utilities/misc';
 import DbPatrol from '../../../firebase_configs/DB/DbPatrol';
 import dayjs from 'dayjs';
+import { useFormContext } from 'react-hook-form';
+import { InvoiceFormFields } from '../../../utilities/zod/schema';
 
 const ClientCostCalculationModal = ({
   opened,
@@ -32,6 +34,8 @@ const ClientCostCalculationModal = ({
   clientId: string;
   setInvoiceItems: React.Dispatch<React.SetStateAction<IInvoiceItems[]>>;
 }) => {
+  const { setValue } = useFormContext<InvoiceFormFields>();
+
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
 
   const [locationId, setLocationId] = useState('');
@@ -247,6 +251,19 @@ const ClientCostCalculationModal = ({
       errorHandler(error);
     }
   };
+
+  useEffect(() => {
+    const selectedLocation = locations.find(
+      (loc) => loc.LocationId === locationId
+    );
+    if (selectedLocation) {
+      setValue('InvoiceLocationId', locationId);
+      setValue('InvoiceLocationName', selectedLocation.LocationName);
+    } else {
+      setValue('InvoiceLocationId', null);
+      setValue('InvoiceLocationName', null);
+    }
+  }, [locationId]);
 
   return (
     <Dialog
