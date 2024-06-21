@@ -245,40 +245,53 @@ const InvoiceList = () => {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-4 w-full justify-end">
-          <InputSelect
-            placeholder="Select Client"
-            searchable
-            searchValue={clientSearchQuery}
-            onSearchChange={(e) => {
-              setClientSearchQuery(e);
-              const selectedClient = clients.find((c) => c.ClientName === e);
-              if (selectedClient) {
-                setClientId(selectedClient.ClientId);
-              } else {
-                setClientId('');
-              }
-            }}
-            clearable
-            data={clients.map((res) => {
-              return { label: res.ClientName, value: res.ClientId };
-            })}
-          />
-          <InputSelect
-            placeholder="Status"
-            searchable
-            clearable
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e as InvoiceStatus)}
-            data={[
-              { label: 'Settled', value: InvoiceStatus.settled },
-              { label: 'Outstanding', value: InvoiceStatus.outstanding },
-              {
-                label: 'Partially Settled',
-                value: InvoiceStatus.partially_settled,
-              },
-            ]}
-          />
+        <div className="flex flex-col items-end gap-4">
+          <div className="flex items-center gap-4 w-full justify-end">
+            <InputSelect
+              placeholder="Select Client"
+              searchable
+              searchValue={clientSearchQuery}
+              onSearchChange={(e) => {
+                setClientSearchQuery(e);
+                const selectedClient = clients.find((c) => c.ClientName === e);
+                if (selectedClient) {
+                  setClientId(selectedClient.ClientId);
+                } else {
+                  setClientId('');
+                }
+              }}
+              clearable
+              data={clients.map((res) => {
+                return { label: res.ClientName, value: res.ClientId };
+              })}
+            />
+            <InputSelect
+              placeholder="Status"
+              searchable
+              clearable
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e as InvoiceStatus)}
+              data={[
+                { label: 'Settled', value: InvoiceStatus.settled },
+                { label: 'Outstanding', value: InvoiceStatus.outstanding },
+                {
+                  label: 'Partially Settled',
+                  value: InvoiceStatus.partially_settled,
+                },
+              ]}
+            />
+          </div>
+          <div className="flex font-semibold gap-2 items-center">
+            <span className="text-textSecondary"> Total Pending Amount: </span>
+            {numberFormatter(
+              data.reduce(
+                (acc, obj) =>
+                  acc + (obj.InvoiceTotalAmount - obj.InvoiceReceivedAmount),
+                0
+              ),
+              true
+            )}
+          </div>
         </div>
       </div>
 
