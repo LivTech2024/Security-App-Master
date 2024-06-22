@@ -609,9 +609,20 @@ export interface IPayStubsCollection {
   PayStubId: string;
   PayStubCompanyId: string;
   PayStubEmpId: string;
-  PayStubEarnings: { Name: string; Amount: number; Quantity: number }[];
-  PayStubDeductions: { Name: string; Amount: number }[];
-
+  PayStubEmpName: string;
+  PayStubEmpRole: string;
+  PayStubEarnings: {
+    Name: string;
+    Amount: number;
+    Quantity: number;
+    YearToDateAmt: number;
+  }[];
+  PayStubDeductions: { Name: string; Amount: number; YearToDateAmt: number }[];
+  PayStubRefNumber?: string | null;
+  PayStubPayPeriodStartDate: Timestamp | FieldValue;
+  PayStubPayPeriodEndDate: Timestamp | FieldValue;
+  PayStubPayDate: Timestamp | FieldValue;
+  PayStubNetPay: { Amount: number; YearToDateAmt: number };
   PayStubCreatedAt: Timestamp | FieldValue;
   PayStubModifiedAt: Timestamp | FieldValue;
 }
