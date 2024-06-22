@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react';
 import InputSelect from '../../../common/inputs/InputSelect';
 import useFetchEmployees from '../../../hooks/fetch/useFetchEmployees';
+import { useFormContext } from 'react-hook-form';
+import { PayStubCreateFormFields } from '../../../utilities/zod/schema';
 
 const EmpDetails = () => {
+  const {
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext<PayStubCreateFormFields>();
+
   const [empSearchQuery, setEmpSearchQuery] = useState('');
 
   const { data: employees } = useFetchEmployees({
@@ -10,7 +18,7 @@ const EmpDetails = () => {
     searchQuery: empSearchQuery,
   });
 
-  const [selectedEmpId, setSelectedEmpId] = useState('');
+  const selectedEmpRole = watch('PayStubEmpRole');
 
   useEffect(() => {
     const selectedEmp = employees.find(
@@ -18,9 +26,13 @@ const EmpDetails = () => {
     );
 
     if (selectedEmp) {
-      setSelectedEmpId(selectedEmp.EmployeeId);
+      setValue('PayStubEmpId', selectedEmp.EmployeeId);
+      setValue('PayStubEmpName', selectedEmp.EmployeeName);
+      setValue('PayStubEmpRole', selectedEmp.EmployeeRole);
     } else {
-      setSelectedEmpId('');
+      setValue('PayStubEmpId', '');
+      setValue('PayStubEmpName', '');
+      setValue('PayStubEmpRole', '');
     }
   }, [empSearchQuery]);
 
@@ -37,17 +49,13 @@ const EmpDetails = () => {
         onSearchChange={setEmpSearchQuery}
         searchable
         className="w-full"
+        error={errors.PayStubEmpId?.message}
       />
 
-      {selectedEmpId && (
+      {selectedEmpRole && (
         <div className="flex items-center gap-2">
           <span>Role:</span>
-          <span className="font-medium">
-            {
-              employees.find((emp) => emp.EmployeeId === selectedEmpId)
-                ?.EmployeeRole
-            }
-          </span>
+          <span className="font-medium">{selectedEmpRole}</span>
         </div>
       )}
     </div>

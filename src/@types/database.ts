@@ -605,19 +605,27 @@ export interface IUserDataDeletionRequestsCollection {
   RequestCreatedAt: Timestamp | FieldValue;
 }
 
+export interface IPayStubEarningsChildCollection {
+  Name: string;
+  Amount: number;
+  Quantity: number;
+  YearToDateAmt: number;
+}
+
+export interface IPayStubDeductionsChildCollection {
+  Name: string;
+  Amount: number;
+  YearToDateAmt: number;
+}
+
 export interface IPayStubsCollection {
   PayStubId: string;
   PayStubCompanyId: string;
   PayStubEmpId: string;
   PayStubEmpName: string;
   PayStubEmpRole: string;
-  PayStubEarnings: {
-    Name: string;
-    Amount: number;
-    Quantity: number;
-    YearToDateAmt: number;
-  }[];
-  PayStubDeductions: { Name: string; Amount: number; YearToDateAmt: number }[];
+  PayStubEarnings: IPayStubEarningsChildCollection[];
+  PayStubDeductions: IPayStubDeductionsChildCollection[];
   PayStubRefNumber?: string | null;
   PayStubPayPeriodStartDate: Timestamp | FieldValue;
   PayStubPayPeriodEndDate: Timestamp | FieldValue;

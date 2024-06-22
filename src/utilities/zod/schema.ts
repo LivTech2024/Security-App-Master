@@ -426,9 +426,9 @@ export type TaskFormFields = z.infer<typeof taskSchema>;
 
 //*PayStub Schema
 export const payStubCreateSchema = z.object({
-  PayStubEmpId: z.string(),
-  PayStubEmpName: z.string(),
-  PayStubEmpRole: z.string(),
+  PayStubEmpId: z.string().min(3, { message: 'Please select employee' }),
+  PayStubEmpName: z.string().min(3, { message: 'Please select employee' }),
+  PayStubEmpRole: z.string().min(3, { message: 'Please select employee' }),
   PayStubEarnings: z.array(
     z.object({
       Name: z.string(),
