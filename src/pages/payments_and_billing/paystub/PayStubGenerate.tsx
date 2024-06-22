@@ -13,20 +13,21 @@ import dayjs from 'dayjs';
 import { htmlToPdf } from '../../../API/HtmlToPdf';
 import { downloadPdf } from '../../../utilities/pdf/common/downloadPdf';
 import { errorHandler } from '../../../utilities/CustomError';
-import InputAutoComplete from '../../../common/inputs/InputAutocomplete';
 import InputDate from '../../../common/inputs/InputDate';
+import InputSelect from '../../../common/inputs/InputSelect';
+import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
+import PayStubDetails from '../../../component/payments_and_billing/paystub/PayStubDetails';
+import EmpDetails from '../../../component/payments_and_billing/paystub/EmpDetails';
 
 const PayStubGenerate = () => {
-  const [selectedEmp, setSelectedEmp] = useState<string | null | undefined>(
-    null
-  );
-
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
+  const [empSearchQuery, setEmpSearchQuery] = useState('');
+
   const { data: employees } = useFetchEmployees({
     limit: 5,
-    searchQuery: selectedEmp,
+    searchQuery: empSearchQuery,
   });
 
   const { company } = useAuthState();
@@ -47,7 +48,7 @@ const PayStubGenerate = () => {
       });
       return;
     }
-    const employee = employees.find((e) => e.EmployeeName === selectedEmp);
+    const employee = employees.find((e) => e.EmployeeName === empSearchQuery);
 
     if (!employee) return;
 
@@ -83,27 +84,21 @@ const PayStubGenerate = () => {
         title="Create new paystub"
         rightSection={<Button label="Save" onClick={onSubmit} type="black" />}
       />
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4">
-          <InputDate
-            label="Pay period start date"
-            value={startDate}
-            setValue={setStartDate}
-          />
-          <InputDate
-            label="Pay period start date"
-            value={endDate}
-            setValue={setEndDate}
-          />
+      <div className="flex flex-col gap-4 w-full h-full">
+        <div className="flex  gap-4 w-full h-full">
+          <PayStubDetails />
+          <EmpDetails />
         </div>
-        <InputAutoComplete
-          onChange={setSelectedEmp}
-          value={selectedEmp}
-          label="Select employee"
-          data={employees.map((res) => {
-            return { label: res.EmployeeName, value: res.EmployeeName };
-          })}
-        />
+
+        {/* Earnings and deduction details */}
+        <div className="flex  gap-4 w-full h-full">
+          <div className="flex flex-col gap-4 bg-surface shadow rounded p-4 items-start  h-full w-full">
+            <div className="font-semibold">Earnings Details</div>
+          </div>
+          <div className="flex flex-col gap-4 bg-surface shadow rounded p-4 items-start  h-full w-full">
+            <div className="font-semibold">Deduction Details</div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { DateInput, DatePickerInput, DateTimePicker } from '@mantine/dates';
 import React from 'react';
 import { MdCalendarToday } from 'react-icons/md';
+import InputHeader from './InputHeader';
 
 interface InputDateProps {
   value?: Date | null;
@@ -27,11 +28,7 @@ const InputDate = ({
 }: InputDateProps) => {
   return (
     <div className={`gap-1 flex flex-col w-full h-full`}>
-      {label ? (
-        <div className={`flex`}>
-          <span className={`text-sm line-clamp-1`}>{label}</span>
-        </div>
-      ) : null}
+      {label ? <InputHeader title={label} /> : null}
 
       {type === 'default' ? (
         <DateInput

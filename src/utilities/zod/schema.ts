@@ -423,3 +423,35 @@ export const taskSchema = z
   );
 
 export type TaskFormFields = z.infer<typeof taskSchema>;
+
+//*PayStub Schema
+export const payStubCreateSchema = z.object({
+  PayStubEmpId: z.string(),
+  PayStubEmpName: z.string(),
+  PayStubEmpRole: z.string(),
+  PayStubEarnings: z.array(
+    z.object({
+      Name: z.string(),
+      Amount: z.coerce.number(),
+      Quantity: z.coerce.number(),
+      YearToDateAmt: z.coerce.number(),
+    })
+  ),
+  PayStubDeductions: z.array(
+    z.object({
+      Name: z.string(),
+      Amount: z.coerce.number(),
+      YearToDateAmt: z.coerce.number(),
+    })
+  ),
+  PayStubRefNumber: z.string().nullable().optional(),
+  PayStubPayPeriodStartDate: z.date(),
+  PayStubPayPeriodEndDate: z.date(),
+  PayStubPayDate: z.date(),
+  PayStubNetPay: z.object({
+    Amount: z.coerce.number(),
+    YearToDateAmt: z.coerce.number(),
+  }),
+});
+
+export type PayStubCreateFormFields = z.infer<typeof payStubCreateSchema>;
