@@ -6,8 +6,14 @@ import { PayStubCreateFormFields } from '../../../utilities/zod/schema';
 import Button from '../../../common/button/Button';
 import CustomError, { errorHandler } from '../../../utilities/CustomError';
 import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils';
+import DbPayment from '../../../firebase_configs/DB/DbPayment';
+import { IEarningList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
 
-const EmpDetails = () => {
+const EmpDetails = ({
+  setEarningsList,
+}: {
+  setEarningsList: React.Dispatch<React.SetStateAction<IEarningList[]>>;
+}) => {
   const {
     watch,
     setValue,
@@ -39,18 +45,41 @@ const EmpDetails = () => {
     }
   }, [empSearchQuery]);
 
-  const generateEarningAndDeductionDetails = () => {
+  const [payStartDate, payEndDate, empId] = watch([
+    'PayStubPayPeriodStartDate',
+    'PayStubPayPeriodEndDate',
+    'PayStubEmpId',
+  ]);
+
+  const generateEarningAndDeductionDetails = async () => {
     try {
-      if (!watch('PayStubPayPeriodStartDate')) {
+      if (!payStartDate) {
         throw new CustomError('Please enter pay period start date');
       }
-      if (!watch('PayStubPayPeriodEndDate')) {
+      if (!payEndDate) {
         throw new CustomError('Please enter pay period end date');
       }
-      if (!watch('PayStubEmpId')) {
+      if (!empId) {
         throw new CustomError('Please select employee');
       }
       showModalLoader({});
+
+      const empEarningDetails = await DbPayment.getEmpEarning({
+        empId,
+        startDate: payStartDate,
+        endDate: payEndDate,
+      });
+
+      setEarningsList([
+        {
+          Name: empEarningDetails.Name,
+          Amount: String(empEarningDetails.Rate),
+          Quantity: String(empEarningDetails.Quantity),
+          YearToDateAmt: String(
+            empEarningDetails.Rate * empEarningDetails.Quantity
+          ),
+        },
+      ]);
 
       closeModalLoader();
     } catch (error) {

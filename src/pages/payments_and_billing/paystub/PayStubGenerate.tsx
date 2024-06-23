@@ -104,7 +104,7 @@ const PayStubGenerate = () => {
         <div className="flex flex-col gap-4 w-full h-full">
           <div className="flex  gap-4 w-full h-full">
             <PayStubDetails />
-            <EmpDetails />
+            <EmpDetails setEarningsList={setEarningsList} />
           </div>
 
           {/* Earnings and deduction details */}

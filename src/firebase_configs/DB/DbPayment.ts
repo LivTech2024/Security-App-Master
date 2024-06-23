@@ -21,10 +21,16 @@ import {
   IInvoiceItems,
   IInvoiceTaxList,
   IInvoicesCollection,
+  IShiftsCollection,
 } from '../../@types/database';
 import CustomError from '../../utilities/CustomError';
 import { getNewDocId } from './utils';
-import { removeTimeFromDate } from '../../utilities/misc';
+import {
+  formatDate,
+  getHoursDiffInTwoTimeString,
+  removeTimeFromDate,
+} from '../../utilities/misc';
+import DbEmployee from './DbEmployee';
 
 class DbPayment {
   static isInvoiceNumberExist = async (
@@ -340,6 +346,70 @@ class DbPayment {
     const invoiceData = invoiceSnapshot.docs[0]?.data() as IInvoicesCollection;
 
     return invoiceData;
+  };
+
+  //*For PayStub
+  static getEmpEarning = async ({
+    empId,
+    endDate,
+    startDate,
+  }: {
+    empId: string;
+    startDate: Date;
+    endDate: Date;
+  }) => {
+    let empEarningDetails = {
+      Name: 'Regular Hours',
+      Rate: 0,
+      Quantity: 0,
+    };
+
+    try {
+      const empDetails = await DbEmployee.getEmpById(empId);
+
+      const shiftRef = collection(db, CollectionName.shifts);
+      const shiftQuery = query(
+        shiftRef,
+        where('ShiftAssignedUserId', 'array-contains', empId),
+        where('ShiftDate', '>=', startDate),
+        where('ShiftDate', '<=', endDate)
+      );
+
+      const shiftSnapshot = await getDocs(shiftQuery);
+      const shiftData = shiftSnapshot.docs.map(
+        (doc) => doc.data() as IShiftsCollection
+      );
+
+      const { EmployeePayRate } = empDetails;
+
+      let empTotalHrs = 0;
+
+      shiftData.forEach((data) => {
+        const shiftStatusForEmp = data.ShiftCurrentStatus.find(
+          (status) => status.StatusReportedById === empId
+        );
+        if (shiftStatusForEmp && shiftStatusForEmp.Status === 'completed') {
+          const hrs = getHoursDiffInTwoTimeString(
+            formatDate(shiftStatusForEmp.StatusStartedTime, 'HH:mm'),
+            formatDate(shiftStatusForEmp.StatusReportedTime, 'HH:mm')
+          );
+
+          empTotalHrs += hrs;
+        }
+      });
+
+      empEarningDetails = {
+        ...empEarningDetails,
+        Rate: EmployeePayRate,
+        Quantity: empTotalHrs,
+      };
+
+      return empEarningDetails;
+    } catch (error) {
+      console.log(error);
+      throw error;
+      return empEarningDetails;
+    }
   };
 }
 
