@@ -15,6 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import EarningDetails from '../../../component/payments_and_billing/paystub/EarningDetails';
 import DeductionDetails from '../../../component/payments_and_billing/paystub/DeductionDetails';
 import { useState } from 'react';
+import TotalAmtDetails from '../../../component/payments_and_billing/paystub/TotalAmtDetails';
 
 export interface IEarningList {
   Name: string;
@@ -38,18 +39,18 @@ const PayStubGenerate = () => {
 
   const [earningsList, setEarningsList] = useState<IEarningList[]>([
     {
-      Name: 'Regular Hours',
-      Amount: '10',
-      Quantity: '3',
-      YearToDateAmt: '500',
+      Name: '',
+      Amount: '',
+      Quantity: '',
+      YearToDateAmt: '',
     },
   ]);
 
   const [deductionsList, setDeductionsList] = useState<IDeductionList[]>([
     {
-      Name: 'Regular Hours',
-      Amount: '10',
-      YearToDateAmt: '500',
+      Name: '',
+      Amount: '',
+      YearToDateAmt: '',
     },
   ]);
 
@@ -117,6 +118,8 @@ const PayStubGenerate = () => {
               setDeductionsList={setDeductionsList}
             />
           </div>
+
+          <TotalAmtDetails />
         </div>
       </form>
     </FormProvider>
