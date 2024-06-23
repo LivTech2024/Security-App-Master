@@ -14,6 +14,20 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import EarningDetails from '../../../component/payments_and_billing/paystub/EarningDetails';
 import DeductionDetails from '../../../component/payments_and_billing/paystub/DeductionDetails';
+import { useState } from 'react';
+
+export interface IEarningList {
+  Name: string;
+  Amount: string;
+  Quantity: string;
+  YearToDateAmt: string;
+}
+
+export interface IDeductionList {
+  Name: string;
+  Amount: string;
+  YearToDateAmt: string;
+}
 
 const PayStubGenerate = () => {
   const methods = useForm<PayStubCreateFormFields>({
@@ -21,6 +35,23 @@ const PayStubGenerate = () => {
   });
 
   const { company } = useAuthState();
+
+  const [earningsList, setEarningsList] = useState<IEarningList[]>([
+    {
+      Name: 'Regular Hours',
+      Amount: '10',
+      Quantity: '3',
+      YearToDateAmt: '500',
+    },
+  ]);
+
+  const [deductionsList, setDeductionsList] = useState<IDeductionList[]>([
+    {
+      Name: 'Regular Hours',
+      Amount: '10',
+      YearToDateAmt: '500',
+    },
+  ]);
 
   const onSubmit = async (data: PayStubCreateFormFields) => {
     if (!company) return;
@@ -77,8 +108,14 @@ const PayStubGenerate = () => {
 
           {/* Earnings and deduction details */}
           <div className="flex flex-col gap-4 w-full h-full">
-            <EarningDetails />
-            <DeductionDetails />
+            <EarningDetails
+              earningsList={earningsList}
+              setEarningsList={setEarningsList}
+            />
+            <DeductionDetails
+              deductionsList={deductionsList}
+              setDeductionsList={setDeductionsList}
+            />
           </div>
         </div>
       </form>

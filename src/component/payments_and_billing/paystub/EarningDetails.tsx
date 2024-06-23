@@ -1,23 +1,18 @@
-import { useState } from 'react';
 import { IPayStubEarningsChildCollection } from '../../../@types/database';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import Button from '../../../common/button/Button';
+import { IEarningList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
 
-const EarningDetails = () => {
-  const [earningsList, setEarningsList] = useState<
-    { Name: string; Amount: string; Quantity: string; YearToDateAmt: string }[]
-  >([
-    {
-      Name: 'Regular Hours',
-      Amount: '10',
-      Quantity: '3',
-      YearToDateAmt: '500',
-    },
-  ]);
+interface EarningDetailsProps {
+  earningsList: IEarningList[];
+  setEarningsList: React.Dispatch<React.SetStateAction<IEarningList[]>>;
+}
 
-  console.log(earningsList, 'here');
-
+const EarningDetails = ({
+  earningsList,
+  setEarningsList,
+}: EarningDetailsProps) => {
   const handleAddEarningDetail = () => {
     setEarningsList([
       ...earningsList,
@@ -30,7 +25,7 @@ const EarningDetails = () => {
     ]);
   };
 
-  const handleRemoveCheckpoint = (idx: number) => {
+  const handleRemoveEarning = (idx: number) => {
     if (earningsList.length <= 1) return;
     setEarningsList((prev) => prev.filter((_, index) => index !== idx));
   };
@@ -76,6 +71,17 @@ const EarningDetails = () => {
             />
             <InputWithTopHeader
               className="mx-0 w-full"
+              label="Current Total"
+              value={Number(data.Quantity ?? 0) * Number(data.Amount ?? 0)}
+              onChange={(e) =>
+                onFieldChange(idx, 'YearToDateAmt', e.target.value)
+              }
+              decimalCount={2}
+              disabled
+              leadingIcon={<span>$</span>}
+            />
+            <InputWithTopHeader
+              className="mx-0 w-full"
               label="YTD"
               value={data.YearToDateAmt}
               onChange={(e) =>
@@ -86,14 +92,14 @@ const EarningDetails = () => {
               leadingIcon={<span>$</span>}
             />
             <span className="pb-[12px] cursor-pointer text-xl hover:scale-105 duration-200">
-              <FaRegTrashAlt onClick={() => handleRemoveCheckpoint(idx)} />
+              <FaRegTrashAlt onClick={() => handleRemoveEarning(idx)} />
             </span>
           </div>
         );
       })}
 
       <Button
-        label="Add New Earning Detail"
+        label="Add New Earning"
         type="blue"
         onClick={handleAddEarningDetail}
       />
