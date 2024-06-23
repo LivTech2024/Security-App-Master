@@ -2,11 +2,13 @@ import { useFormContext } from 'react-hook-form';
 import InputDate from '../../../common/inputs/InputDate';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import { PayStubCreateFormFields } from '../../../utilities/zod/schema';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { removeTimeFromDate } from '../../../utilities/misc';
 
 const PayStubDetails = () => {
   const {
     register,
+    setValue,
     formState: { errors },
   } = useFormContext<PayStubCreateFormFields>();
 
@@ -15,6 +17,24 @@ const PayStubDetails = () => {
   const [endDate, setEndDate] = useState<Date | null>(null);
 
   const [payDate, setPayDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (startDate) {
+      setValue('PayStubPayPeriodStartDate', removeTimeFromDate(startDate));
+    }
+  }, [startDate]);
+
+  useEffect(() => {
+    if (endDate) {
+      setValue('PayStubPayPeriodEndDate', removeTimeFromDate(endDate));
+    }
+  }, [endDate]);
+
+  useEffect(() => {
+    if (payDate) {
+      setValue('PayStubPayDate', removeTimeFromDate(payDate));
+    }
+  }, [payDate]);
 
   return (
     <div className="flex flex-col gap-4 bg-surface shadow rounded p-4 items-start  h-full w-2/3">
