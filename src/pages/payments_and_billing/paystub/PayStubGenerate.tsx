@@ -60,16 +60,6 @@ const PayStubGenerate = () => {
       Amount: '',
       YearToDateAmt: '',
     },
-    {
-      Deduction: 'EI',
-      Amount: '',
-      YearToDateAmt: '',
-    },
-    {
-      Deduction: 'Income Tax',
-      Amount: '',
-      YearToDateAmt: '',
-    },
   ]);
 
   const onSubmit = async (data: PayStubCreateFormFields) => {

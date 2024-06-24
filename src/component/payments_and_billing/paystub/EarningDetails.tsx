@@ -1,9 +1,10 @@
 import { IPayStubEarningsChildCollection } from '../../../@types/database';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import Button from '../../../common/button/Button';
 import { IEarningList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
 import InputSelect from '../../../common/inputs/InputSelect';
+import { numberFormatter } from '../../../utilities/NumberFormater';
+import { AiOutlinePlus } from 'react-icons/ai';
 
 interface EarningDetailsProps {
   earningsList: IEarningList[];
@@ -121,7 +122,9 @@ const EarningDetails = ({
                         value={
                           Number(data.Rate ?? 0) * Number(data.Quantity ?? 0)
                         }
-                        disabled
+                        onChange={(e) =>
+                          onFieldChange(idx, 'CurrentAmount', e.target.value)
+                        }
                       />
                     </div>
                   )}
@@ -146,13 +149,46 @@ const EarningDetails = ({
             );
           })}
         </tbody>
+        <tfoot>
+          <tr className="bg-onHoverBg font-semibold">
+            <td className="text-start pl-2 pr-4 py-2 ">Total</td>
+            <td className="text-start px-4 py-2"></td>
+            <td className="text-start px-4 py-2">
+              {numberFormatter(
+                earningsList.reduce(
+                  (acc, obj) =>
+                    acc +
+                    Number(
+                      obj.CurrentAmount ||
+                        Number(obj.Rate ?? 0) * Number(obj.Quantity ?? 0)
+                    ),
+                  0
+                ),
+                true
+              )}
+            </td>
+            <td className="text-start pl-4 py-2">
+              {numberFormatter(
+                earningsList.reduce(
+                  (acc, obj) => acc + Number(obj.YTDAmount),
+                  0
+                ),
+                true
+              )}
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
       </table>
 
-      <Button
-        label="Add New Earning"
-        type="blue"
-        onClick={handleAddEarningDetail}
-      />
+      <div className="flex items-center justify-between w-full">
+        <button
+          onClick={handleAddEarningDetail}
+          className="w-full border-2 border-dashed border-secondary rounded-full py-[10px] text-textPrimaryBlue font-semibold flex items-center justify-center gap-2"
+        >
+          <AiOutlinePlus /> Add New Earning
+        </button>
+      </div>
     </div>
   );
 };

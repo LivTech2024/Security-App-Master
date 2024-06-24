@@ -1,8 +1,9 @@
 import { FaRegTrashAlt } from 'react-icons/fa';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import { IDeductionList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
-import Button from '../../../common/button/Button';
 import InputSelect from '../../../common/inputs/InputSelect';
+import { AiOutlinePlus } from 'react-icons/ai';
+import { numberFormatter } from '../../../utilities/NumberFormater';
 
 interface DeductionDetailsProps {
   deductionsList: IDeductionList[];
@@ -47,10 +48,10 @@ const DeductionDetails = ({
       <table className="w-full">
         <thead className="bg-onHoverBg">
           <tr>
-            <th className="text-start pl-2 pr-4 py-2">Deduction</th>
-            <th className="text-start px-4 py-2">Current Amount</th>
-            <th className="text-start px-4 py-2">YTD Amount</th>
-            <th className="text-start pl-4 py-2"></th>
+            <th className="text-start pl-2 pr-4 py-2 w-[30%]">Deduction</th>
+            <th className="text-start px-4 py-2 w-[40%]">Current Amount</th>
+            <th className="text-start px-4 py-2 w-[25%]">YTD Amount</th>
+            <th className="text-start pl-4 py-2 w-[5%]"></th>
           </tr>
         </thead>
         <tbody>
@@ -102,7 +103,6 @@ const DeductionDetails = ({
                       onFieldChange(idx, 'YearToDateAmt', e.target.value)
                     }
                     decimalCount={2}
-                    disabled
                     leadingIcon={<span>$</span>}
                   />
                 </td>
@@ -115,13 +115,38 @@ const DeductionDetails = ({
             );
           })}
         </tbody>
-      </table>
+        <tfoot>
+          <tr className="bg-onHoverBg font-semibold">
+            <td className="text-start pl-2 pr-4 py-2 ">Total</td>
 
-      <Button
-        label="Add New Deduction"
-        type="blue"
+            <td className="text-start px-4 py-2">
+              {numberFormatter(
+                deductionsList.reduce(
+                  (acc, obj) => acc + Number(obj.Amount),
+                  0
+                ),
+                true
+              )}
+            </td>
+            <td className="text-start pl-4 py-2">
+              {numberFormatter(
+                deductionsList.reduce(
+                  (acc, obj) => acc + Number(obj.YearToDateAmt),
+                  0
+                ),
+                true
+              )}
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      <button
         onClick={handleAddDeductionDetail}
-      />
+        className="w-full border-2 border-dashed border-secondary rounded-full py-[10px] text-textPrimaryBlue font-semibold flex items-center justify-center gap-2"
+      >
+        <AiOutlinePlus /> Add New Deduction
+      </button>
     </div>
   );
 };
