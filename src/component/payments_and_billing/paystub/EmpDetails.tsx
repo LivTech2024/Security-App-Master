@@ -77,19 +77,21 @@ const EmpDetails = ({
 
       setEarningsList([
         {
-          Name: empEarningDetails.Name,
-          Amount: String(empEarningDetails.Rate),
+          Income: 'Regular',
+          CurrentAmount: String(
+            empEarningDetails.Rate * empEarningDetails.Quantity
+          ),
           Quantity: String(empEarningDetails.Quantity),
-          YearToDateAmt: String(
+          Type: 'Hourly',
+          Rate: String(empEarningDetails.Rate),
+          YTDAmount: String(
             empEarningDetails.Rate * empEarningDetails.Quantity
           ),
         },
       ]);
 
       setDeductionsList([
-        { Name: 'CPP - Employee', Amount: '', YearToDateAmt: '' },
-        { Name: 'EI - Employee', Amount: '', YearToDateAmt: '' },
-        { Name: 'federal Income Tax', Amount: '', YearToDateAmt: '' },
+        { Amount: '500', Deduction: 'CPP', YearToDateAmt: '600' },
       ]);
 
       closeModalLoader();
