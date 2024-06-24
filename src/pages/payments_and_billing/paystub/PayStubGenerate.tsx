@@ -33,9 +33,13 @@ export interface IEarningList
 }
 
 export interface IDeductionList
-  extends Omit<IPayStubDeductionsChildCollection, 'Amount' | 'YearToDateAmt'> {
+  extends Omit<
+    IPayStubDeductionsChildCollection,
+    'Amount' | 'YearToDateAmt' | 'Percentage'
+  > {
   Amount: string;
   YearToDateAmt: string;
+  Percentage: string;
 }
 
 const PayStubGenerate = () => {
@@ -59,6 +63,7 @@ const PayStubGenerate = () => {
       Deduction: 'CPP',
       Amount: '',
       YearToDateAmt: '',
+      Percentage: '',
     },
   ]);
 
@@ -127,6 +132,7 @@ const PayStubGenerate = () => {
             <DeductionDetails
               deductionsList={deductionsList}
               setDeductionsList={setDeductionsList}
+              earningsList={earningsList}
             />
           </div>
 

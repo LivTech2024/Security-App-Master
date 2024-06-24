@@ -616,6 +616,7 @@ export interface IPayStubEarningsChildCollection {
 
 export interface IPayStubDeductionsChildCollection {
   Deduction: 'CPP' | 'EI' | 'Income Tax' | 'other';
+  Percentage: number;
   Amount: number;
   YearToDateAmt: number;
 }

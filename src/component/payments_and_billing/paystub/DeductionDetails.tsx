@@ -1,18 +1,24 @@
 import { FaRegTrashAlt } from 'react-icons/fa';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
-import { IDeductionList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
+import {
+  IDeductionList,
+  IEarningList,
+} from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
 import InputSelect from '../../../common/inputs/InputSelect';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { numberFormatter } from '../../../utilities/NumberFormater';
+import { roundNumber } from '../../../utilities/misc';
 
 interface DeductionDetailsProps {
   deductionsList: IDeductionList[];
   setDeductionsList: React.Dispatch<React.SetStateAction<IDeductionList[]>>;
+  earningsList: IEarningList[];
 }
 
 const DeductionDetails = ({
   deductionsList,
   setDeductionsList,
+  earningsList,
 }: DeductionDetailsProps) => {
   const handleAddDeductionDetail = () => {
     setDeductionsList([
@@ -21,6 +27,7 @@ const DeductionDetails = ({
         Deduction: 'other',
         Amount: '',
         YearToDateAmt: '',
+        Percentage: '',
       },
     ]);
   };
@@ -41,6 +48,15 @@ const DeductionDetails = ({
 
     setDeductionsList(updatedEarningList);
   };
+
+  const totalEarnings = earningsList.reduce(
+    (acc, obj) =>
+      acc +
+      Number(
+        obj.CurrentAmount || Number(obj.Rate ?? 0) * Number(obj.Quantity ?? 0)
+      ),
+    0
+  );
 
   return (
     <div className="flex flex-col gap-4 bg-surface shadow rounded p-4 items-start  h-full w-full">
@@ -76,13 +92,19 @@ const DeductionDetails = ({
                   <div className="flex items-center gap-4 w-full">
                     <InputWithTopHeader
                       className="mx-0 w-full"
-                      value={data.Amount}
+                      value={data.Percentage}
                       onChange={(e) =>
-                        onFieldChange(idx, 'Amount', e.target.value)
+                        onFieldChange(idx, 'Percentage', e.target.value)
                       }
                       decimalCount={2}
                       leadingIcon={<span>%</span>}
                       placeholder="Percentage"
+                      onBlur={() => {
+                        const amount =
+                          (Number(data.Percentage) * totalEarnings) / 100;
+
+                        onFieldChange(idx, 'Amount', roundNumber(amount));
+                      }}
                     />
                     <InputWithTopHeader
                       className="mx-0 w-full"
@@ -92,6 +114,17 @@ const DeductionDetails = ({
                       }
                       decimalCount={2}
                       leadingIcon={<span>$</span>}
+                      placeholder="Amount"
+                      onBlur={() => {
+                        const percentage =
+                          (Number(data.Amount) / totalEarnings) * 100;
+
+                        onFieldChange(
+                          idx,
+                          'Percentage',
+                          roundNumber(percentage)
+                        );
+                      }}
                     />
                   </div>
                 </td>
@@ -142,6 +175,7 @@ const DeductionDetails = ({
         </tfoot>
       </table>
       <button
+        type="button"
         onClick={handleAddDeductionDetail}
         className="w-full border-2 border-dashed border-secondary rounded-full py-[10px] text-textPrimaryBlue font-semibold flex items-center justify-center gap-2"
       >

@@ -183,6 +183,7 @@ const EarningDetails = ({
 
       <div className="flex items-center justify-between w-full">
         <button
+          type="button"
           onClick={handleAddEarningDetail}
           className="w-full border-2 border-dashed border-secondary rounded-full py-[10px] text-textPrimaryBlue font-semibold flex items-center justify-center gap-2"
         >

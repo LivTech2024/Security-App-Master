@@ -131,6 +131,7 @@ const EmpDetails = ({
         type="black"
         onClick={generateEarningAndDeductionDetails}
         className="w-full"
+        buttonType="button"
       />
     </div>
   );
