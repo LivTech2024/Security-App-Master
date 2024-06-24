@@ -7,12 +7,17 @@ import Button from '../../../common/button/Button';
 import CustomError, { errorHandler } from '../../../utilities/CustomError';
 import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils';
 import DbPayment from '../../../firebase_configs/DB/DbPayment';
-import { IEarningList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
+import {
+  IDeductionList,
+  IEarningList,
+} from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
 
 const EmpDetails = ({
   setEarningsList,
+  setDeductionsList,
 }: {
   setEarningsList: React.Dispatch<React.SetStateAction<IEarningList[]>>;
+  setDeductionsList: React.Dispatch<React.SetStateAction<IDeductionList[]>>;
 }) => {
   const {
     watch,
@@ -79,6 +84,12 @@ const EmpDetails = ({
             empEarningDetails.Rate * empEarningDetails.Quantity
           ),
         },
+      ]);
+
+      setDeductionsList([
+        { Name: 'CPP - Employee', Amount: '', YearToDateAmt: '' },
+        { Name: 'EI - Employee', Amount: '', YearToDateAmt: '' },
+        { Name: 'federal Income Tax', Amount: '', YearToDateAmt: '' },
       ]);
 
       closeModalLoader();

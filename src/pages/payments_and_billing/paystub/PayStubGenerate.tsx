@@ -16,16 +16,24 @@ import EarningDetails from '../../../component/payments_and_billing/paystub/Earn
 import DeductionDetails from '../../../component/payments_and_billing/paystub/DeductionDetails';
 import { useState } from 'react';
 import TotalAmtDetails from '../../../component/payments_and_billing/paystub/TotalAmtDetails';
+import {
+  IPayStubDeductionsChildCollection,
+  IPayStubEarningsChildCollection,
+} from '../../../@types/database';
 
-export interface IEarningList {
-  Name: string;
-  Amount: string;
-  Quantity: string;
-  YearToDateAmt: string;
+export interface IEarningList
+  extends Omit<
+    IPayStubEarningsChildCollection,
+    'CurrentAmount' | 'YTDAmount' | 'Rate' | 'Quantity'
+  > {
+  CurrentAmount: string;
+  YTDAmount: string;
+  Rate?: string;
+  Quantity?: string;
 }
 
-export interface IDeductionList {
-  Name: string;
+export interface IDeductionList
+  extends Omit<IPayStubDeductionsChildCollection, 'Amount' | 'YearToDateAmt'> {
   Amount: string;
   YearToDateAmt: string;
 }
@@ -39,16 +47,26 @@ const PayStubGenerate = () => {
 
   const [earningsList, setEarningsList] = useState<IEarningList[]>([
     {
-      Name: '',
-      Amount: '',
-      Quantity: '',
-      YearToDateAmt: '',
+      Income: 'Regular',
+      Type: 'Hourly',
+      CurrentAmount: '',
+      YTDAmount: '',
     },
   ]);
 
   const [deductionsList, setDeductionsList] = useState<IDeductionList[]>([
     {
-      Name: '',
+      Deduction: 'CPP',
+      Amount: '',
+      YearToDateAmt: '',
+    },
+    {
+      Deduction: 'EI',
+      Amount: '',
+      YearToDateAmt: '',
+    },
+    {
+      Deduction: 'Income Tax',
       Amount: '',
       YearToDateAmt: '',
     },
@@ -104,7 +122,10 @@ const PayStubGenerate = () => {
         <div className="flex flex-col gap-4 w-full h-full">
           <div className="flex  gap-4 w-full h-full">
             <PayStubDetails />
-            <EmpDetails setEarningsList={setEarningsList} />
+            <EmpDetails
+              setEarningsList={setEarningsList}
+              setDeductionsList={setDeductionsList}
+            />
           </div>
 
           {/* Earnings and deduction details */}

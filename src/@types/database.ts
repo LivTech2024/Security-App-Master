@@ -606,14 +606,16 @@ export interface IUserDataDeletionRequestsCollection {
 }
 
 export interface IPayStubEarningsChildCollection {
-  Name: string;
-  Amount: number;
-  Quantity: number;
-  YearToDateAmt: number;
+  Income: 'Regular' | 'Overtime' | 'Vacation' | 'Bonus' | 'Stat';
+  Type: 'Fixed' | 'Hourly';
+  Rate?: number;
+  Quantity?: number;
+  CurrentAmount: number;
+  YTDAmount: number;
 }
 
 export interface IPayStubDeductionsChildCollection {
-  Name: string;
+  Deduction: 'CPP' | 'EI' | 'Income Tax' | 'other';
   Amount: number;
   YearToDateAmt: number;
 }

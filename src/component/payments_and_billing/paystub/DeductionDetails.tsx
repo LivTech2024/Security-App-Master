@@ -2,6 +2,7 @@ import { FaRegTrashAlt } from 'react-icons/fa';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import { IDeductionList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
 import Button from '../../../common/button/Button';
+import InputSelect from '../../../common/inputs/InputSelect';
 
 interface DeductionDetailsProps {
   deductionsList: IDeductionList[];
@@ -16,7 +17,7 @@ const DeductionDetails = ({
     setDeductionsList([
       ...deductionsList,
       {
-        Name: '',
+        Deduction: 'other',
         Amount: '',
         YearToDateAmt: '',
       },
@@ -31,7 +32,8 @@ const DeductionDetails = ({
   const onFieldChange = (
     index: number,
     field: keyof IDeductionList,
-    value: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    value: any
   ) => {
     const updatedEarningList = [...deductionsList];
     updatedEarningList[index][field] = value;
@@ -42,41 +44,78 @@ const DeductionDetails = ({
   return (
     <div className="flex flex-col gap-4 bg-surface shadow rounded p-4 items-start  h-full w-full">
       <div className="font-semibold">Deduction Details</div>
-      {deductionsList.map((data, idx) => {
-        return (
-          <div className="flex items-end gap-4 w-full justify-between">
-            <InputWithTopHeader
-              className="mx-0 w-full"
-              label="Name"
-              value={data.Name}
-              onChange={(e) => onFieldChange(idx, 'Name', e.target.value)}
-            />
-            <InputWithTopHeader
-              className="mx-0 w-full"
-              label="Amount"
-              value={data.Amount}
-              onChange={(e) => onFieldChange(idx, 'Amount', e.target.value)}
-              decimalCount={2}
-              leadingIcon={<span>$</span>}
-            />
-
-            <InputWithTopHeader
-              className="mx-0 w-full"
-              label="YTD"
-              value={data.YearToDateAmt}
-              onChange={(e) =>
-                onFieldChange(idx, 'YearToDateAmt', e.target.value)
-              }
-              decimalCount={2}
-              disabled
-              leadingIcon={<span>$</span>}
-            />
-            <span className="pb-[12px] cursor-pointer text-xl hover:scale-105 duration-200">
-              <FaRegTrashAlt onClick={() => handleRemoveDeduction(idx)} />
-            </span>
-          </div>
-        );
-      })}
+      <table className="w-full">
+        <thead className="bg-onHoverBg">
+          <tr>
+            <th className="text-start pl-2 pr-4 py-2">Deduction</th>
+            <th className="text-start px-4 py-2">Current Amount</th>
+            <th className="text-start px-4 py-2">YTD Amount</th>
+            <th className="text-start pl-4 py-2"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {deductionsList.map((data, idx) => {
+            return (
+              <tr>
+                <td className="text-start pr-4 py-2">
+                  <InputSelect
+                    data={[
+                      { label: 'CPP', value: 'CPP' },
+                      { label: 'EI', value: 'EI' },
+                      { label: 'Income Tax', value: 'Income Tax' },
+                      { label: 'Other', value: 'Other' },
+                    ]}
+                    value={data.Deduction}
+                    onChange={(e) =>
+                      onFieldChange(idx, 'Deduction', e as string)
+                    }
+                  />
+                </td>
+                <td className="text-start px-4 py-2">
+                  <div className="flex items-center gap-4 w-full">
+                    <InputWithTopHeader
+                      className="mx-0 w-full"
+                      value={data.Amount}
+                      onChange={(e) =>
+                        onFieldChange(idx, 'Amount', e.target.value)
+                      }
+                      decimalCount={2}
+                      leadingIcon={<span>%</span>}
+                      placeholder="Percentage"
+                    />
+                    <InputWithTopHeader
+                      className="mx-0 w-full"
+                      value={data.Amount}
+                      onChange={(e) =>
+                        onFieldChange(idx, 'Amount', e.target.value)
+                      }
+                      decimalCount={2}
+                      leadingIcon={<span>$</span>}
+                    />
+                  </div>
+                </td>
+                <td className="text-start px-4 py-2">
+                  <InputWithTopHeader
+                    className="mx-0 w-full"
+                    value={data.YearToDateAmt}
+                    onChange={(e) =>
+                      onFieldChange(idx, 'YearToDateAmt', e.target.value)
+                    }
+                    decimalCount={2}
+                    disabled
+                    leadingIcon={<span>$</span>}
+                  />
+                </td>
+                <td className="text-start pl-4 py-2">
+                  <span className="pb-[12px] cursor-pointer text-xl hover:scale-105 duration-200">
+                    <FaRegTrashAlt onClick={() => handleRemoveDeduction(idx)} />
+                  </span>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
 
       <Button
         label="Add New Deduction"
