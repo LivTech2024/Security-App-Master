@@ -33,13 +33,14 @@ import {
 } from '../../utilities/misc';
 import { htmlToPdf } from '../../API/HtmlToPdf';
 import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
+import { Company } from '../../store/slice/auth.slice';
 
 class DbPatrol {
   static createPatrol = async ({
-    cmpId,
+    companyDetails,
     data,
   }: {
-    cmpId: string;
+    companyDetails: Company;
     data: PatrollingFormFields;
   }) => {
     const patrolId = getNewDocId(CollectionName.patrols);
@@ -66,7 +67,7 @@ class DbPatrol {
 
     const newPatrol: IPatrolsCollection = {
       PatrolId: patrolId,
-      PatrolCompanyId: cmpId,
+      PatrolCompanyId: companyDetails.CompanyId,
       PatrolName: data.PatrolName,
       PatrolNameSearchIndex,
       PatrolLocation: new GeoPoint(
@@ -91,7 +92,8 @@ class DbPatrol {
     const html = await generateQrCodesHtml(
       PatrolCheckPoints.map((ch) => {
         return { code: ch.CheckPointId, label: ch.CheckPointName };
-      })
+      }),
+      companyDetails
     );
     const response = await htmlToPdf({ file_name: fileName, html });
     downloadPdf(response, fileName);
@@ -100,9 +102,11 @@ class DbPatrol {
   static updatePatrol = async ({
     patrolId,
     data,
+    companyDetails,
   }: {
     patrolId: string;
     data: PatrollingFormFields;
+    companyDetails: Company;
   }) => {
     const patrolRef = doc(db, CollectionName.patrols, patrolId);
 
@@ -155,7 +159,8 @@ class DbPatrol {
       const html = await generateQrCodesHtml(
         PatrolCheckPoints.map((ch) => {
           return { code: ch.CheckPointId, label: ch.CheckPointName };
-        })
+        }),
+        companyDetails
       );
       const response = await htmlToPdf({ file_name: fileName, html });
       downloadPdf(response, fileName);

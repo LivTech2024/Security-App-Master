@@ -292,7 +292,7 @@ const ShiftCreateOrEdit = () => {
         await DbShift.updateShift({
           shiftData: data,
           shiftId: shiftEditData.ShiftId,
-          cmpId: company.CompanyId,
+          companyDetails: company,
           tasks: shiftTasks,
           shiftDate: selectedDays[0],
           shiftLinkedPatrols,
@@ -300,7 +300,7 @@ const ShiftCreateOrEdit = () => {
       } else {
         await DbShift.addShift({
           shiftData: data,
-          cmpId: company.CompanyId,
+          companyDetails: company,
           tasks: shiftTasks,
           selectedDays,
           shiftLinkedPatrols,

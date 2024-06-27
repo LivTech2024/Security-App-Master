@@ -33,17 +33,18 @@ import { ShiftTask } from '../../component/shifts/ShiftTaskForm';
 import { generateQrCodesHtml } from '../../utilities/pdf/generateQrCodesHtml';
 import { htmlToPdf } from '../../API/HtmlToPdf';
 import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
+import { Company } from '../../store/slice/auth.slice';
 
 class DbShift {
   static addShift = async ({
-    cmpId,
+    companyDetails,
     selectedDays,
     shiftData,
     tasks,
     shiftLinkedPatrols,
   }: {
     shiftData: AddShiftFormFields;
-    cmpId: string;
+    companyDetails: Company;
     tasks: ShiftTask[];
     selectedDays: Date[];
     shiftLinkedPatrols: IShiftLinkedPatrolsChildCollection[];
@@ -95,7 +96,7 @@ class DbShift {
         ShiftTask: shiftTasks,
         ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
         ShiftAcknowledgedByEmpId: [],
-        ShiftCompanyId: cmpId,
+        ShiftCompanyId: companyDetails.CompanyId,
         ShiftLocationId: shiftData.ShiftLocationId ?? null,
         ShiftLocationAddress: shiftData.ShiftLocationAddress ?? null,
         ShiftLocationName: shiftData.ShiftLocationName ?? null,
@@ -120,7 +121,8 @@ class DbShift {
       const html = await generateQrCodesHtml(
         barcodesToBeGenerated.map((task) => {
           return { code: task.ShiftTaskId, label: task.ShiftTask };
-        })
+        }),
+        companyDetails
       );
       const response = await htmlToPdf({ file_name: fileName, html });
       downloadPdf(response, fileName);
@@ -128,7 +130,7 @@ class DbShift {
   };
 
   static updateShift = async ({
-    cmpId,
+    companyDetails,
     shiftData,
     shiftDate,
     shiftId,
@@ -137,7 +139,7 @@ class DbShift {
   }: {
     shiftData: AddShiftFormFields;
     shiftId: string;
-    cmpId: string;
+    companyDetails: Company;
     tasks: ShiftTask[];
     shiftDate: Date;
     shiftLinkedPatrols: IShiftLinkedPatrolsChildCollection[];
@@ -195,7 +197,7 @@ class DbShift {
         ShiftLocationName: shiftData.ShiftLocationName ?? null,
         ShiftClientId: shiftData.ShiftClientId ?? null,
         ShiftRestrictedRadius: shiftData.ShiftRestrictedRadius || null,
-        ShiftCompanyId: cmpId,
+        ShiftCompanyId: companyDetails.CompanyId,
         ShiftLocationId: shiftData.ShiftLocationId ?? null,
         ShiftLocationAddress: shiftData.ShiftLocationAddress ?? null,
         ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),
@@ -216,7 +218,8 @@ class DbShift {
         const html = await generateQrCodesHtml(
           barcodesToBeGenerated.map((task) => {
             return { code: task.ShiftTaskId, label: task.ShiftTask };
-          })
+          }),
+          companyDetails
         );
         const response = await htmlToPdf({ file_name: fileName, html });
         downloadPdf(response, fileName);

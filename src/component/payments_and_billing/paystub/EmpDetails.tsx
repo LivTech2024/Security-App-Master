@@ -91,7 +91,12 @@ const EmpDetails = ({
       ]);
 
       setDeductionsList([
-        { Amount: '500', Deduction: 'CPP', YearToDateAmt: '600' },
+        {
+          Amount: '500',
+          Deduction: 'CPP',
+          YearToDateAmt: '600',
+          Percentage: '5',
+        },
       ]);
 
       closeModalLoader();

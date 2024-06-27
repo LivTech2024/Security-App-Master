@@ -187,6 +187,7 @@ const PatrollingCreateOrEdit = () => {
         await DbPatrol.updatePatrol({
           data,
           patrolId: patrolEditData.PatrolId,
+          companyDetails: company,
         });
         showSnackbar({
           message: 'Patrol updated successfully',
@@ -194,7 +195,7 @@ const PatrollingCreateOrEdit = () => {
         });
       } else {
         await DbPatrol.createPatrol({
-          cmpId: company.CompanyId,
+          companyDetails: company,
           data,
         });
         showSnackbar({
