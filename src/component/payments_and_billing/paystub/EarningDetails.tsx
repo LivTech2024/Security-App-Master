@@ -5,6 +5,8 @@ import { IEarningList } from '../../../pages/payments_and_billing/paystub/PayStu
 import InputSelect from '../../../common/inputs/InputSelect';
 import { numberFormatter } from '../../../utilities/NumberFormater';
 import { AiOutlinePlus } from 'react-icons/ai';
+import { MdClose } from 'react-icons/md';
+import { RiEqualFill } from 'react-icons/ri';
 
 interface EarningDetailsProps {
   earningsList: IEarningList[];
@@ -38,6 +40,7 @@ const EarningDetails = ({
     value: string
   ) => {
     const updatedEarningList = [...earningsList];
+
     updatedEarningList[index][field] = value as never;
 
     setEarningsList(updatedEarningList);
@@ -64,13 +67,16 @@ const EarningDetails = ({
                   <InputSelect
                     data={[
                       { label: 'Regular', value: 'Regular' },
+                      { label: 'Banked', value: 'Banked' },
                       { label: 'Overtime', value: 'Overtime' },
                       { label: 'Vacation', value: 'Vacation' },
                       { label: 'Bonus', value: 'Bonus' },
                       { label: 'Stat', value: 'Stat' },
                     ]}
                     value={data.Income}
-                    onChange={(e) => onFieldChange(idx, 'Income', e as string)}
+                    onChange={(e) => {
+                      onFieldChange(idx, 'Income', e as string);
+                    }}
                   />
                 </td>
                 <td className="text-start pr-4 py-2">
@@ -80,7 +86,12 @@ const EarningDetails = ({
                       { label: 'Fixed', value: 'Fixed' },
                     ]}
                     value={data.Type}
-                    onChange={(e) => onFieldChange(idx, 'Type', e as string)}
+                    onChange={(e) => {
+                      onFieldChange(idx, 'Type', e as string);
+                      onFieldChange(idx, 'CurrentAmount', '');
+                      onFieldChange(idx, 'Rate', '');
+                      onFieldChange(idx, 'Quantity', '');
+                    }}
                   />
                 </td>
 
@@ -93,7 +104,9 @@ const EarningDetails = ({
                         onFieldChange(idx, 'CurrentAmount', e.target.value)
                       }
                       decimalCount={2}
-                      leadingIcon={<span>$</span>}
+                      leadingIcon={
+                        <span>{data.Income === 'Banked' ? '-$' : '$'}</span>
+                      }
                     />
                   ) : (
                     <div className="flex items-center gap-4">
@@ -106,6 +119,7 @@ const EarningDetails = ({
                         }
                         decimalCount={2}
                       />
+                      <MdClose className="text-xl" />
                       <InputWithTopHeader
                         className="mx-0"
                         placeholder="Rate"
@@ -115,15 +129,18 @@ const EarningDetails = ({
                         }
                         decimalCount={2}
                       />
-                      <span>=</span>
+                      <RiEqualFill className="text-xl" />
                       <InputWithTopHeader
                         className="mx-0"
-                        leadingIcon={<span>$</span>}
                         value={
                           Number(data.Rate ?? 0) * Number(data.Quantity ?? 0)
                         }
                         onChange={(e) =>
                           onFieldChange(idx, 'CurrentAmount', e.target.value)
+                        }
+                        disabled
+                        leadingIcon={
+                          <span>{data.Income === 'Banked' ? '-$' : '$'}</span>
                         }
                       />
                     </div>
@@ -155,15 +172,17 @@ const EarningDetails = ({
             <td className="text-start px-4 py-2"></td>
             <td className="text-start px-4 py-2">
               {numberFormatter(
-                earningsList.reduce(
-                  (acc, obj) =>
-                    acc +
-                    Number(
-                      obj.CurrentAmount ||
-                        Number(obj.Rate ?? 0) * Number(obj.Quantity ?? 0)
-                    ),
-                  0
-                ),
+                earningsList.reduce((acc, obj) => {
+                  const amount =
+                    Number(obj.CurrentAmount) ||
+                    Number(obj.Rate ?? 0) * Number(obj.Quantity ?? 0);
+
+                  if (obj.Income === 'Banked') {
+                    return acc - amount;
+                  }
+
+                  return acc + amount;
+                }, 0),
                 true
               )}
             </td>

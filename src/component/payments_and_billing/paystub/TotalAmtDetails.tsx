@@ -18,6 +18,7 @@ const TotalAmtDetails = () => {
           register={register}
           name="PayStubNetPay.Amount"
           error={errors.PayStubNetPay?.Amount?.message}
+          decimalCount={2}
         />
         <InputWithTopHeader
           label="Net Pay YTD"
@@ -26,6 +27,7 @@ const TotalAmtDetails = () => {
           register={register}
           name="PayStubNetPay.YearToDateAmt"
           error={errors.PayStubNetPay?.YearToDateAmt?.message}
+          decimalCount={2}
         />
       </div>
     </div>

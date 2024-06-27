@@ -1,9 +1,6 @@
 import { FaRegTrashAlt } from 'react-icons/fa';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
-import {
-  IDeductionList,
-  IEarningList,
-} from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
+import { IDeductionList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
 import InputSelect from '../../../common/inputs/InputSelect';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { numberFormatter } from '../../../utilities/NumberFormater';
@@ -12,19 +9,19 @@ import { roundNumber } from '../../../utilities/misc';
 interface DeductionDetailsProps {
   deductionsList: IDeductionList[];
   setDeductionsList: React.Dispatch<React.SetStateAction<IDeductionList[]>>;
-  earningsList: IEarningList[];
+  totalEarnings: number;
 }
 
 const DeductionDetails = ({
   deductionsList,
   setDeductionsList,
-  earningsList,
+  totalEarnings,
 }: DeductionDetailsProps) => {
   const handleAddDeductionDetail = () => {
     setDeductionsList([
       ...deductionsList,
       {
-        Deduction: 'other',
+        Deduction: 'CPP',
         Amount: '',
         YearToDateAmt: '',
         Percentage: '',
@@ -48,15 +45,6 @@ const DeductionDetails = ({
 
     setDeductionsList(updatedEarningList);
   };
-
-  const totalEarnings = earningsList.reduce(
-    (acc, obj) =>
-      acc +
-      Number(
-        obj.CurrentAmount || Number(obj.Rate ?? 0) * Number(obj.Quantity ?? 0)
-      ),
-    0
-  );
 
   return (
     <div className="flex flex-col gap-4 bg-surface shadow rounded p-4 items-start  h-full w-full">

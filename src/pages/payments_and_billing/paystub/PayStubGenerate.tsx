@@ -14,7 +14,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import EarningDetails from '../../../component/payments_and_billing/paystub/EarningDetails';
 import DeductionDetails from '../../../component/payments_and_billing/paystub/DeductionDetails';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TotalAmtDetails from '../../../component/payments_and_billing/paystub/TotalAmtDetails';
 import {
   IPayStubDeductionsChildCollection,
@@ -66,6 +66,38 @@ const PayStubGenerate = () => {
       Percentage: '',
     },
   ]);
+
+  const totalEarnings = earningsList.reduce((acc, obj) => {
+    const amount =
+      Number(obj.CurrentAmount) ||
+      Number(obj.Rate ?? 0) * Number(obj.Quantity ?? 0);
+
+    if (obj.Income === 'Banked') {
+      return acc - amount;
+    }
+
+    return acc + amount;
+  }, 0);
+
+  useEffect(() => {
+    const totalEarnings = earningsList.reduce((acc, obj) => {
+      const amount =
+        Number(obj.CurrentAmount) ||
+        Number(obj.Rate ?? 0) * Number(obj.Quantity ?? 0);
+
+      if (obj.Income === 'Banked') {
+        return acc - amount;
+      }
+
+      return acc + amount;
+    }, 0);
+    const totalDeductions = deductionsList.reduce(
+      (acc, obj) => acc + Number(obj.Amount),
+      0
+    );
+    methods.setValue('PayStubNetPay.Amount', totalEarnings - totalDeductions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deductionsList, earningsList]);
 
   const onSubmit = async (data: PayStubCreateFormFields) => {
     if (!company) return;
@@ -132,7 +164,7 @@ const PayStubGenerate = () => {
             <DeductionDetails
               deductionsList={deductionsList}
               setDeductionsList={setDeductionsList}
-              earningsList={earningsList}
+              totalEarnings={totalEarnings}
             />
           </div>
 

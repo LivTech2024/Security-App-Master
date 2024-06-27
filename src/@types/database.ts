@@ -606,7 +606,7 @@ export interface IUserDataDeletionRequestsCollection {
 }
 
 export interface IPayStubEarningsChildCollection {
-  Income: 'Regular' | 'Overtime' | 'Vacation' | 'Bonus' | 'Stat';
+  Income: 'Regular' | 'Banked' | 'Overtime' | 'Vacation' | 'Bonus' | 'Stat';
   Type: 'Fixed' | 'Hourly';
   Rate?: number;
   Quantity?: number;
@@ -615,7 +615,7 @@ export interface IPayStubEarningsChildCollection {
 }
 
 export interface IPayStubDeductionsChildCollection {
-  Deduction: 'CPP' | 'EI' | 'Income Tax' | 'other';
+  Deduction: 'CPP' | 'EI' | 'Income Tax' | 'Other';
   Percentage: number;
   Amount: number;
   YearToDateAmt: number;
