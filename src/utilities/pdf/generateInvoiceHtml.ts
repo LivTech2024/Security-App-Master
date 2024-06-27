@@ -64,9 +64,26 @@ export function generateInvoiceHTML({
           th {
             background-color: #f2f2f2;
           }
+          .border {
+            position: fixed;
+            top: 0;
+            left: 0;
+            border: 5px double;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            page-break-after: always;
+            page-break-inside: avoid;
+            box-sizing: border-box;
+          }
+
         </style>
       </head>
       <body>
+      <div class="border" style="display:flex; justify:content:start; align-items:end; font-weight:600; padding:20px; font-style: italic;">
+       THANK YOU FOR YOUR BUSINESS!
+      </div>
        ${getPdfHeader(companyDetails)}
         <div class="invoice-details">
           <div style="max-width:50%">
