@@ -41,7 +41,7 @@ export const generateQrCodesHtml = async (
          </div>
        </div>
        <img src=${barcodeBase64} style="width:156px; height:136px; object-fit:cover;"/>
-       <div style="padding-bottom:12px;" class="line-clamp-1">${item.label}</div>
+       <div style="padding-bottom:16px;" class="line-clamp-1">${item.label}</div>
     </div>`;
 
     // Increase counter
