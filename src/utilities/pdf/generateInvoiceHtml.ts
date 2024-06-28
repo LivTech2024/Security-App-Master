@@ -90,6 +90,7 @@ export function generateInvoiceHTML({
             <p>Customer Name: ${invoiceData.InvoiceClientName}</p>
             <p>Customer Phone: ${invoiceData.InvoiceClientPhone}</p>
             ${invoiceData.InvoiceClientAddress ? `<p>Customer Address: ${invoiceData.InvoiceClientAddress}</p>` : ''}
+            ${invoiceData.InvoiceLocationName ? `<p>Location: ${invoiceData.InvoiceLocationName}</p>` : ''}
           </div>
           <div style="text-align: end; max-width:50%;">
             <p>Invoice Number: ${invoiceData.InvoiceNumber}</p>
