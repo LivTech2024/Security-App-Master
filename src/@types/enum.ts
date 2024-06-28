@@ -30,6 +30,7 @@ export enum CollectionName {
   shiftExchangeRequests = 'ShiftExchangeRequests',
   callouts = 'Callouts',
   userDataDeletionRequests = 'UserDataDeletionRequests',
+  payStubs = 'PayStubs',
 }
 
 export const DisplayCount = {

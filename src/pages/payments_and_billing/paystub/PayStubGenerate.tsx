@@ -19,6 +19,7 @@ import TotalAmtDetails from '../../../component/payments_and_billing/paystub/Tot
 import {
   IPayStubDeductionsChildCollection,
   IPayStubEarningsChildCollection,
+  IPayStubsCollection,
 } from '../../../@types/database';
 
 export interface IEarningList
@@ -99,10 +100,13 @@ const PayStubGenerate = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deductionsList, earningsList]);
 
+  const [previousPayStub, setPreviousPayStub] =
+    useState<IPayStubsCollection | null>(null);
+
   const onSubmit = async (data: PayStubCreateFormFields) => {
     if (!company) return;
 
-    console.log(data);
+    console.log(data, previousPayStub);
 
     /* const html = getPaystubHtml({
       companyDetails: company,
@@ -152,6 +156,7 @@ const PayStubGenerate = () => {
             <EmpDetails
               setEarningsList={setEarningsList}
               setDeductionsList={setDeductionsList}
+              setPreviousPayStub={setPreviousPayStub}
             />
           </div>
 

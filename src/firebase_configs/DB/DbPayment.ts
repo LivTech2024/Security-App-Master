@@ -415,6 +415,18 @@ class DbPayment {
       return empEarningDetails;
     }
   };
+
+  static getPrevPayStub = (empId: string, startDate: Date) => {
+    const payStubRef = collection(db, CollectionName.payStubs);
+    const payStubQuery = query(
+      payStubRef,
+      where('PayStubEmpId', '==', empId),
+      where('PayStubPayPeriodStartDate', '<=', startDate),
+      limit(1)
+    );
+
+    return getDocs(payStubQuery);
+  };
 }
 
 export default DbPayment;

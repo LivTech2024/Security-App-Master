@@ -11,13 +11,18 @@ import {
   IDeductionList,
   IEarningList,
 } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
+import { IPayStubsCollection } from '../../../@types/database';
 
 const EmpDetails = ({
   setEarningsList,
   setDeductionsList,
+  setPreviousPayStub,
 }: {
   setEarningsList: React.Dispatch<React.SetStateAction<IEarningList[]>>;
   setDeductionsList: React.Dispatch<React.SetStateAction<IDeductionList[]>>;
+  setPreviousPayStub: React.Dispatch<
+    React.SetStateAction<IPayStubsCollection | null>
+  >;
 }) => {
   const {
     watch,
@@ -75,6 +80,8 @@ const EmpDetails = ({
         endDate: payEndDate,
       });
 
+      //const prevPayStubSnapshot = await DbPayment.get
+
       setEarningsList([
         {
           Income: 'Regular',
@@ -89,6 +96,8 @@ const EmpDetails = ({
           ),
         },
       ]);
+
+      setPreviousPayStub(null);
 
       setDeductionsList([
         {
