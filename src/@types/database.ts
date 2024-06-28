@@ -363,6 +363,8 @@ export interface IInvoicesCollection {
   InvoiceClientName: string;
   InvoiceClientPhone: string;
   InvoiceClientAddress: string | null;
+  InvoiceCompanyPhone: string;
+  InvoiceCompanyEmail: string;
   InvoiceLocationId: string | null;
   InvoiceLocationName: string | null;
   InvoiceNumber: string;

@@ -256,6 +256,20 @@ export const invoiceSchema = z
         message: 'Client phone number should be at most 16 characters',
       }),
     InvoiceClientAddress: z.string().optional().nullable(),
+    InvoiceCompanyPhone: z
+      .string()
+      .min(8, {
+        message: 'Company phone number should be at least 8 characters',
+      })
+      .max(16, {
+        message: 'Company phone number should be at most 16 characters',
+      }),
+    InvoiceCompanyEmail: z
+      .string()
+      .min(3, { message: 'Company email is required' })
+      .regex(ConstRegex.EMAIL_OPTIONAL, {
+        message: 'Invalid email',
+      }),
     InvoiceLocationId: z.string().nullable().optional(),
     InvoiceLocationName: z.string().nullable().optional(),
     InvoiceNumber: z

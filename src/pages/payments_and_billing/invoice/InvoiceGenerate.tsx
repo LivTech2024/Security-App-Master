@@ -63,9 +63,17 @@ const InvoiceGenerate = () => {
           InvoiceSubtotal: invoiceEditData.InvoiceSubtotal,
           InvoiceTerms: invoiceEditData.InvoiceTerms,
           InvoiceTotalAmount: invoiceEditData.InvoiceTotalAmount,
+          InvoiceCompanyEmail:
+            invoiceEditData.InvoiceCompanyEmail ?? company?.CompanyEmail,
+          InvoiceCompanyPhone:
+            invoiceEditData.InvoiceCompanyPhone ?? company?.CompanyPhone,
+          InvoiceLocationId: invoiceEditData.InvoiceLocationId,
+          InvoiceLocationName: invoiceEditData.InvoiceLocationName,
         }
       : {
           InvoiceNumber: String(recentInvoiceNumber + 1),
+          InvoiceCompanyEmail: company?.CompanyEmail,
+          InvoiceCompanyPhone: company?.CompanyPhone,
         },
   });
 
@@ -360,7 +368,7 @@ const InvoiceGenerate = () => {
           className="flex flex-col gap-4"
         >
           <div className="flex gap-4 justify-between">
-            <div className="flex flex-col bg-surface shadow p-4 rounded gap-4 w-[60%] max-w-2xl justify-start">
+            <div className="flex flex-col bg-surface shadow p-4 rounded gap-4 w-full justify-start">
               <div className="font-semibold">Bill To.</div>
 
               <InputAutoComplete
@@ -390,7 +398,7 @@ const InvoiceGenerate = () => {
                 setInvoiceItems={setInvoiceItems}
               />
             </div>
-            <div className="flex flex-col bg-surface shadow p-4 rounded gap-4 w-[40%] max-w-xl justify-start">
+            <div className="flex flex-col bg-surface shadow p-4 rounded gap-4 w-full justify-start">
               <div className="font-semibold">Transaction details</div>
               <div className="flex flex-col gap-4">
                 <InputWithTopHeader
@@ -413,6 +421,25 @@ const InvoiceGenerate = () => {
                   value={invoiceDueDate}
                   setValue={setInvoiceDueDate}
                   error={methods.formState.errors?.InvoiceDueDate?.message}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col bg-surface shadow p-4 rounded gap-4 w-full justify-start">
+              <div className="font-semibold">Company details</div>
+              <div className="flex flex-col gap-4">
+                <InputWithTopHeader
+                  className="mx-0"
+                  label="Company phone"
+                  register={methods.register}
+                  name="InvoiceCompanyPhone"
+                  error={methods.formState.errors?.InvoiceCompanyPhone?.message}
+                />
+                <InputWithTopHeader
+                  className="mx-0"
+                  label="Company email"
+                  register={methods.register}
+                  name="InvoiceCompanyEmail"
+                  error={methods.formState.errors?.InvoiceCompanyEmail?.message}
                 />
               </div>
             </div>

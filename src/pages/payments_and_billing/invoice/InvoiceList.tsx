@@ -37,6 +37,7 @@ import useUpdateRecentTransactionNumbers from '../../../hooks/useUpdateRecentTra
 import InputSelect from '../../../common/inputs/InputSelect';
 import useFetchClients from '../../../hooks/fetch/useFetchClients';
 import { downloadPdf } from '../../../utilities/pdf/common/downloadPdf';
+import { Company } from '../../../store/slice/auth.slice';
 
 enum InvoiceStatus {
   settled = 'settled',
@@ -190,8 +191,14 @@ const InvoiceList = () => {
       );
       const clientData = clientSnapshot.data() as IClientsCollection;
 
+      const companyDetails: Company = {
+        ...company,
+        CompanyEmail: invoiceData.InvoiceCompanyEmail ?? company.CompanyEmail,
+        CompanyPhone: invoiceData.InvoiceCompanyPhone ?? company.CompanyPhone,
+      };
+
       const html = generateInvoiceHTML({
-        companyDetails: company,
+        companyDetails,
         invoiceData,
         clientBalance: clientData.ClientBalance,
       });
