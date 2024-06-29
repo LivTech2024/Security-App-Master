@@ -141,7 +141,6 @@ class DbPatrol {
           Number(data.PatrolLocation.latitude),
           Number(data.PatrolLocation.longitude)
         ),
-        PatrolCurrentStatus: [],
         PatrolReminderInMinutes: data.PatrolReminderInMinutes,
         PatrolLocationId: data.PatrolLocationId,
         PatrolLocationName: data.PatrolLocationName,
