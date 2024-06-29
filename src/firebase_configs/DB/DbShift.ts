@@ -146,14 +146,8 @@ class DbShift {
   }) => {
     await runTransaction(db, async (transaction) => {
       const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
-      /*const shiftSnapshot = await transaction.get(shiftDocRef);
+      const shiftSnapshot = await transaction.get(shiftDocRef);
       const oldShiftData = shiftSnapshot.data() as IShiftsCollection;
-
-       if (oldShiftData.ShiftAssignedUserId?.length > 0) {
-        throw new CustomError(
-          "Cannot edit this shift as it already have assigned employees"
-        );
-      } */
 
       const shiftTasks: IShiftTasksChild[] = [];
 
@@ -171,8 +165,14 @@ class DbShift {
             ShiftTask: task.TaskName,
             ShiftTaskQrCodeReq: task.TaskQrCodeRequired,
             ShiftTaskReturnReq: task.TaskReturnReq,
-            ShiftTaskStatus: [],
-            ShiftReturnTaskStatus: [],
+            ShiftTaskStatus:
+              oldShiftData?.ShiftTask?.find(
+                (task) => task.ShiftTaskId === shiftTaskId
+              )?.ShiftTaskStatus || [],
+            ShiftReturnTaskStatus:
+              oldShiftData?.ShiftTask?.find(
+                (task) => task.ShiftTaskId === shiftTaskId
+              )?.ShiftReturnTaskStatus || [],
           });
         }
       });
