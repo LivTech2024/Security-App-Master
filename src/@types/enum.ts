@@ -53,6 +53,7 @@ export const DisplayCount = {
   KEY_ALLOCATION: 20,
   TASK_LIST: 20,
   CALLOUT_LIST: 20,
+  PAY_STUB_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -78,6 +79,7 @@ export const REACT_QUERY_KEYS = {
   KEY_ALLOCATION: 'key-allocation',
   TASK_LIST: 'task-list',
   CALLOUT_LIST: 'callout-list',
+  PAY_STUB_LIST: 'pay-stub-list',
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -90,6 +92,7 @@ export const MinimumQueryCharacter = {
   EMP_DAR: 1,
   KEY: 1,
   TASK_LIST: 1,
+  PAY_STUB: 1,
 } as const;
 
 export const CloudStoragePaths = {

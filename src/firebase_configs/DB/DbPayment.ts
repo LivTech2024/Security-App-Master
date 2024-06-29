@@ -517,6 +517,49 @@ class DbPayment {
 
     return setDoc(payStubRef, newPayStub);
   };
+
+  static getPayStubs = ({
+    cmpId,
+    lastDoc,
+    lmt,
+    endDate,
+    isLifeTime,
+    startDate,
+  }: {
+    cmpId: string;
+    lastDoc?: DocumentData | null;
+    lmt?: number;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+  }) => {
+    const payStubRef = collection(db, CollectionName.payStubs);
+
+    let queryParams: QueryConstraint[] = [
+      where('PayStubCompanyId', '==', cmpId),
+      orderBy('PayStubPayDate', 'desc'),
+    ];
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('PayStubPayDate', '>=', startDate),
+        where('PayStubPayDate', '<=', endDate),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const invoiceQuery = query(payStubRef, ...queryParams);
+
+    return getDocs(invoiceQuery);
+  };
 }
 
 export default DbPayment;

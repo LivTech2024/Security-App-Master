@@ -1,57 +1,17 @@
+import { IPayStubsCollection } from '../../@types/database';
 import { Company } from '../../store/slice/auth.slice';
-import { numberFormatter } from '../NumberFormater';
+import { formatDate } from '../misc';
 import { getPdfHeader } from './common/getPdfHeader';
 
-//utils function
-function calculateFederalIncomeTax(grossPay: number): number {
-  // Calculate federal income tax based on the gross pay
-  // This calculation is simplified and should be adjusted based on the actual tax rates and brackets
-  return grossPay * 0.15; // Placeholder calculation
-}
-
-function calculateProvincialIncomeTax(grossPay: number): number {
-  // Calculate provincial income tax based on the gross pay
-  // This calculation is simplified and should be adjusted based on the actual tax rates and brackets for Alberta
-  return grossPay * 0.1; // Placeholder calculation
-}
-
-function calculateCPPContributions(grossPay: number): number {
-  // Calculate CPP contributions based on the gross pay
-  // This calculation is simplified and should be adjusted based on the actual CPP contribution rates
-  return grossPay * 0.05; // Placeholder calculation
-}
-
-function calculateEIContributions(grossPay: number): number {
-  // Calculate EI contributions based on the gross pay
-  // This calculation is simplified and should be adjusted based on the actual EI contribution rates
-  return grossPay * 0.033; // Placeholder calculation
-}
-
 interface GetPaystubHtmlArgs {
-  startDate: string;
-  endDate: string;
-  empName: string;
-  empHourlyRate: number;
-  empWorkedHours: number;
+  payStub: IPayStubsCollection;
   companyDetails: Company;
 }
 
 export const getPaystubHtml = ({
-  empHourlyRate,
-  empName,
-  empWorkedHours,
-  endDate,
-  startDate,
+  payStub,
   companyDetails,
 }: GetPaystubHtmlArgs) => {
-  const grossPay = empHourlyRate * empWorkedHours;
-
-  const totalDeduction =
-    calculateCPPContributions(grossPay) +
-    calculateEIContributions(grossPay) +
-    calculateFederalIncomeTax(grossPay) +
-    calculateProvincialIncomeTax(grossPay);
-
   const html =
     `<!DOCTYPE html>` +
     `<html>` +
@@ -77,9 +37,9 @@ export const getPaystubHtml = ({
     `<body>` +
     getPdfHeader(companyDetails) +
     `<p style="text-align: center; font-size:24px; font-weight:600;">Earning Statement</p>` +
-    `<p><strong>Employee Name:</strong> ${empName}</p>` +
-    `<p><strong>Pay Period:</strong> ${startDate}, to ${endDate}</p>` +
-    `<p><strong>Pay Date:</strong> ${endDate}</p>` +
+    `<p><strong>Employee Name:</strong> ${payStub.PayStubEmpName}</p>` +
+    `<p><strong>Pay Period:</strong> ${formatDate(payStub.PayStubPayPeriodStartDate)}, to ${formatDate(payStub.PayStubPayPeriodStartDate)}</p>` +
+    `<p><strong>Pay Date:</strong> ${formatDate(payStub.PayStubPayDate)}</p>` +
     `<table>` +
     `<tr>` +
     `<th>Income</th>` +
@@ -88,14 +48,14 @@ export const getPaystubHtml = ({
     `<th>Total</th>` +
     `</tr>` +
     `<tbody><tr>` +
-    `<td>Regular Hours</td>` +
+    /*  `<td>Regular Hours</td>` +
     ` <td>$${empHourlyRate}</td>` +
     ` <td>${empWorkedHours}</td>` +
     `<td>${numberFormatter(empHourlyRate * empWorkedHours, true)}</td>` +
-    `</tr>` +
+    `</tr>` + */
     `<tr>` +
     '<td colspan=3><strong>Total Gross Pay:</strong></td>' +
-    `<td><strong>${numberFormatter(grossPay, true)}</strong></td>` +
+    //`<td><strong>${numberFormatter(grossPay, true)}</strong></td>` +
     `</tr> </tbody>` +
     `</table>` +
     `<table style="margin-top:20px;">` +
@@ -107,33 +67,31 @@ export const getPaystubHtml = ({
     `<td>Income Tax (Federal)</td>` +
     `<td></td>` +
     `<td></td>` +
-    `<td>${numberFormatter(calculateFederalIncomeTax(grossPay), true)}</td>` +
+    //`<td>${numberFormatter(calculateFederalIncomeTax(grossPay), true)}</td>` +
     `</tr>` +
     ` <tr>` +
     `<td>Income Tax (Provincial)</td>` +
     `<td></td>` +
     `<td></td>` +
-    `<td>${numberFormatter(calculateProvincialIncomeTax(grossPay), true)}</td>` +
+    //`<td>${numberFormatter(calculateProvincialIncomeTax(grossPay), true)}</td>` +
     `</tr>` +
     ` <tr>` +
     `<td>CPP Contributions</td>` +
     `<td></td>` +
     `<td></td>` +
-    `<td>${numberFormatter(calculateCPPContributions(grossPay), true)}</td>` +
+    //`<td>${numberFormatter(calculateCPPContributions(grossPay), true)}</td>` +
     `</tr>` +
     `<tr>` +
     `<td>Employment Insurance (EI) Premiums</td>` +
     `<td></td>` +
     `<td></td>` +
-    `<td>${numberFormatter(calculateEIContributions(grossPay), true)}</td>` +
+    //`<td>${numberFormatter(calculateEIContributions(grossPay), true)}</td>` +
     `</tr>` +
     `<tr>` +
     '<td colspan=3><strong>Total Deductions:</strong></td>' +
-    ` <td><strong>${numberFormatter(totalDeduction, true)}</strong></td>` +
-    `</tr>` +
-    `</table>` +
-    `<p style="margin-top:20px;"><strong>Net Pay:</strong> ${numberFormatter(grossPay - totalDeduction, true)}</p>` +
-    `</body>` +
+    /*  ` <td><strong>${numberFormatter(totalDeduction, true)}</strong></td>` +
+    `</tr>` */ +`</table>` +
+    /*  `<p style="margin-top:20px;"><strong>Net Pay:</strong> ${numberFormatter(grossPay - totalDeduction, true)}</p>` */ +`</body>` +
     `</html>`;
 
   return html;
