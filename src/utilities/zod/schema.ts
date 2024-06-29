@@ -443,21 +443,6 @@ export const payStubCreateSchema = z.object({
   PayStubEmpId: z.string().min(3, { message: 'Please select employee' }),
   PayStubEmpName: z.string().min(3, { message: 'Please select employee' }),
   PayStubEmpRole: z.string().min(3, { message: 'Please select employee' }),
-  PayStubEarnings: z.array(
-    z.object({
-      Name: z.string(),
-      Amount: z.coerce.number(),
-      Quantity: z.coerce.number(),
-      YearToDateAmt: z.coerce.number(),
-    })
-  ),
-  PayStubDeductions: z.array(
-    z.object({
-      Name: z.string(),
-      Amount: z.coerce.number(),
-      YearToDateAmt: z.coerce.number(),
-    })
-  ),
   PayStubRefNumber: z.string().nullable().optional(),
   PayStubPayPeriodStartDate: z.date(),
   PayStubPayPeriodEndDate: z.date(),

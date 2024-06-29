@@ -7,19 +7,14 @@ import Button from '../../../common/button/Button';
 import CustomError, { errorHandler } from '../../../utilities/CustomError';
 import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils';
 import DbPayment from '../../../firebase_configs/DB/DbPayment';
-import {
-  IDeductionList,
-  IEarningList,
-} from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
+import { IEarningList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
 import { IPayStubsCollection } from '../../../@types/database';
 
 const EmpDetails = ({
   setEarningsList,
-  setDeductionsList,
   setPreviousPayStub,
 }: {
   setEarningsList: React.Dispatch<React.SetStateAction<IEarningList[]>>;
-  setDeductionsList: React.Dispatch<React.SetStateAction<IDeductionList[]>>;
   setPreviousPayStub: React.Dispatch<
     React.SetStateAction<IPayStubsCollection | null>
   >;
@@ -80,7 +75,13 @@ const EmpDetails = ({
         endDate: payEndDate,
       });
 
-      //const prevPayStubSnapshot = await DbPayment.get
+      const prevPayStub = await DbPayment.getPrevPayStub(empId, payStartDate);
+
+      setPreviousPayStub(prevPayStub);
+
+      const prevYtdAmt =
+        prevPayStub?.PayStubEarnings?.find((e) => e?.Income === 'Regular')
+          ?.YTDAmount || 0;
 
       setEarningsList([
         {
@@ -92,19 +93,8 @@ const EmpDetails = ({
           Type: 'Hourly',
           Rate: String(empEarningDetails.Rate),
           YTDAmount: String(
-            empEarningDetails.Rate * empEarningDetails.Quantity
+            prevYtdAmt + empEarningDetails.Rate * empEarningDetails.Quantity
           ),
-        },
-      ]);
-
-      setPreviousPayStub(null);
-
-      setDeductionsList([
-        {
-          Amount: '500',
-          Deduction: 'CPP',
-          YearToDateAmt: '600',
-          Percentage: '5',
         },
       ]);
 

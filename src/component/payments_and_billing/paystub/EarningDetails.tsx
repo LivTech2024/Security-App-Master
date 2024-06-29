@@ -1,4 +1,7 @@
-import { IPayStubEarningsChildCollection } from '../../../@types/database';
+import {
+  IPayStubEarningsChildCollection,
+  IPayStubsCollection,
+} from '../../../@types/database';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { IEarningList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
@@ -11,20 +14,25 @@ import { RiEqualFill } from 'react-icons/ri';
 interface EarningDetailsProps {
   earningsList: IEarningList[];
   setEarningsList: React.Dispatch<React.SetStateAction<IEarningList[]>>;
+  previousPayStub: IPayStubsCollection | null;
 }
 
 const EarningDetails = ({
   earningsList,
   setEarningsList,
+  previousPayStub,
 }: EarningDetailsProps) => {
   const handleAddEarningDetail = () => {
+    const prevYtdAmount =
+      previousPayStub?.PayStubEarnings.find((res) => res.Income === 'Regular')
+        ?.YTDAmount || 0;
     setEarningsList([
       ...earningsList,
       {
         Income: 'Regular',
         Type: 'Fixed',
         CurrentAmount: '',
-        YTDAmount: '',
+        YTDAmount: String(prevYtdAmount),
       },
     ]);
   };
@@ -42,6 +50,24 @@ const EarningDetails = ({
     const updatedEarningList = [...earningsList];
 
     updatedEarningList[index][field] = value as never;
+
+    const prevYtdAmt =
+      previousPayStub?.PayStubEarnings.find(
+        (res) => res.Income === updatedEarningList[index].Income
+      )?.YTDAmount || 0;
+
+    if (field === 'CurrentAmount' || field === 'Rate' || field === 'Quantity') {
+      updatedEarningList[index].YTDAmount = String(
+        prevYtdAmt +
+          (Number(updatedEarningList[index].CurrentAmount) ||
+            Number(updatedEarningList[index].Rate) *
+              Number(updatedEarningList[index].Quantity))
+      );
+    }
+
+    if (field === 'Income') {
+      updatedEarningList[index].YTDAmount = String(prevYtdAmt);
+    }
 
     setEarningsList(updatedEarningList);
   };

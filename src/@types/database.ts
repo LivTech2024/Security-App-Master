@@ -610,8 +610,8 @@ export interface IUserDataDeletionRequestsCollection {
 export interface IPayStubEarningsChildCollection {
   Income: 'Regular' | 'Banked' | 'Overtime' | 'Vacation' | 'Bonus' | 'Stat';
   Type: 'Fixed' | 'Hourly';
-  Rate?: number;
-  Quantity?: number;
+  Rate?: number | null;
+  Quantity?: number | null;
   CurrentAmount: number;
   YTDAmount: number;
 }

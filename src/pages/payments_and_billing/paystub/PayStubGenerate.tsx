@@ -1,7 +1,11 @@
 import PageHeader from '../../../common/PageHeader';
 import Button from '../../../common/button/Button';
 import { useAuthState } from '../../../store';
-import { closeModalLoader } from '../../../utilities/TsxUtils';
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from '../../../utilities/TsxUtils';
 
 import { errorHandler } from '../../../utilities/CustomError';
 import PayStubDetails from '../../../component/payments_and_billing/paystub/PayStubDetails';
@@ -21,6 +25,9 @@ import {
   IPayStubEarningsChildCollection,
   IPayStubsCollection,
 } from '../../../@types/database';
+import DbPayment from '../../../firebase_configs/DB/DbPayment';
+import { useNavigate } from 'react-router-dom';
+import { PageRoutes } from '../../../@types/enum';
 
 export interface IEarningList
   extends Omit<
@@ -47,6 +54,8 @@ const PayStubGenerate = () => {
   const methods = useForm<PayStubCreateFormFields>({
     resolver: zodResolver(payStubCreateSchema),
   });
+
+  const navigate = useNavigate();
 
   const { company } = useAuthState();
 
@@ -103,30 +112,37 @@ const PayStubGenerate = () => {
   const [previousPayStub, setPreviousPayStub] =
     useState<IPayStubsCollection | null>(null);
 
+  const netPayCurrent = Number(methods.watch('PayStubNetPay.Amount'));
+
+  useEffect(() => {
+    const prevYtdAmt = previousPayStub?.PayStubNetPay?.YearToDateAmt || 0;
+    methods.setValue(
+      'PayStubNetPay.YearToDateAmt',
+      Number(netPayCurrent + prevYtdAmt)
+    );
+  }, [previousPayStub, netPayCurrent]);
+
   const onSubmit = async (data: PayStubCreateFormFields) => {
     if (!company) return;
 
-    console.log(data, previousPayStub);
-
-    /* const html = getPaystubHtml({
-      companyDetails: company,
-      empHourlyRate: employee.EmployeePayRate,
-      empName: employee.EmployeeName,
-      empWorkedHours: 25,
-      endDate: dayjs(endDate).format('MMMM DD,YYYY'),
-      startDate: dayjs(startDate).format('MMMM DD,YYYY'),
-    }); */
-
     try {
-      /* showModalLoader({});
+      showModalLoader({});
 
-      const fileName = `${employee.EmployeeName}_paystub.pdf`;
+      await DbPayment.createPayStub({
+        cmpId: company.CompanyId,
+        data,
+        deductionsList,
+        earningsList,
+      });
 
-      const response = await htmlToPdf({ html, file_name: fileName });
+      showSnackbar({
+        message: 'PayStub created successfully',
+        type: 'success',
+      });
 
-      downloadPdf(response, fileName);
+      closeModalLoader();
 
-      closeModalLoader(); */
+      navigate(PageRoutes.PAY_STUB_LIST);
     } catch (error) {
       console.log(error);
       errorHandler(error);
@@ -155,7 +171,6 @@ const PayStubGenerate = () => {
             <PayStubDetails />
             <EmpDetails
               setEarningsList={setEarningsList}
-              setDeductionsList={setDeductionsList}
               setPreviousPayStub={setPreviousPayStub}
             />
           </div>
@@ -165,11 +180,13 @@ const PayStubGenerate = () => {
             <EarningDetails
               earningsList={earningsList}
               setEarningsList={setEarningsList}
+              previousPayStub={previousPayStub}
             />
             <DeductionDetails
               deductionsList={deductionsList}
               setDeductionsList={setDeductionsList}
               totalEarnings={totalEarnings}
+              previousPayStub={previousPayStub}
             />
           </div>
 

@@ -10,17 +10,24 @@ import {
   query,
   runTransaction,
   serverTimestamp,
+  setDoc,
   startAfter,
   where,
 } from 'firebase/firestore';
 import { db } from '../config';
 import { CollectionName } from '../../@types/enum';
-import { InvoiceFormFields } from '../../utilities/zod/schema';
+import {
+  InvoiceFormFields,
+  PayStubCreateFormFields,
+} from '../../utilities/zod/schema';
 import {
   IClientsCollection,
   IInvoiceItems,
   IInvoiceTaxList,
   IInvoicesCollection,
+  IPayStubDeductionsChildCollection,
+  IPayStubEarningsChildCollection,
+  IPayStubsCollection,
   IShiftsCollection,
 } from '../../@types/database';
 import CustomError from '../../utilities/CustomError';
@@ -31,6 +38,10 @@ import {
   removeTimeFromDate,
 } from '../../utilities/misc';
 import DbEmployee from './DbEmployee';
+import {
+  IDeductionList,
+  IEarningList,
+} from '../../pages/payments_and_billing/paystub/PayStubGenerate';
 
 class DbPayment {
   static isInvoiceNumberExist = async (
@@ -416,7 +427,7 @@ class DbPayment {
     }
   };
 
-  static getPrevPayStub = (empId: string, startDate: Date) => {
+  static getPrevPayStub = async (empId: string, startDate: Date) => {
     const payStubRef = collection(db, CollectionName.payStubs);
     const payStubQuery = query(
       payStubRef,
@@ -425,7 +436,86 @@ class DbPayment {
       limit(1)
     );
 
-    return getDocs(payStubQuery);
+    const snapshot = await getDocs(payStubQuery);
+
+    return snapshot.docs[0].data() as IPayStubsCollection;
+  };
+
+  static createPayStub = ({
+    cmpId,
+    data,
+    deductionsList,
+    earningsList,
+  }: {
+    cmpId: string;
+    data: PayStubCreateFormFields;
+    earningsList: IEarningList[];
+    deductionsList: IDeductionList[];
+  }) => {
+    const payStubId = getNewDocId(CollectionName.payStubs);
+    const payStubRef = doc(db, CollectionName.payStubs, payStubId);
+
+    const {
+      PayStubEmpId,
+      PayStubEmpName,
+      PayStubEmpRole,
+      PayStubNetPay,
+      PayStubPayDate,
+      PayStubPayPeriodEndDate,
+      PayStubPayPeriodStartDate,
+      PayStubRefNumber,
+    } = data;
+
+    const PayStubEarnings: IPayStubEarningsChildCollection[] = earningsList.map(
+      (res) => {
+        return {
+          ...res,
+          CurrentAmount: res.CurrentAmount
+            ? Number(res.CurrentAmount)
+            : Number(res.Quantity) * Number(res.Rate),
+          Quantity: Number(res.Quantity) || null,
+          Rate: Number(res.Rate) || null,
+          YTDAmount: Number(res.YTDAmount || 0),
+        };
+      }
+    );
+
+    const PayStubDeductions: IPayStubDeductionsChildCollection[] =
+      deductionsList
+        .filter((res) => res.Amount && res.Percentage)
+        .map((res) => {
+          return {
+            Amount: Number(res.Amount),
+            Deduction: res.Deduction,
+            Percentage: Number(res.Percentage),
+            YearToDateAmt: Number(res.YearToDateAmt || 0),
+          };
+        });
+
+    const newPayStub: IPayStubsCollection = {
+      PayStubId: payStubId,
+      PayStubCompanyId: cmpId,
+      PayStubEmpId,
+      PayStubEmpName,
+      PayStubEmpRole,
+      PayStubEarnings,
+      PayStubDeductions,
+      PayStubPayPeriodStartDate: removeTimeFromDate(
+        PayStubPayPeriodStartDate
+      ) as unknown as Timestamp,
+      PayStubPayPeriodEndDate: removeTimeFromDate(
+        PayStubPayPeriodEndDate
+      ) as unknown as Timestamp,
+      PayStubPayDate: removeTimeFromDate(
+        PayStubPayDate
+      ) as unknown as Timestamp,
+      PayStubNetPay,
+      PayStubRefNumber,
+      PayStubCreatedAt: serverTimestamp(),
+      PayStubModifiedAt: serverTimestamp(),
+    };
+
+    return setDoc(payStubRef, newPayStub);
   };
 }
 

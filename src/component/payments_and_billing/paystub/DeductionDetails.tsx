@@ -5,25 +5,31 @@ import InputSelect from '../../../common/inputs/InputSelect';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { numberFormatter } from '../../../utilities/NumberFormater';
 import { roundNumber } from '../../../utilities/misc';
+import { IPayStubsCollection } from '../../../@types/database';
 
 interface DeductionDetailsProps {
   deductionsList: IDeductionList[];
   setDeductionsList: React.Dispatch<React.SetStateAction<IDeductionList[]>>;
   totalEarnings: number;
+  previousPayStub: IPayStubsCollection | null;
 }
 
 const DeductionDetails = ({
   deductionsList,
   setDeductionsList,
   totalEarnings,
+  previousPayStub,
 }: DeductionDetailsProps) => {
   const handleAddDeductionDetail = () => {
+    const prevYtdAmount =
+      previousPayStub?.PayStubDeductions.find((res) => res.Deduction === 'CPP')
+        ?.YearToDateAmt || 0;
     setDeductionsList([
       ...deductionsList,
       {
         Deduction: 'CPP',
         Amount: '',
-        YearToDateAmt: '',
+        YearToDateAmt: String(prevYtdAmount),
         Percentage: '',
       },
     ]);
@@ -42,6 +48,21 @@ const DeductionDetails = ({
   ) => {
     const updatedEarningList = [...deductionsList];
     updatedEarningList[index][field] = value;
+
+    const prevYtdAmt =
+      previousPayStub?.PayStubDeductions.find(
+        (res) => res.Deduction === updatedEarningList[index].Deduction
+      )?.YearToDateAmt || 0;
+
+    if (field === 'Amount' || field === 'Percentage') {
+      updatedEarningList[index].YearToDateAmt = String(
+        prevYtdAmt + Number(updatedEarningList[index].Amount)
+      );
+    }
+
+    if (field === 'Deduction') {
+      updatedEarningList[index].YearToDateAmt = String(prevYtdAmt);
+    }
 
     setDeductionsList(updatedEarningList);
   };
