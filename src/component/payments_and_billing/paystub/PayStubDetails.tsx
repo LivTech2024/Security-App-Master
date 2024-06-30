@@ -47,7 +47,7 @@ const PayStubDetails = () => {
           error={errors.PayStubPayPeriodStartDate?.message}
         />
         <InputDate
-          label="Pay period start date"
+          label="Pay period end date"
           value={endDate}
           setValue={setEndDate}
           error={errors.PayStubPayPeriodEndDate?.message}
