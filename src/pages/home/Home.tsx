@@ -72,21 +72,23 @@ const Home = () => {
   return (
     <div className="flex flex-col w-full p-10 items-center gap-6 h-full justify-center bg-primary">
       <div className="flex w-full justify-center items-center">
-        <div className="flex flex-col items-center gap-">
+        <div className="flex flex-col items-center">
           <img
             src={company?.CompanyLogo}
             alt=""
             className="w-[140px] object-cover "
           />
 
-          <div className="font-semibold text-lg">
+          <div className="font-semibold text-lg text-surface">
             Welcome {company?.CompanyName}
           </div>
 
-          <SelectBranch
-            selectedBranch={selectedBranch}
-            setSelectedBranch={setSelectedBranch}
-          />
+          <div className="mt-4">
+            <SelectBranch
+              selectedBranch={selectedBranch}
+              setSelectedBranch={setSelectedBranch}
+            />
+          </div>
         </div>
         {/* <button onClick={test} className="text-white">
           test email

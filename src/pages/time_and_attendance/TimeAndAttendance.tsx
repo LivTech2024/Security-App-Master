@@ -13,7 +13,11 @@ import { IShiftsCollection } from '../../@types/database';
 import { useInView } from 'react-intersection-observer';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import NoSearchResult from '../../common/NoSearchResult';
-import { formatDate, toDate } from '../../utilities/misc';
+import {
+  formatDate,
+  getHoursDiffInTwoTimeString,
+  toDate,
+} from '../../utilities/misc';
 
 const TimeAndAttendance = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -108,7 +112,10 @@ const TimeAndAttendance = () => {
   const getHoursSpent = (startTime?: Timestamp, endTime?: Timestamp) => {
     if (!startTime || !endTime) return 'N/A';
 
-    return dayjs(toDate(startTime)).diff(toDate(endTime), 'hours');
+    return getHoursDiffInTwoTimeString(
+      dayjs(toDate(endTime)).format('HH:mm'),
+      dayjs(toDate(startTime)).format('HH:mm')
+    );
   };
 
   return (
@@ -145,7 +152,7 @@ const TimeAndAttendance = () => {
             <th className="uppercase px-4 py-2 w-[15%] text-start">In Time</th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">Out Time</th>
             <th className="uppercase px-4 py-2 w-[15%] text-end">
-              Total Time Spent
+              Total Hrs Spent
             </th>
           </tr>
         </thead>
@@ -216,10 +223,10 @@ const TimeAndAttendance = () => {
                         getHoursSpent(
                           shift.ShiftCurrentStatus.find(
                             (s) => s.StatusReportedById === selectedEmpId
-                          )?.StatusStartedTime as Timestamp,
+                          )?.StatusReportedTime as Timestamp,
                           shift.ShiftCurrentStatus.find(
                             (s) => s.StatusReportedById === selectedEmpId
-                          )?.StatusReportedTime as Timestamp
+                          )?.StatusStartedTime as Timestamp
                         )}
                     </span>
                   </td>
