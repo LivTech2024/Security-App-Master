@@ -58,7 +58,7 @@ import VisitorList from './pages/visitor_management/VisitorList';
 import VisitorView from './pages/visitor_management/VisitorView';
 import KeyList from './pages/key_management/KeyList';
 import KeyView from './pages/key_management/KeyView';
-import TimeAndAttendance from './pages/time_and_attendance/TimeAndAttendance';
+import TimeAndAttendanceView from './pages/time_and_attendance/TimeAndAttendanceView';
 import EmpDarList from './pages/employee_dar/EmpDarList';
 import EmpDarView from './pages/employee_dar/EmpDarView';
 import PerformanceAssurance from './pages/performance_assurance/PerformanceAssurance';
@@ -76,6 +76,7 @@ import PrivacyPolicy from './pages/uprotected_pages/privacy_policy/PrivacyPolicy
 import UserDataDeletionRequest from './pages/uprotected_pages/user_data_deletion_request/UserDataDeletionRequest';
 import PayStubGenerate from './pages/payments_and_billing/paystub/PayStubGenerate';
 import PayStubList from './pages/payments_and_billing/paystub/PayStubList';
+import TimeAndAttendanceList from './pages/time_and_attendance/TimeAndAttendanceList';
 
 function App() {
   useOnAuthStateChanged();
@@ -321,8 +322,13 @@ function App() {
             <Route path={PageRoutes.VISITOR_VIEW} Component={VisitorView} />
 
             <Route
-              path={PageRoutes.TIME_AND_ATTENDANCE}
-              Component={TimeAndAttendance}
+              path={PageRoutes.TIME_AND_ATTENDANCE_VIEW}
+              Component={TimeAndAttendanceView}
+            />
+
+            <Route
+              path={PageRoutes.TIME_AND_ATTENDANCE_LIST}
+              Component={TimeAndAttendanceList}
             />
 
             <Route

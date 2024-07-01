@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import PageHeader from '../../common/PageHeader';
 import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
 import dayjs from 'dayjs';
-import useFetchEmployees from '../../hooks/fetch/useFetchEmployees';
-import InputSelect from '../../common/inputs/InputSelect';
 import { useAuthState } from '../../store';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
@@ -18,6 +16,7 @@ import {
   getHoursDiffInTwoTimeString,
   toDate,
 } from '../../utilities/misc';
+import { useSearchParams } from 'react-router-dom';
 
 const TimeAndAttendance = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -28,16 +27,13 @@ const TimeAndAttendance = () => {
     dayjs().endOf('M').toDate()
   );
 
-  const [empSearchQuery, setEmpSearchQuery] = useState('');
-
-  const { data: employees } = useFetchEmployees({
-    limit: 5,
-    searchQuery: empSearchQuery,
-  });
-
   const { company } = useAuthState();
 
-  const [selectedEmpId, setSelectedEmpId] = useState('');
+  const [searchParam] = useSearchParams();
+
+  const selectedEmpId = searchParam.get('emp_id');
+
+  const selectedEmpName = searchParam.get('emp_name');
 
   const {
     data: snapshotData,
@@ -56,7 +52,7 @@ const TimeAndAttendance = () => {
         companyId: company!.CompanyId,
         startDate,
         endDate,
-        empId: selectedEmpId,
+        empId: selectedEmpId || '',
       });
       return snapshot.docs;
     },
@@ -120,20 +116,12 @@ const TimeAndAttendance = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <PageHeader title="Time & Attendance" />
+      <PageHeader title="Time & Attendance View" />
       <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
-        <InputSelect
-          value={selectedEmpId}
-          onChange={(e) => setSelectedEmpId(e as string)}
-          data={employees.map((emp) => {
-            return { label: emp.EmployeeName, value: emp.EmployeeId };
-          })}
-          searchValue={empSearchQuery}
-          onSearchChange={setEmpSearchQuery}
-          searchable
-          clearable
-          placeholder="Select employee"
-        />
+        <div className="text-lg">
+          Employee Name:{' '}
+          <span className="font-semibold">{selectedEmpName}</span>
+        </div>
         <DateFilterDropdown
           endDate={endDate}
           setEndDate={setEndDate}
