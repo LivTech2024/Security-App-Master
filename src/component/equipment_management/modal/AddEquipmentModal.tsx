@@ -16,9 +16,10 @@ import {
   showSnackbar,
 } from '../../../utilities/TsxUtils';
 import DbAssets from '../../../firebase_configs/DB/DbAssets';
-import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { PageRoutes, REACT_QUERY_KEYS } from '../../../@types/enum';
 import { useQueryClient } from '@tanstack/react-query';
 import { openContextModal } from '@mantine/modals';
+import { useNavigate } from 'react-router-dom';
 
 const AddEquipmentModal = ({
   opened,
@@ -27,6 +28,8 @@ const AddEquipmentModal = ({
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const navigate = useNavigate();
+
   const methods = useForm<EquipmentFormFields>({
     resolver: zodResolver(equipmentSchema),
   });
@@ -113,6 +116,8 @@ const AddEquipmentModal = ({
       setEquipmentEditData(null);
       setOpened(false);
       setLoading(false);
+
+      navigate(PageRoutes.EQUIPMENT_LIST);
     } catch (error) {
       setLoading(false);
       console.log(error);
