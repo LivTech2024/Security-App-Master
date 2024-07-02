@@ -189,7 +189,7 @@ const PayStubList = () => {
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={6}>
+              <td colSpan={7}>
                 <NoSearchResult />
               </td>
             </tr>
@@ -233,7 +233,7 @@ const PayStubList = () => {
             })
           )}
           <tr ref={ref}>
-            <td colSpan={6}>
+            <td colSpan={7}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />
