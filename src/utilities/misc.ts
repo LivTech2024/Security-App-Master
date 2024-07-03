@@ -184,22 +184,22 @@ export const getHoursDiffInTwoTimeString = (
   return Number(diff.toFixed(2));
 };
 
+export const parseTime = (time: string) => {
+  const [hourStr, minuteStr] = time.split(':');
+  let hour = parseInt(hourStr, 10);
+  const minute = parseInt(minuteStr.replace(/\D/g, ''), 10); // Remove any non-digit characters (AM/PM)
+  if (time.includes('PM') && hour !== 12) {
+    hour += 12;
+  } else if (time.includes('AM') && hour === 12) {
+    hour = 0;
+  }
+  return { hour, minute };
+};
+
 export const getMinutesDiffInTwoTimeString = (
   time1: string,
   time2: string
 ): number => {
-  const parseTime = (time: string) => {
-    const [hourStr, minuteStr] = time.split(':');
-    let hour = parseInt(hourStr, 10);
-    const minute = parseInt(minuteStr.replace(/\D/g, ''), 10); // Remove any non-digit characters (AM/PM)
-    if (time.includes('PM') && hour !== 12) {
-      hour += 12;
-    } else if (time.includes('AM') && hour === 12) {
-      hour = 0;
-    }
-    return { hour, minute };
-  };
-
   const is24HourFormat = (time: string) =>
     !time.includes('AM') && !time.includes('PM');
 
