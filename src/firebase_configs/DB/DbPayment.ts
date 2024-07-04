@@ -122,6 +122,7 @@ class DbPayment {
         InvoiceLocationId: data.InvoiceLocationId || null,
         InvoiceLocationName: data.InvoiceLocationName || null,
         InvoiceNumber: data.InvoiceNumber,
+        InvoicePONumber: data.InvoicePONumber || null,
         InvoiceDate: removeTimeFromDate(
           data.InvoiceDate
         ) as unknown as Timestamp,
@@ -209,6 +210,7 @@ class DbPayment {
         InvoiceLocationId: data.InvoiceLocationId || null,
         InvoiceLocationName: data.InvoiceLocationName || null,
         InvoiceNumber: data.InvoiceNumber,
+        InvoicePONumber: data.InvoicePONumber || null,
         InvoiceDate: removeTimeFromDate(
           data.InvoiceDate
         ) as unknown as Timestamp,

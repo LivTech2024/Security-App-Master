@@ -94,8 +94,13 @@ export function generateInvoiceHTML({
            
           </div>
           <div style="text-align: end; max-width:50%;">
+
             <p>Invoice Number: ${invoiceData.InvoiceNumber}</p>
+
+            ${invoiceData?.InvoicePONumber && `<p>PO Number: ${invoiceData.InvoicePONumber}</p>`}
+
             <p>Invoice Date: ${formatDate(invoiceData.InvoiceDate)}</p>
+
             <p>Invoice Due Date: ${formatDate(invoiceData.InvoiceDueDate)}</p>
           </div>
         </div>

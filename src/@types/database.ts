@@ -368,6 +368,7 @@ export interface IInvoicesCollection {
   InvoiceLocationId: string | null;
   InvoiceLocationName: string | null;
   InvoiceNumber: string;
+  InvoicePONumber: string | null;
   InvoiceDate: Timestamp | FieldValue;
   InvoiceDueDate: Timestamp | FieldValue;
   InvoiceItems: IInvoiceItems[];

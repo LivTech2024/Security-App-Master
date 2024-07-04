@@ -276,6 +276,7 @@ export const invoiceSchema = z
       .string()
       .min(1, { message: 'Invoice number should be at least 1 character' })
       .max(6, { message: 'Invoice number should be at most 6 character' }),
+    InvoicePONumber: z.string().optional().nullable(),
     InvoiceDate: z.date(),
     InvoiceDueDate: z.date(),
     InvoiceSubtotal: z.coerce

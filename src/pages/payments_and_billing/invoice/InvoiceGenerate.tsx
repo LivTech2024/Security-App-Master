@@ -59,6 +59,7 @@ const InvoiceGenerate = () => {
           InvoiceDescription: invoiceEditData.InvoiceDescription,
           InvoiceDueDate: toDate(invoiceEditData.InvoiceDueDate),
           InvoiceNumber: invoiceEditData.InvoiceNumber,
+          InvoicePONumber: invoiceEditData.InvoicePONumber || null,
           InvoiceReceivedAmount: invoiceEditData.InvoiceReceivedAmount,
           InvoiceSubtotal: invoiceEditData.InvoiceSubtotal,
           InvoiceTerms: invoiceEditData.InvoiceTerms,
@@ -408,6 +409,14 @@ const InvoiceGenerate = () => {
                   decimalCount={0}
                   name="InvoiceNumber"
                   error={methods.formState.errors?.InvoiceNumber?.message}
+                />
+                <InputWithTopHeader
+                  className="mx-0"
+                  label="PO No."
+                  register={methods.register}
+                  decimalCount={0}
+                  name="InvoicePONumber"
+                  error={methods.formState.errors?.InvoicePONumber?.message}
                 />
                 <InputDate
                   label="Invoice date"
