@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import {
   formatDate,
   getHoursDiffInTwoTimeString,
+  parseTime,
   toDate,
 } from '../../../utilities/misc';
 import DbSchedule, { ISchedule } from '../../../firebase_configs/DB/DbSchedule';
-import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { PageRoutes, REACT_QUERY_KEYS } from '../../../@types/enum';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthState } from '../../../store';
 import SelectBranch from '../../../common/SelectBranch';
@@ -15,6 +16,7 @@ import Button from '../../../common/button/Button';
 import { generateStatsViewHtml } from '../../../utilities/pdf/genrateStatsViewHtml';
 import { htmlStringToPdf } from '../../../utilities/htmlStringToPdf';
 import DateFilterDropdown from '../../../common/dropdown/DateFilterDropdown';
+import { useNavigate } from 'react-router-dom';
 
 const StatisticsView = () => {
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
@@ -105,9 +107,32 @@ const StatisticsView = () => {
     schedule.forEach((sch) => {
       const { employee, shift } = sch;
 
-      let shiftHours = getHoursDiffInTwoTimeString(
-        shift.ShiftStartTime,
-        shift.ShiftEndTime
+      const { ShiftDate, ShiftStartTime, ShiftEndTime } = shift;
+
+      const { hour: startHour, minute: startMinute } =
+        parseTime(ShiftStartTime);
+      const { hour: endHour, minute: endMinute } = parseTime(ShiftEndTime);
+
+      const shiftStartTimeWithDate = dayjs()
+        .date(toDate(ShiftDate).getDate())
+        .month(toDate(ShiftDate).getMonth())
+        .hour(startHour)
+        .minute(startMinute)
+        .second(0)
+        .toDate();
+
+      const shiftEndTimeWithDate = dayjs()
+        .date(toDate(ShiftDate).getDate())
+        .month(toDate(ShiftDate).getMonth())
+        .hour(endHour)
+        .minute(endMinute)
+        .second(0)
+        .add(startHour > endHour ? 1 : 0, 'day')
+        .toDate();
+
+      let shiftHours = dayjs(shiftEndTimeWithDate).diff(
+        shiftStartTimeWithDate,
+        'hours'
       );
 
       allShiftsCost += employee.reduce((acc, obj) => {
@@ -118,8 +143,15 @@ const StatisticsView = () => {
           const empShiftStatus = shift?.ShiftCurrentStatus?.find(
             (status) => status.StatusReportedById === obj.EmployeeId
           );
-          if (empShiftStatus && empShiftStatus.StatusShiftTotalHrs) {
-            shiftHours = empShiftStatus.StatusShiftTotalHrs;
+          if (
+            empShiftStatus &&
+            empShiftStatus.StatusReportedTime &&
+            empShiftStatus.StatusStartedTime
+          ) {
+            shiftHours = dayjs(toDate(empShiftStatus.StatusReportedTime)).diff(
+              toDate(empShiftStatus.StatusStartedTime),
+              'hours'
+            );
           }
         }
         return acc + obj.EmployeePayRate * shiftHours;
@@ -175,9 +207,33 @@ const StatisticsView = () => {
     schedules?.forEach((schedule) => {
       if (schedule?.employee?.length > 0) {
         const { employee, shift } = schedule;
-        let shiftHours = getHoursDiffInTwoTimeString(
-          shift.ShiftStartTime,
-          shift.ShiftEndTime
+
+        const { ShiftDate, ShiftStartTime, ShiftEndTime } = shift;
+
+        const { hour: startHour, minute: startMinute } =
+          parseTime(ShiftStartTime);
+        const { hour: endHour, minute: endMinute } = parseTime(ShiftEndTime);
+
+        const shiftStartTimeWithDate = dayjs()
+          .date(toDate(ShiftDate).getDate())
+          .month(toDate(ShiftDate).getMonth())
+          .hour(startHour)
+          .minute(startMinute)
+          .second(0)
+          .toDate();
+
+        const shiftEndTimeWithDate = dayjs()
+          .date(toDate(ShiftDate).getDate())
+          .month(toDate(ShiftDate).getMonth())
+          .hour(endHour)
+          .minute(endMinute)
+          .second(0)
+          .add(startHour > endHour ? 1 : 0, 'day')
+          .toDate();
+
+        let shiftHours = dayjs(toDate(shiftEndTimeWithDate)).diff(
+          toDate(shiftStartTimeWithDate),
+          'hours'
         );
 
         employee.forEach((emp) => {
@@ -185,6 +241,17 @@ const StatisticsView = () => {
             shift?.ShiftCurrentStatus &&
             Array.isArray(shift?.ShiftCurrentStatus)
           ) {
+            const empStatus = shift.ShiftCurrentStatus.find(
+              (e) => e.StatusReportedById === emp.EmployeeId
+            );
+            const startTime = empStatus?.StatusStartedTime;
+            const endTime = empStatus?.StatusReportedTime;
+            if (startTime && endTime) {
+              shiftHours = dayjs(toDate(endTime)).diff(
+                toDate(startTime),
+                'hours'
+              );
+            }
             const empShiftStatus = shift?.ShiftCurrentStatus?.find(
               (status) => status.StatusReportedById === emp.EmployeeId
             );
@@ -228,30 +295,64 @@ const StatisticsView = () => {
     return schedule.reduce((acc, obj) => {
       let shiftTotalHrsSpentByAllEmp = 0;
 
+      const { ShiftDate, ShiftStartTime, ShiftEndTime } = obj.shift;
+
+      const { hour: startHour, minute: startMinute } =
+        parseTime(ShiftStartTime);
+      const { hour: endHour, minute: endMinute } = parseTime(ShiftEndTime);
+
+      const shiftStartTimeWithDate = dayjs()
+        .date(toDate(ShiftDate).getDate())
+        .month(toDate(ShiftDate).getMonth())
+        .hour(startHour)
+        .minute(startMinute)
+        .second(0)
+        .toDate();
+
+      const shiftEndTimeWithDate = dayjs()
+        .date(toDate(ShiftDate).getDate())
+        .month(toDate(ShiftDate).getMonth())
+        .hour(endHour)
+        .minute(endMinute)
+        .second(0)
+        .add(startHour > endHour ? 1 : 0, 'day')
+        .toDate();
+
       if (
         obj?.shift?.ShiftCurrentStatus &&
         Array.isArray(obj?.shift?.ShiftCurrentStatus) &&
         obj?.shift?.ShiftCurrentStatus.length > 0
       ) {
-        shiftTotalHrsSpentByAllEmp = obj?.shift?.ShiftCurrentStatus?.reduce(
-          (acc, obj) => acc + (obj.StatusShiftTotalHrs || 0),
+        shiftTotalHrsSpentByAllEmp = obj.shift.ShiftCurrentStatus.reduce(
+          (acc, obj) => {
+            const { StatusStartedTime, StatusReportedTime } = obj;
+            let actualHrsSpent = 0;
+            if (StatusStartedTime && StatusReportedTime) {
+              actualHrsSpent = dayjs(toDate(StatusReportedTime)).diff(
+                toDate(StatusStartedTime),
+                'hours'
+              );
+            } else {
+              actualHrsSpent = dayjs(shiftEndTimeWithDate).diff(
+                shiftStartTimeWithDate,
+                'hours'
+              );
+            }
+            return acc + actualHrsSpent;
+          },
           0
         );
+      } else {
+        shiftTotalHrsSpentByAllEmp =
+          dayjs(shiftEndTimeWithDate).diff(shiftStartTimeWithDate, 'hours') *
+          (obj.shift.ShiftAssignedUserId.length || 1);
       }
 
-      const shiftHours =
-        getHoursDiffInTwoTimeString(
-          obj.shift.ShiftStartTime,
-          obj.shift.ShiftEndTime
-        ) * obj.shift.ShiftAssignedUserId.length;
-
-      if (shiftTotalHrsSpentByAllEmp) {
-        return acc + shiftTotalHrsSpentByAllEmp;
-      }
-
-      return acc + shiftHours;
+      return acc + shiftTotalHrsSpentByAllEmp;
     }, 0);
   };
+
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -399,7 +500,17 @@ const StatisticsView = () => {
               {empHavingShifts.map((data) => {
                 return (
                   <tr key={data.empId}>
-                    <td className="px-2 py-2 text-start">{data.empName}</td>
+                    <td
+                      onClick={() =>
+                        navigate(
+                          PageRoutes.TIME_AND_ATTENDANCE_VIEW +
+                            `?emp_id=${data.empId}&emp_name=${data.empName}`
+                        )
+                      }
+                      className="px-2 py-2 text-start text-textPrimaryBlue cursor-pointer hover:underline"
+                    >
+                      {data.empName}
+                    </td>
                     <td className="px-2 py-2 text-center">{data.empShifts}</td>
                     <td className="px-2 py-2 text-center">
                       {numberFormatter(data.empHours)}
