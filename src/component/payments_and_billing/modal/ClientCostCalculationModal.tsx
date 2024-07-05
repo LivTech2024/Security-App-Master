@@ -22,6 +22,7 @@ import DbPatrol from '../../../firebase_configs/DB/DbPatrol';
 import dayjs from 'dayjs';
 import { useFormContext } from 'react-hook-form';
 import { InvoiceFormFields } from '../../../utilities/zod/schema';
+import { getShiftActualHours } from '../../../utilities/scheduleHelper';
 
 const ClientCostCalculationModal = ({
   opened,
@@ -114,21 +115,16 @@ const ClientCostCalculationModal = ({
 
         await Promise.all(
           shifts?.map(async (shift) => {
-            const {
-              ShiftAssignedUserId,
-              ShiftStartTime,
-              ShiftEndTime,
-              ShiftCurrentStatus,
-            } = shift;
+            const { ShiftAssignedUserId, ShiftCurrentStatus } = shift;
 
             if (
               Array.isArray(ShiftCurrentStatus) &&
               ShiftCurrentStatus.some((status) => status.Status === 'completed')
             ) {
-              let shiftHours = getHoursDiffInTwoTimeString(
-                ShiftStartTime,
-                ShiftEndTime
-              );
+              let { shiftHours } = getShiftActualHours({
+                shift,
+                timeMarginInMins: 0,
+              });
 
               shiftHours = shiftHours * (ShiftAssignedUserId.length || 0);
 

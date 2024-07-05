@@ -17,10 +17,11 @@ import { numberFormatter } from '../../utilities/NumberFormater';
 import PageHeader from '../../common/PageHeader';
 import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
 import dayjs from 'dayjs';
-import { formatDate, getHoursDiffInTwoTimeString } from '../../utilities/misc';
+import { formatDate } from '../../utilities/misc';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
 import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
 import DbPatrol from '../../firebase_configs/DB/DbPatrol';
+import { getShiftActualHours } from '../../utilities/scheduleHelper';
 
 interface ILocationCostDetails {
   LocationId: string;
@@ -105,22 +106,17 @@ const ClientView = () => {
 
       await Promise.all(
         shifts?.map(async (shift) => {
-          const {
-            ShiftAssignedUserId,
-            ShiftStartTime,
-            ShiftEndTime,
-            ShiftCurrentStatus,
-          } = shift;
+          const { ShiftAssignedUserId, ShiftCurrentStatus } = shift;
 
           if (
             Array.isArray(ShiftCurrentStatus) &&
             ShiftCurrentStatus.some((status) => status.Status === 'completed')
           ) {
             totalShifts += 1;
-            let shiftHours = getHoursDiffInTwoTimeString(
-              ShiftStartTime,
-              ShiftEndTime
-            );
+            let { shiftHours } = getShiftActualHours({
+              shift,
+              timeMarginInMins: 0,
+            });
 
             shiftHours = shiftHours * (ShiftAssignedUserId.length || 1);
 
