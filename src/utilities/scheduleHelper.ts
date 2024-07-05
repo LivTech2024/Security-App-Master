@@ -196,10 +196,8 @@ export const getShiftActualHours = ({
     shiftEndTimeWithDate = dayjs(shiftEndTimeWithDate).add(1, 'day').toDate();
   }
 
-  shiftHours = dayjs(shiftEndTimeWithDate).diff(
-    shiftStartTimeWithDate,
-    'hours'
-  );
+  shiftHours =
+    dayjs(shiftEndTimeWithDate).diff(shiftStartTimeWithDate, 'minutes') / 60;
 
   if (empId) {
     const empShiftStatus = shift.ShiftCurrentStatus.find(
@@ -230,7 +228,7 @@ export const getShiftActualHours = ({
             ? toDate(StatusReportedTime)
             : shiftEndTimeWithDate;
 
-        actualShiftHrsSpent = dayjs(endTime).diff(startTime, 'hours');
+        actualShiftHrsSpent = dayjs(endTime).diff(startTime, 'minutes') / 60;
       }
     }
   }

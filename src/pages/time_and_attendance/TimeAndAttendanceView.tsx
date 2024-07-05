@@ -14,6 +14,7 @@ import NoSearchResult from '../../common/NoSearchResult';
 import { formatDate } from '../../utilities/misc';
 import { useSearchParams } from 'react-router-dom';
 import { getShiftActualHours } from '../../utilities/scheduleHelper';
+import { numberFormatter } from '../../utilities/NumberFormater';
 
 const TimeAndAttendance = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -195,14 +196,14 @@ const TimeAndAttendance = () => {
                   </td>
                   <td className="align-top px-4 py-2 text-end">
                     <span className="line-clamp-2">
-                      {
+                      {numberFormatter(
                         getShiftActualHours({
                           shift,
                           empId: selectedEmpId,
                           timeMarginInMins:
                             settings?.SettingEmpShiftTimeMarginInMins || 0,
                         }).actualShiftHrsSpent
-                      }
+                      )}
                     </span>
                   </td>
                 </tr>
