@@ -440,7 +440,7 @@ class DbPayment {
 
     const snapshot = await getDocs(payStubQuery);
 
-    return snapshot.docs[0].data() as IPayStubsCollection;
+    return snapshot?.docs[0]?.data() as IPayStubsCollection;
   };
 
   static createPayStub = ({

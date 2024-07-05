@@ -9,6 +9,7 @@ import { closeModalLoader, showModalLoader } from '../../../utilities/TsxUtils';
 import DbPayment from '../../../firebase_configs/DB/DbPayment';
 import { IEarningList } from '../../../pages/payments_and_billing/paystub/PayStubGenerate';
 import { IPayStubsCollection } from '../../../@types/database';
+import { roundNumber } from '../../../utilities/misc';
 
 const EmpDetails = ({
   setEarningsList,
@@ -87,13 +88,15 @@ const EmpDetails = ({
         {
           Income: 'Regular',
           CurrentAmount: String(
-            empEarningDetails.Rate * empEarningDetails.Quantity
+            roundNumber(empEarningDetails.Rate * empEarningDetails.Quantity)
           ),
-          Quantity: String(empEarningDetails.Quantity),
+          Quantity: String(roundNumber(empEarningDetails.Quantity)),
           Type: 'Hourly',
-          Rate: String(empEarningDetails.Rate),
+          Rate: String(roundNumber(empEarningDetails.Rate)),
           YTDAmount: String(
-            prevYtdAmt + empEarningDetails.Rate * empEarningDetails.Quantity
+            roundNumber(
+              prevYtdAmt + empEarningDetails.Rate * empEarningDetails.Quantity
+            )
           ),
         },
       ]);
