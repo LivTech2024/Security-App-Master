@@ -55,14 +55,17 @@ export const getColorAccToShiftStatus = (
     .second(0)
     .toDate();
 
-  const shiftEndTimeWithDate = dayjs()
+  let shiftEndTimeWithDate = dayjs()
     .date(toDate(ShiftDate).getDate())
     .month(toDate(ShiftDate).getMonth())
     .hour(endHour)
     .minute(endMinute)
     .second(0)
-    .add(startHour > endHour ? 1 : 0, 'day')
     .toDate();
+
+  if (dayjs(shiftEndTimeWithDate).isBefore(shiftStartTimeWithDate)) {
+    shiftEndTimeWithDate = dayjs(shiftEndTimeWithDate).add(1, 'day').toDate();
+  }
 
   try {
     if (!shift.ShiftCurrentStatus || shift.ShiftCurrentStatus.length === 0) {
@@ -154,4 +157,83 @@ export const getColorAccToShiftStatus = (
     //console.log(error);
     return color;
   }
+};
+
+export const getShiftActualHours = ({
+  shift,
+  timeMarginInMins,
+  empId,
+}: {
+  shift: IShiftsCollection;
+  timeMarginInMins: number;
+  empId?: string | null;
+}) => {
+  let shiftHours = 0,
+    actualShiftHrsSpent = 0;
+
+  const { ShiftDate, ShiftStartTime, ShiftEndTime } = shift;
+
+  const { hour: startHour, minute: startMinute } = parseTime(ShiftStartTime);
+  const { hour: endHour, minute: endMinute } = parseTime(ShiftEndTime);
+
+  const shiftStartTimeWithDate = dayjs()
+    .date(toDate(ShiftDate).getDate())
+    .month(toDate(ShiftDate).getMonth())
+    .hour(startHour)
+    .minute(startMinute)
+    .second(0)
+    .toDate();
+
+  let shiftEndTimeWithDate = dayjs()
+    .date(toDate(ShiftDate).getDate())
+    .month(toDate(ShiftDate).getMonth())
+    .hour(endHour)
+    .minute(endMinute)
+    .second(0)
+    .toDate();
+
+  if (dayjs(shiftEndTimeWithDate).isBefore(shiftStartTimeWithDate)) {
+    shiftEndTimeWithDate = dayjs(shiftEndTimeWithDate).add(1, 'day').toDate();
+  }
+
+  shiftHours = dayjs(shiftEndTimeWithDate).diff(
+    shiftStartTimeWithDate,
+    'hours'
+  );
+
+  if (empId) {
+    const empShiftStatus = shift.ShiftCurrentStatus.find(
+      (s) => s.StatusReportedById === empId
+    );
+
+    if (empShiftStatus && empShiftStatus.Status === 'completed') {
+      const { StatusStartedTime, StatusReportedTime } = empShiftStatus;
+      if (StatusStartedTime && StatusReportedTime) {
+        const startTimeDiff = dayjs(shiftStartTimeWithDate).diff(
+          toDate(StatusStartedTime),
+          'minutes'
+        );
+
+        const endTimeDiff = dayjs(shiftEndTimeWithDate).diff(
+          toDate(StatusReportedTime),
+          'minutes'
+        );
+
+        const startTime =
+          (startTimeDiff >= 0 ? startTimeDiff : startTimeDiff * -1) >
+          timeMarginInMins
+            ? toDate(StatusStartedTime)
+            : shiftStartTimeWithDate;
+
+        const endTime =
+          (endTimeDiff >= 0 ? endTimeDiff : endTimeDiff * -1) > timeMarginInMins
+            ? toDate(StatusReportedTime)
+            : shiftEndTimeWithDate;
+
+        actualShiftHrsSpent = dayjs(endTime).diff(startTime, 'hours');
+      }
+    }
+  }
+
+  return { shiftHours, actualShiftHrsSpent };
 };

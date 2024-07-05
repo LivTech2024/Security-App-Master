@@ -6,17 +6,14 @@ import { useAuthState } from '../../store';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
 import { DisplayCount } from '../../@types/enum';
-import { DocumentData, Timestamp } from 'firebase/firestore';
+import { DocumentData } from 'firebase/firestore';
 import { IShiftsCollection } from '../../@types/database';
 import { useInView } from 'react-intersection-observer';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import NoSearchResult from '../../common/NoSearchResult';
-import {
-  formatDate,
-  getHoursDiffInTwoTimeString,
-  toDate,
-} from '../../utilities/misc';
+import { formatDate } from '../../utilities/misc';
 import { useSearchParams } from 'react-router-dom';
+import { getShiftActualHours } from '../../utilities/scheduleHelper';
 
 const TimeAndAttendance = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
@@ -27,7 +24,7 @@ const TimeAndAttendance = () => {
     dayjs().endOf('M').toDate()
   );
 
-  const { company } = useAuthState();
+  const { company, settings } = useAuthState();
 
   const [searchParam] = useSearchParams();
 
@@ -105,15 +102,6 @@ const TimeAndAttendance = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
-  const getHoursSpent = (startTime?: Timestamp, endTime?: Timestamp) => {
-    if (!startTime || !endTime) return 'N/A';
-
-    return getHoursDiffInTwoTimeString(
-      dayjs(toDate(endTime)).format('HH:mm'),
-      dayjs(toDate(startTime)).format('HH:mm')
-    );
-  };
-
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader title="Time & Attendance View" />
@@ -159,6 +147,9 @@ const TimeAndAttendance = () => {
             </tr>
           ) : (
             data.map((shift) => {
+              const empShiftStatus = shift.ShiftCurrentStatus.find(
+                (s) => s.StatusReportedById === selectedEmpId
+              );
               return (
                 <tr key={shift.ShiftId} className="cursor-pointer">
                   <td className="align-top px-4 py-2 text-start">
@@ -191,9 +182,8 @@ const TimeAndAttendance = () => {
                   </td>
                   <td className="align-top px-4 py-2 text-start ">
                     <span className="line-clamp-2">
-                      {shift.ShiftCurrentStatus.find(
-                        (s) => s.StatusReportedById === selectedEmpId
-                      )?.StatusReportedTime
+                      {empShiftStatus?.StatusReportedTime &&
+                      empShiftStatus?.Status === 'completed'
                         ? formatDate(
                             shift.ShiftCurrentStatus.find(
                               (s) => s.StatusReportedById === selectedEmpId
@@ -205,17 +195,14 @@ const TimeAndAttendance = () => {
                   </td>
                   <td className="align-top px-4 py-2 text-end">
                     <span className="line-clamp-2">
-                      {shift.ShiftCurrentStatus.find(
-                        (s) => s.StatusReportedById === selectedEmpId
-                      )?.StatusShiftTotalHrs ??
-                        getHoursSpent(
-                          shift.ShiftCurrentStatus.find(
-                            (s) => s.StatusReportedById === selectedEmpId
-                          )?.StatusReportedTime as Timestamp,
-                          shift.ShiftCurrentStatus.find(
-                            (s) => s.StatusReportedById === selectedEmpId
-                          )?.StatusStartedTime as Timestamp
-                        )}
+                      {
+                        getShiftActualHours({
+                          shift,
+                          empId: selectedEmpId,
+                          timeMarginInMins:
+                            settings?.SettingEmpShiftTimeMarginInMins || 0,
+                        }).actualShiftHrsSpent
+                      }
                     </span>
                   </td>
                 </tr>
