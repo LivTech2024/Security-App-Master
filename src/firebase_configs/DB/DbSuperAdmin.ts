@@ -1,9 +1,19 @@
 import {
+  DocumentData,
+  QueryConstraint,
   Transaction,
+  collection,
   doc,
+  endAt,
   getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
   runTransaction,
   serverTimestamp,
+  startAfter,
+  startAt,
 } from 'firebase/firestore';
 import { CollectionName } from '../../@types/enum';
 import { getNewDocId } from './utils';
@@ -58,6 +68,43 @@ class DbSuperAdmin {
 
       return transaction.set(reportCatRef, newCategory);
     });
+  };
+
+  static getCompanies = async ({
+    lmt,
+    lastDoc,
+    searchQuery,
+  }: {
+    lmt?: number;
+    lastDoc?: DocumentData | null;
+    searchQuery?: string | null;
+  }) => {
+    const companyRef = collection(db, CollectionName.companies);
+
+    let queryParams: QueryConstraint[] = [];
+
+    if (searchQuery && searchQuery.length > 0) {
+      queryParams = [
+        ...queryParams,
+        orderBy('CompanyName'),
+        startAt(searchQuery),
+        endAt(searchQuery + '\uF8FF'),
+      ];
+    } else {
+      queryParams = [...queryParams, orderBy('CompanyCreatedAt', 'desc')];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const companyQuery = query(companyRef, ...queryParams);
+
+    return getDocs(companyQuery);
   };
 
   static createNewCompany = async () => {

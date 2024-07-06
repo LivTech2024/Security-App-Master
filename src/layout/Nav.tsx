@@ -143,6 +143,11 @@ const Nav = ({
           <NavItem path={PageRoutes.CLIENT_PORTAL_MESSAGING} name="Messaging" />
         </>
       )}
+      {userType === 'super_admin' && (
+        <div className="mr-auto text-base font-semibold ml-2">
+          Welcome Super Admin
+        </div>
+      )}
       {userType !== 'guest' && (
         <NavItem
           name="Sign out"

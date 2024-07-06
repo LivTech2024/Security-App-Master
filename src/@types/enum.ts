@@ -54,6 +54,7 @@ export const DisplayCount = {
   TASK_LIST: 20,
   CALLOUT_LIST: 20,
   PAY_STUB_LIST: 20,
+  COMPANY_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -80,6 +81,7 @@ export const REACT_QUERY_KEYS = {
   TASK_LIST: 'task-list',
   CALLOUT_LIST: 'callout-list',
   PAY_STUB_LIST: 'pay-stub-list',
+  COMPANY_LIST: 'company-list',
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -93,6 +95,7 @@ export const MinimumQueryCharacter = {
   KEY: 1,
   TASK_LIST: 1,
   PAY_STUB: 1,
+  COMPANY: 1,
 } as const;
 
 export const CloudStoragePaths = {
@@ -148,6 +151,7 @@ export const PageRoutes = {
   CLIENTS: '/clients',
   CLIENT_VIEW: '/client_view',
   CLIENT_CREATE_OR_EDIT: '/client_create_or_edit',
+  SUPER_ADMIN_COMPANY_LIST: '/super_admin/company_list',
   SUPER_ADMIN_CREATE_NEW_COMPANY: '/super_admin/create_new_company',
   DOCUMENT_REPOSITORY: '/document_repository',
   EQUIPMENT_LIST: '/equipment_list',

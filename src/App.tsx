@@ -77,6 +77,7 @@ import UserDataDeletionRequest from './pages/uprotected_pages/user_data_deletion
 import PayStubGenerate from './pages/payments_and_billing/paystub/PayStubGenerate';
 import PayStubList from './pages/payments_and_billing/paystub/PayStubList';
 import TimeAndAttendanceList from './pages/time_and_attendance/TimeAndAttendanceList';
+import CompanyList from './pages/super_admin/CompanyList';
 
 function App() {
   useOnAuthStateChanged();
@@ -192,14 +193,19 @@ function App() {
         <ModalsProvider
           modals={{ loader: LoaderModal, confirmModal: ContextConfirmModal }}
         >
-          <ToastContainer />
-          <Routes>
-            {' '}
-            <Route
-              path={PageRoutes.SUPER_ADMIN_CREATE_NEW_COMPANY}
-              Component={CreateNewCompany}
-            />
-          </Routes>
+          <Layout userType="super_admin">
+            <ToastContainer />
+            <Routes>
+              <Route
+                path={PageRoutes.SUPER_ADMIN_COMPANY_LIST}
+                Component={CompanyList}
+              />
+              <Route
+                path={PageRoutes.SUPER_ADMIN_CREATE_NEW_COMPANY}
+                Component={CreateNewCompany}
+              />
+            </Routes>
+          </Layout>
         </ModalsProvider>
       </MantineProvider>
     );

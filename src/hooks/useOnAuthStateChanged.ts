@@ -150,6 +150,9 @@ const useOnAuthStateChanged = () => {
           );
           const superAdmin = superAdminSnapshot.data() as ISuperAdminCollection;
           setSuperAdmin(superAdmin);
+          if (!location.pathname.includes('/super_admin')) {
+            navigate(PageRoutes.SUPER_ADMIN_COMPANY_LIST);
+          }
         } else if (_loggedInUser.LoggedInUserType === IUserType.CLIENT) {
           //* Fetch clientand store in zustand
           const superAdminSnapshot = await DbClient.getClientById(
