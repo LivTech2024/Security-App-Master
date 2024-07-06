@@ -16,6 +16,7 @@ export const adminUpdateSchema = z.object({
 
 //*Admin create schema
 export const adminCreateSchema = adminUpdateSchema.extend({
+  AdminId: z.string().nullable().optional(), //*Required only while editing a company
   AdminEmail: z
     .string()
     .min(3, { message: 'Valid email is required' })
@@ -42,7 +43,9 @@ export const companyCreateSchema = z.object({
     .string()
     .min(3, { message: 'Company address should be minimum 3 characters' }),
   CompanyAdminDetails: adminCreateSchema,
+
   //*Settings only accessible by super_admin
+  SettingId: z.string().nullable().optional(), //*Required only while editing a company
   SettingIsPatrollingEnabled: z.boolean(),
   SettingIsEmpDarEnabled: z.boolean(),
   SettingIsCalloutEnabled: z.boolean(),

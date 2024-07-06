@@ -7,7 +7,7 @@ import {
 import DbSuperAdmin from '../../firebase_configs/DB/DbSuperAdmin';
 import Button from '../../common/button/Button';
 import PageHeader from '../../common/PageHeader';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   CompanyCreateFormFields,
   companyCreateSchema,
@@ -19,9 +19,17 @@ import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader';
 import { PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
 import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import {
+  IAdminsCollection,
+  ICompaniesCollection,
+  ISettingsCollection,
+} from '../../@types/database';
 
 const CreateNewCompany = () => {
   const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
 
   const methods = useForm<CompanyCreateFormFields>({
     resolver: zodResolver(companyCreateSchema),
@@ -46,17 +54,121 @@ const CreateNewCompany = () => {
     },
   });
 
+  const companyId = searchParams.get('cmp_id');
+
+  const [isEdit, setIsEdit] = useState(false);
+
+  useEffect(() => {
+    if (!companyId) return;
+
+    const fetchCompanyDetails = async () => {
+      try {
+        showModalLoader({});
+        const companySnapshot = await DbSuperAdmin.getCompanyById(companyId);
+        const companyData = companySnapshot.data() as ICompaniesCollection;
+
+        const adminSnapshot =
+          await DbSuperAdmin.getAdminByCompanyById(companyId);
+        const adminData = adminSnapshot?.docs[0]?.data() as IAdminsCollection;
+
+        const settingSnapshot =
+          await DbSuperAdmin.getCompanySettings(companyId);
+        const settingsData =
+          settingSnapshot?.docs[0]?.data() as ISettingsCollection;
+
+        if (companyData && adminData && settingsData) {
+          const { CompanyAddress, CompanyEmail, CompanyName, CompanyPhone } =
+            companyData;
+
+          const { AdminEmail, AdminPhone, AdminName, AdminId } = adminData;
+
+          const {
+            SettingId,
+            SettingIsAuditEnabled,
+            SettingIsCalloutEnabled,
+            SettingIsCommunicationCenterEnabled,
+            SettingIsDocRepoEnabled,
+            SettingIsEmergencyResponseEnabled,
+            SettingIsEmpDarEnabled,
+            SettingIsEquipmentManagementEnabled,
+            SettingIsHRSystemEnabled,
+            SettingIsKeyManagementEnabled,
+            SettingIsPatrollingEnabled,
+            SettingIsPaymentsAndBillingEnabled,
+            SettingIsPerformanceAssuranceEnabled,
+            SettingIsReportsEnabled,
+            SettingIsTaskAssignmentAndTrackingEnabled,
+            SettingIsTimeAndAttendanceEnabled,
+            SettingIsTrainingAndCertificationsEnabled,
+            SettingIsVisitorManagementEnabled,
+          } = settingsData;
+
+          methods.reset({
+            CompanyName,
+            CompanyAddress,
+            CompanyAdminDetails: {
+              AdminId,
+              AdminEmail,
+              AdminName,
+              AdminPhone,
+              AdminPassword: '******',
+            },
+            CompanyEmail,
+            CompanyPhone,
+            SettingId,
+            SettingIsAuditEnabled,
+            SettingIsCalloutEnabled,
+            SettingIsCommunicationCenterEnabled,
+            SettingIsDocRepoEnabled,
+            SettingIsEmergencyResponseEnabled,
+            SettingIsEmpDarEnabled,
+            SettingIsEquipmentManagementEnabled,
+            SettingIsHRSystemEnabled,
+            SettingIsKeyManagementEnabled,
+            SettingIsPatrollingEnabled,
+            SettingIsPaymentsAndBillingEnabled,
+            SettingIsPerformanceAssuranceEnabled,
+            SettingIsReportsEnabled,
+            SettingIsTaskAssignmentAndTrackingEnabled,
+            SettingIsTimeAndAttendanceEnabled,
+            SettingIsTrainingAndCertificationsEnabled,
+            SettingIsVisitorManagementEnabled,
+          });
+
+          setIsEdit(true);
+        }
+        closeModalLoader();
+      } catch (error) {
+        console.log(error);
+        errorHandler(error);
+        closeModalLoader();
+      }
+    };
+
+    fetchCompanyDetails();
+  }, []);
+
   const queryClient = useQueryClient();
 
   const onSubmit = async (data: CompanyCreateFormFields) => {
     try {
       showModalLoader({});
-      await DbSuperAdmin.createNewCompany(data);
 
-      showSnackbar({
-        message: 'Company created successfully',
-        type: 'success',
-      });
+      if (isEdit && companyId) {
+        await DbSuperAdmin.updateCompany(data, companyId);
+
+        showSnackbar({
+          message: 'Company created successfully',
+          type: 'success',
+        });
+      } else {
+        await DbSuperAdmin.createNewCompany(data);
+
+        showSnackbar({
+          message: 'Company created successfully',
+          type: 'success',
+        });
+      }
 
       closeModalLoader();
 
@@ -157,18 +269,21 @@ const CreateNewCompany = () => {
                 methods.formState.errors.CompanyAdminDetails?.AdminEmail
                   ?.message
               }
+              disabled={isEdit}
             />
-            <InputWithTopHeader
-              className="mx-0"
-              label="Admin Password"
-              register={methods.register}
-              name="CompanyAdminDetails.AdminPassword"
-              error={
-                methods.formState.errors.CompanyAdminDetails?.AdminPassword
-                  ?.message
-              }
-              inputType="password"
-            />
+            {!companyId && (
+              <InputWithTopHeader
+                className="mx-0"
+                label="Admin Password"
+                register={methods.register}
+                name="CompanyAdminDetails.AdminPassword"
+                error={
+                  methods.formState.errors.CompanyAdminDetails?.AdminPassword
+                    ?.message
+                }
+                inputType="password"
+              />
+            )}
           </div>
 
           {/* Company settings */}

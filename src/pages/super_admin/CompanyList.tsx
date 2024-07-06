@@ -120,7 +120,7 @@ const CompanyList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[10%] text-start"></th>
+            <th className="uppercase px-4 py-2 w-[10%] text-start">Logo</th>
             <th className="uppercase px-4 py-2 w-[25%] text-start">
               Company Name
             </th>
@@ -140,7 +140,16 @@ const CompanyList = () => {
           ) : (
             data.map((cmp) => {
               return (
-                <tr key={cmp.CompanyId} className="cursor-pointer">
+                <tr
+                  onClick={() =>
+                    navigate(
+                      PageRoutes.SUPER_ADMIN_CREATE_NEW_COMPANY +
+                        `?cmp_id=${cmp.CompanyId}`
+                    )
+                  }
+                  key={cmp.CompanyId}
+                  className="cursor-pointer"
+                >
                   <td className="align-top px-4 py-2 text-start">
                     <img
                       src={cmp.CompanyLogo}

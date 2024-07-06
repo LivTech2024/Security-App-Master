@@ -14,6 +14,7 @@ import {
   serverTimestamp,
   startAfter,
   startAt,
+  where,
 } from 'firebase/firestore';
 import { CollectionName } from '../../@types/enum';
 import { getNewDocId } from './utils';
@@ -113,6 +114,31 @@ class DbSuperAdmin {
     const companyRef = doc(db, CollectionName.companies, cmpId);
 
     return getDoc(companyRef);
+  };
+
+  static getAdminByCompanyById = (cmpId: string) => {
+    const adminRef = collection(db, CollectionName.admins);
+
+    const adminQuery = query(
+      adminRef,
+      where('AdminCompanyId', '==', cmpId),
+      orderBy('AdminCreatedAt', 'desc'),
+      limit(1)
+    );
+
+    return getDocs(adminQuery);
+  };
+
+  static getCompanySettings = (cmpId: string) => {
+    const settingsRef = collection(db, CollectionName.settings);
+
+    const settingsQuery = query(
+      settingsRef,
+      where('SettingCompanyId', '==', cmpId),
+      limit(1)
+    );
+
+    return getDocs(settingsQuery);
   };
 
   static createNewCompany = async (data: CompanyCreateFormFields) => {
@@ -250,6 +276,100 @@ class DbSuperAdmin {
       if (user) {
         await deleteUser(user);
       }
+      throw error;
+    }
+  };
+
+  static updateCompany = async (
+    data: CompanyCreateFormFields,
+    cmpId: string
+  ) => {
+    if (!data.CompanyAdminDetails.AdminId || !data.SettingId || !cmpId) return;
+    try {
+      await runTransaction(db, async (transaction) => {
+        const {
+          CompanyName,
+          CompanyEmail,
+          CompanyPhone,
+          CompanyAddress,
+          CompanyAdminDetails,
+        } = data;
+
+        //*Update company
+        const companyRef = doc(db, CollectionName.companies, cmpId);
+        const updatedCompany: Partial<ICompaniesCollection> = {
+          CompanyName,
+          CompanyEmail,
+          CompanyPhone: CompanyPhone,
+          CompanyAddress,
+          CompanyModifiedAt: serverTimestamp(),
+        };
+
+        transaction.update(companyRef, updatedCompany);
+
+        //*update the admin
+        const adminDocRef = doc(
+          db,
+          CollectionName.admins,
+          CompanyAdminDetails.AdminId || ''
+        );
+
+        const newAdmin: Partial<IAdminsCollection> = {
+          AdminName: CompanyAdminDetails.AdminName,
+          AdminPhone: CompanyAdminDetails.AdminPhone,
+          AdminModifiedAt: serverTimestamp(),
+        };
+
+        transaction.update(adminDocRef, newAdmin);
+
+        //*Update settings;
+
+        const {
+          SettingIsAuditEnabled,
+          SettingIsCalloutEnabled,
+          SettingIsCommunicationCenterEnabled,
+          SettingIsDocRepoEnabled,
+          SettingIsEmergencyResponseEnabled,
+          SettingIsEmpDarEnabled,
+          SettingIsEquipmentManagementEnabled,
+          SettingIsHRSystemEnabled,
+          SettingIsKeyManagementEnabled,
+          SettingIsPatrollingEnabled,
+          SettingIsVisitorManagementEnabled,
+          SettingIsTrainingAndCertificationsEnabled,
+          SettingIsTimeAndAttendanceEnabled,
+          SettingIsTaskAssignmentAndTrackingEnabled,
+          SettingIsReportsEnabled,
+          SettingIsPerformanceAssuranceEnabled,
+          SettingIsPaymentsAndBillingEnabled,
+          SettingId,
+        } = data;
+
+        const settingRef = doc(db, CollectionName.settings, SettingId || '');
+        const newSetting: Partial<ISettingsCollection> = {
+          SettingIsAuditEnabled,
+          SettingIsCalloutEnabled,
+          SettingIsCommunicationCenterEnabled,
+          SettingIsDocRepoEnabled,
+          SettingIsEmergencyResponseEnabled,
+          SettingIsEmpDarEnabled,
+          SettingIsEquipmentManagementEnabled,
+          SettingIsHRSystemEnabled,
+          SettingIsKeyManagementEnabled,
+          SettingIsPatrollingEnabled,
+          SettingIsPaymentsAndBillingEnabled,
+          SettingIsPerformanceAssuranceEnabled,
+          SettingIsReportsEnabled,
+          SettingIsTaskAssignmentAndTrackingEnabled,
+          SettingIsTimeAndAttendanceEnabled,
+          SettingIsTrainingAndCertificationsEnabled,
+          SettingIsVisitorManagementEnabled,
+        };
+
+        transaction.update(settingRef, newSetting);
+      });
+    } catch (error) {
+      console.log(error);
       throw error;
     }
   };

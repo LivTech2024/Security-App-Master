@@ -13,6 +13,7 @@ import {
   IShiftsCollection,
 } from '../../@types/database';
 import { CompanyBranches } from './auth.slice';
+import { CompanyCreateFormFields } from '../../utilities/zod/schema';
 
 export interface Employee
   extends Omit<
@@ -105,6 +106,9 @@ export interface KeyAllocation
 }
 
 interface EditFormState {
+  companyEditData: CompanyCreateFormFields | null;
+  setCompanyEditData: (cmp: CompanyCreateFormFields | null) => void;
+
   employeeEditData: Employee | null;
   setEmployeeEditData: (emp: Employee | null) => void;
 
@@ -143,6 +147,11 @@ interface EditFormState {
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
+  //Company
+  companyEditData: null,
+  setCompanyEditData: (cmp) =>
+    set((state) => ({ ...state, companyEditData: cmp })),
+
   //Emp
   employeeEditData: null,
   setEmployeeEditData: (emp) =>
