@@ -402,6 +402,25 @@ export interface ISettingsCollection {
   SettingCompanyId: string;
   SettingEmpWellnessIntervalInMins: number;
   SettingEmpShiftTimeMarginInMins: number;
+
+  //*Only Super Admin accessible settings
+  SettingIsPatrollingEnabled: boolean;
+  SettingIsEmpDarEnabled: boolean;
+  SettingIsCalloutEnabled: boolean;
+  SettingIsEquipmentManagementEnabled: boolean;
+  SettingIsKeyManagementEnabled: boolean;
+  SettingIsPaymentsAndBillingEnabled: boolean;
+  SettingIsTrainingAndCertificationsEnabled: boolean;
+  SettingIsVisitorManagementEnabled: boolean;
+  SettingIsReportsEnabled: boolean;
+  SettingIsCommunicationCenterEnabled: boolean;
+  SettingIsDocRepoEnabled: boolean;
+  SettingIsEmergencyResponseEnabled: boolean;
+  SettingIsTimeAndAttendanceEnabled: boolean;
+  SettingIsAuditEnabled: boolean;
+  SettingIsPerformanceAssuranceEnabled: boolean;
+  SettingIsTaskAssignmentAndTrackingEnabled: boolean;
+  SettingIsHRSystemEnabled: boolean;
 }
 
 export interface IEquipmentsCollection {

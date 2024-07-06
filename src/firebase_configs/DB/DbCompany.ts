@@ -16,7 +16,6 @@ import {
   IDocumentsCollection,
   ILocationsCollection,
   IReportCategoriesCollection,
-  ISettingsCollection,
   ITaskLogsCollection,
   ITasksCollection,
 } from '../../@types/database';
@@ -689,20 +688,6 @@ class DbCompany {
   static getReportById = (reportId: string) => {
     const reportDocRef = doc(db, CollectionName.reports, reportId);
     return getDoc(reportDocRef);
-  };
-
-  static createSettings = (cmpId: string) => {
-    const settingId = getNewDocId(CollectionName.settings);
-    const settingRef = doc(db, CollectionName.settings, settingId);
-
-    const newSetting: ISettingsCollection = {
-      SettingId: settingId,
-      SettingCompanyId: cmpId,
-      SettingEmpWellnessIntervalInMins: 60,
-      SettingEmpShiftTimeMarginInMins: 10,
-    };
-
-    return setDoc(settingRef, newSetting);
   };
 
   static addReportCategory = (catName: string, cmpId: string) => {

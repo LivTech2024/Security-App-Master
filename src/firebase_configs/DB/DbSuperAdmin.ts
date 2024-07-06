@@ -25,10 +25,12 @@ import {
   IReportCategoriesCollection,
   ISettingsCollection,
 } from '../../@types/database';
-import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
-
-const emailId = 'sales@tpssolution.com';
-const password = 'tpssolution';
+import {
+  createUserWithEmailAndPassword,
+  deleteUser,
+  User,
+} from 'firebase/auth';
+import { CompanyCreateFormFields } from '../../utilities/zod/schema';
 
 class DbSuperAdmin {
   static getSuperAdminById = (id: string) => {
@@ -107,27 +109,47 @@ class DbSuperAdmin {
     return getDocs(companyQuery);
   };
 
-  static createNewCompany = async () => {
+  static getCompanyById = (cmpId: string) => {
+    const companyRef = doc(db, CollectionName.companies, cmpId);
+
+    return getDoc(companyRef);
+  };
+
+  static createNewCompany = async (data: CompanyCreateFormFields) => {
     //*Create a new auth user
-    const userCred = await createUserWithEmailAndPassword(
-      auth,
-      emailId,
-      password
-    );
-    const user = userCred.user;
-    const { uid } = user;
+
+    let user: User | null = null;
+
     try {
       await runTransaction(db, async (transaction) => {
+        const {
+          CompanyName,
+          CompanyEmail,
+          CompanyPhone,
+          CompanyAddress,
+          CompanyAdminDetails,
+        } = data;
+
+        //*Create a auth user with admin credentials
+        const userCred = await createUserWithEmailAndPassword(
+          auth,
+          CompanyAdminDetails.AdminEmail,
+          CompanyAdminDetails.AdminPassword
+        );
+
+        user = userCred.user;
+        const { uid } = user;
+
         //*Create a new company
         const companyId = getNewDocId(CollectionName.companies);
         const companyRef = doc(db, CollectionName.companies, companyId);
 
         const newCompany: ICompaniesCollection = {
           CompanyId: companyId,
-          CompanyName: 'Tactical Protection Solutions Ltd.',
-          CompanyEmail: emailId,
-          CompanyPhone: '+1234567',
-          CompanyAddress: 'Alberta, Canada',
+          CompanyName,
+          CompanyEmail,
+          CompanyPhone: CompanyPhone,
+          CompanyAddress,
           CompanyLogo: '',
           CompanyCreatedAt: serverTimestamp(),
           CompanyModifiedAt: serverTimestamp(),
@@ -139,9 +161,9 @@ class DbSuperAdmin {
         const adminDocRef = doc(db, CollectionName.admins, uid);
         const newAdmin: IAdminsCollection = {
           AdminId: uid,
-          AdminName: 'Jhon Doe',
-          AdminEmail: emailId,
-          AdminPhone: '+1234567',
+          AdminName: CompanyAdminDetails.AdminName,
+          AdminEmail: CompanyAdminDetails.AdminEmail,
+          AdminPhone: CompanyAdminDetails.AdminPhone,
           AdminCompanyId: companyId,
           AdminCreatedAt: serverTimestamp(),
           AdminModifiedAt: serverTimestamp(),
@@ -172,6 +194,27 @@ class DbSuperAdmin {
         });
 
         //*Create default settings;
+
+        const {
+          SettingIsAuditEnabled,
+          SettingIsCalloutEnabled,
+          SettingIsCommunicationCenterEnabled,
+          SettingIsDocRepoEnabled,
+          SettingIsEmergencyResponseEnabled,
+          SettingIsEmpDarEnabled,
+          SettingIsEquipmentManagementEnabled,
+          SettingIsHRSystemEnabled,
+          SettingIsKeyManagementEnabled,
+          SettingIsPatrollingEnabled,
+          SettingIsVisitorManagementEnabled,
+          SettingIsTrainingAndCertificationsEnabled,
+          SettingIsTimeAndAttendanceEnabled,
+          SettingIsTaskAssignmentAndTrackingEnabled,
+          SettingIsReportsEnabled,
+          SettingIsPerformanceAssuranceEnabled,
+          SettingIsPaymentsAndBillingEnabled,
+        } = data;
+
         const settingId = getNewDocId(CollectionName.settings);
         const settingRef = doc(db, CollectionName.settings, settingId);
         const newSetting: ISettingsCollection = {
@@ -179,6 +222,23 @@ class DbSuperAdmin {
           SettingCompanyId: companyId,
           SettingEmpWellnessIntervalInMins: 60,
           SettingEmpShiftTimeMarginInMins: 10,
+          SettingIsAuditEnabled,
+          SettingIsCalloutEnabled,
+          SettingIsCommunicationCenterEnabled,
+          SettingIsDocRepoEnabled,
+          SettingIsEmergencyResponseEnabled,
+          SettingIsEmpDarEnabled,
+          SettingIsEquipmentManagementEnabled,
+          SettingIsHRSystemEnabled,
+          SettingIsKeyManagementEnabled,
+          SettingIsPatrollingEnabled,
+          SettingIsPaymentsAndBillingEnabled,
+          SettingIsPerformanceAssuranceEnabled,
+          SettingIsReportsEnabled,
+          SettingIsTaskAssignmentAndTrackingEnabled,
+          SettingIsTimeAndAttendanceEnabled,
+          SettingIsTrainingAndCertificationsEnabled,
+          SettingIsVisitorManagementEnabled,
         };
 
         transaction.set(settingRef, newSetting);
@@ -187,7 +247,9 @@ class DbSuperAdmin {
       });
     } catch (error) {
       console.log(error);
-      await deleteUser(user);
+      if (user) {
+        await deleteUser(user);
+      }
       throw error;
     }
   };

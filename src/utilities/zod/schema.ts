@@ -2,6 +2,30 @@ import { z } from 'zod';
 import { numberString } from './helper';
 import { ConstRegex } from '../../constants/ConstRegex';
 
+//*Admin  update schema
+export const adminUpdateSchema = z.object({
+  AdminName: z
+    .string()
+    .min(3, { message: 'Admin name should be minimum 3 characters' })
+    .max(100),
+  AdminPhone: z
+    .string()
+    .min(10, { message: 'Company phone with country code is required' })
+    .max(16),
+});
+
+//*Admin create schema
+export const adminCreateSchema = adminUpdateSchema.extend({
+  AdminEmail: z
+    .string()
+    .min(3, { message: 'Valid email is required' })
+    .regex(ConstRegex.EMAIL_OPTIONAL),
+  AdminPassword: z
+    .string()
+    .min(6, { message: 'Password must be minimum six characters' })
+    .max(100),
+});
+
 //*Company  create schema
 export const companyCreateSchema = z.object({
   CompanyName: z
@@ -17,6 +41,25 @@ export const companyCreateSchema = z.object({
   CompanyAddress: z
     .string()
     .min(3, { message: 'Company address should be minimum 3 characters' }),
+  CompanyAdminDetails: adminCreateSchema,
+  //*Settings only accessible by super_admin
+  SettingIsPatrollingEnabled: z.boolean(),
+  SettingIsEmpDarEnabled: z.boolean(),
+  SettingIsCalloutEnabled: z.boolean(),
+  SettingIsEquipmentManagementEnabled: z.boolean(),
+  SettingIsKeyManagementEnabled: z.boolean(),
+  SettingIsPaymentsAndBillingEnabled: z.boolean(),
+  SettingIsTrainingAndCertificationsEnabled: z.boolean(),
+  SettingIsVisitorManagementEnabled: z.boolean(),
+  SettingIsReportsEnabled: z.boolean(),
+  SettingIsCommunicationCenterEnabled: z.boolean(),
+  SettingIsDocRepoEnabled: z.boolean(),
+  SettingIsEmergencyResponseEnabled: z.boolean(),
+  SettingIsTimeAndAttendanceEnabled: z.boolean(),
+  SettingIsAuditEnabled: z.boolean(),
+  SettingIsPerformanceAssuranceEnabled: z.boolean(),
+  SettingIsTaskAssignmentAndTrackingEnabled: z.boolean(),
+  SettingIsHRSystemEnabled: z.boolean(),
 });
 
 export type CompanyCreateFormFields = z.infer<typeof companyCreateSchema>;
@@ -57,28 +100,7 @@ export const locationCreateSchema = z.object({
 
 export type LocationCreateFormFields = z.infer<typeof locationCreateSchema>;
 
-//*Admin  update schema
-export const adminUpdateSchema = z.object({
-  AdminName: z
-    .string()
-    .min(3, { message: 'Admin name should be minimum 3 characters' }),
-  AdminPhone: z
-    .string()
-    .min(10, { message: 'Company phone with country code is required' }),
-});
-
 export type AdminUpdateFormFields = z.infer<typeof adminUpdateSchema>;
-
-//*Admin create schema
-export const adminCreateSchema = adminUpdateSchema.extend({
-  AdminEmail: z
-    .string()
-    .min(3, { message: 'Valid email is required' })
-    .regex(ConstRegex.EMAIL_OPTIONAL),
-  AdminPassword: z
-    .string()
-    .min(6, { message: 'Password must be minimum six characters' }),
-});
 
 export type AdminCreateFormFields = z.infer<typeof adminCreateSchema>;
 
