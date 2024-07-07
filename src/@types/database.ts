@@ -638,6 +638,7 @@ export interface IPayStubEarningsChildCollection {
 
 export interface IPayStubDeductionsChildCollection {
   Deduction: 'CPP' | 'EI' | 'Income Tax' | 'Other';
+  OtherDeduction?: string | null; //*This req only when "Other" is selected
   Percentage: number;
   Amount: number;
   YearToDateAmt: number;

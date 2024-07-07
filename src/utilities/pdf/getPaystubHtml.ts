@@ -162,7 +162,7 @@ export const getPaystubHtml = ({
               ${payStub.PayStubDeductions.map(
                 (data) =>
                   `<tr>
-                <td style="text-align: left; border-bottom: 1px solid #ddd;">${data.Deduction}</td>
+                <td style="text-align: left; border-bottom: 1px solid #ddd;">${data.Deduction === 'Other' ? data.OtherDeduction || 'N/A' : data.Deduction}</td>
                 <td style="text-align: center; border-bottom: 1px solid #ddd;">${data.Percentage}%</td>
                 <td style="text-align: right; border-bottom: 1px solid #ddd;">${numberFormatter(data.Amount, true)}</td>
                 <td style="text-align: right; border-bottom: 1px solid #ddd;">${numberFormatter(data.YearToDateAmt, true)}</td>

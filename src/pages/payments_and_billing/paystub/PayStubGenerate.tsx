@@ -68,14 +68,7 @@ const PayStubGenerate = () => {
     },
   ]);
 
-  const [deductionsList, setDeductionsList] = useState<IDeductionList[]>([
-    {
-      Deduction: 'CPP',
-      Amount: '',
-      YearToDateAmt: '',
-      Percentage: '',
-    },
-  ]);
+  const [deductionsList, setDeductionsList] = useState<IDeductionList[]>([]);
 
   const totalEarnings = earningsList.reduce((acc, obj) => {
     const amount =

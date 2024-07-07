@@ -84,18 +84,31 @@ const DeductionDetails = ({
             return (
               <tr>
                 <td className="text-start pr-4 py-2">
-                  <InputSelect
-                    data={[
-                      { label: 'CPP', value: 'CPP' },
-                      { label: 'EI', value: 'EI' },
-                      { label: 'Income Tax', value: 'Income Tax' },
-                      { label: 'Other', value: 'Other' },
-                    ]}
-                    value={data.Deduction}
-                    onChange={(e) =>
-                      onFieldChange(idx, 'Deduction', e as string)
-                    }
-                  />
+                  <div className="flex items-center gap-4 w-full">
+                    <InputSelect
+                      data={[
+                        { label: 'CPP', value: 'CPP' },
+                        { label: 'EI', value: 'EI' },
+                        { label: 'Income Tax', value: 'Income Tax' },
+                        { label: 'Other', value: 'Other' },
+                      ]}
+                      value={data.Deduction}
+                      onChange={(e) =>
+                        onFieldChange(idx, 'Deduction', e as string)
+                      }
+                      className="w-full"
+                    />
+                    {data.Deduction === 'Other' && (
+                      <InputWithTopHeader
+                        className="mx-0 w-[150%]"
+                        placeholder="Other deduction"
+                        value={data.OtherDeduction || ''}
+                        onChange={(e) =>
+                          onFieldChange(idx, 'OtherDeduction', e.target.value)
+                        }
+                      />
+                    )}
+                  </div>
                 </td>
                 <td className="text-start px-4 py-2">
                   <div className="flex items-center gap-4 w-full">

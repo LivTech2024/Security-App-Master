@@ -489,6 +489,7 @@ class DbPayment {
           return {
             Amount: Number(res.Amount),
             Deduction: res.Deduction,
+            OtherDeduction: res.OtherDeduction,
             Percentage: Number(res.Percentage),
             YearToDateAmt: Number(res.YearToDateAmt || 0),
           };
