@@ -78,6 +78,8 @@ import PayStubGenerate from './pages/payments_and_billing/paystub/PayStubGenerat
 import PayStubList from './pages/payments_and_billing/paystub/PayStubList';
 import TimeAndAttendanceList from './pages/time_and_attendance/TimeAndAttendanceList';
 import CompanyList from './pages/super_admin/CompanyList';
+import CertificationList from './pages/training_and_certification/CertificationList';
+import CertificationView from './pages/training_and_certification/CertificationView';
 
 function App() {
   useOnAuthStateChanged();
@@ -328,10 +330,18 @@ function App() {
             <Route path={PageRoutes.VISITOR_VIEW} Component={VisitorView} />
 
             <Route
+              path={PageRoutes.TRAINING_AND_CERTIFICATION_LIST}
+              Component={CertificationList}
+            />
+            <Route
+              path={PageRoutes.TRAINING_AND_CERTIFICATION_VIEW}
+              Component={CertificationView}
+            />
+
+            <Route
               path={PageRoutes.TIME_AND_ATTENDANCE_VIEW}
               Component={TimeAndAttendanceView}
             />
-
             <Route
               path={PageRoutes.TIME_AND_ATTENDANCE_LIST}
               Component={TimeAndAttendanceList}

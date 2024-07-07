@@ -139,7 +139,7 @@ const Home = () => {
           name="Billing and Invoicing"
         />
         <HomeItem
-          path={PageRoutes.EMPLOYEE_LIST}
+          path={PageRoutes.TRAINING_AND_CERTIFICATION_LIST}
           name="Training & Certification"
           icon={<GrCertificate className="text-2xl text-primaryGold" />}
         />
