@@ -6,6 +6,8 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { numberFormatter } from '../../../utilities/NumberFormater';
 import { roundNumber } from '../../../utilities/misc';
 import { IPayStubsCollection } from '../../../@types/database';
+import { useEditFormStore } from '../../../store';
+import { useEffect } from 'react';
 
 interface DeductionDetailsProps {
   deductionsList: IDeductionList[];
@@ -20,6 +22,25 @@ const DeductionDetails = ({
   totalEarnings,
   previousPayStub,
 }: DeductionDetailsProps) => {
+  const { payStubEditData } = useEditFormStore();
+
+  const isEdit = !!payStubEditData;
+
+  useEffect(() => {
+    if (!isEdit) return;
+    setDeductionsList(
+      payStubEditData.PayStubDeductions.map((res) => {
+        return {
+          Amount: String(res.Amount),
+          Deduction: res.Deduction,
+          Percentage: String(res.Percentage),
+          YearToDateAmt: String(res.YearToDateAmt),
+          OtherDeduction: String(res.OtherDeduction || ''),
+        };
+      })
+    );
+  }, [isEdit]);
+
   const handleAddDeductionDetail = () => {
     const prevYtdAmount =
       previousPayStub?.PayStubDeductions.find((res) => res.Deduction === 'CPP')

@@ -3,6 +3,7 @@ import {
   QueryConstraint,
   Timestamp,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   limit,
@@ -12,6 +13,7 @@ import {
   serverTimestamp,
   setDoc,
   startAfter,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 import { db } from '../config';
@@ -537,6 +539,86 @@ class DbPayment {
     };
 
     return setDoc(payStubRef, newPayStub);
+  };
+
+  static updatePayStub = ({
+    payStubId,
+    data,
+    deductionsList,
+    earningsList,
+  }: {
+    payStubId: string;
+    data: PayStubCreateFormFields;
+    earningsList: IEarningList[];
+    deductionsList: IDeductionList[];
+  }) => {
+    const payStubRef = doc(db, CollectionName.payStubs, payStubId);
+
+    const {
+      PayStubEmpId,
+      PayStubEmpName,
+      PayStubEmpRole,
+      PayStubNetPay,
+      PayStubPayDate,
+      PayStubPayPeriodEndDate,
+      PayStubPayPeriodStartDate,
+      PayStubRefNumber,
+    } = data;
+
+    const PayStubEarnings: IPayStubEarningsChildCollection[] = earningsList.map(
+      (res) => {
+        return {
+          ...res,
+          CurrentAmount: res.CurrentAmount
+            ? Number(res.CurrentAmount)
+            : Number(res.Quantity) * Number(res.Rate),
+          Quantity: Number(res.Quantity) || null,
+          Rate: Number(res.Rate) || null,
+          YTDAmount: Number(res.YTDAmount || 0),
+        };
+      }
+    );
+
+    const PayStubDeductions: IPayStubDeductionsChildCollection[] =
+      deductionsList
+        .filter((res) => res.Amount && res.Percentage)
+        .map((res) => {
+          return {
+            Amount: Number(res.Amount),
+            Deduction: res.Deduction,
+            OtherDeduction: res.OtherDeduction,
+            Percentage: Number(res.Percentage),
+            YearToDateAmt: Number(res.YearToDateAmt || 0),
+          };
+        });
+
+    const updatedPayStub: Partial<IPayStubsCollection> = {
+      PayStubEmpId,
+      PayStubEmpName,
+      PayStubEmpRole,
+      PayStubEarnings,
+      PayStubDeductions,
+      PayStubPayPeriodStartDate: removeTimeFromDate(
+        PayStubPayPeriodStartDate
+      ) as unknown as Timestamp,
+      PayStubPayPeriodEndDate: removeTimeFromDate(
+        PayStubPayPeriodEndDate
+      ) as unknown as Timestamp,
+      PayStubPayDate: removeTimeFromDate(
+        PayStubPayDate
+      ) as unknown as Timestamp,
+      PayStubNetPay,
+      PayStubRefNumber,
+      PayStubModifiedAt: serverTimestamp(),
+    };
+
+    return updateDoc(payStubRef, updatedPayStub);
+  };
+
+  static deletePayStub = (payStubId: string) => {
+    const payStubRef = doc(db, CollectionName.payStubs, payStubId);
+
+    return deleteDoc(payStubRef);
   };
 
   static getPayStubs = ({

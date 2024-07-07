@@ -6,7 +6,7 @@ import {
   PageRoutes,
   REACT_QUERY_KEYS,
 } from '../../../@types/enum';
-import { useAuthState } from '../../../store';
+import { useAuthState, useEditFormStore } from '../../../store';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
@@ -34,6 +34,8 @@ const PayStubList = () => {
   const navigate = useNavigate();
 
   const { company } = useAuthState();
+
+  const { setPayStubEditData } = useEditFormStore();
 
   const [startDate, setStartDate] = useState<Date | string | null>(
     dayjs().startOf('M').toDate()
@@ -196,7 +198,13 @@ const PayStubList = () => {
           ) : (
             data.map((payStub) => {
               return (
-                <tr key={payStub.PayStubId}>
+                <tr
+                  onClick={() => {
+                    setPayStubEditData(payStub);
+                    navigate(PageRoutes.PAY_STUB_GENERATE);
+                  }}
+                  key={payStub.PayStubId}
+                >
                   <td className="align-top cursor-pointer px-4 py-2 text-start ">
                     <span className="line-clamp-3">
                       {payStub.PayStubEmpName}

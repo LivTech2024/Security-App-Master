@@ -1,6 +1,6 @@
 import PageHeader from '../../../common/PageHeader';
 import Button from '../../../common/button/Button';
-import { useAuthState } from '../../../store';
+import { useAuthState, useEditFormStore } from '../../../store';
 import {
   closeModalLoader,
   showModalLoader,
@@ -28,6 +28,7 @@ import {
 import DbPayment from '../../../firebase_configs/DB/DbPayment';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../../@types/enum';
+import { openContextModal } from '@mantine/modals';
 
 export interface IEarningList
   extends Omit<
@@ -51,8 +52,18 @@ export interface IDeductionList
 }
 
 const PayStubGenerate = () => {
+  const { payStubEditData } = useEditFormStore();
+
+  const isEdit = !!payStubEditData;
+
   const methods = useForm<PayStubCreateFormFields>({
     resolver: zodResolver(payStubCreateSchema),
+    defaultValues: isEdit
+      ? {
+          PayStubRefNumber: payStubEditData.PayStubRefNumber,
+          PayStubNetPay: payStubEditData.PayStubNetPay,
+        }
+      : {},
   });
 
   const navigate = useNavigate();
@@ -115,33 +126,80 @@ const PayStubGenerate = () => {
     );
   }, [previousPayStub, netPayCurrent]);
 
+  const [loading, setLoading] = useState(false);
+
   const onSubmit = async (data: PayStubCreateFormFields) => {
     if (!company) return;
 
     try {
-      showModalLoader({});
+      setLoading(true);
 
-      await DbPayment.createPayStub({
-        cmpId: company.CompanyId,
-        data,
-        deductionsList,
-        earningsList,
-      });
+      if (isEdit) {
+        await DbPayment.updatePayStub({
+          payStubId: payStubEditData.PayStubId,
+          data,
+          deductionsList,
+          earningsList,
+        });
 
-      showSnackbar({
-        message: 'PayStub created successfully',
-        type: 'success',
-      });
+        showSnackbar({
+          message: 'PayStub updated successfully',
+          type: 'success',
+        });
+      } else {
+        await DbPayment.createPayStub({
+          cmpId: company.CompanyId,
+          data,
+          deductionsList,
+          earningsList,
+        });
 
-      closeModalLoader();
+        showSnackbar({
+          message: 'PayStub created successfully',
+          type: 'success',
+        });
+      }
+
+      setLoading(false);
 
       navigate(PageRoutes.PAY_STUB_LIST);
     } catch (error) {
       console.log(error);
+      setLoading(false);
       errorHandler(error);
-      closeModalLoader();
     }
   };
+
+  const onDelete = async () => {
+    if (!isEdit) return;
+    try {
+      setLoading(true);
+
+      await DbPayment.deletePayStub(payStubEditData.PayStubId);
+
+      showSnackbar({
+        message: 'PayStub deleted successfully',
+        type: 'success',
+      });
+
+      setLoading(false);
+
+      navigate(PageRoutes.PAY_STUB_LIST);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      errorHandler(error);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
 
   return (
     <FormProvider {...methods}>
@@ -152,11 +210,38 @@ const PayStubGenerate = () => {
         <PageHeader
           title="Create new paystub"
           rightSection={
-            <Button
-              label="Save"
-              onClick={methods.handleSubmit(onSubmit)}
-              type="black"
-            />
+            <div className="flex items-center gap-4">
+              {isEdit && (
+                <Button
+                  label="Delete"
+                  type="white"
+                  onClick={() =>
+                    openContextModal({
+                      modal: 'confirmModal',
+                      withCloseButton: false,
+                      centered: true,
+                      closeOnClickOutside: true,
+                      innerProps: {
+                        title: 'Confirm',
+                        body: 'Are you sure to delete this pay stub',
+                        onConfirm: () => {
+                          onDelete();
+                        },
+                      },
+                      size: '30%',
+                      styles: {
+                        body: { padding: '0px' },
+                      },
+                    })
+                  }
+                />
+              )}
+              <Button
+                label="Save"
+                onClick={methods.handleSubmit(onSubmit)}
+                type="black"
+              />
+            </div>
           }
         />
         <div className="flex flex-col gap-4 w-full h-full">

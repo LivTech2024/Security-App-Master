@@ -1,9 +1,4 @@
-import {
-  MdAssuredWorkload,
-  MdEmergencyShare,
-  MdOutlineSensors,
-  MdPeople,
-} from 'react-icons/md';
+import { MdAssuredWorkload, MdEmergencyShare, MdPeople } from 'react-icons/md';
 import { VscCallOutgoing } from 'react-icons/vsc';
 import { LuActivitySquare } from 'react-icons/lu';
 import { useAuthState } from '../../store';
@@ -155,7 +150,7 @@ const Home = () => {
         />
         <HomeItem
           path={PageRoutes.REPORTS}
-          name="Reports & analysis"
+          name="Reports"
           icon={<TbReport className="text-2xl text-primaryGold" />}
         />
         <HomeItem
@@ -173,11 +168,7 @@ const Home = () => {
           name="Emergency response"
           icon={<MdEmergencyShare className="text-2xl text-primaryGold" />}
         />
-        <HomeItem
-          path={PageRoutes.HOME}
-          name="Environmental sensor"
-          icon={<MdOutlineSensors className="text-2xl text-primaryGold" />}
-        />
+
         <HomeItem
           path={PageRoutes.TIME_AND_ATTENDANCE_LIST}
           name="Time & Attendance"

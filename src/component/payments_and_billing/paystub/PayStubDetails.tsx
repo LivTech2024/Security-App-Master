@@ -3,7 +3,8 @@ import InputDate from '../../../common/inputs/InputDate';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import { PayStubCreateFormFields } from '../../../utilities/zod/schema';
 import { useEffect, useState } from 'react';
-import { removeTimeFromDate } from '../../../utilities/misc';
+import { removeTimeFromDate, toDate } from '../../../utilities/misc';
+import { useEditFormStore } from '../../../store';
 
 const PayStubDetails = () => {
   const {
@@ -12,11 +13,22 @@ const PayStubDetails = () => {
     formState: { errors },
   } = useFormContext<PayStubCreateFormFields>();
 
+  const { payStubEditData } = useEditFormStore();
+
+  const isEdit = !!payStubEditData;
+
   const [startDate, setStartDate] = useState<Date | null>(null);
 
   const [endDate, setEndDate] = useState<Date | null>(null);
 
   const [payDate, setPayDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!isEdit) return;
+    setStartDate(toDate(payStubEditData.PayStubPayPeriodStartDate));
+    setEndDate(toDate(payStubEditData.PayStubPayPeriodEndDate));
+    setPayDate(toDate(payStubEditData.PayStubPayDate));
+  }, [isEdit]);
 
   useEffect(() => {
     if (startDate) {

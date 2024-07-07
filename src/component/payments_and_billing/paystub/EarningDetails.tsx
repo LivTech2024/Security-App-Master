@@ -10,6 +10,8 @@ import { numberFormatter } from '../../../utilities/NumberFormater';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { MdClose } from 'react-icons/md';
 import { RiEqualFill } from 'react-icons/ri';
+import { useEditFormStore } from '../../../store';
+import { useEffect } from 'react';
 
 interface EarningDetailsProps {
   earningsList: IEarningList[];
@@ -22,6 +24,26 @@ const EarningDetails = ({
   setEarningsList,
   previousPayStub,
 }: EarningDetailsProps) => {
+  const { payStubEditData } = useEditFormStore();
+
+  const isEdit = !!payStubEditData;
+
+  useEffect(() => {
+    if (!isEdit) return;
+    setEarningsList(
+      payStubEditData.PayStubEarnings.map((res) => {
+        return {
+          CurrentAmount: String(res.CurrentAmount),
+          Income: res.Income,
+          Type: res.Type,
+          YTDAmount: String(res.YTDAmount),
+          Quantity: String(res.Quantity || ''),
+          Rate: String(res.Rate || ''),
+        };
+      })
+    );
+  }, [isEdit]);
+
   const handleAddEarningDetail = () => {
     const prevYtdAmount =
       previousPayStub?.PayStubEarnings.find((res) => res.Income === 'Regular')

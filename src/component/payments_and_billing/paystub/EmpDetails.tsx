@@ -11,6 +11,7 @@ import { IEarningList } from '../../../pages/payments_and_billing/paystub/PayStu
 import { IPayStubsCollection } from '../../../@types/database';
 import { roundNumber } from '../../../utilities/misc';
 import { openContextModal } from '@mantine/modals';
+import { useEditFormStore } from '../../../store';
 
 const EmpDetails = ({
   setEarningsList,
@@ -21,6 +22,10 @@ const EmpDetails = ({
     React.SetStateAction<IPayStubsCollection | null>
   >;
 }) => {
+  const { payStubEditData } = useEditFormStore();
+
+  const isEdit = !!payStubEditData;
+
   const {
     watch,
     setValue,
@@ -37,20 +42,26 @@ const EmpDetails = ({
   const selectedEmpRole = watch('PayStubEmpRole');
 
   useEffect(() => {
+    if (isEdit) {
+      setEmpSearchQuery(payStubEditData.PayStubEmpName);
+    }
+  }, [isEdit]);
+
+  useEffect(() => {
     const selectedEmp = employees.find(
       (emp) => emp.EmployeeName === empSearchQuery
     );
 
     if (selectedEmp) {
-      setValue('PayStubEmpId', selectedEmp.EmployeeId);
-      setValue('PayStubEmpName', selectedEmp.EmployeeName);
-      setValue('PayStubEmpRole', selectedEmp.EmployeeRole);
+      setValue('PayStubEmpId', selectedEmp?.EmployeeId);
+      setValue('PayStubEmpName', selectedEmp?.EmployeeName);
+      setValue('PayStubEmpRole', selectedEmp?.EmployeeRole);
     } else {
-      setValue('PayStubEmpId', '');
-      setValue('PayStubEmpName', '');
-      setValue('PayStubEmpRole', '');
+      setValue('PayStubEmpId', isEdit ? payStubEditData.PayStubEmpId : '');
+      setValue('PayStubEmpName', isEdit ? payStubEditData.PayStubEmpName : '');
+      setValue('PayStubEmpRole', isEdit ? payStubEditData.PayStubEmpRole : '');
     }
-  }, [empSearchQuery]);
+  }, [empSearchQuery, isEdit]);
 
   const [payStartDate, payEndDate, empId] = watch([
     'PayStubPayPeriodStartDate',

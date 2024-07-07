@@ -10,6 +10,7 @@ import {
   IKeysCollection,
   ILocationsCollection,
   IPatrolsCollection,
+  IPayStubsCollection,
   IShiftsCollection,
 } from '../../@types/database';
 import { CompanyBranches } from './auth.slice';
@@ -144,6 +145,9 @@ interface EditFormState {
 
   invoiceEditData: IInvoicesCollection | null;
   setInvoiceEditData: (inv: IInvoicesCollection | null) => void;
+
+  payStubEditData: IPayStubsCollection | null;
+  setPayStubEditData: (payStub: IPayStubsCollection | null) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -210,4 +214,9 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   invoiceEditData: null,
   setInvoiceEditData: (inv) =>
     set((state) => ({ ...state, invoiceEditData: inv })),
+
+  //payStub
+  payStubEditData: null,
+  setPayStubEditData: (payStub) =>
+    set((state) => ({ ...state, payStubEditData: payStub })),
 });
