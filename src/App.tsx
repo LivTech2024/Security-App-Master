@@ -78,8 +78,9 @@ import PayStubGenerate from './pages/payments_and_billing/paystub/PayStubGenerat
 import PayStubList from './pages/payments_and_billing/paystub/PayStubList';
 import TimeAndAttendanceList from './pages/time_and_attendance/TimeAndAttendanceList';
 import CompanyList from './pages/super_admin/CompanyList';
-import CertificationList from './pages/training_and_certification/CertificationList';
-import CertificationView from './pages/training_and_certification/CertificationView';
+import TrainCertsList from './pages/training_and_certification/TrainCertsList';
+import TrainCertsView from './pages/training_and_certification/TrainCertsView';
+import TrainCertsCreateOrEdit from './pages/training_and_certification/TrainCertsCreateOrEdit';
 
 function App() {
   useOnAuthStateChanged();
@@ -330,12 +331,16 @@ function App() {
             <Route path={PageRoutes.VISITOR_VIEW} Component={VisitorView} />
 
             <Route
+              path={PageRoutes.TRAINING_AND_CERTIFICATION_CREATE_OR_EDIT}
+              Component={TrainCertsCreateOrEdit}
+            />
+            <Route
               path={PageRoutes.TRAINING_AND_CERTIFICATION_LIST}
-              Component={CertificationList}
+              Component={TrainCertsList}
             />
             <Route
               path={PageRoutes.TRAINING_AND_CERTIFICATION_VIEW}
-              Component={CertificationView}
+              Component={TrainCertsView}
             />
 
             <Route

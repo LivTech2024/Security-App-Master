@@ -661,3 +661,34 @@ export interface IPayStubsCollection {
   PayStubCreatedAt: Timestamp | FieldValue;
   PayStubModifiedAt: Timestamp | FieldValue;
 }
+
+export enum TrainCertsCategories {
+  TECHNICAL = 'Technical',
+  SAFETY = 'Safety',
+  COMPLIANCE = 'Compliance',
+}
+
+export interface ITrainingAndCertificationsCollection {
+  TrainCertsId: string;
+  TrainCertsCompanyId: string;
+  TrainCertsTitle: string;
+  TrainCertsDescription?: string | null;
+  TrainCertsCategory: TrainCertsCategories;
+  TrainCertsCost?: number | null;
+  TrainCertsDuration: number;
+  TrainCertsStartDate: Timestamp | FieldValue;
+  TrainCertsEndDate: Timestamp | FieldValue;
+  TrainCertsCreatedAt: Timestamp | FieldValue;
+  TrainCertsModifiedAt: Timestamp | FieldValue;
+}
+
+export interface ITrainCertsAllocationsCollection {
+  TrainCertsAllocId: string;
+  TrainCertsId: string;
+  TrainCertsAllocEmpId: string;
+  TrainCertsAllocEmpName: string;
+  TrainCertsAllocStatus: 'pending' | 'started' | 'completed';
+  TrainCertsAllocDate: Timestamp | FieldValue;
+  TrainCertsAllocCompletionDate: Timestamp | FieldValue;
+  TrainCertsAllocCreatedAt: Timestamp | FieldValue;
+}

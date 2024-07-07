@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { numberString } from './helper';
 import { ConstRegex } from '../../constants/ConstRegex';
+import { TrainCertsCategories } from '../../@types/database';
 
 //*Admin  update schema
 export const adminUpdateSchema = z.object({
@@ -480,3 +481,20 @@ export const payStubCreateSchema = z.object({
 });
 
 export type PayStubCreateFormFields = z.infer<typeof payStubCreateSchema>;
+
+//*Training & Certification Create Schema
+export const trainCertsCreateSchema = z.object({
+  TrainCertsTitle: z.string().min(3).max(100),
+  TrainCertsDescription: z.string().optional().nullable(),
+  TrainCertsCategory: z.enum([
+    TrainCertsCategories.TECHNICAL,
+    TrainCertsCategories.SAFETY,
+    TrainCertsCategories.COMPLIANCE,
+  ]),
+  TrainCertsCost: z.coerce.number().nullable().optional(),
+  TrainCertsDuration: z.coerce.number().min(1),
+  TrainCertsStartDate: z.date(),
+  TrainCertsEndDate: z.date(),
+});
+
+export type TrainCertsCreateFormFields = z.infer<typeof trainCertsCreateSchema>;

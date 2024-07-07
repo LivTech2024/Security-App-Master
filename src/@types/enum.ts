@@ -31,6 +31,7 @@ export enum CollectionName {
   callouts = 'Callouts',
   userDataDeletionRequests = 'UserDataDeletionRequests',
   payStubs = 'PayStubs',
+  trainingAndCertifications = 'TrainingAndCertifications',
 }
 
 export const DisplayCount = {
@@ -160,6 +161,8 @@ export const PageRoutes = {
   KEY_VIEW: '/key_view',
   MESSAGING: '/messaging',
   TRAINING_AND_CERTIFICATION_LIST: '/training_and_certification_list',
+  TRAINING_AND_CERTIFICATION_CREATE_OR_EDIT:
+    '/training_and_certification_create_or_edit',
   TRAINING_AND_CERTIFICATION_VIEW: '/training_and_certification_view',
   TIME_AND_ATTENDANCE_LIST: '/time_and_attendance_list',
   TIME_AND_ATTENDANCE_VIEW: '/time_and_attendance_view',
