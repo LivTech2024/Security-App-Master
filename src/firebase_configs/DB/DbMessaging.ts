@@ -57,6 +57,7 @@ class DbMessaging {
     const newMessage: IMessagesCollection = {
       MessageId: messageId,
       MessageCompanyId: cmpId,
+      MessageType: 'message',
       MessageData: data,
       MessageCreatedById: senderId,
       MessageCreatedByName: senderName,

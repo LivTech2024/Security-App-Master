@@ -291,6 +291,7 @@ export interface IDocumentsCollection {
 export interface IMessagesCollection {
   MessageId: string;
   MessageCompanyId: string;
+  MessageType: 'message' | 'panic';
   MessageData: string;
   MessageCreatedById: string;
   MessageCreatedByName: string;
