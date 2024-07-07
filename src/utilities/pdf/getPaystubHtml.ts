@@ -131,10 +131,17 @@ export const getPaystubHtml = ({
                   true
                 )}</th>
                 <th style="text-align: right">${numberFormatter(
-                  payStub.PayStubEarnings.reduce(
-                    (acc, obj) => acc + obj.YTDAmount,
-                    0
-                  ),
+                  payStub.PayStubEarnings.reduce((acc, obj) => {
+                    const amount =
+                      Number(obj.CurrentAmount) ||
+                      Number(obj.Rate ?? 0) * Number(obj.Quantity ?? 0);
+
+                    if (obj.Income === 'Banked') {
+                      return acc - amount;
+                    }
+
+                    return acc + amount;
+                  }, 0),
                   true
                 )}</th>
               </tr>
