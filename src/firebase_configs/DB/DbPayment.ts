@@ -366,6 +366,24 @@ class DbPayment {
   };
 
   //*For PayStub
+
+  static isPayStubExistForPayPeriod = async (
+    empId: string,
+    startDate: Date
+  ) => {
+    const payStubRef = collection(db, CollectionName.payStubs);
+    const payStubQuery = query(
+      payStubRef,
+      where('PayStubEmpId', '==', empId),
+      where('PayStubPayPeriodStartDate', '>=', startDate),
+      limit(1)
+    );
+
+    const snapshot = await getDocs(payStubQuery);
+
+    return snapshot.size > 0;
+  };
+
   static getEmpEarning = async ({
     empId,
     endDate,
