@@ -20,6 +20,7 @@ import { useInView } from 'react-intersection-observer';
 import { Status } from '../../common/Status';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import Button from '../../common/button/Button';
+import TrainCertsAllocModal from '../../component/training_and_certifications/modal/TrainCertsAllocModal';
 
 const TrainCertsView = () => {
   const [searchParam] = useSearchParams();
@@ -148,6 +149,8 @@ const TrainCertsView = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const [trainCertsAllocModal, setTrainCertsAllocModal] = useState(false);
+
   if (!data && !loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -175,9 +178,17 @@ const TrainCertsView = () => {
             <Button
               label="Allot To New Employee"
               type="black"
-              onClick={() => {}}
+              onClick={() => {
+                setTrainCertsAllocModal(true);
+              }}
             />
           }
+        />
+
+        <TrainCertsAllocModal
+          opened={trainCertsAllocModal}
+          setOpened={setTrainCertsAllocModal}
+          trainCertsId={trainCertId || ''}
         />
 
         <div className="bg-surface shadow rounded p-4 grid grid-cols-2 gap-x-4 gap-y-1">
@@ -284,7 +295,7 @@ const TrainCertsView = () => {
             ) : (
               allocData.map((alloc) => {
                 return (
-                  <tr key={alloc.TrainCertsAllocId} className="cursor-pointer">
+                  <tr key={alloc.TrainCertsAllocId} className="">
                     <td className="align-top px-4 py-2 text-start">
                       <span className="line-clamp-3">
                         {alloc.TrainCertsAllocEmpName}
@@ -298,22 +309,30 @@ const TrainCertsView = () => {
                     </td>
                     <td className="align-top px-4 py-2 text-start ">
                       <span className="line-clamp-2">
-                        {alloc.TrainCertsAllocStartDate
-                          ? formatDate(alloc.TrainCertsAllocStartDate)
-                          : 'N/A'}
+                        {alloc.TrainCertsAllocStartDate ? (
+                          formatDate(alloc.TrainCertsAllocStartDate)
+                        ) : (
+                          <span className="text-textPrimaryBlue cursor-pointer hover:underline">
+                            Mark it started
+                          </span>
+                        )}
                       </span>
                     </td>
                     <td className="align-top px-4 py-2 text-start ">
                       <span className="line-clamp-2">
-                        {alloc.TrainCertsAllocCompletionDate
-                          ? formatDate(alloc.TrainCertsAllocCompletionDate)
-                          : 'N/A'}
+                        {alloc.TrainCertsAllocCompletionDate ? (
+                          formatDate(alloc.TrainCertsAllocCompletionDate)
+                        ) : (
+                          <span className="text-textPrimaryBlue cursor-pointer hover:underline">
+                            Mark it completed
+                          </span>
+                        )}
                       </span>
                     </td>
                     <td className="align-top px-4 py-2 text-end">
-                      <span className="line-clamp-3">
+                      <div className="flex justify-end">
                         <Status status={alloc.TrainCertsAllocStatus} />
-                      </span>
+                      </div>
                     </td>
                   </tr>
                 );
