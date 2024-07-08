@@ -45,6 +45,7 @@ import {
   AdminUpdateFormFields,
   CompanyBranchFormFields,
   CompanyCreateFormFields,
+  CompanyUpdateFormFields,
   LocationCreateFormFields,
   SettingsFormFields,
   TaskFormFields,
@@ -98,7 +99,7 @@ class DbCompany {
     data,
     logoBase64,
   }: {
-    data: CompanyCreateFormFields;
+    data: CompanyUpdateFormFields;
     cmpId: string;
     logoBase64: string;
   }) => {

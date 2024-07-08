@@ -68,6 +68,25 @@ export const companyCreateSchema = z.object({
 
 export type CompanyCreateFormFields = z.infer<typeof companyCreateSchema>;
 
+//*Company update schema
+export const companyUpdateSchema = z.object({
+  CompanyName: z
+    .string()
+    .min(3, { message: 'Company name should be minimum 3 characters' }),
+  CompanyEmail: z
+    .string()
+    .min(3, { message: 'Valid email is required' })
+    .regex(ConstRegex.EMAIL_OPTIONAL),
+  CompanyPhone: z
+    .string()
+    .min(10, { message: 'Company phone with country code is required' }),
+  CompanyAddress: z
+    .string()
+    .min(3, { message: 'Company address should be minimum 3 characters' }),
+});
+
+export type CompanyUpdateFormFields = z.infer<typeof companyUpdateSchema>;
+
 //*Location  create schema
 export const locationCreateSchema = z.object({
   LocationClientId: z.string().min(3),

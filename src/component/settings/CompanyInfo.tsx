@@ -1,7 +1,7 @@
 import { FormProvider, useForm } from 'react-hook-form';
 import {
-  CompanyCreateFormFields,
-  companyCreateSchema,
+  CompanyUpdateFormFields,
+  companyUpdateSchema,
 } from '../../utilities/zod/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
@@ -20,8 +20,8 @@ import DbCompany from '../../firebase_configs/DB/DbCompany';
 const CompanyInfo = () => {
   const { company, setCompany } = useAuthState();
 
-  const methods = useForm<CompanyCreateFormFields>({
-    resolver: zodResolver(companyCreateSchema),
+  const methods = useForm<CompanyUpdateFormFields>({
+    resolver: zodResolver(companyUpdateSchema),
     defaultValues: {
       CompanyName: company?.CompanyName,
       CompanyAddress: company?.CompanyAddress,
@@ -43,7 +43,7 @@ const CompanyInfo = () => {
     }
   };
 
-  const onSubmit = async (data: CompanyCreateFormFields) => {
+  const onSubmit = async (data: CompanyUpdateFormFields) => {
     if (!company || !logoImgBase64) return;
     try {
       showModalLoader({});
