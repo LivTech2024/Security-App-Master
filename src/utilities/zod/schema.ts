@@ -498,3 +498,13 @@ export const trainCertsCreateSchema = z.object({
 });
 
 export type TrainCertsCreateFormFields = z.infer<typeof trainCertsCreateSchema>;
+
+//*Training & Certification Allocation Schema
+export const trainCertsAllocSchema = z.object({
+  TrainCertsId: z.string().min(3),
+  TrainCertsAllocEmpId: z.string().min(3),
+  TrainCertsAllocEmpName: z.string().min(3),
+  TrainCertsAllocDate: z.date(),
+});
+
+export type TrainCertsAllocFormFields = z.infer<typeof trainCertsAllocSchema>;

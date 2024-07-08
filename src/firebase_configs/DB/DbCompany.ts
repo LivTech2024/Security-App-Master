@@ -18,6 +18,8 @@ import {
   IReportCategoriesCollection,
   ITaskLogsCollection,
   ITasksCollection,
+  ITrainCertsAllocationsCollection,
+  ITrainingAndCertificationsCollection,
 } from '../../@types/database';
 import {
   doc,
@@ -46,6 +48,8 @@ import {
   LocationCreateFormFields,
   SettingsFormFields,
   TaskFormFields,
+  TrainCertsAllocFormFields,
+  TrainCertsCreateFormFields,
 } from '../../utilities/zod/schema';
 import CustomError from '../../utilities/CustomError';
 import dayjs from 'dayjs';
@@ -1120,6 +1124,267 @@ class DbCompany {
     const taskQuery = query(taskRef, ...queryParams);
 
     return getDocs(taskQuery);
+  };
+
+  //*For TrainingAndCerts
+  static createTrainCerts = (
+    data: TrainCertsCreateFormFields,
+    cmpId: string
+  ) => {
+    const trainCertsId = getNewDocId(CollectionName.trainingAndCertifications);
+    const trainCertsRef = doc(
+      db,
+      CollectionName.trainingAndCertifications,
+      trainCertsId
+    );
+
+    const {
+      TrainCertsCategory,
+      TrainCertsDuration,
+      TrainCertsEndDate,
+      TrainCertsStartDate,
+      TrainCertsTitle,
+      TrainCertsCost,
+      TrainCertsDescription,
+    } = data;
+
+    const newTrainCerts: ITrainingAndCertificationsCollection = {
+      TrainCertsId: trainCertsId,
+      TrainCertsCompanyId: cmpId,
+      TrainCertsTitle,
+      TrainCertsCategory,
+      TrainCertsDuration,
+      TrainCertsCost,
+      TrainCertsDescription,
+      TrainCertsTotalTrainee: 0,
+      TrainCertsTotalTraineeCompletedTraining: 0,
+      TrainCertsStartDate: TrainCertsStartDate as unknown as Timestamp,
+      TrainCertsEndDate: TrainCertsEndDate as unknown as Timestamp,
+      TrainCertsCreatedAt: serverTimestamp(),
+      TrainCertsModifiedAt: serverTimestamp(),
+    };
+
+    return setDoc(trainCertsRef, newTrainCerts);
+  };
+
+  static updateTrainCerts = (
+    data: TrainCertsCreateFormFields,
+    trainCertsId: string
+  ) => {
+    const trainCertsRef = doc(
+      db,
+      CollectionName.trainingAndCertifications,
+      trainCertsId
+    );
+
+    const {
+      TrainCertsCategory,
+      TrainCertsDuration,
+      TrainCertsEndDate,
+      TrainCertsStartDate,
+      TrainCertsTitle,
+      TrainCertsCost,
+      TrainCertsDescription,
+    } = data;
+
+    const newTrainCerts: Partial<ITrainingAndCertificationsCollection> = {
+      TrainCertsTitle,
+      TrainCertsCategory,
+      TrainCertsDuration,
+      TrainCertsCost,
+      TrainCertsDescription,
+      TrainCertsStartDate: TrainCertsStartDate as unknown as Timestamp,
+      TrainCertsEndDate: TrainCertsEndDate as unknown as Timestamp,
+      TrainCertsModifiedAt: serverTimestamp(),
+    };
+
+    return updateDoc(trainCertsRef, newTrainCerts);
+  };
+
+  static deleteTrainCerts = async (trainCertsId: string) => {
+    const trainCertsRef = doc(
+      db,
+      CollectionName.trainingAndCertifications,
+      trainCertsId
+    );
+
+    const trainCertsAllocRef = collection(
+      db,
+      CollectionName.trainCertsAllocation
+    );
+    const trainCertsAllocQuery = query(
+      trainCertsAllocRef,
+      where('TrainCertsId', '==', trainCertsId)
+    );
+    const trainCertsAllocSnapshot = await getDocs(trainCertsAllocQuery);
+    const trainCertsAllocData = trainCertsAllocSnapshot.docs.map(
+      (doc) => doc.data() as ITrainCertsAllocationsCollection
+    );
+
+    await runTransaction(db, async (transaction) => {
+      trainCertsAllocData.forEach((data) => {
+        const trainCertsAllocDocRef = doc(
+          db,
+          CollectionName.trainCertsAllocation,
+          data.TrainCertsAllocId
+        );
+        transaction.delete(trainCertsAllocDocRef);
+      });
+
+      transaction.delete(trainCertsRef);
+    });
+  };
+
+  //For allocation
+
+  static createTrainCertsAlloc = async (data: TrainCertsAllocFormFields) => {
+    const trainCertsAllocId = getNewDocId(CollectionName.trainCertsAllocation);
+    const trainCertsAllocRef = doc(
+      db,
+      CollectionName.trainCertsAllocation,
+      trainCertsAllocId
+    );
+
+    const {
+      TrainCertsAllocDate,
+      TrainCertsAllocEmpId,
+      TrainCertsAllocEmpName,
+      TrainCertsId,
+    } = data;
+
+    const trainCertsRef = doc(
+      db,
+      CollectionName.trainingAndCertifications,
+      TrainCertsId
+    );
+
+    await runTransaction(db, async (transaction) => {
+      const trainCertsSnapshot = await transaction.get(trainCertsRef);
+      const trainCertsData =
+        trainCertsSnapshot.data() as ITrainingAndCertificationsCollection;
+
+      const newTrainCertsAlloc: ITrainCertsAllocationsCollection = {
+        TrainCertsAllocId: 'trainCertsAllocId',
+        TrainCertsId,
+        TrainCertsAllocEmpId,
+        TrainCertsAllocEmpName,
+        TrainCertsAllocStatus: 'pending',
+        TrainCertsAllocDate: TrainCertsAllocDate as unknown as Timestamp,
+        TrainCertsAllocCreatedAt: serverTimestamp(),
+      };
+
+      transaction.set(trainCertsAllocRef, newTrainCertsAlloc);
+
+      const updatedTrainCerts: Partial<ITrainingAndCertificationsCollection> = {
+        TrainCertsTotalTrainee: trainCertsData.TrainCertsTotalTrainee + 1,
+      };
+
+      transaction.update(trainCertsRef, updatedTrainCerts);
+    });
+  };
+
+  static updateTrainCertsAllocStatus = async ({
+    status,
+    trainCertsAllocId,
+    completionDate,
+    startDate,
+  }: {
+    trainCertsAllocId: string;
+    status: 'started' | 'completed';
+    startDate?: Date;
+    completionDate?: Date;
+  }) => {
+    const trainCertsAllocRef = doc(
+      db,
+      CollectionName.trainCertsAllocation,
+      trainCertsAllocId
+    );
+
+    if (status === 'started' && !startDate) {
+      throw new CustomError('Please enter start date');
+    }
+
+    if (status === 'completed' && !completionDate) {
+      throw new CustomError('Please enter completion date');
+    }
+
+    await runTransaction(db, async (transaction) => {
+      const trainCertsAllocSnapshot = await transaction.get(trainCertsAllocRef);
+      const trainCertsAllocData =
+        trainCertsAllocSnapshot.data() as ITrainCertsAllocationsCollection;
+      const { TrainCertsId } = trainCertsAllocData;
+
+      if (status === 'started' && startDate) {
+        const updatedTrainCertsAlloc: Partial<ITrainCertsAllocationsCollection> =
+          {
+            TrainCertsAllocStatus: status,
+            TrainCertsAllocStartDate: startDate as unknown as Timestamp,
+          };
+        transaction.update(trainCertsAllocRef, updatedTrainCertsAlloc);
+      } else if (status === 'completed' && completionDate) {
+        const updatedTrainCertsAlloc: Partial<ITrainCertsAllocationsCollection> =
+          {
+            TrainCertsAllocStatus: status,
+            TrainCertsAllocCompletionDate:
+              completionDate as unknown as Timestamp,
+          };
+
+        //*Update the number of trainee completed training in TrainingAndCertifications
+        const trainCertsRef = doc(
+          db,
+          CollectionName.trainingAndCertifications,
+          TrainCertsId
+        );
+        const trainCertsSnapshot = await transaction.get(trainCertsRef);
+        const trainCertsData =
+          trainCertsSnapshot.data() as ITrainingAndCertificationsCollection;
+
+        const updatedTrainCerts: Partial<ITrainingAndCertificationsCollection> =
+          {
+            TrainCertsTotalTraineeCompletedTraining:
+              trainCertsData.TrainCertsTotalTraineeCompletedTraining + 1,
+          };
+
+        //*Update documents after all read completed
+        transaction.update(trainCertsAllocRef, updatedTrainCertsAlloc);
+        transaction.update(trainCertsRef, updatedTrainCerts);
+      }
+    });
+  };
+
+  static deleteTrainCertsAlloc = async (trainCertsAllocId: string) => {
+    const trainCertsAllocRef = doc(
+      db,
+      CollectionName.trainCertsAllocation,
+      trainCertsAllocId
+    );
+    await runTransaction(db, async (transaction) => {
+      const trainCertsAllocSnapshot = await transaction.get(trainCertsAllocRef);
+      const trainCertsAllocData =
+        trainCertsAllocSnapshot.data() as ITrainCertsAllocationsCollection;
+      const { TrainCertsId, TrainCertsAllocStatus } = trainCertsAllocData;
+
+      const trainCertsRef = doc(
+        db,
+        CollectionName.trainingAndCertifications,
+        TrainCertsId
+      );
+      const trainCertsSnapshot = await transaction.get(trainCertsRef);
+      const trainCertsData =
+        trainCertsSnapshot.data() as ITrainingAndCertificationsCollection;
+
+      transaction.delete(trainCertsAllocRef);
+
+      const updatedTrainCerts: Partial<ITrainingAndCertificationsCollection> = {
+        TrainCertsTotalTrainee: trainCertsData.TrainCertsTotalTrainee - 1,
+        TrainCertsTotalTraineeCompletedTraining:
+          TrainCertsAllocStatus === 'completed'
+            ? trainCertsData.TrainCertsTotalTraineeCompletedTraining - 1
+            : trainCertsData.TrainCertsTotalTraineeCompletedTraining,
+      };
+
+      transaction.update(trainCertsRef, updatedTrainCerts);
+    });
   };
 }
 

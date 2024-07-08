@@ -32,6 +32,7 @@ export enum CollectionName {
   userDataDeletionRequests = 'UserDataDeletionRequests',
   payStubs = 'PayStubs',
   trainingAndCertifications = 'TrainingAndCertifications',
+  trainCertsAllocation = 'TrainCertsAllocation',
 }
 
 export const DisplayCount = {

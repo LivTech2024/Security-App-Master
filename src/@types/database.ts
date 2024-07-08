@@ -678,6 +678,8 @@ export interface ITrainingAndCertificationsCollection {
   TrainCertsDuration: number;
   TrainCertsStartDate: Timestamp | FieldValue;
   TrainCertsEndDate: Timestamp | FieldValue;
+  TrainCertsTotalTrainee: number;
+  TrainCertsTotalTraineeCompletedTraining: number;
   TrainCertsCreatedAt: Timestamp | FieldValue;
   TrainCertsModifiedAt: Timestamp | FieldValue;
 }
@@ -689,6 +691,7 @@ export interface ITrainCertsAllocationsCollection {
   TrainCertsAllocEmpName: string;
   TrainCertsAllocStatus: 'pending' | 'started' | 'completed';
   TrainCertsAllocDate: Timestamp | FieldValue;
-  TrainCertsAllocCompletionDate: Timestamp | FieldValue;
+  TrainCertsAllocStartDate?: Timestamp | FieldValue;
+  TrainCertsAllocCompletionDate?: Timestamp | FieldValue;
   TrainCertsAllocCreatedAt: Timestamp | FieldValue;
 }
