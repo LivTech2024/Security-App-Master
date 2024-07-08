@@ -1310,7 +1310,7 @@ class DbCompany {
         trainCertsSnapshot.data() as ITrainingAndCertificationsCollection;
 
       const newTrainCertsAlloc: ITrainCertsAllocationsCollection = {
-        TrainCertsAllocId: 'trainCertsAllocId',
+        TrainCertsAllocId: trainCertsAllocId,
         TrainCertsId,
         TrainCertsAllocEmpId,
         TrainCertsAllocEmpName,
@@ -1332,13 +1332,11 @@ class DbCompany {
   static updateTrainCertsAllocStatus = async ({
     status,
     trainCertsAllocId,
-    completionDate,
-    startDate,
+    date,
   }: {
     trainCertsAllocId: string;
     status: 'started' | 'completed';
-    startDate?: Date;
-    completionDate?: Date;
+    date: Date;
   }) => {
     const trainCertsAllocRef = doc(
       db,
@@ -1346,33 +1344,24 @@ class DbCompany {
       trainCertsAllocId
     );
 
-    if (status === 'started' && !startDate) {
-      throw new CustomError('Please enter start date');
-    }
-
-    if (status === 'completed' && !completionDate) {
-      throw new CustomError('Please enter completion date');
-    }
-
     await runTransaction(db, async (transaction) => {
       const trainCertsAllocSnapshot = await transaction.get(trainCertsAllocRef);
       const trainCertsAllocData =
         trainCertsAllocSnapshot.data() as ITrainCertsAllocationsCollection;
       const { TrainCertsId } = trainCertsAllocData;
 
-      if (status === 'started' && startDate) {
+      if (status === 'started') {
         const updatedTrainCertsAlloc: Partial<ITrainCertsAllocationsCollection> =
           {
             TrainCertsAllocStatus: status,
-            TrainCertsAllocStartDate: startDate as unknown as Timestamp,
+            TrainCertsAllocStartDate: date as unknown as Timestamp,
           };
         transaction.update(trainCertsAllocRef, updatedTrainCertsAlloc);
-      } else if (status === 'completed' && completionDate) {
+      } else if (status === 'completed') {
         const updatedTrainCertsAlloc: Partial<ITrainCertsAllocationsCollection> =
           {
             TrainCertsAllocStatus: status,
-            TrainCertsAllocCompletionDate:
-              completionDate as unknown as Timestamp,
+            TrainCertsAllocCompletionDate: date as unknown as Timestamp,
           };
 
         //*Update the number of trainee completed training in TrainingAndCertifications

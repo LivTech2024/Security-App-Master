@@ -14,13 +14,22 @@ import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
 import useFetchEmployees from '../../hooks/fetch/useFetchEmployees';
 import InputSelect from '../../common/inputs/InputSelect';
 import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { DocumentData } from 'firebase/firestore';
 import { useInView } from 'react-intersection-observer';
 import { Status } from '../../common/Status';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import Button from '../../common/button/Button';
 import TrainCertsAllocModal from '../../component/training_and_certifications/modal/TrainCertsAllocModal';
+import AllocUpdateModal from '../../component/training_and_certifications/modal/AllocUpdateModal';
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { errorHandler } from '../../utilities/CustomError';
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from '../../utilities/TsxUtils';
+import { openContextModal } from '@mantine/modals';
 
 const TrainCertsView = () => {
   const [searchParam] = useSearchParams();
@@ -151,6 +160,38 @@ const TrainCertsView = () => {
 
   const [trainCertsAllocModal, setTrainCertsAllocModal] = useState(false);
 
+  const [trainCertsUpdateModal, setTrainCertsUpdateModal] = useState(false);
+
+  const [allocUpdateModalProps, setAllocUpdateModalProps] = useState<{
+    status: 'started' | 'completed';
+    allocId: string;
+  }>({ allocId: '', status: 'completed' });
+
+  const queryClient = useQueryClient();
+
+  const onAllocDelete = async (allocId: string) => {
+    try {
+      showModalLoader({});
+
+      await DbCompany.deleteTrainCertsAlloc(allocId);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.TRAIN_CERTS_ALLOC_LIST],
+      });
+
+      showSnackbar({
+        message: 'Allocation deleted successfully',
+        type: 'success',
+      });
+
+      closeModalLoader();
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      closeModalLoader();
+    }
+  };
+
   if (!data && !loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -189,6 +230,13 @@ const TrainCertsView = () => {
           opened={trainCertsAllocModal}
           setOpened={setTrainCertsAllocModal}
           trainCertsId={trainCertId || ''}
+        />
+
+        <AllocUpdateModal
+          opened={trainCertsUpdateModal}
+          setOpened={setTrainCertsUpdateModal}
+          status={allocUpdateModalProps.status}
+          trainCertsAllocId={allocUpdateModalProps.allocId}
         />
 
         <div className="bg-surface shadow rounded p-4 grid grid-cols-2 gap-x-4 gap-y-1">
@@ -282,13 +330,14 @@ const TrainCertsView = () => {
               <th className="uppercase px-4 py-2 w-[20%] text-start">
                 Completion Date
               </th>
-              <th className="uppercase px-4 py-2 w-[15%] text-end">Status</th>
+              <th className="uppercase px-4 py-2 w-[10%] text-end">Status</th>
+              <th className="w-[5%]"></th>
             </tr>
           </thead>
           <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
             {allocData.length === 0 && !isLoading ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={7}>
                   <NoSearchResult />
                 </td>
               </tr>
@@ -312,7 +361,16 @@ const TrainCertsView = () => {
                         {alloc.TrainCertsAllocStartDate ? (
                           formatDate(alloc.TrainCertsAllocStartDate)
                         ) : (
-                          <span className="text-textPrimaryBlue cursor-pointer hover:underline">
+                          <span
+                            onClick={() => {
+                              setAllocUpdateModalProps({
+                                allocId: alloc.TrainCertsAllocId,
+                                status: 'started',
+                              });
+                              setTrainCertsUpdateModal(true);
+                            }}
+                            className="text-textPrimaryBlue cursor-pointer hover:underline"
+                          >
                             Mark it started
                           </span>
                         )}
@@ -323,7 +381,16 @@ const TrainCertsView = () => {
                         {alloc.TrainCertsAllocCompletionDate ? (
                           formatDate(alloc.TrainCertsAllocCompletionDate)
                         ) : (
-                          <span className="text-textPrimaryBlue cursor-pointer hover:underline">
+                          <span
+                            onClick={() => {
+                              setAllocUpdateModalProps({
+                                allocId: alloc.TrainCertsAllocId,
+                                status: 'completed',
+                              });
+                              setTrainCertsUpdateModal(true);
+                            }}
+                            className="text-textPrimaryBlue cursor-pointer hover:underline"
+                          >
                             Mark it completed
                           </span>
                         )}
@@ -334,12 +401,36 @@ const TrainCertsView = () => {
                         <Status status={alloc.TrainCertsAllocStatus} />
                       </div>
                     </td>
+                    <td className="text-end">
+                      <FaRegTrashAlt
+                        onClick={() => {
+                          openContextModal({
+                            modal: 'confirmModal',
+                            withCloseButton: false,
+                            centered: true,
+                            closeOnClickOutside: true,
+                            innerProps: {
+                              title: 'Confirm',
+                              body: 'Are you sure to delete this branch',
+                              onConfirm: () => {
+                                onAllocDelete(alloc.TrainCertsAllocId);
+                              },
+                            },
+                            size: '30%',
+                            styles: {
+                              body: { padding: '0px' },
+                            },
+                          });
+                        }}
+                        className="text-textPrimaryRed cursor-pointer"
+                      />
+                    </td>
                   </tr>
                 );
               })
             )}
             <tr ref={ref}>
-              <td colSpan={5}>
+              <td colSpan={7}>
                 {(isLoading || isFetchingNextPage) &&
                   Array.from({ length: 10 }).map((_, idx) => (
                     <TableShimmer key={idx} />
