@@ -152,7 +152,8 @@ const TrainCertsList = () => {
                 <tr
                   onClick={() =>
                     navigate(
-                      PageRoutes.TRAINING_AND_CERTIFICATION_CREATE_OR_EDIT
+                      PageRoutes.TRAINING_AND_CERTIFICATION_VIEW +
+                        `?id=${trainCerts.TrainCertsId}`
                     )
                   }
                   key={trainCerts.TrainCertsId}

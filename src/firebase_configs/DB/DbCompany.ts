@@ -1275,6 +1275,12 @@ class DbCompany {
     return getDocs(trainCertsQuery);
   };
 
+  static getTrainCertsById = (id: string) => {
+    const trainCertsRef = doc(db, CollectionName.trainingAndCertifications, id);
+
+    return getDoc(trainCertsRef);
+  };
+
   //For allocation
 
   static createTrainCertsAlloc = async (data: TrainCertsAllocFormFields) => {
