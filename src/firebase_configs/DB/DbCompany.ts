@@ -1235,6 +1235,46 @@ class DbCompany {
     });
   };
 
+  static getTrainCerts = async ({
+    lmt,
+    lastDoc,
+    searchQuery,
+  }: {
+    lmt?: number;
+    lastDoc?: DocumentData | null;
+    searchQuery?: string | null;
+  }) => {
+    const trainCertsRef = collection(
+      db,
+      CollectionName.trainingAndCertifications
+    );
+
+    let queryParams: QueryConstraint[] = [];
+
+    if (searchQuery && searchQuery.length > 0) {
+      queryParams = [
+        ...queryParams,
+        orderBy('TrainCertsTitle'),
+        startAt(searchQuery),
+        endAt(searchQuery + '\uF8FF'),
+      ];
+    } else {
+      queryParams = [...queryParams, orderBy('TrainCertsCreatedAt', 'desc')];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const trainCertsQuery = query(trainCertsRef, ...queryParams);
+
+    return getDocs(trainCertsQuery);
+  };
+
   //For allocation
 
   static createTrainCertsAlloc = async (data: TrainCertsAllocFormFields) => {

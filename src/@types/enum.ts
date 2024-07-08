@@ -57,6 +57,7 @@ export const DisplayCount = {
   CALLOUT_LIST: 20,
   PAY_STUB_LIST: 20,
   COMPANY_LIST: 20,
+  TRAIN_CERTS_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -84,6 +85,7 @@ export const REACT_QUERY_KEYS = {
   CALLOUT_LIST: 'callout-list',
   PAY_STUB_LIST: 'pay-stub-list',
   COMPANY_LIST: 'company-list',
+  TRAIN_CERTS_LIST: 'train-certs-list',
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -98,6 +100,7 @@ export const MinimumQueryCharacter = {
   TASK_LIST: 1,
   PAY_STUB: 1,
   COMPANY: 1,
+  TRAIN_CERTS: 1,
 } as const;
 
 export const CloudStoragePaths = {

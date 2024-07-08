@@ -8,7 +8,11 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { errorHandler } from '../../utilities/CustomError';
 import { useEffect, useState } from 'react';
-import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
+import {
+  closeModalLoader,
+  showModalLoader,
+  showSnackbar,
+} from '../../utilities/TsxUtils';
 import { useAuthState } from '../../store';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
 import InputSelect from '../../common/inputs/InputSelect';
@@ -16,8 +20,13 @@ import { TrainCertsCategories } from '../../@types/database';
 import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import InputDate from '../../common/inputs/InputDate';
 import { removeTimeFromDate } from '../../utilities/misc';
+import DbCompany from '../../firebase_configs/DB/DbCompany';
+import { useNavigate } from 'react-router-dom';
+import { PageRoutes } from '../../@types/enum';
 
 const TrainCertsCreateOrEdit = () => {
+  const navigate = useNavigate();
+
   const { company } = useAuthState();
 
   const methods = useForm<TrainCertsCreateFormFields>({
@@ -47,9 +56,16 @@ const TrainCertsCreateOrEdit = () => {
     try {
       setLoading(true);
 
-      console.log(data);
+      await DbCompany.createTrainCerts(data, company.CompanyId);
+
+      showSnackbar({
+        message: 'Training & Certifications created successfully',
+        type: 'success',
+      });
 
       setLoading(false);
+
+      navigate(PageRoutes.TRAINING_AND_CERTIFICATION_LIST);
     } catch (error) {
       setLoading(false);
       console.log(error);
