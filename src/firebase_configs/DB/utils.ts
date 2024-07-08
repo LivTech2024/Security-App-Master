@@ -9,7 +9,7 @@ import {
 } from 'firebase/storage';
 
 import { storage } from '../config';
-import { resizeImage } from '../../API/ResizeImage';
+import { resizeImage } from '../../utilities/resizeImage';
 
 interface Image {
   path: string;
@@ -47,11 +47,11 @@ class CloudStorageImageHandler {
   ) => {
     try {
       const response = await resizeImage({
-        base64_image: base64Image,
+        base64Image,
         width,
         height,
       });
-      return response.data;
+      return response;
     } catch (error) {
       console.log(error);
       return null;
