@@ -58,6 +58,7 @@ export const DisplayCount = {
   PAY_STUB_LIST: 20,
   COMPANY_LIST: 20,
   TRAIN_CERTS_LIST: 20,
+  TRAIN_CERTS_ALLOC_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -86,6 +87,7 @@ export const REACT_QUERY_KEYS = {
   PAY_STUB_LIST: 'pay-stub-list',
   COMPANY_LIST: 'company-list',
   TRAIN_CERTS_LIST: 'train-certs-list',
+  TRAIN_CERTS_ALLOC_LIST: 'train-certs-alloc-list',
 } as const;
 
 export const MinimumQueryCharacter = {

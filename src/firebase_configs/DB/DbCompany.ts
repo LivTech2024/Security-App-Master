@@ -1432,6 +1432,61 @@ class DbCompany {
       transaction.update(trainCertsRef, updatedTrainCerts);
     });
   };
+
+  static getTrainCertsAlloc = ({
+    trainCertsId,
+    lastDoc,
+    lmt,
+    endDate,
+    isLifeTime,
+    startDate,
+    empId,
+  }: {
+    trainCertsId: string;
+    lastDoc?: DocumentData | null;
+    lmt?: number;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+    empId?: string;
+  }) => {
+    const trainCertsAllocRef = collection(
+      db,
+      CollectionName.trainCertsAllocation
+    );
+
+    let queryParams: QueryConstraint[] = [
+      where('TrainCertsId', '==', trainCertsId),
+      orderBy('TrainCertsAllocDate', 'desc'),
+    ];
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('TrainCertsAllocDate', '>=', startDate),
+        where('TrainCertsAllocDate', '<=', endDate),
+      ];
+    }
+
+    if (empId) {
+      queryParams = [
+        ...queryParams,
+        where('TrainCertsAllocEmpId', '==', empId),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const trainCertsAllocQuery = query(trainCertsAllocRef, ...queryParams);
+
+    return getDocs(trainCertsAllocQuery);
+  };
 }
 
 export default DbCompany;

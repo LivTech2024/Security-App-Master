@@ -1,11 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ITrainingAndCertificationsCollection } from '../../@types/database';
+import {
+  ITrainCertsAllocationsCollection,
+  ITrainingAndCertificationsCollection,
+} from '../../@types/database';
 import DbCompany from '../../firebase_configs/DB/DbCompany';
 import NoSearchResult from '../../common/NoSearchResult';
 import PageHeader from '../../common/PageHeader';
 import { formatDate } from '../../utilities/misc';
 import { numberFormatter } from '../../utilities/NumberFormater';
+import dayjs from 'dayjs';
+import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
+import useFetchEmployees from '../../hooks/fetch/useFetchEmployees';
+import InputSelect from '../../common/inputs/InputSelect';
+import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { DocumentData } from 'firebase/firestore';
+import { useInView } from 'react-intersection-observer';
+import { Status } from '../../common/Status';
+import TableShimmer from '../../common/shimmer/TableShimmer';
+import Button from '../../common/button/Button';
 
 const TrainCertsView = () => {
   const [searchParam] = useSearchParams();
@@ -34,6 +48,106 @@ const TrainCertsView = () => {
       });
   }, [trainCertId]);
 
+  //*Fetch all allocation of the trainCerts
+  const [startDate, setStartDate] = useState<Date | string | null>(
+    dayjs().startOf('M').toDate()
+  );
+
+  const [endDate, setEndDate] = useState<Date | string | null>(
+    dayjs().endOf('M').toDate()
+  );
+
+  const [isLifeTime, setIsLifeTime] = useState(false);
+
+  const [empSearchQuery, setEmpSearchQuery] = useState('');
+
+  const [selectedEmpId, setSelectedEmpId] = useState('');
+
+  const { data: employees } = useFetchEmployees({
+    limit: 5,
+    searchQuery: empSearchQuery,
+  });
+
+  const {
+    data: snapshotData,
+    fetchNextPage,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    isFetching,
+    error,
+  } = useInfiniteQuery({
+    queryKey: [
+      REACT_QUERY_KEYS.TRAIN_CERTS_ALLOC_LIST,
+      trainCertId,
+      isLifeTime,
+      startDate,
+      endDate,
+      selectedEmpId,
+    ],
+    queryFn: async ({ pageParam }) => {
+      const snapshot = await DbCompany.getTrainCertsAlloc({
+        lmt: DisplayCount.TRAIN_CERTS_ALLOC_LIST,
+        lastDoc: pageParam,
+        isLifeTime,
+        startDate,
+        endDate,
+        empId: selectedEmpId,
+        trainCertsId: trainCertId || '',
+      });
+      return snapshot.docs;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage?.length === 0) {
+        return null;
+      }
+      if (lastPage?.length === DisplayCount.EMPLOYEE_LIST) {
+        return lastPage.at(-1);
+      }
+      return null;
+    },
+    initialPageParam: null as null | DocumentData,
+  });
+
+  const [allocData, setAllocData] = useState<
+    ITrainCertsAllocationsCollection[]
+  >(() => {
+    if (snapshotData) {
+      return snapshotData.pages.flatMap((page) =>
+        page.map((doc) => doc.data() as ITrainCertsAllocationsCollection)
+      );
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    console.log(error, 'error');
+  }, [error]);
+
+  // we are looping through the snapshot returned by react-query and converting them to data
+  useEffect(() => {
+    if (snapshotData) {
+      const docData: ITrainCertsAllocationsCollection[] = [];
+      snapshotData.pages?.forEach((page) => {
+        page?.forEach((doc) => {
+          const data = doc.data() as ITrainCertsAllocationsCollection;
+          docData.push(data);
+        });
+      });
+      setAllocData(docData);
+    }
+  }, [snapshotData]);
+
+  // hook for pagination
+  const { ref, inView } = useInView();
+
+  // this is for pagination
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetching) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, inView, hasNextPage, isFetching]);
+
   if (!data && !loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -55,7 +169,16 @@ const TrainCertsView = () => {
   if (data)
     return (
       <div className="flex flex-col w-full h-full p-6 gap-6">
-        <PageHeader title="Training & Certifications Data" />
+        <PageHeader
+          title="Training & Certifications Data"
+          rightSection={
+            <Button
+              label="Allot To New Employee"
+              type="black"
+              onClick={() => {}}
+            />
+          }
+        />
 
         <div className="bg-surface shadow rounded p-4 grid grid-cols-2 gap-x-4 gap-y-1">
           <div className="flex items-center gap-2">
@@ -109,6 +232,103 @@ const TrainCertsView = () => {
             </span>
           </div>
         </div>
+
+        <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
+          <DateFilterDropdown
+            endDate={endDate}
+            isLifetime={isLifeTime}
+            setEndDate={setEndDate}
+            setIsLifetime={setIsLifeTime}
+            setStartDate={setStartDate}
+            startDate={startDate}
+          />
+          <InputSelect
+            value={selectedEmpId}
+            onChange={(e) => setSelectedEmpId(e as string)}
+            data={employees.map((emp) => {
+              return { label: emp.EmployeeName, value: emp.EmployeeId };
+            })}
+            searchValue={empSearchQuery}
+            onSearchChange={setEmpSearchQuery}
+            searchable
+            clearable
+            placeholder="Select employee"
+          />
+        </div>
+        <table className="rounded overflow-hidden w-full">
+          <thead className="bg-primary text-surface text-sm">
+            <tr>
+              <th className="uppercase px-4 py-2 w-[25%] text-start">
+                Employee Name
+              </th>
+
+              <th className="uppercase px-4 py-2 w-[20%] text-start">
+                Allocation Date
+              </th>
+              <th className="uppercase px-4 py-2 w-[20%] text-start">
+                Start Date
+              </th>
+              <th className="uppercase px-4 py-2 w-[20%] text-start">
+                Completion Date
+              </th>
+              <th className="uppercase px-4 py-2 w-[15%] text-end">Status</th>
+            </tr>
+          </thead>
+          <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
+            {allocData.length === 0 && !isLoading ? (
+              <tr>
+                <td colSpan={5}>
+                  <NoSearchResult />
+                </td>
+              </tr>
+            ) : (
+              allocData.map((alloc) => {
+                return (
+                  <tr key={alloc.TrainCertsAllocId} className="cursor-pointer">
+                    <td className="align-top px-4 py-2 text-start">
+                      <span className="line-clamp-3">
+                        {alloc.TrainCertsAllocEmpName}
+                      </span>
+                    </td>
+
+                    <td className="align-top px-4 py-2 text-start">
+                      <span className="line-clamp-2">
+                        {formatDate(alloc.TrainCertsAllocDate)}
+                      </span>
+                    </td>
+                    <td className="align-top px-4 py-2 text-start ">
+                      <span className="line-clamp-2">
+                        {alloc.TrainCertsAllocStartDate
+                          ? formatDate(alloc.TrainCertsAllocStartDate)
+                          : 'N/A'}
+                      </span>
+                    </td>
+                    <td className="align-top px-4 py-2 text-start ">
+                      <span className="line-clamp-2">
+                        {alloc.TrainCertsAllocCompletionDate
+                          ? formatDate(alloc.TrainCertsAllocCompletionDate)
+                          : 'N/A'}
+                      </span>
+                    </td>
+                    <td className="align-top px-4 py-2 text-end">
+                      <span className="line-clamp-3">
+                        <Status status={alloc.TrainCertsAllocStatus} />
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+            <tr ref={ref}>
+              <td colSpan={5}>
+                {(isLoading || isFetchingNextPage) &&
+                  Array.from({ length: 10 }).map((_, idx) => (
+                    <TableShimmer key={idx} />
+                  ))}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     );
 };
