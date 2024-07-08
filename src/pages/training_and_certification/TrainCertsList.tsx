@@ -18,8 +18,12 @@ import NoSearchResult from '../../common/NoSearchResult';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import { useInView } from 'react-intersection-observer';
 import { numberFormatter } from '../../utilities/NumberFormater';
+import { MdEdit } from 'react-icons/md';
+import { useEditFormStore } from '../../store';
 
 const TrainCertsList = () => {
+  const { setTrainCertsEditData } = useEditFormStore();
+
   const navigate = useNavigate();
 
   const [query, setQuery] = useState('');
@@ -108,6 +112,7 @@ const TrainCertsList = () => {
             label="Create New Training & Certifications"
             type="black"
             onClick={() => {
+              setTrainCertsEditData(null);
               navigate(PageRoutes.TRAINING_AND_CERTIFICATION_CREATE_OR_EDIT);
             }}
           />
@@ -125,18 +130,19 @@ const TrainCertsList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[20%] text-start">Title</th>
+            <th className="uppercase px-4 py-2 w-[25%] text-start">Title</th>
             <th className="uppercase px-4 py-2 w-[30%] text-start">
               Description
             </th>
             <th className="uppercase px-4 py-2 w-[10%] text-start">Category</th>
 
-            <th className="uppercase px-4 py-2 w-[20%] text-end">
-              Total Trainee Enrolled
+            <th className="uppercase px-4 py-2 w-[15%] text-end">
+              Total Enrolled
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-end">
-              Total Trainee Completed
+            <th className="uppercase px-4 py-2 w-[15%] text-end">
+              Total Completed
             </th>
+            <th className="uppercase px-4 py-2 w-[5%] text-end"></th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -149,34 +155,57 @@ const TrainCertsList = () => {
           ) : (
             data.map((trainCerts) => {
               return (
-                <tr
-                  onClick={() =>
-                    navigate(
-                      PageRoutes.TRAINING_AND_CERTIFICATION_VIEW +
-                        `?id=${trainCerts.TrainCertsId}`
-                    )
-                  }
-                  key={trainCerts.TrainCertsId}
-                  className="cursor-pointer"
-                >
-                  <td className="align-top px-4 py-2 text-start">
+                <tr key={trainCerts.TrainCertsId} className="cursor-pointer">
+                  <td
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.TRAINING_AND_CERTIFICATION_VIEW +
+                          `?id=${trainCerts.TrainCertsId}`
+                      )
+                    }
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-2">
                       {trainCerts.TrainCertsTitle}
                     </span>
                   </td>
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.TRAINING_AND_CERTIFICATION_VIEW +
+                          `?id=${trainCerts.TrainCertsId}`
+                      )
+                    }
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-3">
                       {trainCerts.TrainCertsDescription || 'N/A'}
                     </span>
                   </td>
 
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.TRAINING_AND_CERTIFICATION_VIEW +
+                          `?id=${trainCerts.TrainCertsId}`
+                      )
+                    }
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-2">
                       {trainCerts.TrainCertsCategory}
                     </span>
                   </td>
 
-                  <td className="align-top px-4 py-2 text-end">
+                  <td
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.TRAINING_AND_CERTIFICATION_VIEW +
+                          `?id=${trainCerts.TrainCertsId}`
+                      )
+                    }
+                    className="align-top px-4 py-2 text-end"
+                  >
                     <span className="line-clamp-2">
                       {numberFormatter(
                         trainCerts.TrainCertsTotalTrainee,
@@ -185,7 +214,15 @@ const TrainCertsList = () => {
                       )}
                     </span>
                   </td>
-                  <td className="align-top px-4 py-2 text-end">
+                  <td
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.TRAINING_AND_CERTIFICATION_VIEW +
+                          `?id=${trainCerts.TrainCertsId}`
+                      )
+                    }
+                    className="align-top px-4 py-2 text-end"
+                  >
                     <span className="line-clamp-2">
                       {numberFormatter(
                         trainCerts.TrainCertsTotalTraineeCompletedTraining,
@@ -193,6 +230,17 @@ const TrainCertsList = () => {
                         1
                       )}
                     </span>
+                  </td>
+                  <td
+                    onClick={() => {
+                      setTrainCertsEditData(trainCerts);
+                      navigate(
+                        PageRoutes.TRAINING_AND_CERTIFICATION_CREATE_OR_EDIT
+                      );
+                    }}
+                    className="px-4 py-2 text-end capitalize align-top flex justify-end"
+                  >
+                    <MdEdit className="text-lg text-textPrimaryBlue cursor-pointer hover:scale-110 duration-150" />
                   </td>
                 </tr>
               );

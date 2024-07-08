@@ -13,24 +13,38 @@ import {
   showModalLoader,
   showSnackbar,
 } from '../../utilities/TsxUtils';
-import { useAuthState } from '../../store';
+import { useAuthState, useEditFormStore } from '../../store';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
 import InputSelect from '../../common/inputs/InputSelect';
 import { TrainCertsCategories } from '../../@types/database';
 import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import InputDate from '../../common/inputs/InputDate';
-import { removeTimeFromDate } from '../../utilities/misc';
+import { removeTimeFromDate, toDate } from '../../utilities/misc';
 import DbCompany from '../../firebase_configs/DB/DbCompany';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../@types/enum';
+import { openContextModal } from '@mantine/modals';
 
 const TrainCertsCreateOrEdit = () => {
   const navigate = useNavigate();
 
   const { company } = useAuthState();
 
+  const { trainCertsEditData } = useEditFormStore();
+
+  const isEdit = !!trainCertsEditData;
+
   const methods = useForm<TrainCertsCreateFormFields>({
     resolver: zodResolver(trainCertsCreateSchema),
+    defaultValues: isEdit
+      ? {
+          TrainCertsCategory: trainCertsEditData.TrainCertsCategory,
+          TrainCertsCost: trainCertsEditData.TrainCertsCost,
+          TrainCertsDescription: trainCertsEditData.TrainCertsDescription,
+          TrainCertsDuration: trainCertsEditData.TrainCertsDuration,
+          TrainCertsTitle: trainCertsEditData.TrainCertsTitle,
+        }
+      : {},
   });
 
   const [loading, setLoading] = useState(false);
@@ -38,6 +52,12 @@ const TrainCertsCreateOrEdit = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
 
   const [endDate, setEndDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!isEdit) return;
+    setStartDate(toDate(trainCertsEditData.TrainCertsStartDate));
+    setEndDate(toDate(trainCertsEditData.TrainCertsEndDate));
+  }, [isEdit]);
 
   useEffect(() => {
     if (startDate) {
@@ -56,15 +76,45 @@ const TrainCertsCreateOrEdit = () => {
     try {
       setLoading(true);
 
-      await DbCompany.createTrainCerts(data, company.CompanyId);
+      if (isEdit) {
+        await DbCompany.updateTrainCerts(data, trainCertsEditData.TrainCertsId);
+
+        showSnackbar({
+          message: 'Training & Certifications updated successfully',
+          type: 'success',
+        });
+      } else {
+        await DbCompany.createTrainCerts(data, company.CompanyId);
+
+        showSnackbar({
+          message: 'Training & Certifications created successfully',
+          type: 'success',
+        });
+      }
+
+      setLoading(false);
+
+      navigate(PageRoutes.TRAINING_AND_CERTIFICATION_LIST);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      errorHandler(error);
+    }
+  };
+
+  const onDelete = async () => {
+    if (!isEdit) return;
+    try {
+      setLoading(true);
+
+      await DbCompany.deleteTrainCerts(trainCertsEditData.TrainCertsId);
 
       showSnackbar({
-        message: 'Training & Certifications created successfully',
+        message: 'Training & Certification deleted successfully',
         type: 'success',
       });
 
       setLoading(false);
-
       navigate(PageRoutes.TRAINING_AND_CERTIFICATION_LIST);
     } catch (error) {
       setLoading(false);
@@ -92,10 +142,35 @@ const TrainCertsCreateOrEdit = () => {
           title="Create Training & Certification"
           rightSection={
             <div className="flex items-center gap-4">
+              {isEdit && (
+                <Button
+                  label="Delete"
+                  type="white"
+                  onClick={() =>
+                    openContextModal({
+                      modal: 'confirmModal',
+                      withCloseButton: false,
+                      centered: true,
+                      closeOnClickOutside: true,
+                      innerProps: {
+                        title: 'Confirm',
+                        body: 'Are you sure to delete this training & certification',
+                        onConfirm: () => {
+                          onDelete();
+                        },
+                      },
+                      size: '30%',
+                      styles: {
+                        body: { padding: '0px' },
+                      },
+                    })
+                  }
+                />
+              )}
               <Button
                 label="Save"
                 type="black"
-                onClick={() => {}}
+                onClick={methods.handleSubmit(onSubmit)}
                 buttonType="submit"
               />
             </div>

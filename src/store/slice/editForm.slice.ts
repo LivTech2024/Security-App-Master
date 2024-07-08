@@ -12,6 +12,7 @@ import {
   IPatrolsCollection,
   IPayStubsCollection,
   IShiftsCollection,
+  ITrainingAndCertificationsCollection,
 } from '../../@types/database';
 import { CompanyBranches } from './auth.slice';
 import { CompanyCreateFormFields } from '../../utilities/zod/schema';
@@ -148,6 +149,11 @@ interface EditFormState {
 
   payStubEditData: IPayStubsCollection | null;
   setPayStubEditData: (payStub: IPayStubsCollection | null) => void;
+
+  trainCertsEditData: ITrainingAndCertificationsCollection | null;
+  setTrainCertsEditData: (
+    trainCerts: ITrainingAndCertificationsCollection | null
+  ) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -219,4 +225,9 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   payStubEditData: null,
   setPayStubEditData: (payStub) =>
     set((state) => ({ ...state, payStubEditData: payStub })),
+
+  //trainCerts
+  trainCertsEditData: null,
+  setTrainCertsEditData: (trainCerts) =>
+    set((state) => ({ ...state, trainCertsEditData: trainCerts })),
 });
