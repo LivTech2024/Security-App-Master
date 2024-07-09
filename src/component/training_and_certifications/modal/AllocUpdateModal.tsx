@@ -10,11 +10,14 @@ import InputDate from '../../../common/inputs/InputDate';
 import DbCompany from '../../../firebase_configs/DB/DbCompany';
 import { useQueryClient } from '@tanstack/react-query';
 import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { ITrainCertsAllocationsCollection } from '../../../@types/database';
+import dayjs from 'dayjs';
+import { toDate } from '../../../utilities/misc';
 
 interface AllocUpdateModalProps {
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
-  trainCertsAllocId: string;
+  trainCertsAlloc: ITrainCertsAllocationsCollection;
   status: 'started' | 'completed';
 }
 
@@ -22,7 +25,7 @@ const AllocUpdateModal = ({
   opened,
   setOpened,
   status,
-  trainCertsAllocId,
+  trainCertsAlloc,
 }: AllocUpdateModalProps) => {
   const queryClient = useQueryClient();
 
@@ -34,11 +37,34 @@ const AllocUpdateModal = ({
         throw new CustomError('Please enter date');
       }
 
+      if (
+        status === 'started' &&
+        dayjs(updatedTime).isBefore(toDate(trainCertsAlloc.TrainCertsAllocDate))
+      ) {
+        throw new CustomError(
+          'Start date cannot be smaller than allocation date'
+        );
+      }
+
+      if (
+        status === 'completed' &&
+        (!trainCertsAlloc.TrainCertsAllocStartDate ||
+          dayjs(updatedTime).isBefore(
+            toDate(trainCertsAlloc.TrainCertsAllocStartDate)
+          ))
+      ) {
+        throw new CustomError(
+          'Completion date cannot be smaller than start date'
+        );
+      }
+
       showModalLoader({});
+
+      console.log(trainCertsAlloc);
 
       await DbCompany.updateTrainCertsAllocStatus({
         status,
-        trainCertsAllocId: trainCertsAllocId,
+        trainCertsAllocId: trainCertsAlloc.TrainCertsAllocId,
         date: updatedTime,
       });
 
@@ -57,7 +83,6 @@ const AllocUpdateModal = ({
       console.log(error);
       errorHandler(error);
       closeModalLoader();
-      setOpened(false);
     }
   };
 
@@ -68,7 +93,7 @@ const AllocUpdateModal = ({
       title={`Update allocation status`}
       size="30%"
       positiveCallback={updateStatus}
-      isFormModal
+      isFormModal={true}
     >
       <div className="flex flex-col">
         <InputDate

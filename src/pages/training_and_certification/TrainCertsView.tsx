@@ -164,8 +164,8 @@ const TrainCertsView = () => {
 
   const [allocUpdateModalProps, setAllocUpdateModalProps] = useState<{
     status: 'started' | 'completed';
-    allocId: string;
-  }>({ allocId: '', status: 'completed' });
+    allocData: ITrainCertsAllocationsCollection;
+  }>({ allocData: allocData[0], status: 'completed' });
 
   const queryClient = useQueryClient();
 
@@ -236,7 +236,7 @@ const TrainCertsView = () => {
           opened={trainCertsUpdateModal}
           setOpened={setTrainCertsUpdateModal}
           status={allocUpdateModalProps.status}
-          trainCertsAllocId={allocUpdateModalProps.allocId}
+          trainCertsAlloc={allocUpdateModalProps.allocData}
         />
 
         <div className="bg-surface shadow rounded p-4 grid grid-cols-2 gap-x-4 gap-y-1">
@@ -331,7 +331,7 @@ const TrainCertsView = () => {
                 Completion Date
               </th>
               <th className="uppercase px-4 py-2 w-[10%] text-end">Status</th>
-              <th className="w-[5%]"></th>
+              <th className="w-[5%] text-end"></th>
             </tr>
           </thead>
           <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -364,7 +364,7 @@ const TrainCertsView = () => {
                           <span
                             onClick={() => {
                               setAllocUpdateModalProps({
-                                allocId: alloc.TrainCertsAllocId,
+                                allocData: alloc,
                                 status: 'started',
                               });
                               setTrainCertsUpdateModal(true);
@@ -383,8 +383,16 @@ const TrainCertsView = () => {
                         ) : (
                           <span
                             onClick={() => {
+                              if (!alloc.TrainCertsAllocStartDate) {
+                                showSnackbar({
+                                  message:
+                                    'Please mark it started before marking it completed',
+                                  type: 'error',
+                                });
+                                return;
+                              }
                               setAllocUpdateModalProps({
-                                allocId: alloc.TrainCertsAllocId,
+                                allocData: alloc,
                                 status: 'completed',
                               });
                               setTrainCertsUpdateModal(true);
@@ -401,29 +409,31 @@ const TrainCertsView = () => {
                         <Status status={alloc.TrainCertsAllocStatus} />
                       </div>
                     </td>
-                    <td className="text-end">
-                      <FaRegTrashAlt
-                        onClick={() => {
-                          openContextModal({
-                            modal: 'confirmModal',
-                            withCloseButton: false,
-                            centered: true,
-                            closeOnClickOutside: true,
-                            innerProps: {
-                              title: 'Confirm',
-                              body: 'Are you sure to delete this branch',
-                              onConfirm: () => {
-                                onAllocDelete(alloc.TrainCertsAllocId);
+                    <td className="align-middle px-4 py-2">
+                      <div className="flex justify-end">
+                        <FaRegTrashAlt
+                          onClick={() => {
+                            openContextModal({
+                              modal: 'confirmModal',
+                              withCloseButton: false,
+                              centered: true,
+                              closeOnClickOutside: true,
+                              innerProps: {
+                                title: 'Confirm',
+                                body: 'Are you sure to delete this branch',
+                                onConfirm: () => {
+                                  onAllocDelete(alloc.TrainCertsAllocId);
+                                },
                               },
-                            },
-                            size: '30%',
-                            styles: {
-                              body: { padding: '0px' },
-                            },
-                          });
-                        }}
-                        className="text-textPrimaryRed cursor-pointer"
-                      />
+                              size: '30%',
+                              styles: {
+                                body: { padding: '0px' },
+                              },
+                            });
+                          }}
+                          className="text-textPrimaryRed cursor-pointer"
+                        />
+                      </div>
                     </td>
                   </tr>
                 );
