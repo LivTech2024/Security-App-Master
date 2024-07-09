@@ -60,8 +60,6 @@ const AllocUpdateModal = ({
 
       showModalLoader({});
 
-      console.log(trainCertsAlloc);
-
       await DbCompany.updateTrainCertsAllocStatus({
         status,
         trainCertsAllocId: trainCertsAlloc.TrainCertsAllocId,
