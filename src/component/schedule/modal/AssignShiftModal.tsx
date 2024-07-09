@@ -43,6 +43,10 @@ const AssignShiftModal = ({
   const { company } = useAuthState();
 
   useEffect(() => {
+    setSelectedEmps([]);
+  }, [opened]);
+
+  useEffect(() => {
     const fetchEmpSchedule = async () => {
       if (!schedule || !company) return;
       try {
@@ -72,15 +76,7 @@ const AssignShiftModal = ({
     if (!schedule || selectedEmps.length === 0 || !company) {
       return;
     }
-    if (schedule.shift.ShiftRequiredEmp !== selectedEmps.length) {
-      showSnackbar({
-        message: `This shift requires ${
-          schedule?.shift.ShiftRequiredEmp
-        } ${schedule?.shift.ShiftPosition.toUpperCase()}s`,
-        type: 'error',
-      });
-      return;
-    }
+
     try {
       showModalLoader({});
 
@@ -122,7 +118,8 @@ const AssignShiftModal = ({
     if (
       !data.EmpIsAvailable ||
       (schedule?.shift?.ShiftAssignedUserId &&
-        schedule?.shift?.ShiftAssignedUserId.length > 0)
+        schedule?.shift?.ShiftAssignedUserId.length ===
+          schedule.shift.ShiftRequiredEmp)
     )
       return;
     const emp: Partial<IEmployeesCollection> = {
@@ -135,7 +132,10 @@ const AssignShiftModal = ({
       if (prev.find((e) => e.EmployeeId === emp.EmployeeId)) {
         return prev.filter((e) => e.EmployeeId !== emp.EmployeeId);
       } else {
-        if (selectedEmps.length === schedule?.shift.ShiftRequiredEmp) {
+        if (
+          selectedEmps.length + (schedule?.employee?.length || 0) ===
+          schedule?.shift.ShiftRequiredEmp
+        ) {
           showSnackbar({
             message: `This shift requires only ${
               schedule?.shift.ShiftRequiredEmp
@@ -158,12 +158,7 @@ const AssignShiftModal = ({
       isFormModal
       positiveCallback={onSubmit}
       disableSubmit={selectedEmps.length === 0}
-      showBottomTool={
-        schedule?.shift?.ShiftAssignedUserId &&
-        schedule?.shift?.ShiftAssignedUserId.length > 0
-          ? false
-          : true
-      }
+      showBottomTool={selectedEmps.length === 0 ? false : true}
       onClose={() => setSelectedSchedule(null)}
     >
       <div className="flex flex-col bg-gray-100 rounded-md p-4">

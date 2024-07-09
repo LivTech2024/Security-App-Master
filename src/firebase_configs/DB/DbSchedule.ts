@@ -1,6 +1,7 @@
 import {
   QueryConstraint,
   Timestamp,
+  arrayUnion,
   collection,
   doc,
   getDoc,
@@ -184,7 +185,7 @@ class DbSchedule {
   static assignShiftToEmp = async (shiftId: string, empId: string[]) => {
     const shiftRef = doc(db, CollectionName.shifts, shiftId);
 
-    return updateDoc(shiftRef, { ShiftAssignedUserId: empId });
+    return updateDoc(shiftRef, { ShiftAssignedUserId: arrayUnion(...empId) });
   };
 
   static removeEmpFromShift = async (

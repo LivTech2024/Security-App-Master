@@ -260,7 +260,8 @@ const ShiftDropPoint = ({
                   </div>
                   {/* Employees */}
                   <div className="flex w-full overflow-x-auto remove-horizontal-scrollbar shift-emp-scrollbar gap-2">
-                    {data.employee.length > 0 ? (
+                    {data.employee.length > 0 &&
+                    data.employee.length === data.shift.ShiftRequiredEmp ? (
                       data.employee.map((emp) => {
                         return (
                           <Tooltip
@@ -300,7 +301,9 @@ const ShiftDropPoint = ({
                       })
                     ) : (
                       <div className="bg-[#ffff64] py-[2px] rounded w-full text-center line-clamp-1">
-                        (Unassigned)
+                        (Unassigned){' '}
+                        {data.shift.ShiftAssignedUserId.length || 0}/
+                        {data.shift.ShiftRequiredEmp}
                       </div>
                     )}
                   </div>
