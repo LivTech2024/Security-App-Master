@@ -1001,6 +1001,7 @@ class DbCompany {
       TaskCompanyBranchId: data.TaskCompanyBranchId,
       TaskDescription: data.TaskDescription,
       TaskStartDate: data.TaskStartDate as unknown as Timestamp,
+      TaskStartTime: data.TaskStartTime,
       TaskForDays: data.TaskForDays,
       TaskCreatedAt: serverTimestamp(),
     };

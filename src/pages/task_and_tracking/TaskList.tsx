@@ -20,6 +20,7 @@ import { formatDate } from '../../utilities/misc';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import SearchBar from '../../common/inputs/SearchBar';
 import SelectBranch from '../../common/SelectBranch';
+import CreateTaskModal from '../../component/task_and_tracking/modal/CreateTaskModal';
 
 const TaskList = () => {
   const [branchId, setBranchId] = useState('');
@@ -110,13 +111,23 @@ const TaskList = () => {
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
   const navigate = useNavigate();
+
+  const [taskCreateModal, setTaskCreateModal] = useState(false);
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
         title="Task assignment and tracking"
         rightSection={
-          <Button label="Create new task" type="black" onClick={() => {}} />
+          <Button
+            label="Create new task"
+            type="black"
+            onClick={() => setTaskCreateModal(true)}
+          />
         }
+      />
+      <CreateTaskModal
+        opened={taskCreateModal}
+        setOpened={setTaskCreateModal}
       />
       <div className="flex items-center bg-surface shadow p-4 rounded w-full justify-between">
         <SearchBar
