@@ -1119,6 +1119,60 @@ class DbCompany {
     return getDocs(taskQuery);
   };
 
+  static getTaskById = async (taskId: string) => {
+    const taskRef = doc(db, CollectionName.tasks, taskId);
+    return getDoc(taskRef);
+  };
+
+  static getTaskLogs = ({
+    taskId,
+    lastDoc,
+    lmt,
+    endDate,
+    isLifeTime,
+    startDate,
+    empId,
+  }: {
+    taskId: string;
+    lastDoc?: DocumentData | null;
+    lmt?: number;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+    empId?: string;
+  }) => {
+    const taskLogsRef = collection(db, CollectionName.taskLogs);
+
+    let queryParams: QueryConstraint[] = [
+      where('TaskId', '==', taskId),
+      orderBy('TaskLogCompletionTime', 'desc'),
+    ];
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('TaskLogCompletionTime', '>=', startDate),
+        where('TaskLogCompletionTime', '<=', endDate),
+      ];
+    }
+
+    if (empId) {
+      queryParams = [...queryParams, where('TaskLogEmpId', '==', empId)];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const taskLogsQuery = query(taskLogsRef, ...queryParams);
+
+    return getDocs(taskLogsQuery);
+  };
+
   //*For TrainingAndCerts
   static createTrainCerts = (
     data: TrainCertsCreateFormFields,
