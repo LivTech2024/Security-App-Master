@@ -457,7 +457,7 @@ export const taskSchema = z
     TaskForDays: z.coerce.number().min(1),
     TaskStartTime: z.string(),
     TaskAllotedLocationId: z.string().nullable().optional(),
-    TaskAllotedToEmpIds: z.array(z.string()).nullable().optional(),
+    TaskAllotedToEmpIds: z.array(z.string()),
     TaskIsAllotedToAllEmps: z.boolean(),
   })
   .superRefine(
@@ -471,12 +471,18 @@ export const taskSchema = z
         !TaskIsAllotedToAllEmps
       ) {
         ctx.addIssue({
-          path: [
-            'TaskAllotedLocationId',
-            'TaskAllotedToEmpIds',
-            'TaskIsAllotedToAllEmps',
-          ],
-          message: `Please allot this task to either location or employees`,
+          path: ['TaskIsAllotedToAllEmps'],
+          message: `Please allot this task to location, employees or all employees`,
+          code: 'custom',
+        });
+        ctx.addIssue({
+          path: ['TaskAllotedLocationId'],
+          message: `Please allot this task to location, employees or all employees`,
+          code: 'custom',
+        });
+        ctx.addIssue({
+          path: ['TaskAllotedToEmpIds'],
+          message: `Please allot this task to location, employees or all employees`,
           code: 'custom',
         });
       }

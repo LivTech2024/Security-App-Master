@@ -998,7 +998,7 @@ class DbCompany {
     let newTask: ITasksCollection = {
       TaskId: taskId,
       TaskCompanyId: cmpId,
-      TaskCompanyBranchId: data.TaskCompanyBranchId,
+      TaskCompanyBranchId: data.TaskCompanyBranchId || null,
       TaskDescription: data.TaskDescription,
       TaskStartDate: data.TaskStartDate as unknown as Timestamp,
       TaskStartTime: data.TaskStartTime,
@@ -1012,7 +1012,7 @@ class DbCompany {
         TaskAllotedLocationId: data.TaskAllotedLocationId,
       };
     } else {
-      if (data.TaskAllotedToEmpIds) {
+      if (data.TaskAllotedToEmpIds && data.TaskAllotedToEmpIds.length > 0) {
         newTask = {
           ...newTask,
           TaskAllotedToEmpIds: data.TaskAllotedToEmpIds,

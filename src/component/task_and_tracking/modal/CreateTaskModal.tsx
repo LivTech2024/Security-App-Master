@@ -20,6 +20,8 @@ import InputSelect from '../../../common/inputs/InputSelect';
 import useFetchLocations from '../../../hooks/fetch/useFetchLocations';
 import useFetchEmployees from '../../../hooks/fetch/useFetchEmployees';
 import { MdClose } from 'react-icons/md';
+import { useQueryClient } from '@tanstack/react-query';
+import { REACT_QUERY_KEYS } from '../../../@types/enum';
 
 const CreateTaskModal = ({
   opened,
@@ -28,6 +30,8 @@ const CreateTaskModal = ({
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const queryClient = useQueryClient();
+
   const { company, companyBranches } = useAuthState();
 
   const { data: locations } = useFetchLocations({});
@@ -85,17 +89,32 @@ const CreateTaskModal = ({
     }
   }, [startTime]);
 
+  useEffect(() => {
+    methods.setValue('TaskCompanyBranchId', selectedBranch);
+  }, [selectedBranch]);
+
   const [assignTo, setAssignTo] = useState<
     'location' | 'employees' | 'all_employees'
   >('location');
 
   useEffect(() => {
+    //*Reset all the previous allotment data
+    setSelectedEmps([]);
+    methods.setValue('TaskAllotedLocationId', null);
+    methods.setValue('TaskIsAllotedToAllEmps', false);
+    methods.setValue('TaskAllotedToEmpIds', []);
+
     if (assignTo === 'all_employees') {
       methods.setValue('TaskIsAllotedToAllEmps', true);
     }
   }, [assignTo]);
 
-  console.log(methods.watch('TaskAllotedLocationId'));
+  useEffect(() => {
+    methods.setValue(
+      'TaskAllotedToEmpIds',
+      selectedEmps.map((emp) => emp.id)
+    );
+  }, [selectedEmps]);
 
   const onSubmit = async (data: TaskFormFields) => {
     if (!company) return;
@@ -105,9 +124,14 @@ const CreateTaskModal = ({
 
       await DbCompany.createNewTask(company.CompanyId, data);
 
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.TASK_LIST],
+      });
+
       showSnackbar({ message: 'Task created successfully', type: 'success' });
 
       setLoading(false);
+      setOpened(false);
     } catch (error) {
       console.log(error);
       errorHandler(error);
@@ -123,6 +147,10 @@ const CreateTaskModal = ({
     }
     return () => closeModalLoader();
   }, [loading]);
+
+  useEffect(() => {
+    console.log(methods.formState.errors);
+  }, [methods.formState.errors]);
 
   return (
     <Dialog
@@ -231,6 +259,7 @@ const CreateTaskModal = ({
                   onSearchChange={setEmpSearchQuery}
                   onChange={(e) => setSelectedEmployee(e as string)}
                   searchable
+                  error={methods.formState.errors.TaskAllotedToEmpIds?.message}
                 />
 
                 <div className="flex flex-col col-span-3">

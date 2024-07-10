@@ -15,7 +15,6 @@ interface SendShiftDetailsEmailArgs {
 
 const getMinutesDifference = (date1: Dayjs, date2: Dayjs) => {
   const diff = date1.diff(date2, 'minutes');
-  console.log(diff, date1.toDate(), date2.toDate());
   return diff;
 };
 

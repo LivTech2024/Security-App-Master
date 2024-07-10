@@ -144,9 +144,12 @@ const TaskList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[40%] text-start">Task</th>
-            <th className="uppercase px-4 py-2 w-[20%] text-start">
+            <th className="uppercase px-4 py-2 w-[30%] text-start">Task</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
               Start Date
+            </th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
+              Start Time
             </th>
 
             <th className="uppercase px-4 py-2 w-[20%] text-start">For Days</th>
@@ -180,13 +183,20 @@ const TaskList = () => {
                       {formatDate(task.TaskStartDate)}
                     </span>
                   </td>
+                  <td className="align-top px-4 py-2 text-start">
+                    <span className="line-clamp-3">{task.TaskStartTime}</span>
+                  </td>
 
                   <td className="align-top px-4 py-2 text-start">
                     <span className="line-clamp-2">{task.TaskForDays}</span>
                   </td>
-                  <td className="align-top px-4 py-2 text-start">
+                  <td className="align-top px-4 py-2 text-end">
                     <span className="line-clamp-2">
-                      {task.TaskAllotedToEmpIds}
+                      {task.TaskAllotedLocationId
+                        ? 'Alloted to location'
+                        : task.TaskIsAllotedToAllEmps
+                          ? 'Alloted to all employees'
+                          : `Alloted to ${task.TaskAllotedToEmpIds?.length} employees`}
                     </span>
                   </td>
                 </tr>
