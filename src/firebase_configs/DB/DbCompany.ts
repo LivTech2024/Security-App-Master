@@ -1033,32 +1033,21 @@ class DbCompany {
   static updateTask = (taskId: string, data: TaskFormFields) => {
     const taskRef = doc(db, CollectionName.tasks, taskId);
 
-    let updatedTask: Partial<ITasksCollection> = {
+    const updatedTask: Partial<ITasksCollection> = {
       TaskId: taskId,
-      TaskCompanyBranchId: data.TaskCompanyBranchId,
+      TaskCompanyBranchId: data.TaskCompanyBranchId || null,
       TaskDescription: data.TaskDescription,
       TaskStartDate: data.TaskStartDate as unknown as Timestamp,
+      TaskStartTime: data.TaskStartTime,
       TaskForDays: data.TaskForDays,
+      TaskAllotedLocationId: data.TaskAllotedLocationId || null,
+      TaskAllotedLocationName: data.TaskAllotedLocationName || null,
+      TaskAllotedToEmpIds:
+        data.TaskAllotedToEmpIds.length > 0 ? data.TaskAllotedToEmpIds : null,
+      TaskAllotedToEmps:
+        data.TaskAllotedToEmps?.length > 0 ? data.TaskAllotedToEmps : null,
+      TaskIsAllotedToAllEmps: data.TaskIsAllotedToAllEmps,
     };
-
-    if (data.TaskAllotedLocationId && data.TaskAllotedLocationId.length > 0) {
-      updatedTask = {
-        ...updatedTask,
-        TaskAllotedLocationId: data.TaskAllotedLocationId,
-      };
-    } else {
-      if (data.TaskAllotedToEmpIds) {
-        updatedTask = {
-          ...updatedTask,
-          TaskAllotedToEmpIds: data.TaskAllotedToEmpIds,
-        };
-      } else {
-        updatedTask = {
-          ...updatedTask,
-          TaskIsAllotedToAllEmps: true,
-        };
-      }
-    }
 
     return updateDoc(taskRef, updatedTask);
   };

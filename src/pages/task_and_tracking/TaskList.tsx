@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import PageHeader from '../../common/PageHeader';
 import Button from '../../common/button/Button';
-import { useAuthState } from '../../store';
+import { useAuthState, useEditFormStore } from '../../store';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import {
   DisplayCount,
@@ -21,8 +21,11 @@ import TableShimmer from '../../common/shimmer/TableShimmer';
 import SearchBar from '../../common/inputs/SearchBar';
 import SelectBranch from '../../common/SelectBranch';
 import CreateTaskModal from '../../component/task_and_tracking/modal/CreateTaskModal';
+import { MdEdit } from 'react-icons/md';
 
 const TaskList = () => {
+  const { setTaskEditData } = useEditFormStore();
+
   const [branchId, setBranchId] = useState('');
 
   const { company } = useAuthState();
@@ -121,7 +124,10 @@ const TaskList = () => {
           <Button
             label="Create new task"
             type="black"
-            onClick={() => setTaskCreateModal(true)}
+            onClick={() => {
+              setTaskEditData(null);
+              setTaskCreateModal(true);
+            }}
           />
         }
       />
@@ -144,7 +150,7 @@ const TaskList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[30%] text-start">Task</th>
+            <th className="uppercase px-4 py-2 w-[20%] text-start">Task</th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">
               Start Date
             </th>
@@ -152,8 +158,11 @@ const TaskList = () => {
               Start Time
             </th>
 
-            <th className="uppercase px-4 py-2 w-[20%] text-start">For Days</th>
-            <th className="uppercase px-4 py-2 w-[20%] text-end">Alloted To</th>
+            <th className="uppercase px-4 py-2 w-[10%] text-start">For Days</th>
+            <th className="uppercase px-4 py-2 w-[35%] text-start">
+              Alloted To
+            </th>
+            <th className="uppercase px-4 py-2 w-[5%] text-end"></th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -166,31 +175,58 @@ const TaskList = () => {
           ) : (
             data.map((task) => {
               return (
-                <tr
-                  key={task.TaskId}
-                  className="cursor-pointer"
-                  onClick={() =>
-                    navigate(
-                      PageRoutes.TASK_AND_TRACKING_LOGS + `?id=${task.TaskId}`
-                    )
-                  }
-                >
-                  <td className="align-top px-4 py-2 text-start">
+                <tr key={task.TaskId} className="cursor-pointer">
+                  <td
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.TASK_AND_TRACKING_LOGS + `?id=${task.TaskId}`
+                      )
+                    }
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-3">{task.TaskDescription}</span>
                   </td>
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.TASK_AND_TRACKING_LOGS + `?id=${task.TaskId}`
+                      )
+                    }
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-3">
                       {formatDate(task.TaskStartDate)}
                     </span>
                   </td>
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.TASK_AND_TRACKING_LOGS + `?id=${task.TaskId}`
+                      )
+                    }
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-3">{task.TaskStartTime}</span>
                   </td>
 
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.TASK_AND_TRACKING_LOGS + `?id=${task.TaskId}`
+                      )
+                    }
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-2">{task.TaskForDays}</span>
                   </td>
-                  <td className="align-top px-4 py-2 text-end">
+                  <td
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.TASK_AND_TRACKING_LOGS + `?id=${task.TaskId}`
+                      )
+                    }
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-2">
                       {task.TaskAllotedLocationId
                         ? `Location Name: ${task.TaskAllotedLocationName}`
@@ -198,6 +234,15 @@ const TaskList = () => {
                           ? 'All Employees'
                           : `Employees: ${task.TaskAllotedToEmps?.map((emp) => emp.EmpName).join(',')} `}
                     </span>
+                  </td>
+                  <td
+                    onClick={() => {
+                      setTaskEditData(task);
+                      setTaskCreateModal(true);
+                    }}
+                    className="px-4 py-2 text-end capitalize align-top flex justify-end"
+                  >
+                    <MdEdit className="text-lg text-textPrimaryBlue cursor-pointer hover:scale-110 duration-150" />
                   </td>
                 </tr>
               );

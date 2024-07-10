@@ -2,7 +2,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import Dialog from '../../../common/Dialog';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TaskFormFields, taskSchema } from '../../../utilities/zod/schema';
-import { useAuthState } from '../../../store';
+import { useAuthState, useEditFormStore } from '../../../store';
 import { useEffect, useState } from 'react';
 import {
   closeModalLoader,
@@ -14,7 +14,7 @@ import DbCompany from '../../../firebase_configs/DB/DbCompany';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import InputDate from '../../../common/inputs/InputDate';
 import InputTime from '../../../common/inputs/InputTime';
-import { removeTimeFromDate } from '../../../utilities/misc';
+import { removeTimeFromDate, toDate } from '../../../utilities/misc';
 import InputRadio from '../../../common/inputs/InputRadio';
 import InputSelect from '../../../common/inputs/InputSelect';
 import useFetchLocations from '../../../hooks/fetch/useFetchLocations';
@@ -22,6 +22,7 @@ import useFetchEmployees from '../../../hooks/fetch/useFetchEmployees';
 import { MdClose } from 'react-icons/md';
 import { useQueryClient } from '@tanstack/react-query';
 import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { openContextModal } from '@mantine/modals';
 
 const CreateTaskModal = ({
   opened,
@@ -33,6 +34,10 @@ const CreateTaskModal = ({
   const queryClient = useQueryClient();
 
   const { company, companyBranches } = useAuthState();
+
+  const { taskEditData } = useEditFormStore();
+
+  const isEdit = !!taskEditData;
 
   const { data: locations } = useFetchLocations({});
 
@@ -84,6 +89,7 @@ const CreateTaskModal = ({
   }, [startDate]);
 
   useEffect(() => {
+    console.log(startTime, 'here');
     if (startTime) {
       methods.setValue('TaskStartTime', startTime);
     }
@@ -97,17 +103,23 @@ const CreateTaskModal = ({
     'location' | 'employees' | 'all_employees'
   >('location');
 
-  useEffect(() => {
+  const handleAssignToChange = (
+    type: 'location' | 'employees' | 'all_employees'
+  ) => {
     //*Reset all the previous allotment data
     setSelectedEmps([]);
     methods.setValue('TaskAllotedLocationId', null);
+    methods.setValue('TaskAllotedLocationName', null);
     methods.setValue('TaskIsAllotedToAllEmps', false);
     methods.setValue('TaskAllotedToEmpIds', []);
 
-    if (assignTo === 'all_employees') {
+    if (type === 'all_employees') {
       methods.setValue('TaskIsAllotedToAllEmps', true);
     }
-  }, [assignTo]);
+    setAssignTo(type);
+  };
+
+  console.log(methods.watch(['TaskStartTime']));
 
   useEffect(() => {
     methods.setValue(
@@ -123,12 +135,59 @@ const CreateTaskModal = ({
   }, [selectedEmps]);
 
   useEffect(() => {
-    methods.reset();
+    let formField = {};
+
+    if (isEdit) {
+      formField = {
+        TaskDescription: taskEditData.TaskDescription,
+        TaskForDays: taskEditData.TaskForDays,
+        TaskAllotedLocationId: taskEditData.TaskAllotedLocationId,
+        TaskAllotedLocationName: taskEditData.TaskAllotedLocationName,
+        TaskStartTime: taskEditData.TaskStartTime,
+      };
+      setStartDate(toDate(taskEditData.TaskStartDate));
+      setStartTime(taskEditData.TaskStartTime);
+      setSelectedEmps(
+        taskEditData.TaskAllotedToEmps
+          ? taskEditData.TaskAllotedToEmps.map((emp) => {
+              return {
+                id: emp.EmpId,
+                name: emp.EmpName,
+              };
+            })
+          : []
+      );
+      setSelectedBranch(taskEditData.TaskCompanyBranchId || '');
+      if (
+        taskEditData.TaskAllotedLocationId &&
+        taskEditData.TaskAllotedLocationName
+      ) {
+        setAssignTo('location');
+      } else if (
+        taskEditData.TaskAllotedToEmpIds &&
+        taskEditData.TaskAllotedToEmps?.length
+      ) {
+        setAssignTo('employees');
+      } else {
+        setAssignTo('all_employees');
+      }
+      methods.reset(formField);
+      return;
+    }
+
+    formField = {
+      TaskDescription: '',
+      TaskForDays: null,
+      TaskAllotedLocationId: null,
+      TaskAllotedLocationName: null,
+    };
+
+    methods.reset(formField);
     setStartDate(null);
     setStartTime('');
     setSelectedEmps([]);
     setAssignTo('location');
-  }, [opened]);
+  }, [opened, isEdit]);
 
   const onSubmit = async (data: TaskFormFields) => {
     if (!company) return;
@@ -136,13 +195,39 @@ const CreateTaskModal = ({
     try {
       setLoading(true);
 
-      await DbCompany.createNewTask(company.CompanyId, data);
+      if (isEdit) {
+        await DbCompany.updateTask(taskEditData.TaskId, data);
+        showSnackbar({ message: 'Task updated successfully', type: 'success' });
+      } else {
+        await DbCompany.createNewTask(company.CompanyId, data);
+        showSnackbar({ message: 'Task created successfully', type: 'success' });
+      }
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.TASK_LIST],
       });
 
-      showSnackbar({ message: 'Task created successfully', type: 'success' });
+      setLoading(false);
+      setOpened(false);
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      setLoading(false);
+    }
+  };
+
+  const onDelete = async () => {
+    if (!isEdit) return;
+
+    try {
+      setLoading(true);
+
+      await DbCompany.deleteTask(taskEditData.TaskId);
+      showSnackbar({ message: 'Task deleted successfully', type: 'success' });
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.TASK_LIST],
+      });
 
       setLoading(false);
       setOpened(false);
@@ -172,9 +257,34 @@ const CreateTaskModal = ({
       setOpened={setOpened}
       title="Create Task"
       size="80%"
-      positiveLabel="Submit"
       positiveCallback={methods.handleSubmit(onSubmit)}
       isFormModal
+      negativeCallback={() =>
+        isEdit
+          ? openContextModal({
+              modal: 'confirmModal',
+              withCloseButton: false,
+              centered: true,
+              closeOnClickOutside: true,
+              innerProps: {
+                title: 'Confirm',
+                body: 'Are you sure to delete this task',
+                onConfirm: () => {
+                  onDelete();
+                },
+                onCancel: () => {
+                  setOpened(true);
+                },
+              },
+              size: '30%',
+              styles: {
+                body: { padding: '0px' },
+              },
+            })
+          : setOpened(false)
+      }
+      negativeLabel={isEdit ? 'Delete' : 'Cancel'}
+      positiveLabel={isEdit ? 'Update' : 'Save'}
     >
       <FormProvider {...methods}>
         <form
@@ -228,19 +338,19 @@ const CreateTaskModal = ({
             type="checkbox"
             label="Assign to location"
             checked={assignTo === 'location'}
-            onChange={() => setAssignTo('location')}
+            onChange={() => handleAssignToChange('location')}
           />
           <InputRadio
             type="checkbox"
             label="Assign to employees"
             checked={assignTo === 'employees'}
-            onChange={() => setAssignTo('employees')}
+            onChange={() => handleAssignToChange('employees')}
           />
           <InputRadio
             type="checkbox"
             label="Assign to all employees"
             checked={assignTo === 'all_employees'}
-            onChange={() => setAssignTo('all_employees')}
+            onChange={() => handleAssignToChange('all_employees')}
           />
 
           {assignTo === 'location' ? (

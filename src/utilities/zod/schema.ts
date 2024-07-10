@@ -468,7 +468,7 @@ export const taskSchema = z
     ),
 
     //*Task alloted to all employees
-    TaskIsAllotedToAllEmps: z.boolean(),
+    TaskIsAllotedToAllEmps: z.boolean().default(false),
   })
   .superRefine(
     (

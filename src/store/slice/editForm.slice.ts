@@ -12,6 +12,7 @@ import {
   IPatrolsCollection,
   IPayStubsCollection,
   IShiftsCollection,
+  ITasksCollection,
   ITrainingAndCertificationsCollection,
 } from '../../@types/database';
 import { CompanyBranches } from './auth.slice';
@@ -154,6 +155,9 @@ interface EditFormState {
   setTrainCertsEditData: (
     trainCerts: ITrainingAndCertificationsCollection | null
   ) => void;
+
+  taskEditData: ITasksCollection | null;
+  setTaskEditData: (task: ITasksCollection | null) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -230,4 +234,8 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   trainCertsEditData: null,
   setTrainCertsEditData: (trainCerts) =>
     set((state) => ({ ...state, trainCertsEditData: trainCerts })),
+
+  //task
+  taskEditData: null,
+  setTaskEditData: (task) => set((state) => ({ ...state, taskEditData: task })),
 });
