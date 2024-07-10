@@ -456,8 +456,18 @@ export const taskSchema = z
     TaskStartDate: z.date(),
     TaskForDays: z.coerce.number().min(1),
     TaskStartTime: z.string(),
+
+    //*Task alloted to location
     TaskAllotedLocationId: z.string().nullable().optional(),
+    TaskAllotedLocationName: z.string().nullable().optional(),
+
+    //*Task alloted to employees
     TaskAllotedToEmpIds: z.array(z.string()),
+    TaskAllotedToEmps: z.array(
+      z.object({ EmpName: z.string(), EmpId: z.string() })
+    ),
+
+    //*Task alloted to all employees
     TaskIsAllotedToAllEmps: z.boolean(),
   })
   .superRefine(

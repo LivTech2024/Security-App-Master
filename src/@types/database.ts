@@ -573,8 +573,10 @@ export interface ITasksCollection {
   TaskForDays: number;
   TaskStartTime: string; //*Task should start at this time all the day
   TaskAllotedLocationId?: string | null; //* Either task will be alloted to location
+  TaskAllotedLocationName?: string | null; //* Either task will be alloted to location
   TaskAllotedToEmpIds?: string[] | null; //* Or it will be alloted directly to emp
-  TaskIsAllotedToAllEmps?: boolean;
+  TaskAllotedToEmps?: { EmpName: string; EmpId: string }[] | null; //* Or it will be alloted directly to emp
+  TaskIsAllotedToAllEmps?: boolean; //*Or it will be alloted to all employees
   TaskCreatedAt: Timestamp | FieldValue;
 }
 

@@ -1010,12 +1010,14 @@ class DbCompany {
       newTask = {
         ...newTask,
         TaskAllotedLocationId: data.TaskAllotedLocationId,
+        TaskAllotedLocationName: data.TaskAllotedLocationName,
       };
     } else {
       if (data.TaskAllotedToEmpIds && data.TaskAllotedToEmpIds.length > 0) {
         newTask = {
           ...newTask,
           TaskAllotedToEmpIds: data.TaskAllotedToEmpIds,
+          TaskAllotedToEmps: data.TaskAllotedToEmps,
         };
       } else {
         newTask = {

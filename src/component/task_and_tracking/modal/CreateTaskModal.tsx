@@ -114,7 +114,21 @@ const CreateTaskModal = ({
       'TaskAllotedToEmpIds',
       selectedEmps.map((emp) => emp.id)
     );
+    methods.setValue(
+      'TaskAllotedToEmps',
+      selectedEmps.map((emp) => {
+        return { EmpName: emp.name, EmpId: emp.id };
+      })
+    );
   }, [selectedEmps]);
+
+  useEffect(() => {
+    methods.reset();
+    setStartDate(null);
+    setStartTime('');
+    setSelectedEmps([]);
+    setAssignTo('location');
+  }, [opened]);
 
   const onSubmit = async (data: TaskFormFields) => {
     if (!company) return;
@@ -233,9 +247,20 @@ const CreateTaskModal = ({
             <InputSelect
               label="Select location"
               value={methods.watch('TaskAllotedLocationId') || ''}
-              onChange={(e) =>
-                methods.setValue('TaskAllotedLocationId', e as string)
-              }
+              onChange={(e) => {
+                const selectedLocation = locations.find(
+                  (loc) => loc.LocationId === (e as string)
+                );
+
+                methods.setValue(
+                  'TaskAllotedLocationId',
+                  selectedLocation?.LocationId
+                );
+                methods.setValue(
+                  'TaskAllotedLocationName',
+                  selectedLocation?.LocationName
+                );
+              }}
               data={locations.map((loc) => {
                 return {
                   label: loc.LocationName,
