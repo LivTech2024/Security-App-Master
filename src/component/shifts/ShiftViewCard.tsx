@@ -3,7 +3,7 @@ import {
   IEmployeeRouteCollection,
   IShiftsCollection,
 } from '../../@types/database';
-import { formatDate } from '../../utilities/misc';
+import { formatDate, toDate } from '../../utilities/misc';
 import EmpRouteModal from './modal/EmpRouteModal';
 import { errorHandler } from '../../utilities/CustomError';
 import {
@@ -61,6 +61,8 @@ const ShiftViewCard = ({
     empId: string;
     field: 'start_time' | 'end_time';
   }>({ empId: '', field: 'start_time' });
+
+  console.log(coordinates, 'here');
 
   return (
     <div className="bg-surface shadow-md rounded-lg p-4">
@@ -396,14 +398,25 @@ const ShiftViewCard = ({
                   <div key={res.EmpId} className="flex flex-col">
                     <div
                       onClick={() => {
-                        setCoordinates(
-                          empRoute.EmpRouteLocations.map((loc) => {
-                            return {
-                              lat: loc.LocationCoordinates.latitude,
-                              lng: loc.LocationCoordinates.longitude,
-                            };
-                          })
+                        const sortedCoords = empRoute.EmpRouteLocations.sort(
+                          (a, b) =>
+                            toDate(a.LocationReportedAt).getTime() -
+                            toDate(b.LocationReportedAt).getTime()
                         );
+                        setCoordinates([
+                          {
+                            lat: sortedCoords[0].LocationCoordinates.latitude,
+                            lng: sortedCoords[0].LocationCoordinates.longitude,
+                          },
+                          {
+                            lat: sortedCoords[
+                              empRoute.EmpRouteLocations.length - 1
+                            ].LocationCoordinates.latitude,
+                            lng: sortedCoords[
+                              empRoute.EmpRouteLocations.length - 1
+                            ].LocationCoordinates.longitude,
+                          },
+                        ]);
                         setEmpRouteModal(true);
                       }}
                       className="text-textPrimaryBlue cursor-pointer underline"
