@@ -167,18 +167,6 @@ const ShiftDropPoint = ({
         </div>
       ) : getScheduleForDay(datesArray[index], schedules).length > 0 ? (
         getScheduleForDay(datesArray[index], schedules).map((data, idx) => {
-          const colors = getColorAccToShiftStatus(
-            data.shift,
-            settings?.SettingEmpShiftTimeMarginInMins || 10
-          );
-
-          const backgroundStyle =
-            colors.length > 1
-              ? {
-                  background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
-                }
-              : { backgroundColor: colors[0] };
-
           return shiftToBeDeleted.includes(data.shift.ShiftId) ? (
             <div className="flex flex-col w-full h-full min-h-[140px] justify-center items-center py-4">
               <div>This Shift is Deleted</div>
@@ -213,11 +201,10 @@ const ShiftDropPoint = ({
                 }`}
               >
                 <div
-                  className={`h-[30px] py-1 text-sm font-semibold  px-2 flex ${data.employee.length === 0 ? 'justify-between' : 'justify-center'}`}
-                  style={backgroundStyle}
+                  className={`h-[30px] bg-[#5e5c5c34] border-b border-inputBorder py-1 text-sm font-semibold  px-2 flex ${data.employee.length === 0 ? 'justify-between' : 'justify-center'}`}
                 >
                   {data.employee.length === 0 && <span>&nbsp;</span>}
-                  <span className="line-clamp-1 text-center">
+                  <span className="line-clamp-1 text-center ">
                     {data.shift.ShiftName}
                   </span>
                   {data.employee.length === 0 && (
@@ -263,6 +250,18 @@ const ShiftDropPoint = ({
                     {data.employee.length > 0 &&
                     data.employee.length === data.shift.ShiftRequiredEmp ? (
                       data.employee.map((emp) => {
+                        const colors = getColorAccToShiftStatus(
+                          data.shift,
+                          settings?.SettingEmpShiftTimeMarginInMins || 10,
+                          emp.EmployeeId
+                        );
+
+                        const backgroundStyle =
+                          colors.length > 1
+                            ? {
+                                background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})`,
+                              }
+                            : { backgroundColor: colors[0] };
                         return (
                           <Tooltip
                             key={emp.EmployeeId}
@@ -274,7 +273,10 @@ const ShiftDropPoint = ({
                               </div>
                             }
                           >
-                            <div className=" py-[2px] w-full text-center line-clamp-1 flex justify-between items-center gap-1 border-2 border-gray-500 rounded-full px-1 min-w-full mt-1">
+                            <div
+                              style={backgroundStyle}
+                              className=" py-[2px] w-full text-center line-clamp-1 flex justify-between items-center gap-1 border-2 border-gray-500 rounded-full px-1 min-w-full mt-1"
+                            >
                               <img
                                 src={
                                   data.employee[0].EmployeeImg ??

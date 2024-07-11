@@ -37,7 +37,8 @@ export const sendShiftDetailsEmail = ({
 
 export const getColorAccToShiftStatus = (
   shift: IShiftsCollection,
-  timeMarginInMins: number
+  timeMarginInMins: number,
+  empId: string
 ) => {
   let color = ['#e5e7eb'];
 
@@ -67,40 +68,37 @@ export const getColorAccToShiftStatus = (
   }
 
   try {
-    if (!shift.ShiftCurrentStatus || shift.ShiftCurrentStatus.length === 0) {
+    const empShiftStatus = shift.ShiftCurrentStatus?.find(
+      (s) => s?.StatusReportedById === empId
+    );
+
+    if (!empShiftStatus) {
       color = ['#fed7aa'];
     }
 
-    if (
-      shift.ShiftCurrentStatus &&
-      Array.isArray(shift.ShiftCurrentStatus) &&
-      shift.ShiftCurrentStatus.length > 0
-    ) {
+    if (empShiftStatus) {
       //*Pending
-      if (shift.ShiftCurrentStatus.some((s) => s.Status === 'pending')) {
+      if (empShiftStatus.Status === 'pending') {
         color = ['#fed7aa'];
       }
 
       //*Started
-      if (shift.ShiftCurrentStatus.some((s) => s.Status === 'started')) {
+      if (empShiftStatus.Status === 'started') {
         color = ['#fbcfe8'];
       }
 
       //*Completed
-      if (shift.ShiftCurrentStatus.every((s) => s.Status === 'completed')) {
+      if (empShiftStatus.Status === 'completed') {
         color = ['#4ade80'];
       }
 
       //*Started Late
       if (
-        shift.ShiftCurrentStatus.some(
-          (s) =>
-            toDate(s.StatusStartedTime) &&
-            getMinutesDifference(
-              dayjs(toDate(s.StatusStartedTime)),
-              dayjs(shiftStartTimeWithDate)
-            ) > timeMarginInMins
-        )
+        toDate(empShiftStatus.StatusStartedTime) &&
+        getMinutesDifference(
+          dayjs(toDate(empShiftStatus.StatusStartedTime)),
+          dayjs(shiftStartTimeWithDate)
+        ) > timeMarginInMins
       ) {
         color = [
           ...color.filter(
@@ -112,15 +110,12 @@ export const getColorAccToShiftStatus = (
 
       //*Ended Early
       if (
-        shift.ShiftCurrentStatus.some(
-          (s) =>
-            s.Status === 'completed' &&
-            toDate(s.StatusReportedTime) &&
-            getMinutesDifference(
-              dayjs(shiftEndTimeWithDate),
-              dayjs(toDate(s.StatusReportedTime))
-            ) > timeMarginInMins
-        )
+        empShiftStatus.Status === 'completed' &&
+        toDate(empShiftStatus.StatusReportedTime) &&
+        getMinutesDifference(
+          dayjs(shiftEndTimeWithDate),
+          dayjs(toDate(empShiftStatus.StatusReportedTime))
+        ) > timeMarginInMins
       ) {
         color = [
           ...color.filter(
@@ -132,15 +127,12 @@ export const getColorAccToShiftStatus = (
 
       //*Ended Late
       if (
-        shift.ShiftCurrentStatus.some(
-          (s) =>
-            s.Status === 'completed' &&
-            toDate(s.StatusReportedTime) &&
-            getMinutesDifference(
-              dayjs(toDate(s.StatusReportedTime)),
-              dayjs(shiftEndTimeWithDate)
-            ) > timeMarginInMins
-        )
+        empShiftStatus.Status === 'completed' &&
+        toDate(empShiftStatus.StatusReportedTime) &&
+        getMinutesDifference(
+          dayjs(toDate(empShiftStatus.StatusReportedTime)),
+          dayjs(shiftEndTimeWithDate)
+        ) > timeMarginInMins
       ) {
         color = [
           ...color.filter(
@@ -153,7 +145,7 @@ export const getColorAccToShiftStatus = (
 
     return color;
   } catch (error) {
-    //console.log(error);
+    console.log(error);
     return color;
   }
 };
