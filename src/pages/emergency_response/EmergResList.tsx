@@ -8,6 +8,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import {
   DisplayCount,
   MinimumQueryCharacter,
+  PageRoutes,
   REACT_QUERY_KEYS,
 } from '../../@types/enum';
 import { DocumentData } from 'firebase/firestore';
@@ -17,8 +18,11 @@ import { useInView } from 'react-intersection-observer';
 import SearchBar from '../../common/inputs/SearchBar';
 import NoSearchResult from '../../common/NoSearchResult';
 import TableShimmer from '../../common/shimmer/TableShimmer';
+import { useNavigate } from 'react-router-dom';
 
 const EmergResList = () => {
+  const navigate = useNavigate();
+
   const [createEmergProtocolModal, setCreateEmergProtocolModal] =
     useState(false);
 
@@ -122,6 +126,25 @@ const EmergResList = () => {
           />
         }
       />
+      <div className="flex flex-col gap-4 bg-surface shadow p-4 rounded">
+        <div className="font-semibold text-lg">Emergencies</div>
+        <div className="flex items-center gap-4">
+          <Button
+            label="View Callouts"
+            type="gray"
+            onClick={() => {
+              navigate(PageRoutes.CALL_OUT_LIST);
+            }}
+          />
+          <Button
+            label="View Panic Response"
+            type="gray"
+            onClick={() => {
+              navigate(PageRoutes.MESSAGING);
+            }}
+          />
+        </div>
+      </div>
       <CreateEmergProtocolModal
         opened={createEmergProtocolModal}
         setOpened={setCreateEmergProtocolModal}
@@ -149,7 +172,7 @@ const EmergResList = () => {
           {data.length === 0 && !isLoading ? (
             <tr>
               <td colSpan={3}>
-                <NoSearchResult text="No employee" />
+                <NoSearchResult text="No emergency protocols" />
               </td>
             </tr>
           ) : (
