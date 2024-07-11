@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Button from '../../common/button/Button';
 import PageHeader from '../../common/PageHeader';
 import CreateEmergProtocolModal from '../../component/emergency_response/modal/CreateEmergProtocolModal';
-import { useAuthState } from '../../store';
+import { useAuthState, useEditFormStore } from '../../store';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import {
@@ -23,6 +23,8 @@ const EmergResList = () => {
     useState(false);
 
   const { company } = useAuthState();
+
+  const { setEmergProtocolEditData } = useEditFormStore();
 
   const [query, setQuery] = useState('');
 
@@ -114,6 +116,7 @@ const EmergResList = () => {
             label="Create new emergency protocol"
             type="black"
             onClick={() => {
+              setEmergProtocolEditData(null);
               setCreateEmergProtocolModal(true);
             }}
           />
@@ -135,11 +138,11 @@ const EmergResList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[20%] text-start">Title</th>
+            <th className="uppercase px-4 py-2 w-[30%] text-start">Title</th>
             <th className="uppercase px-4 py-2 w-[60%] text-start">
               Description
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-end">video</th>
+            <th className="uppercase px-4 py-2 w-[10%] text-end">video</th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -153,12 +156,24 @@ const EmergResList = () => {
             data.map((protocol) => {
               return (
                 <tr key={protocol.EmergProtocolId} className="cursor-pointer">
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() => {
+                      setEmergProtocolEditData(protocol);
+                      setCreateEmergProtocolModal(true);
+                    }}
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-1">
                       {protocol.EmergProtocolTitle}
                     </span>
                   </td>
-                  <td className="align-top px-4 py-2 text-start">
+                  <td
+                    onClick={() => {
+                      setEmergProtocolEditData(protocol);
+                      setCreateEmergProtocolModal(true);
+                    }}
+                    className="align-top px-4 py-2 text-start"
+                  >
                     <span className="line-clamp-4">
                       {protocol.EmergProtocolDescription}
                     </span>

@@ -1584,6 +1584,96 @@ class DbCompany {
     }
   };
 
+  static updateEmergProtocol = async ({
+    emergProtocolId,
+    data,
+    video,
+  }: {
+    emergProtocolId: string;
+    data: EmergProtocolCreateFormFields;
+    video: File | null | string;
+  }) => {
+    const { EmergProtocolDescription, EmergProtocolTitle } = data;
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const protocolRef = doc(
+          db,
+          CollectionName.emergencyProtocols,
+          emergProtocolId
+        );
+        const protocolSnap = await transaction.get(protocolRef);
+        const oldProtocolData =
+          protocolSnap.data() as IEmergencyProtocolsCollection;
+
+        let videoFileUrl = oldProtocolData.EmergProtocolVideo;
+        let fileToBeDeleted: string | null = null;
+
+        if (video && typeof video !== 'string') {
+          const videoFileName =
+            CloudStorageFileHandler.generateFileNameWithRandom(
+              emergProtocolId,
+              0,
+              '.mp4'
+            );
+
+          videoFileUrl = await CloudStorageFileHandler.uploadFile(
+            video,
+            CloudStoragePaths.COMPANIES_EMERGENCY_PROTOCOLS +
+              '/' +
+              videoFileName
+          );
+
+          fileToBeDeleted = oldProtocolData.EmergProtocolVideo;
+        }
+
+        const newDocument: Partial<IEmergencyProtocolsCollection> = {
+          EmergProtocolTitle,
+          EmergProtocolDescription,
+          EmergProtocolTitleSearchIndex: fullTextSearchIndex(
+            EmergProtocolTitle.trim().toLowerCase()
+          ),
+          EmergProtocolVideo: videoFileUrl,
+          EmergProtocolModifiedAt: serverTimestamp(),
+        };
+
+        transaction.update(protocolRef, newDocument);
+
+        if (fileToBeDeleted) {
+          await CloudStorageFileHandler.deleteFileByUrl(fileToBeDeleted);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
+
+  static deleteEmergProtocol = async (emergProtocolId: string) => {
+    try {
+      await runTransaction(db, async (transaction) => {
+        const documentRef = doc(
+          db,
+          CollectionName.emergencyProtocols,
+          emergProtocolId
+        );
+        const docSnap = await transaction.get(documentRef);
+        const docData = docSnap.data() as IEmergencyProtocolsCollection;
+
+        transaction.delete(documentRef);
+
+        if (docData.EmergProtocolVideo) {
+          await CloudStorageFileHandler.deleteFileByUrl(
+            docData.EmergProtocolVideo
+          );
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
+
   static getEmergProtocols = ({
     lmt,
     lastDoc,

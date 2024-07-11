@@ -2,6 +2,7 @@ import { StateCreator } from 'zustand';
 import {
   IClientsCollection,
   IDocumentsCollection,
+  IEmergencyProtocolsCollection,
   IEmployeesCollection,
   IEquipmentAllocations,
   IEquipmentsCollection,
@@ -158,6 +159,11 @@ interface EditFormState {
 
   taskEditData: ITasksCollection | null;
   setTaskEditData: (task: ITasksCollection | null) => void;
+
+  emergProtocolEditData: IEmergencyProtocolsCollection | null;
+  setEmergProtocolEditData: (
+    task: IEmergencyProtocolsCollection | null
+  ) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -238,4 +244,9 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   //task
   taskEditData: null,
   setTaskEditData: (task) => set((state) => ({ ...state, taskEditData: task })),
+
+  //task
+  emergProtocolEditData: null,
+  setEmergProtocolEditData: (protocol) =>
+    set((state) => ({ ...state, emergProtocolEditData: protocol })),
 });
