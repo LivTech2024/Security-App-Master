@@ -33,6 +33,7 @@ export enum CollectionName {
   payStubs = 'PayStubs',
   trainingAndCertifications = 'TrainingAndCertifications',
   trainCertsAllocation = 'TrainCertsAllocation',
+  emergencyProtocols = 'EmergencyProtocols',
 }
 
 export const DisplayCount = {
@@ -60,6 +61,7 @@ export const DisplayCount = {
   COMPANY_LIST: 20,
   TRAIN_CERTS_LIST: 20,
   TRAIN_CERTS_ALLOC_LIST: 20,
+  EMERG_PROTOCOLS_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -90,6 +92,7 @@ export const REACT_QUERY_KEYS = {
   COMPANY_LIST: 'company-list',
   TRAIN_CERTS_LIST: 'train-certs-list',
   TRAIN_CERTS_ALLOC_LIST: 'train-certs-alloc-list',
+  EMERG_PROTOCOLS_LIST: 'emerg-protocol-list',
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -105,6 +108,7 @@ export const MinimumQueryCharacter = {
   PAY_STUB: 1,
   COMPANY: 1,
   TRAIN_CERTS: 1,
+  EMERG_PROTOCOLS: 1,
 } as const;
 
 export const CloudStoragePaths = {
@@ -115,6 +119,7 @@ export const CloudStoragePaths = {
   CLIENT_IMAGES: 'clients/images',
   CLIENT_DOCUMENTS: 'clients/documents',
   COMPANIES_LOCATIONS_DOCUMENTS: 'companies/locations/documents',
+  COMPANIES_EMERGENCY_PROTOCOLS: 'companies/emergency_protocols',
 };
 
 export const ImageResolution = {

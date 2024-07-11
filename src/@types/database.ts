@@ -698,3 +698,15 @@ export interface ITrainCertsAllocationsCollection {
   TrainCertsAllocCompletionDate?: Timestamp | FieldValue;
   TrainCertsAllocCreatedAt: Timestamp | FieldValue;
 }
+
+//*Emergency protocols
+export interface IEmergencyProtocolsCollection {
+  EmergProtocolId: string;
+  EmergProtocolCompanyId: string;
+  EmergProtocolTitle: string;
+  EmergProtocolTitleSearchIndex: string[];
+  EmergProtocolDescription: string;
+  EmergProtocolVideo: string | null;
+  EmergProtocolCreatedAt: Timestamp | FieldValue;
+  EmergProtocolModifiedAt: Timestamp | FieldValue;
+}

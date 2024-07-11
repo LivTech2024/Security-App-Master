@@ -157,14 +157,22 @@ class CloudStorageImageHandler {
 }
 
 export class CloudStorageFileHandler {
-  static generateFileNameWithRandom = (id: string, index: number) => {
+  static generateFileNameWithRandom = (
+    id: string,
+    index: number,
+    ext: string = '.pdf'
+  ) => {
     const random = Math.floor(Math.random() * (9999 - 1111 + 1)) + 1111;
     const ms = new Date().getMilliseconds();
-    return id + index + random + ms + '.pdf';
+    return id + index + random + ms + ext;
   };
 
-  static generateFileName = (id: string, name: string) => {
-    return `${id}_${name}.pdf`;
+  static generateFileName = (
+    id: string,
+    name: string,
+    ext: string = '.pdf'
+  ) => {
+    return `${id}_${name}${ext}`;
   };
 
   static uploadFile = async (file: File, path: string) => {

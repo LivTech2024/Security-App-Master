@@ -14,6 +14,7 @@ import {
   ICompanyBranchesCollection,
   IDocumentCategories,
   IDocumentsCollection,
+  IEmergencyProtocolsCollection,
   ILocationsCollection,
   IReportCategoriesCollection,
   ITaskLogsCollection,
@@ -46,6 +47,7 @@ import {
   CompanyBranchFormFields,
   CompanyCreateFormFields,
   CompanyUpdateFormFields,
+  EmergProtocolCreateFormFields,
   LocationCreateFormFields,
   SettingsFormFields,
   TaskFormFields,
@@ -1522,6 +1524,106 @@ class DbCompany {
     const trainCertsAllocQuery = query(trainCertsAllocRef, ...queryParams);
 
     return getDocs(trainCertsAllocQuery);
+  };
+
+  //*Emergency Protocols
+  static createEmergProtocol = async ({
+    cmpId,
+    data,
+    video,
+  }: {
+    cmpId: string;
+    data: EmergProtocolCreateFormFields;
+    video: File | null;
+  }) => {
+    const { EmergProtocolDescription, EmergProtocolTitle } = data;
+
+    const emergProtocolId = getNewDocId(CollectionName.emergencyProtocols);
+    const emergProtocolRef = doc(
+      db,
+      CollectionName.emergencyProtocols,
+      emergProtocolId
+    );
+    let videoFileUrl: string | null = null;
+    if (video) {
+      const videoFileName = CloudStorageFileHandler.generateFileNameWithRandom(
+        emergProtocolId,
+        0,
+        '.mp4'
+      );
+
+      videoFileUrl = await CloudStorageFileHandler.uploadFile(
+        video,
+        CloudStoragePaths.COMPANIES_EMERGENCY_PROTOCOLS + '/' + videoFileName
+      );
+    }
+
+    const EmergProtocolTitleSearchIndex = fullTextSearchIndex(
+      EmergProtocolTitle.toLocaleLowerCase().trim()
+    );
+
+    try {
+      const newEmergProtocol: IEmergencyProtocolsCollection = {
+        EmergProtocolId: emergProtocolId,
+        EmergProtocolTitle,
+        EmergProtocolDescription,
+        EmergProtocolCompanyId: cmpId,
+        EmergProtocolTitleSearchIndex,
+        EmergProtocolVideo: videoFileUrl ?? null,
+        EmergProtocolCreatedAt: serverTimestamp(),
+        EmergProtocolModifiedAt: serverTimestamp(),
+      };
+
+      await setDoc(emergProtocolRef, newEmergProtocol);
+    } catch (error) {
+      console.log(error);
+      if (videoFileUrl) {
+        await CloudStorageFileHandler.deleteFileByUrl(videoFileUrl);
+      }
+      throw error;
+    }
+  };
+
+  static getEmergProtocols = ({
+    lmt,
+    lastDoc,
+    searchQuery,
+    cmpId,
+  }: {
+    lmt?: number;
+    lastDoc?: DocumentData | null;
+    searchQuery?: string;
+    cmpId: string;
+  }) => {
+    const emergProtocolsRef = collection(db, CollectionName.emergencyProtocols);
+
+    let queryParams: QueryConstraint[] = [
+      where('EmergProtocolCompanyId', '==', cmpId),
+      orderBy('EmergProtocolCreatedAt', 'desc'),
+    ];
+
+    if (searchQuery && searchQuery.length > 0) {
+      queryParams = [
+        ...queryParams,
+        where(
+          'EmergProtocolTitleSearchIndex',
+          'array-contains',
+          searchQuery.toLocaleLowerCase()
+        ),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const emergProtocolsQuery = query(emergProtocolsRef, ...queryParams);
+
+    return getDocs(emergProtocolsQuery);
   };
 }
 

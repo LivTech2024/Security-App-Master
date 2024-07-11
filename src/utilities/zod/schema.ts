@@ -544,3 +544,13 @@ export const trainCertsAllocSchema = z.object({
 });
 
 export type TrainCertsAllocFormFields = z.infer<typeof trainCertsAllocSchema>;
+
+//*Emergency Protocol create schema
+export const emergProtocolCreateSchema = z.object({
+  EmergProtocolTitle: z.string().min(3),
+  EmergProtocolDescription: z.string().min(1),
+});
+
+export type EmergProtocolCreateFormFields = z.infer<
+  typeof emergProtocolCreateSchema
+>;
