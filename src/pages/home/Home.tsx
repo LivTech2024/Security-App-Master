@@ -164,7 +164,7 @@ const Home = () => {
           icon={<IoMdDocument className="text-3xl text-primaryGold" />}
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.EMERGENCY_RESPONSE_LIST}
           name="Emergency response"
           icon={<MdEmergencyShare className="text-2xl text-primaryGold" />}
         />

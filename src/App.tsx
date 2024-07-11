@@ -81,6 +81,7 @@ import CompanyList from './pages/super_admin/CompanyList';
 import TrainCertsList from './pages/training_and_certification/TrainCertsList';
 import TrainCertsView from './pages/training_and_certification/TrainCertsView';
 import TrainCertsCreateOrEdit from './pages/training_and_certification/TrainCertsCreateOrEdit';
+import EmergResList from './pages/emergency_response/EmergResList';
 
 function App() {
   useOnAuthStateChanged();
@@ -367,8 +368,12 @@ function App() {
             />
 
             <Route path={PageRoutes.CALL_OUT_LIST} Component={CalloutList} />
-
             <Route path={PageRoutes.CALL_OUT_VIEW} Component={CalloutView} />
+
+            <Route
+              path={PageRoutes.EMERGENCY_RESPONSE_LIST}
+              Component={EmergResList}
+            />
 
             <Route path={PageRoutes.HRM_HOME} Component={HrmHome} />
           </Routes>
