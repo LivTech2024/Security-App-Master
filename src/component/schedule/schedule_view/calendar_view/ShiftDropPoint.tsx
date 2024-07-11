@@ -279,7 +279,7 @@ const ShiftDropPoint = ({
                             >
                               <img
                                 src={
-                                  data.employee[0].EmployeeImg ??
+                                  data.employee[0].EmployeeImg ||
                                   empDefaultPlaceHolder
                                 }
                                 alt=""

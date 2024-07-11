@@ -199,7 +199,7 @@ const EmployeeList = () => {
                 >
                   <td className="px-4 py-2 text-start">
                     <img
-                      src={emp.EmployeeImg ?? empDefaultPlaceHolder}
+                      src={emp.EmployeeImg || empDefaultPlaceHolder}
                       alt=""
                       className="rounded-full object-cover w-14 h-14"
                     />
