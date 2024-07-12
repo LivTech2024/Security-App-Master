@@ -4,7 +4,6 @@ import {
   IShiftsCollection,
 } from '../../@types/database';
 import { formatDate } from '../../utilities/misc';
-import EmpRouteModal from './modal/EmpRouteModal';
 import { errorHandler } from '../../utilities/CustomError';
 import {
   closeModalLoader,
@@ -14,6 +13,8 @@ import {
 import DbShift from '../../firebase_configs/DB/DbShift';
 import { RxUpdate } from 'react-icons/rx';
 import UpdateShiftTimeModal from './modal/UpdateShiftTimeModal';
+import { useNavigate } from 'react-router-dom';
+import { PageRoutes } from '../../@types/enum';
 
 const ShiftViewCard = ({
   data,
@@ -28,10 +29,6 @@ const ShiftViewCard = ({
   empRoutes: IEmployeeRouteCollection[];
   setShouldRefetch: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const [empRouteModal, setEmpRouteModal] = useState(false);
-
-  const [empRouteId, setEmpRouteId] = useState('');
-
   const markShiftEnded = async (empId: string) => {
     try {
       showModalLoader({});
@@ -59,6 +56,8 @@ const ShiftViewCard = ({
     empId: string;
     field: 'start_time' | 'end_time';
   }>({ empId: '', field: 'start_time' });
+
+  const navigate = useNavigate();
 
   return (
     <div className="bg-surface shadow-md rounded-lg p-4">
@@ -393,10 +392,12 @@ const ShiftViewCard = ({
                 return (
                   <div key={res.EmpId} className="flex flex-col">
                     <div
-                      onClick={() => {
-                        setEmpRouteId(empRoute.EmpRouteId);
-                        setEmpRouteModal(true);
-                      }}
+                      onClick={() =>
+                        navigate(
+                          PageRoutes.EMPLOYEE_ROUTE +
+                            `?id=${empRoute.EmpRouteId}&is_mobile_guard=${data.ShiftClientId ? false : true}`
+                        )
+                      }
                       className="text-textPrimaryBlue cursor-pointer underline"
                     >
                       {res.EmpName}
@@ -407,12 +408,6 @@ const ShiftViewCard = ({
           </div>
         </div>
       ) : null}
-
-      <EmpRouteModal
-        empRouteId={empRouteId}
-        opened={empRouteModal}
-        setOpened={setEmpRouteModal}
-      />
     </div>
   );
 };

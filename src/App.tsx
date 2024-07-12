@@ -82,6 +82,7 @@ import TrainCertsList from './pages/training_and_certification/TrainCertsList';
 import TrainCertsView from './pages/training_and_certification/TrainCertsView';
 import TrainCertsCreateOrEdit from './pages/training_and_certification/TrainCertsCreateOrEdit';
 import EmergResList from './pages/emergency_response/EmergResList';
+import EmployeeRoute from './pages/employee/EmployeeRoute';
 
 function App() {
   useOnAuthStateChanged();
@@ -259,6 +260,7 @@ function App() {
               Component={EmployeeCreateOrEdit}
             />
 
+            <Route path={PageRoutes.EMPLOYEE_ROUTE} Component={EmployeeRoute} />
             <Route path={PageRoutes.EMPLOYEE_DAR_LIST} Component={EmpDarList} />
             <Route path={PageRoutes.EMPLOYEE_DAR_VIEW} Component={EmpDarView} />
 

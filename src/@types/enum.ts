@@ -140,6 +140,7 @@ export const PageRoutes = {
   SHIFT_LIST: '/shift_list',
   SHIFT_VIEW: '/shift_view',
   SHIFT_CREATE_OR_EDIT: '/shift_create_or_edit',
+  EMPLOYEE_ROUTE: '/employee_route',
   EMPLOYEE_LIST: '/employee_list',
   EMPLOYEE_CREATE_OR_EDIT: '/employee_create_or_edit',
   EMPLOYEE_DAR_LIST: '/employee_dar_list',
