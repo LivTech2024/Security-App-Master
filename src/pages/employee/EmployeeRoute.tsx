@@ -90,7 +90,7 @@ const EmployeeRoute = () => {
               <Marker
                 position={coordinates[0]}
                 icon={{
-                  url: '../../../public/assets/start_point.png', // Replace with the URL for your home icon
+                  url: 'https://firebasestorage.googleapis.com/v0/b/livtech-dbcf2.appspot.com/o/admin_portal_assets%2Fstart_point.png?alt=media&token=e0f86db9-76bd-412b-adf2-5e019d583611', // Replace with the URL for your home icon
                   scaledSize: new window.google.maps.Size(40, 40), // Adjust the size as needed
                 }}
               />
@@ -98,8 +98,8 @@ const EmployeeRoute = () => {
                 position={coordinates[coordinates.length - 1]}
                 icon={{
                   url: isMobileGuard
-                    ? '../../../public/assets/car.png'
-                    : '../../../public/assets/guard.png',
+                    ? 'https://firebasestorage.googleapis.com/v0/b/livtech-dbcf2.appspot.com/o/admin_portal_assets%2Fcar.png?alt=media&token=199f4374-0a4b-45a5-a51d-a72cfc72c2e0'
+                    : 'https://firebasestorage.googleapis.com/v0/b/livtech-dbcf2.appspot.com/o/admin_portal_assets%2Fguard.png?alt=media&token=d8890536-9c2a-40e8-8d93-9a1a10dd682c',
                   scaledSize: new window.google.maps.Size(40, 40), // Adjust the size as needed
                 }}
               />
