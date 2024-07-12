@@ -3,7 +3,7 @@ import {
   IEmployeeRouteCollection,
   IShiftsCollection,
 } from '../../@types/database';
-import { formatDate, toDate } from '../../utilities/misc';
+import { formatDate } from '../../utilities/misc';
 import EmpRouteModal from './modal/EmpRouteModal';
 import { errorHandler } from '../../utilities/CustomError';
 import {
@@ -30,9 +30,7 @@ const ShiftViewCard = ({
 }) => {
   const [empRouteModal, setEmpRouteModal] = useState(false);
 
-  const [coordinates, setCoordinates] = useState<
-    { lat: number; lng: number }[]
-  >([]);
+  const [empRouteId, setEmpRouteId] = useState('');
 
   const markShiftEnded = async (empId: string) => {
     try {
@@ -61,8 +59,6 @@ const ShiftViewCard = ({
     empId: string;
     field: 'start_time' | 'end_time';
   }>({ empId: '', field: 'start_time' });
-
-  console.log(coordinates, 'here');
 
   return (
     <div className="bg-surface shadow-md rounded-lg p-4">
@@ -398,25 +394,7 @@ const ShiftViewCard = ({
                   <div key={res.EmpId} className="flex flex-col">
                     <div
                       onClick={() => {
-                        const sortedCoords = empRoute.EmpRouteLocations.sort(
-                          (a, b) =>
-                            toDate(a.LocationReportedAt).getTime() -
-                            toDate(b.LocationReportedAt).getTime()
-                        );
-                        setCoordinates([
-                          {
-                            lat: sortedCoords[0].LocationCoordinates.latitude,
-                            lng: sortedCoords[0].LocationCoordinates.longitude,
-                          },
-                          {
-                            lat: sortedCoords[
-                              empRoute.EmpRouteLocations.length - 1
-                            ].LocationCoordinates.latitude,
-                            lng: sortedCoords[
-                              empRoute.EmpRouteLocations.length - 1
-                            ].LocationCoordinates.longitude,
-                          },
-                        ]);
+                        setEmpRouteId(empRoute.EmpRouteId);
                         setEmpRouteModal(true);
                       }}
                       className="text-textPrimaryBlue cursor-pointer underline"
@@ -431,7 +409,7 @@ const ShiftViewCard = ({
       ) : null}
 
       <EmpRouteModal
-        coordinates={coordinates}
+        empRouteId={empRouteId}
         opened={empRouteModal}
         setOpened={setEmpRouteModal}
       />
