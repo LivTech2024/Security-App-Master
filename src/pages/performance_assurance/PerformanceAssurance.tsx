@@ -26,6 +26,7 @@ import { useInView } from 'react-intersection-observer';
 import NoSearchResult from '../../common/NoSearchResult';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import { IoArrowBackCircle } from 'react-icons/io5';
+import { getShiftActualHours } from '../../utilities/scheduleHelper';
 
 const PerformanceAssurance = () => {
   const { company } = useAuthState();
@@ -191,16 +192,18 @@ const PerformanceAssurance = () => {
     fetchEmpReport();
   }, [selectedEmpId, startDate, endDate]);
 
+  const { settings } = useAuthState();
+
   const totalSpentHrsOnShift = () => {
     if (!selectedEmpId || empShifts.length === 0) return 0;
 
     return empShifts.reduce((acc, obj) => {
-      return (
-        acc +
-        (obj.ShiftCurrentStatus.find(
-          (status) => status.StatusReportedById === selectedEmpId
-        )?.StatusShiftTotalHrs || 0)
-      );
+      const { actualShiftHrsSpent } = getShiftActualHours({
+        shift: obj,
+        empId: selectedEmpId,
+        timeMarginInMins: settings?.SettingEmpShiftTimeMarginInMins || 0,
+      });
+      return acc + actualShiftHrsSpent;
     }, 0);
   };
 
