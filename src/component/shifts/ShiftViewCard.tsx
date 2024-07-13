@@ -15,6 +15,7 @@ import { RxUpdate } from 'react-icons/rx';
 import UpdateShiftTimeModal from './modal/UpdateShiftTimeModal';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../@types/enum';
+import { openContextModal } from '@mantine/modals';
 
 const ShiftViewCard = ({
   data,
@@ -174,10 +175,27 @@ const ShiftViewCard = ({
                       </div>
                     ) : (
                       <div
-                        onClick={() =>
-                          data.StatusReportedById &&
-                          markShiftEnded(data.StatusReportedById)
-                        }
+                        onClick={() => {
+                          openContextModal({
+                            modal: 'confirmModal',
+                            withCloseButton: false,
+                            centered: true,
+                            closeOnClickOutside: true,
+                            innerProps: {
+                              title: 'Confirm',
+                              body: 'Are you sure to mark this shift ended',
+                              onConfirm: () => {
+                                if (data.StatusReportedById) {
+                                  markShiftEnded(data.StatusReportedById);
+                                }
+                              },
+                            },
+                            size: '30%',
+                            styles: {
+                              body: { padding: '0px' },
+                            },
+                          });
+                        }}
                         className="flex items-center gap-2 text-textPrimaryBlue cursor-pointer underline"
                       >
                         Mark this shift ended
