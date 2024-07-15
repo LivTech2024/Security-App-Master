@@ -394,6 +394,7 @@ const LocationCreateOrEdit = () => {
               onChange={(e) =>
                 methods.setValue('LocationClientId', e as string)
               }
+              clearable
               searchable
               searchValue={clientSearchQuery}
               onSearchChange={setClientSearchQuery}
