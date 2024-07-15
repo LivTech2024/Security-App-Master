@@ -397,7 +397,7 @@ const EmployeeCreateOrEdit = () => {
                 decimalCount={2}
               />
 
-              {employeeRole === 'GUARD' && (
+              {employeeRole !== 'SUPERVISOR' && (
                 <div className="flex flex-col gap-1 col-span-2">
                   <InputHeader title="Supervisor" />
                   <MultiSelect
