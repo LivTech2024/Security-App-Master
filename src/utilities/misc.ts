@@ -237,3 +237,14 @@ export function findRemovedElements<T>(oldArray: T[], newArray: T[]): T[] {
   const removedElements = oldArray.filter((element) => !newSet.has(element));
   return removedElements;
 }
+
+export const reorderArray = (
+  list: any[],
+  startIndex: number,
+  endIndex: number
+) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+};

@@ -1,25 +1,24 @@
-import { TagsInput } from '@mantine/core';
+import { rem, TagsInput } from '@mantine/core';
 import Button from '../../common/button/Button';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
-
 import InputSelect from '../../common/inputs/InputSelect';
 import { MdClose } from 'react-icons/md';
+import cx from 'clsx';
+import { VscGripper } from 'react-icons/vsc';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import classes from '../../DndListHandle.module.css';
+import { reorderArray } from '../../utilities/misc';
+
+interface CheckpointList {
+  checkPointId: string | null;
+  checkPointName: string;
+  checkPointCategory: string | null;
+  checkPointHint: string | null;
+}
 
 interface CheckPointInputProps {
-  checkpoints: {
-    checkPointId: string | null;
-    checkPointName: string;
-    checkPointCategory: string | null;
-    checkPointHint: string | null;
-  }[];
-  setCheckpoints: (
-    checkpoints: {
-      checkPointId: string | null;
-      checkPointName: string;
-      checkPointCategory: string | null;
-      checkPointHint: string | null;
-    }[]
-  ) => void;
+  checkpoints: CheckpointList[];
+  setCheckpoints: (checkpoints: CheckpointList[]) => void;
   checkpointCategories: string[];
   setCheckpointCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
@@ -57,6 +56,74 @@ const CheckpointForm = ({
     setCheckpoints(updatedCheckpoints);
   };
 
+  console.log(checkpoints, 'here');
+
+  const items = checkpoints.map((item, index) => (
+    <Draggable
+      key={item.checkPointId || index}
+      index={index}
+      draggableId={item.checkPointId || String(index)}
+    >
+      {(provided, snapshot) => (
+        <div
+          className={`${cx(classes.item, {
+            [classes.itemDragging]: snapshot.isDragging,
+          })} pl-0 pr-1 w-full`}
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+        >
+          <div key={index} className="flex items-center space-x-4 w-full">
+            <div {...provided.dragHandleProps} className={classes.dragHandle}>
+              <VscGripper
+                style={{ width: rem(18), height: rem(18) }}
+                stroke="1.5"
+              />
+            </div>
+            {checkpoints.length > 1 && (
+              <div className="bg-onHoverBg rounded-full p-2">
+                <MdClose
+                  className="text-textPrimaryRed text-xl cursor-pointer"
+                  onClick={() => handleRemoveCheckpoint(index)}
+                />
+              </div>
+            )}
+            <div className="flex items-center gap-4">
+              <InputWithTopHeader
+                className={`mx-0 ${
+                  checkpointCategories.length === 0 && 'w-full'
+                }`}
+                placeholder="Checkpoint Name"
+                value={item.checkPointName}
+                onChange={(e) =>
+                  handleChange(index, 'checkPointName', e.target.value)
+                }
+              />
+              <InputWithTopHeader
+                className={`mx-0 `}
+                placeholder="Hint"
+                value={item.checkPointHint || ''}
+                onChange={(e) =>
+                  handleChange(index, 'checkPointHint', e.target.value)
+                }
+              />
+              {checkpointCategories.length > 0 && (
+                <InputSelect
+                  placeholder="Select category"
+                  data={checkpointCategories}
+                  value={item.checkPointCategory || ''}
+                  className="w-full"
+                  onChange={(e) =>
+                    handleChange(index, 'checkPointCategory', e as string)
+                  }
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </Draggable>
+  ));
+
   return (
     <div className="flex flex-col gap-4">
       <TagsInput
@@ -77,51 +144,35 @@ const CheckpointForm = ({
           },
         }}
       />
-      <div className="grid grid-cols-2 gap-4">
-        {checkpoints.map((checkpoint, index) => (
-          <div key={index} className="flex items-center space-x-4">
-            {checkpoints.length > 1 && (
-              <div className="bg-onHoverBg rounded-full p-2">
-                <MdClose
-                  className="text-textPrimaryRed text-xl cursor-pointer"
-                  onClick={() => handleRemoveCheckpoint(index)}
-                />
-              </div>
-            )}
-            <div className="flex items-center gap-4">
-              <InputWithTopHeader
-                className={`mx-0 ${
-                  checkpointCategories.length === 0 && 'w-full'
-                }`}
-                placeholder="Checkpoint Name"
-                value={checkpoint.checkPointName}
-                onChange={(e) =>
-                  handleChange(index, 'checkPointName', e.target.value)
-                }
-              />
-              <InputWithTopHeader
-                className={`mx-0 `}
-                placeholder="Hint"
-                value={checkpoint.checkPointHint || ''}
-                onChange={(e) =>
-                  handleChange(index, 'checkPointHint', e.target.value)
-                }
-              />
-              {checkpointCategories.length > 0 && (
-                <InputSelect
-                  placeholder="Select category"
-                  data={checkpointCategories}
-                  value={checkpoint.checkPointCategory || ''}
-                  className="w-full"
-                  onChange={(e) =>
-                    handleChange(index, 'checkPointCategory', e as string)
-                  }
-                />
-              )}
+
+      <DragDropContext
+        onDragEnd={({ destination, source }) => {
+          const updatedCheckPoints = reorderArray(
+            checkpoints,
+            source.index,
+            destination?.index || 0
+          );
+          setCheckpoints(updatedCheckPoints);
+        }}
+      >
+        <Droppable
+          droppableId="dnd-list"
+          direction="vertical"
+          ignoreContainerClipping={true}
+        >
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="grid grid-cols-2 gap-4 col-span-2"
+            >
+              {items}
+              {provided.placeholder}
             </div>
-          </div>
-        ))}
-      </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+
       <Button
         type="green"
         className="px-6 py-[6px] text-base w-fit"
