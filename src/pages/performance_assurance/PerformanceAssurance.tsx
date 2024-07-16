@@ -3,15 +3,13 @@ import PageHeader from '../../common/PageHeader';
 import dayjs from 'dayjs';
 import empDefaultPlaceHolder from '../../../public/assets/avatar.png';
 import { useAuthState } from '../../store';
-import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
 import {
   IEmployeesCollection,
   IPatrolLogsCollection,
   IShiftsCollection,
 } from '../../@types/database';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
-import { formatDate } from '../../utilities/misc';
-import { numberFormatter } from '../../utilities/NumberFormater';
+
 import {
   DisplayCount,
   MinimumQueryCharacter,
@@ -25,8 +23,15 @@ import SelectBranch from '../../common/SelectBranch';
 import { useInView } from 'react-intersection-observer';
 import NoSearchResult from '../../common/NoSearchResult';
 import TableShimmer from '../../common/shimmer/TableShimmer';
-import { IoArrowBackCircle } from 'react-icons/io5';
 import { getShiftActualHours } from '../../utilities/scheduleHelper';
+import DateFilterDropdown from '../../common/dropdown/DateFilterDropdown';
+import { numberFormatter } from '../../utilities/NumberFormater';
+
+interface IEmployeeListWithPerformance extends IEmployeesCollection {
+  TotalShifts: number;
+  TotalShiftHrsSpent: number;
+  TotalPatrol: number;
+}
 
 const PerformanceAssurance = () => {
   const { company } = useAuthState();
@@ -38,16 +43,6 @@ const PerformanceAssurance = () => {
   const [endDate, setEndDate] = useState<Date | string | null>(
     dayjs().endOf('M').toDate()
   );
-
-  const [selectedEmpId, setSelectedEmpId] = useState('');
-
-  const [empShifts, setEmpShifts] = useState<IShiftsCollection[]>([]);
-
-  const [empPatrolLogs, setEmpPatrolLogs] = useState<IPatrolLogsCollection[]>(
-    []
-  );
-
-  const [loading, setLoading] = useState(false);
 
   const [query, setQuery] = useState('');
 
@@ -69,23 +64,34 @@ const PerformanceAssurance = () => {
       debouncedQuery,
       company!.CompanyId,
       branch,
+      startDate,
+      endDate,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbEmployee.getEmployees({
-        lmt: DisplayCount.EMPLOYEE_LIST,
         lastDoc: pageParam,
         searchQuery: debouncedQuery,
         cmpId: company!.CompanyId,
         branch,
       });
-      return snapshot.docs;
+
+      const docData: IEmployeeListWithPerformance[] = [];
+
+      await Promise.all(
+        snapshot?.docs.map(async (doc) => {
+          const emp = doc.data() as IEmployeesCollection;
+          const empDataWithPerformance = await fetchEpmPerformance(emp);
+          docData.push(empDataWithPerformance);
+        })
+      );
+      return { docs: snapshot.docs, docData: docData };
     },
     getNextPageParam: (lastPage) => {
-      if (lastPage?.length === 0) {
+      if (lastPage.docs?.length === 0) {
         return null;
       }
-      if (lastPage?.length === DisplayCount.EMPLOYEE_LIST) {
-        return lastPage.at(-1);
+      if (lastPage.docs?.length === DisplayCount.EMPLOYEE_LIST) {
+        return lastPage.docs.at(-1);
       }
       return null;
     },
@@ -97,14 +103,23 @@ const PerformanceAssurance = () => {
         : true,
   });
 
-  const [data, setData] = useState<IEmployeesCollection[]>(() => {
+  const fetchDataFromSnapshot = () => {
     if (snapshotData) {
-      return snapshotData.pages.flatMap((page) =>
-        page.map((doc) => doc.data() as IEmployeesCollection)
-      );
+      const docData: IEmployeeListWithPerformance[] = [];
+      snapshotData.pages?.forEach((page) => {
+        page.docData?.forEach(async (data) => {
+          docData.push(data);
+        });
+      });
+      return docData;
     }
+
     return [];
-  });
+  };
+
+  const [data, setData] = useState<IEmployeeListWithPerformance[]>(() =>
+    fetchDataFromSnapshot()
+  );
 
   useEffect(() => {
     console.log(error, 'error');
@@ -112,16 +127,7 @@ const PerformanceAssurance = () => {
 
   // we are looping through the snapshot returned by react-query and converting them to data
   useEffect(() => {
-    if (snapshotData) {
-      const docData: IEmployeesCollection[] = [];
-      snapshotData.pages?.forEach((page) => {
-        page?.forEach((doc) => {
-          const data = doc.data() as IEmployeesCollection;
-          docData.push(data);
-        });
-      });
-      setData(docData);
-    }
+    setData(fetchDataFromSnapshot());
   }, [snapshotData]);
 
   // hook for pagination
@@ -134,73 +140,75 @@ const PerformanceAssurance = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
-  useEffect(() => {
-    const fetchEmpReport = async () => {
-      if (!company) return;
-
-      if (!selectedEmpId || !startDate || !endDate) {
-        setEmpShifts([]);
-        setEmpPatrolLogs([]);
-        return;
-      }
-      try {
-        setLoading(true);
-
-        setEmpPatrolLogs([]);
-        setEmpShifts([]);
-
-        //* Fetch all the shifts of employee
-        const shiftSnapshot = await DbEmployee.getEmpShifts({
-          companyId: company.CompanyId,
-          empId: selectedEmpId,
-          startDate,
-          endDate,
-        });
-
-        if (shiftSnapshot.size > 0) {
-          const shiftData = shiftSnapshot.docs.map(
-            (doc) => doc.data() as IShiftsCollection
-          );
-          setEmpShifts(shiftData);
-        } else {
-          setEmpShifts([]);
-        }
-
-        //*Fetch all the patrol logs of employee
-        const patrolLogSnapshot = await DbEmployee.getEmpPatrolLogs({
-          empId: selectedEmpId,
-          startDate,
-          endDate,
-        });
-
-        if (patrolLogSnapshot.size > 0) {
-          const patrolLogData = patrolLogSnapshot.docs.map(
-            (doc) => doc.data() as IPatrolLogsCollection
-          );
-          setEmpPatrolLogs(patrolLogData);
-        } else {
-          setEmpPatrolLogs([]);
-        }
-
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-        setLoading(false);
-      }
-    };
-
-    fetchEmpReport();
-  }, [selectedEmpId, startDate, endDate]);
-
   const { settings } = useAuthState();
 
-  const totalSpentHrsOnShift = () => {
-    if (!selectedEmpId || empShifts.length === 0) return 0;
+  const fetchEpmPerformance = async (emp: IEmployeesCollection) => {
+    let empWithPerformance: IEmployeeListWithPerformance = {
+      ...emp,
+      TotalPatrol: 0,
+      TotalShiftHrsSpent: 0,
+      TotalShifts: 0,
+    };
+    if (!company) return empWithPerformance;
+
+    const { EmployeeId } = emp;
+    try {
+      //* Fetch all the shifts of employee
+      const shiftSnapshot = await DbEmployee.getEmpShifts({
+        companyId: company.CompanyId,
+        empId: EmployeeId,
+        startDate,
+        endDate,
+      });
+
+      if (shiftSnapshot.size > 0) {
+        const shiftData = shiftSnapshot.docs.map(
+          (doc) => doc.data() as IShiftsCollection
+        );
+
+        const totalShiftHrs = totalSpentHrsOnShift(emp.EmployeeId, shiftData);
+
+        empWithPerformance = {
+          ...empWithPerformance,
+          TotalShiftHrsSpent: totalShiftHrs,
+          TotalShifts: shiftData.length,
+        };
+      }
+
+      //*Fetch all the patrol logs of employee
+      const patrolLogSnapshot = await DbEmployee.getEmpPatrolLogs({
+        empId: EmployeeId,
+        startDate,
+        endDate,
+      });
+
+      if (patrolLogSnapshot.size > 0) {
+        const patrolLogData = patrolLogSnapshot.docs.map(
+          (doc) => doc.data() as IPatrolLogsCollection
+        );
+        empWithPerformance = {
+          ...empWithPerformance,
+          TotalPatrol: patrolLogData.length,
+        };
+      }
+
+      return empWithPerformance;
+    } catch (error) {
+      console.log(error);
+      return empWithPerformance;
+    }
+  };
+
+  const totalSpentHrsOnShift = (
+    empId: string,
+    empShifts: IShiftsCollection[]
+  ) => {
+    if (empShifts.length === 0) return 0;
 
     return empShifts.reduce((acc, obj) => {
       const { actualShiftHrsSpent } = getShiftActualHours({
         shift: obj,
-        empId: selectedEmpId,
+        empId,
         timeMarginInMins: settings?.SettingEmpShiftTimeMarginInMins || 0,
       });
       return acc + actualShiftHrsSpent;
@@ -216,38 +224,49 @@ const PerformanceAssurance = () => {
           setValue={setQuery}
           placeholder="Search employee"
         />
-        <SelectBranch selectedBranch={branch} setSelectedBranch={setBranch} />
+        <div className="flex items-center gap-4 w-full justify-end">
+          <DateFilterDropdown
+            endDate={endDate}
+            setEndDate={setEndDate}
+            setStartDate={setStartDate}
+            startDate={startDate}
+          />
+          <SelectBranch selectedBranch={branch} setSelectedBranch={setBranch} />
+        </div>
       </div>
-      {!selectedEmpId ? (
-        <table className="rounded overflow-hidden w-full">
-          <thead className="bg-primary text-surface text-sm">
+      <table className="rounded overflow-hidden w-full">
+        <thead className="bg-primary text-surface text-sm">
+          <tr>
+            <th className="uppercase px-4 py-2 w-[10%] text-start">Image</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">Name</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">Email</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">
+              Total Shifts
+            </th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">
+              Total Shift Hours
+            </th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">
+              Total Patrols
+            </th>
+            {(!query || query.length === 0) && (
+              <th className="uppercase px-4 py-2 w-[10%] text-end">Rank</th>
+            )}
+          </tr>
+        </thead>
+        <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
+          {data.length === 0 && !isLoading ? (
             <tr>
-              <th className="uppercase px-4 py-2 w-[10%] text-start">Image</th>
-              <th className="uppercase px-4 py-2 w-[15%] text-center">Name</th>
-              <th className="uppercase px-4 py-2 w-[20%] text-center">Email</th>
-              <th className="uppercase px-4 py-2 w-[20%] text-center">
-                PHONE NUMBER
-              </th>
-              <th className="uppercase px-4 py-2 w-[20%] text-center">Role</th>
+              <td colSpan={7}>
+                <NoSearchResult text="No employee" />
+              </td>
             </tr>
-          </thead>
-          <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
-            {data.length === 0 && !isLoading ? (
-              <tr>
-                <td colSpan={5}>
-                  <NoSearchResult text="No employee" />
-                </td>
-              </tr>
-            ) : (
-              data.map((emp) => {
+          ) : (
+            data
+              .sort((a, b) => (b?.TotalShifts || 0) - (a?.TotalShifts || 0))
+              .map((emp, idx) => {
                 return (
-                  <tr
-                    key={emp.EmployeeId}
-                    onClick={() => {
-                      setSelectedEmpId(emp.EmployeeId);
-                    }}
-                    className="cursor-pointer"
-                  >
+                  <tr key={emp.EmployeeId}>
                     <td className="px-4 py-2 text-start">
                       <img
                         src={emp.EmployeeImg ?? empDefaultPlaceHolder}
@@ -255,83 +274,39 @@ const PerformanceAssurance = () => {
                         className="rounded-full object-cover w-14 h-14"
                       />
                     </td>
-                    <td className="px-4 py-2 text-center">
-                      {emp.EmployeeName}
-                    </td>
-                    <td className="px-4 py-2 text-center">
+                    <td className="px-4 py-2 text-start">{emp.EmployeeName}</td>
+                    <td className="px-4 py-2 text-start">
                       {emp.EmployeeEmail}
                     </td>
-                    <td className="px-4 py-2 text-center">
-                      {emp.EmployeePhone}
+
+                    <td className="px-4 py-2 text-end">
+                      {numberFormatter(emp.TotalShifts, false, 1)}
                     </td>
-                    <td className="px-4 py-2 text-center capitalize">
-                      {emp.EmployeeRole}
+                    <td className="px-4 py-2 text-end">
+                      {numberFormatter(emp.TotalShiftHrsSpent)}
                     </td>
+                    <td className="px-4 py-2 text-end capitalize">
+                      {numberFormatter(emp.TotalPatrol, false, 1)}
+                    </td>
+                    {(!query || query.length === 0) && (
+                      <td className="px-4 py-2 text-end capitalize">
+                        #{idx + 1}
+                      </td>
+                    )}
                   </tr>
                 );
               })
-            )}
-            <tr ref={ref}>
-              <td colSpan={5}>
-                {(isLoading || isFetchingNextPage) &&
-                  Array.from({ length: 10 }).map((_, idx) => (
-                    <TableShimmer key={idx} />
-                  ))}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      ) : loading ? (
-        <div className="h-[400px] bg-shimmerColor animate-pulse"></div>
-      ) : (
-        <div className="flex flex-col w-full gap-6 p-4 rounded bg-surface shadow">
-          <div className="flex items-center gap-4">
-            <div
-              onClick={() => setSelectedEmpId('')}
-              className="cursor-pointer"
-            >
-              <IoArrowBackCircle className="h-6 w-6" />
-            </div>
-            <DateFilterDropdown
-              endDate={endDate}
-              setEndDate={setEndDate}
-              setStartDate={setStartDate}
-              startDate={startDate}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-4">
-              <p className="font-semibold flex gap-2">Start Date:</p>
-              <p>{formatDate(startDate)}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <p className="font-semibold flex gap-2">End Date:</p>
-              <p>{formatDate(endDate)}</p>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <p className="font-semibold flex gap-2">
-                No of shifts completed:
-              </p>
-              <p>{empShifts.length}</p>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <p className="font-semibold flex gap-2">
-                No of patrol completed:
-              </p>
-              <p>{empPatrolLogs.length}</p>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <p className="font-semibold flex gap-2">
-                Total hours spent on shifts
-              </p>
-              <p>{numberFormatter(totalSpentHrsOnShift())}</p>
-            </div>
-          </div>
-        </div>
-      )}
+          )}
+          <tr ref={ref}>
+            <td colSpan={7}>
+              {(isLoading || isFetchingNextPage) &&
+                Array.from({ length: 10 }).map((_, idx) => (
+                  <TableShimmer key={idx} />
+                ))}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };
