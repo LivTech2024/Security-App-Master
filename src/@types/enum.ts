@@ -232,3 +232,12 @@ export enum ScheduleView {
   BY_EMPLOYEE_VIEW = 'by_employee_view',
   STATISTICS_VIEW = 'statistics_view',
 }
+
+export enum PerformanceSortType {
+  OVERALL = 'overall',
+  SHIFT = 'shift',
+  PATROL = 'patrol',
+  SHIFT_HRS = 'shift_hrs',
+  DARS = 'dars',
+  REPORTS = 'reports',
+}

@@ -851,6 +851,44 @@ class DbEmployee {
 
     return getDocs(patrolLogQuery);
   };
+
+  static getEmpReports = ({
+    companyId,
+    empId,
+    endDate,
+    startDate,
+    lastDoc,
+    lmt,
+  }: {
+    empId: string;
+    companyId: string;
+    startDate: Date | string | null;
+    endDate: Date | string | null;
+    lastDoc?: DocumentData | null;
+    lmt?: number | null;
+  }) => {
+    const reportRef = collection(db, CollectionName.reports);
+
+    let queryParams: QueryConstraint[] = [
+      where('ReportCompanyId', '==', companyId),
+      where('ReportEmployeeId', '==', empId),
+      where('ReportCreatedAt', '>=', dayjs(startDate).startOf('day').toDate()),
+      where('ReportCreatedAt', '<=', dayjs(endDate).endOf('day').toDate()),
+      orderBy('ReportCreatedAt', 'desc'),
+    ];
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const reportQuery = query(reportRef, ...queryParams);
+
+    return getDocs(reportQuery);
+  };
 }
 
 export default DbEmployee;
