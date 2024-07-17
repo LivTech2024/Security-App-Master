@@ -73,6 +73,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
       );
       return data;
     },
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
