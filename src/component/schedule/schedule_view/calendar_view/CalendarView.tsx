@@ -447,6 +447,10 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     }
   }, [searchQuery, empAvailableForShift]);
 
+  //*Copy single shift
+
+  const [copiedShifts, setCopiedShifts] = useState<IShiftsCollection[]>([]);
+
   return (
     <>
       <DndProvider backend={HTML5Backend}>
@@ -532,6 +536,8 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                     setSelectedSchedule={setSelectedSchedule}
                     shiftToBeDeleted={shiftToBeDeleted}
                     isLoading={isLoading}
+                    copiedShifts={copiedShifts}
+                    setCopiedShifts={setCopiedShifts}
                   />
                 );
               })}

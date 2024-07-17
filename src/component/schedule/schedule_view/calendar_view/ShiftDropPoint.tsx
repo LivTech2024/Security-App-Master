@@ -1,7 +1,12 @@
 import dayjs from 'dayjs';
 import Button from '../../../../common/button/Button';
 import { DropPoint } from '../../../../utilities/DragAndDropHelper';
-import { formatDate, toDate } from '../../../../utilities/misc';
+import {
+  formatDate,
+  getRandomNumbers,
+  removeTimeFromDate,
+  toDate,
+} from '../../../../utilities/misc';
 import DbSchedule, {
   ISchedule,
 } from '../../../../firebase_configs/DB/DbSchedule';
@@ -9,12 +14,20 @@ import { getColorAccToShiftStatus } from '../../../../utilities/scheduleHelper';
 import { useAuthState } from '../../../../store';
 import { FaRegTrashAlt, FaUndo } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { PageRoutes, REACT_QUERY_KEYS } from '../../../../@types/enum';
+import {
+  CollectionName,
+  PageRoutes,
+  REACT_QUERY_KEYS,
+} from '../../../../@types/enum';
 import { Tooltip } from '@mantine/core';
 import { AiOutlineClose } from 'react-icons/ai';
 import empDefaultPlaceHolder from '../../../../../public/assets/avatar.png';
 import { openContextModal } from '@mantine/modals';
-import { IEmployeesCollection } from '../../../../@types/database';
+import {
+  IEmployeesCollection,
+  IShiftsCollection,
+  IShiftTasksChild,
+} from '../../../../@types/database';
 import {
   closeModalLoader,
   showModalLoader,
@@ -23,6 +36,10 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { errorHandler } from '../../../../utilities/CustomError';
 import { useEffect, useState } from 'react';
+import { MdContentCopy, MdContentPaste } from 'react-icons/md';
+import { getNewDocId } from '../../../../firebase_configs/DB/utils';
+import { db } from '../../../../firebase_configs/config';
+import { doc, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore';
 
 interface ShiftDropPointProps {
   index: number;
@@ -37,6 +54,8 @@ interface ShiftDropPointProps {
   onDeleteClick: (shiftId: string) => void;
   onUndo: (shiftId?: string, empId?: string) => void;
   isLoading: boolean;
+  copiedShifts: IShiftsCollection[];
+  setCopiedShifts: React.Dispatch<React.SetStateAction<IShiftsCollection[]>>;
 }
 
 const ShiftDropPoint = ({
@@ -52,6 +71,8 @@ const ShiftDropPoint = ({
   onDeleteClick,
   onUndo,
   isLoading,
+  copiedShifts,
+  setCopiedShifts,
 }: ShiftDropPointProps) => {
   const { settings } = useAuthState();
 
@@ -136,6 +157,77 @@ const ShiftDropPoint = ({
     }
   };
 
+  const handleCopyClicked = (shift: IShiftsCollection) => {
+    if (copiedShifts.find((prev) => prev.ShiftId === shift.ShiftId)) {
+      setCopiedShifts((prev) =>
+        prev.filter((s) => s.ShiftId !== shift.ShiftId)
+      );
+    } else {
+      setCopiedShifts((prev) => [...prev, shift]);
+    }
+  };
+
+  const handlePasteClicked = async (date: Date) => {
+    if (!copiedShifts || copiedShifts.length === 0 || !date) return;
+    try {
+      setLoading(true);
+
+      const shiftCreatePromise = copiedShifts.map(async (data) => {
+        const { ShiftTask } = data;
+
+        const shiftId = getNewDocId(CollectionName.shifts);
+        const shiftDocRef = doc(db, CollectionName.shifts, shiftId);
+        const shiftTasks: IShiftTasksChild[] = [];
+
+        ShiftTask.map((task, idx) => {
+          if (task.ShiftTask && task.ShiftTask.length > 0) {
+            const random = getRandomNumbers();
+            const shiftTaskId = `${shiftId}${random}${idx}`;
+
+            shiftTasks.push({
+              ShiftTaskId: shiftTaskId,
+              ShiftTask: task.ShiftTask,
+              ShiftTaskQrCodeReq: task.ShiftTaskQrCodeReq,
+              ShiftTaskReturnReq: task.ShiftTaskReturnReq,
+              ShiftTaskStatus: [],
+              ShiftReturnTaskStatus: [],
+            });
+          }
+        });
+
+        const newShiftDate = removeTimeFromDate(date) as unknown as Timestamp;
+
+        const newShiftData: IShiftsCollection = {
+          ...data,
+          ShiftId: shiftId,
+          ShiftAcknowledgedByEmpId: [],
+          ShiftAssignedUserId: [],
+          ShiftCurrentStatus: [],
+          ShiftGuardWellnessReport: [],
+          ShiftDate: newShiftDate,
+          ShiftTask: shiftTasks,
+          ShiftCreatedAt: serverTimestamp(),
+          ShiftModifiedAt: serverTimestamp(),
+        };
+
+        await setDoc(shiftDocRef, newShiftData);
+      });
+
+      await Promise.all(shiftCreatePromise);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.SCHEDULES],
+      });
+
+      setCopiedShifts([]);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      errorHandler(error);
+    }
+  };
+
   useEffect(() => {
     if (loading) {
       showModalLoader({});
@@ -144,6 +236,7 @@ const ShiftDropPoint = ({
     }
     return () => closeModalLoader();
   }, [loading]);
+
   return (
     <div
       key={index}
@@ -201,13 +294,18 @@ const ShiftDropPoint = ({
                 }`}
               >
                 <div
-                  className={`h-[30px] bg-[#5e5c5c34] border-b border-inputBorder py-1 text-sm font-semibold  px-2 flex ${data.employee.length === 0 ? 'justify-between' : 'justify-center'}`}
+                  className={`h-[30px] bg-[#5e5c5c34] border-b border-inputBorder py-1 text-sm font-semibold  px-2 flex justify-between`}
                 >
-                  {data.employee.length === 0 && <span>&nbsp;</span>}
+                  <span
+                    onClick={() => handleCopyClicked(data.shift)}
+                    className={`${copiedShifts.find((prev) => prev.ShiftId === data.shift.ShiftId) ? 'text-textSecondary' : 'text-textPrimaryBlue'}  cursor-pointer pt-1`}
+                  >
+                    <MdContentCopy />
+                  </span>
                   <span className="line-clamp-1 text-center ">
                     {data.shift.ShiftName}
                   </span>
-                  {data.employee.length === 0 && (
+                  {data.employee.length === 0 ? (
                     <span className="">
                       <FaRegTrashAlt
                         onClick={(e) => {
@@ -223,6 +321,8 @@ const ShiftDropPoint = ({
                         className="text-lg font-semibold text-textPrimaryRed ml-1 cursor-pointer"
                       />
                     </span>
+                  ) : (
+                    <span>&nbsp;</span>
                   )}
                 </div>
                 <div className="bg-[#5e5c5c23] p-2 rounded  min-w-full items-center text-sm">
@@ -317,6 +417,35 @@ const ShiftDropPoint = ({
       ) : (
         <div className="flex flex-col">
           <div className="h-[40px] "></div>
+        </div>
+      )}
+      {copiedShifts.length > 0 && (
+        <div
+          onClick={() =>
+            openContextModal({
+              modal: 'confirmModal',
+              withCloseButton: false,
+              centered: true,
+              closeOnClickOutside: true,
+              innerProps: {
+                title: 'Confirm',
+                body: `Are you sure to paste copied shifts to ${formatDate(date)}`,
+                onConfirm: () => {
+                  handlePasteClicked(date);
+                },
+              },
+              size: '30%',
+              styles: {
+                body: { padding: '0px' },
+              },
+            })
+          }
+          className="flex flex-col gap-2 items-center justify-center p-4 opacity-20 hover:opacity-100 duration-500 cursor-pointer"
+        >
+          <MdContentPaste />
+          <span className="text-sm text-textSecondary">
+            Paste the copied shifts here
+          </span>
         </div>
       )}
     </div>
