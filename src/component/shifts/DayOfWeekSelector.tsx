@@ -96,6 +96,7 @@ const DaysOfWeekSelector = ({
           />
         </div>
         <InputRadio
+          disabled={!isMultipleSelectable}
           type="checkbox"
           label="Select all"
           checked={arrayContainsAll(daysOfWeek, selectedDays)}
