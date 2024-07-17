@@ -195,7 +195,9 @@ export const addShiftFormSchema = z
       .min(3, { message: 'Shift address is required' })
       .nullable()
       .optional(),
-    ShiftCompanyBranchId: z.string().nullable().optional(),
+    ShiftCompanyBranchId: z
+      .string()
+      .min(3, { message: 'Please select branch' }),
     ShiftRestrictedRadius: z.coerce.number().nullable().optional(),
     ShiftEnableRestrictedRadius: z.boolean(),
     ShiftClientId: z

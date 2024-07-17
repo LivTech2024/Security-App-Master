@@ -198,6 +198,7 @@ class DbShift {
         ShiftClientId: shiftData.ShiftClientId ?? null,
         ShiftRestrictedRadius: shiftData.ShiftRestrictedRadius || null,
         ShiftCompanyId: companyDetails.CompanyId,
+        ShiftCompanyBranchId: shiftData.ShiftCompanyBranchId,
         ShiftLocationId: shiftData.ShiftLocationId ?? null,
         ShiftLocationAddress: shiftData.ShiftLocationAddress ?? null,
         ShiftRequiredEmp: Number(shiftData.ShiftRequiredEmp),

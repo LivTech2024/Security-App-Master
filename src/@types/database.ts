@@ -147,7 +147,7 @@ export interface IShiftsCollection {
   ShiftClientId: string | null; //*Null for mobile guard
   ShiftCompanyId: string;
   ShiftRequiredEmp: number; //* By default 1
-  ShiftCompanyBranchId?: string | null;
+  ShiftCompanyBranchId: string;
   ShiftAcknowledgedByEmpId: string[];
   ShiftTask: IShiftTasksChild[];
   ShiftGuardWellnessReport: {

@@ -81,7 +81,11 @@ const ShiftCreateOrEdit = () => {
           ShiftPhotoUploadIntervalInMinutes:
             shiftEditData.ShiftPhotoUploadIntervalInMinutes,
         }
-      : { ShiftRequiredEmp: String(1) as unknown as number },
+      : {
+          ShiftRequiredEmp: String(1) as unknown as number,
+          ShiftCompanyBranchId:
+            localStorage.getItem(LocalStorageKey.SELECTED_BRANCH) || '',
+        },
   });
 
   const { company, empRoles, companyBranches } = useAuthState();
@@ -102,10 +106,6 @@ const ShiftCreateOrEdit = () => {
   const [endTime, setEndTime] = useState('17:00');
 
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
-
-  const [companyBranch, setCompanyBranch] = useState<string | null | undefined>(
-    null
-  );
 
   const [shiftTasks, setShiftTasks] = useState<ShiftTask[]>([
     {
@@ -197,14 +197,6 @@ const ShiftCreateOrEdit = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationId]);
 
-  useEffect(() => {
-    const branchId = companyBranches.find(
-      (b) => b.CompanyBranchName === companyBranch
-    )?.CompanyBranchId;
-    methods.setValue('ShiftCompanyBranchId', branchId || null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyBranch]);
-
   //* populate value on editing
   useEffect(() => {
     if (isEdit) {
@@ -214,12 +206,6 @@ const ShiftCreateOrEdit = () => {
       setShiftPosition(shiftEditData.ShiftPosition);
       setSelectedDays([toDate(shiftEditData.ShiftDate)]);
       setIsSpecialShift(shiftEditData.ShiftIsSpecialShift);
-      if (shiftEditData.ShiftCompanyBranchId) {
-        const branchName = companyBranches.find(
-          (b) => b.CompanyBranchId === shiftEditData.ShiftCompanyBranchId
-        )?.CompanyBranchName;
-        setCompanyBranch(branchName || null);
-      }
       if (shiftEditData.ShiftTask && shiftEditData.ShiftTask.length > 0) {
         setShiftTasks(
           shiftEditData.ShiftTask.map((task) => {
@@ -246,16 +232,7 @@ const ShiftCreateOrEdit = () => {
     setLocationSearchQuery('');
     setShiftPosition('');
     setShiftLinkedPatrols([]);
-    if (localStorage.getItem(LocalStorageKey.SELECTED_BRANCH)) {
-      const branchName = companyBranches.find(
-        (b) =>
-          b.CompanyBranchId ===
-          localStorage.getItem(LocalStorageKey.SELECTED_BRANCH)
-      )?.CompanyBranchName;
-      setCompanyBranch(branchName || null);
-    } else {
-      setCompanyBranch(null);
-    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, shiftEditData]);
 
@@ -577,19 +554,20 @@ const ShiftCreateOrEdit = () => {
             </div>
 
             <div className="flex flex-col gap-4 row-span-2">
-              <InputAutoComplete
-                readonly={isEdit}
-                label="Branch (Optional)"
-                value={companyBranch}
-                onChange={setCompanyBranch}
-                isFilterReq={true}
+              <InputSelect
+                label="Branch"
                 data={companyBranches.map((branch) => {
                   return {
                     label: branch.CompanyBranchName,
-                    value: branch.CompanyBranchName,
+                    value: branch.CompanyBranchId,
                   };
                 })}
-                dropDownHeader={
+                value={methods.watch('ShiftCompanyBranchId') || ''}
+                onChange={(e) =>
+                  methods.setValue('ShiftCompanyBranchId', e as string)
+                }
+                searchable
+                nothingFoundMessage={
                   <div
                     onClick={() => {
                       setAddCmpBranchModal(true);
@@ -603,6 +581,7 @@ const ShiftCreateOrEdit = () => {
                     </div>
                   </div>
                 }
+                error={methods.formState.errors.ShiftCompanyBranchId?.message}
               />
 
               <div className="flex flex-col gap-1">
