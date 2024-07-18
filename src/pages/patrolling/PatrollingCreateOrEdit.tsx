@@ -42,6 +42,7 @@ const PatrollingCreateOrEdit = () => {
           PatrolKeepGuardInRadiusOfLocation:
             patrolEditData.PatrolKeepGuardInRadiusOfLocation,
           PatrolClientId: patrolEditData.PatrolClientId,
+          PatrolCompanyBranchId: patrolEditData?.PatrolCompanyBranchId || '',
         }
       : {
           PatrolReminderInMinutes: 60,
@@ -49,7 +50,7 @@ const PatrollingCreateOrEdit = () => {
         },
   });
 
-  const { company } = useAuthState();
+  const { company, companyBranches } = useAuthState();
 
   const [checkPoints, setCheckPoints] = useState<
     {
@@ -362,23 +363,37 @@ const PatrollingCreateOrEdit = () => {
               </div>
             }
           />
+          <InputSelect
+            label="Select branch"
+            data={[
+              { label: 'All branch', value: '' },
+              ...companyBranches.map((branches) => {
+                return {
+                  label: branches.CompanyBranchName,
+                  value: branches.CompanyBranchId,
+                };
+              }),
+            ]}
+            value={methods.watch('PatrolCompanyBranchId') || ''}
+            onChange={(e) =>
+              methods.setValue('PatrolCompanyBranchId', e as string)
+            }
+          />
 
-          <div className="md:col-span-2 flex items-end w-full gap-4">
-            <InputWithTopHeader
-              className="mx-0 w-full"
-              label="Restricted Radius (In Meters)"
-              register={methods.register}
-              name="PatrolRestrictedRadius"
-              decimalCount={2}
-              error={methods.formState.errors.PatrolRestrictedRadius?.message}
-            />
-            <SwitchWithSideHeader
-              register={methods.register}
-              name="PatrolKeepGuardInRadiusOfLocation"
-              className="w-full mb-2 font-medium"
-              label="Restrict guard from moving out from this radius while patrolling"
-            />
-          </div>
+          <InputWithTopHeader
+            className="mx-0 w-full"
+            label="Restricted Radius (In Meters)"
+            register={methods.register}
+            name="PatrolRestrictedRadius"
+            decimalCount={2}
+            error={methods.formState.errors.PatrolRestrictedRadius?.message}
+          />
+          <SwitchWithSideHeader
+            register={methods.register}
+            name="PatrolKeepGuardInRadiusOfLocation"
+            className="w-full mb-2 font-medium px-4 py-[10px] bg-onHoverBg rounded"
+            label="Restrict guard from moving out from this radius while patrolling"
+          />
 
           <div className="col-span-2 w-full gap-4 flex flex-col">
             <div className="font-medium text-lg ">Create checkpoints</div>

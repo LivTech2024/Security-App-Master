@@ -264,6 +264,7 @@ export const patrollingSchema = z.object({
       message: 'Patrol reminder in minutes cannot be more than 720',
     }),
   PatrolClientId: z.string().min(3, { message: 'Please select client' }),
+  PatrolCompanyBranchId: z.string().nullable().optional(),
 });
 
 export type PatrollingFormFields = z.infer<typeof patrollingSchema>;

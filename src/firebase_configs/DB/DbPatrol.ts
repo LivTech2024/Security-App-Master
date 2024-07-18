@@ -68,6 +68,7 @@ class DbPatrol {
     const newPatrol: IPatrolsCollection = {
       PatrolId: patrolId,
       PatrolCompanyId: companyDetails.CompanyId,
+      PatrolCompanyBranchId: data.PatrolCompanyBranchId || null,
       PatrolName: data.PatrolName,
       PatrolNameSearchIndex,
       PatrolLocation: new GeoPoint(
@@ -149,6 +150,7 @@ class DbPatrol {
         PatrolKeepGuardInRadiusOfLocation:
           data.PatrolKeepGuardInRadiusOfLocation,
         PatrolClientId: data.PatrolClientId,
+        PatrolCompanyBranchId: data.PatrolCompanyBranchId || null,
         PatrolModifiedAt: serverTimestamp(),
       };
 
@@ -172,12 +174,14 @@ class DbPatrol {
     searchQuery,
     cmpId,
     locationId,
+    branchId,
   }: {
     lmt?: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId: string;
     locationId?: string | null;
+    branchId?: string;
   }) => {
     const patrolRef = collection(db, CollectionName.patrols);
 
@@ -190,6 +194,13 @@ class DbPatrol {
       queryParams = [
         ...queryParams,
         where('PatrolLocationId', '==', locationId),
+      ];
+    }
+
+    if (branchId && branchId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where('PatrolCompanyBranchId', '==', branchId),
       ];
     }
 
