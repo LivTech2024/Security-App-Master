@@ -192,6 +192,7 @@ export interface IPatrolCheckPointsChild {
 export interface IPatrolsCollection {
   PatrolId: string;
   PatrolCompanyId: string;
+  PatrolCompanyBranchId?: string | null;
   PatrolName: string;
   PatrolNameSearchIndex: string[];
   PatrolLocation: GeoPoint;

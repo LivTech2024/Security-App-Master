@@ -4,12 +4,15 @@ import {
   IEquipmentsCollection,
   IInvoicesCollection,
   IPayStubsCollection,
+  IShiftsCollection,
 } from '../../@types/database';
 import DbPayment from './DbPayment';
 import DbEmployee from './DbEmployee';
 import DbAssets from './DbAssets';
 import DbClient from './DbClient';
 import dayjs from 'dayjs';
+import DbShift from './DbShift';
+import DbPatrol from './DbPatrol';
 
 class DbAudit {
   static getTotalAmounts = async ({
@@ -27,7 +30,8 @@ class DbAudit {
       employees: IEmployeesCollection[] = [],
       equipments: IEquipmentsCollection[] = [],
       payStubs: IPayStubsCollection[] = [],
-      invoices: IInvoicesCollection[] = [];
+      invoices: IInvoicesCollection[] = [],
+      shifts: IShiftsCollection[] = [];
 
     endDate = dayjs(endDate).endOf('day').toDate();
 
@@ -58,6 +62,15 @@ class DbAudit {
 
       const clientTask = DbClient.getClients({ cmpId, branchId });
 
+      const shiftTask = DbShift.getShifts({
+        cmpId,
+        endDate,
+        startDate,
+        branchId,
+      });
+
+      const patrolTask = DbPatrol.getPatrols({ cmpId });
+
       //*Resolve all the task promise
 
       const [
@@ -66,12 +79,14 @@ class DbAudit {
         employeesSnapshot,
         equipmentSnapshot,
         clientSnapshot,
+        shiftSnapshot,
       ] = await Promise.all([
         invoiceTask,
         payStubTask,
         employeesTask,
         equipmentTask,
         clientTask,
+        shiftTask,
       ]);
 
       invoices = invoiceSnapshot.docs.map(
@@ -94,12 +109,15 @@ class DbAudit {
         (doc) => doc.data() as IClientsCollection
       );
 
+      shifts = shiftSnapshot.docs.map((doc) => doc.data() as IShiftsCollection);
+
       return {
         clients,
         employees,
         equipments,
         payStubs,
         invoices,
+        shifts,
       };
     } catch (error) {
       console.log(error, 'here');
@@ -109,6 +127,7 @@ class DbAudit {
         equipments,
         payStubs,
         invoices,
+        shifts,
       };
     }
   };

@@ -279,10 +279,12 @@ class DbShift {
     isLifeTime,
     locationId,
     startDate,
+    branchId,
   }: {
-    lmt: number;
+    lmt?: number;
     lastDoc?: DocumentData | null;
     cmpId: string;
+    branchId?: string;
     locationId?: string | null;
     startDate?: Date | string | null;
     endDate?: Date | string | null;
@@ -299,6 +301,13 @@ class DbShift {
       queryParams = [
         ...queryParams,
         where('ShiftLocationId', '==', locationId),
+      ];
+    }
+
+    if (branchId && branchId.length > 3) {
+      queryParams = [
+        ...queryParams,
+        where('ShiftCompanyBranchId', '==', branchId),
       ];
     }
 

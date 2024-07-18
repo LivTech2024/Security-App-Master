@@ -12,10 +12,12 @@ import {
   IEquipmentsCollection,
   IInvoicesCollection,
   IPayStubsCollection,
+  IShiftsCollection,
 } from '../../@types/database';
 import { toDate } from '../../utilities/misc';
 import IncomeChart from '../../component/audit/dashboard/charts/IncomeChart';
 import ExpenseChart from '../../component/audit/dashboard/charts/ExpenseChart';
+import ShiftChart from '../../component/audit/dashboard/charts/ShiftChart';
 
 const AuditDashboard = () => {
   const { company } = useAuthState();
@@ -36,12 +38,14 @@ const AuditDashboard = () => {
     equipments: IEquipmentsCollection[];
     payStubs: IPayStubsCollection[];
     invoices: IInvoicesCollection[];
+    shifts: IShiftsCollection[];
   }>({
     clients: [],
     employees: [],
     equipments: [],
     invoices: [],
     payStubs: [],
+    shifts: [],
   });
 
   useEffect(() => {
@@ -81,8 +85,8 @@ const AuditDashboard = () => {
         )}
       />
 
-      <div className="flex gap-4 w-full">
-        <div className="bg-surface p-4 rounded shadow w-1/2 flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-4 w-full">
+        <div className="bg-surface p-4 rounded shadow  flex flex-col gap-4">
           <div className="font-semibold">Income Chart</div>
           <IncomeChart
             IncomeData={auditData.invoices
@@ -99,7 +103,7 @@ const AuditDashboard = () => {
               })}
           />
         </div>
-        <div className="bg-surface p-4 rounded shadow w-1/2 flex flex-col gap-4">
+        <div className="bg-surface p-4 rounded shadow  flex flex-col gap-4">
           <div className="font-semibold">Expense Chart</div>
 
           <ExpenseChart
@@ -115,6 +119,21 @@ const AuditDashboard = () => {
                   Date: toDate(res.PayStubPayDate),
                 };
               })}
+          />
+        </div>
+        <div className="bg-surface p-4 rounded shadow flex flex-col gap-4">
+          <div className="flex justify-between">
+            <div className="font-semibold">Shift Chart</div>
+            <span className=" text-textSecondary font-semibold">
+              Total: {auditData.shifts.length}
+            </span>
+          </div>
+
+          <ShiftChart
+            shifts={auditData.shifts.sort(
+              (a, b) =>
+                toDate(a.ShiftDate).getTime() - toDate(b.ShiftDate).getTime()
+            )}
           />
         </div>
       </div>
