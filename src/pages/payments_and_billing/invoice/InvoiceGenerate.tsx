@@ -26,14 +26,13 @@ import {
 } from '../../../store';
 import DbPayment from '../../../firebase_configs/DB/DbPayment';
 import { useNavigate } from 'react-router-dom';
-import { LocalStorageKey, PageRoutes } from '../../../@types/enum';
+import { PageRoutes } from '../../../@types/enum';
 import useFetchClients from '../../../hooks/fetch/useFetchClients';
 import InputAutoComplete from '../../../common/inputs/InputAutocomplete';
 import PageHeader from '../../../common/PageHeader';
 import { roundNumber, toDate } from '../../../utilities/misc';
 import { openContextModal } from '@mantine/modals';
 import ClientCostCalculationModal from '../../../component/payments_and_billing/modal/ClientCostCalculationModal';
-import SelectBranch from '../../../common/SelectBranch';
 
 const numberToString = (value: number) => {
   return String(value) as unknown as number;
@@ -77,9 +76,6 @@ const InvoiceGenerate = () => {
           InvoiceNumber: String(recentInvoiceNumber + 1),
           InvoiceCompanyEmail: company?.CompanyEmail,
           InvoiceCompanyPhone: company?.CompanyPhone,
-          InvoiceCompanyBranchId: localStorage.getItem(
-            LocalStorageKey.SELECTED_BRANCH || ''
-          ),
         },
   });
 
@@ -123,11 +119,16 @@ const InvoiceGenerate = () => {
       methods.setValue('InvoiceClientId', selectedClient.ClientId);
       methods.setValue('InvoiceClientAddress', selectedClient.ClientAddress);
       methods.setValue('InvoiceClientPhone', selectedClient.ClientPhone);
+      methods.setValue(
+        'InvoiceCompanyBranchId',
+        selectedClient?.ClientCompanyBranchId || ''
+      );
     } else {
       methods.setValue('InvoiceClientName', '');
       methods.setValue('InvoiceClientId', '');
       methods.setValue('InvoiceClientAddress', '');
       methods.setValue('InvoiceClientPhone', '');
+      methods.setValue('InvoiceCompanyBranchId', '');
     }
   }, [clientSearchQuery, clients]);
 
@@ -454,13 +455,6 @@ const InvoiceGenerate = () => {
                   register={methods.register}
                   name="InvoiceCompanyEmail"
                   error={methods.formState.errors?.InvoiceCompanyEmail?.message}
-                />
-                <SelectBranch
-                  label="Select Branch"
-                  selectedBranch={methods.watch('InvoiceCompanyBranchId') || ''}
-                  setSelectedBranch={(e) =>
-                    methods.setValue('InvoiceCompanyBranchId', e as string)
-                  }
                 />
               </div>
             </div>
