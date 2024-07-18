@@ -42,7 +42,7 @@ const PatrolChart = ({ patrolLogs }: PatrolChartProps) => {
   const data: ChartData<'line'> = {
     datasets: [
       {
-        label: 'Shift',
+        label: 'Patrol',
         data: [
           {
             x: dayjs(PatrolChartData[0]?.Date)
