@@ -6,11 +6,11 @@ import TotalAmtCards from '../../component/audit/dashboard/TotalAmtCards';
 
 const AuditDashboard = () => {
   const [startDate, setStartDate] = useState<Date | string | null>(
-    dayjs().startOf('week').toDate()
+    dayjs().startOf('month').toDate()
   );
 
   const [endDate, setEndDate] = useState<Date | string | null>(
-    dayjs().endOf('week').toDate()
+    dayjs().endOf('month').toDate()
   );
 
   const [selectedBranchId, setSelectedBranchId] = useState('');

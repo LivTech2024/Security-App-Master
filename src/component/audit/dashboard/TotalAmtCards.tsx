@@ -103,8 +103,6 @@ const TotalAmtCards = ({
     });
   }, [startDate, endDate, selectedBranchId, company]);
 
-  console.log(totalAmounts.TotalExpense, 'expense in front');
-
   return (
     <div className="flex gap-4 w-full ">
       <Cards

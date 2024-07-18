@@ -6,6 +6,7 @@ import DbPayment from './DbPayment';
 import DbEmployee from './DbEmployee';
 import DbAssets from './DbAssets';
 import DbClient from './DbClient';
+import dayjs from 'dayjs';
 
 class DbAudit {
   static getTotalAmounts = async ({
@@ -24,6 +25,8 @@ class DbAudit {
       TotalEquipments = 0,
       TotalExpense = 0,
       TotalIncome = 0;
+
+    endDate = dayjs(endDate).endOf('day').toDate();
 
     try {
       const invoiceTask = DbPayment.getInvoices({
