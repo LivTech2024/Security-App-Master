@@ -175,7 +175,7 @@ const Home = () => {
           icon={<FaClock className="text-2xl text-primaryGold" />}
         />
         <HomeItem
-          path={PageRoutes.HOME}
+          path={PageRoutes.AUDIT_DASHBOARD}
           name="Audit"
           icon={<AiOutlineAudit className="text-2xl text-primaryGold" />}
         />

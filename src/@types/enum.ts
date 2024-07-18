@@ -199,6 +199,8 @@ export const PageRoutes = {
   CALL_OUT_LIST: '/callout_list',
   CALL_OUT_VIEW: '/callout_view',
 
+  AUDIT_DASHBOARD: '/audit_dashboard',
+
   HRM_HOME: '/hrm_home',
 
   //Unprotected page

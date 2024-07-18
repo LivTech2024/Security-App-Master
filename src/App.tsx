@@ -83,6 +83,7 @@ import TrainCertsView from './pages/training_and_certification/TrainCertsView';
 import TrainCertsCreateOrEdit from './pages/training_and_certification/TrainCertsCreateOrEdit';
 import EmergResList from './pages/emergency_response/EmergResList';
 import EmployeeRoute from './pages/employee/EmployeeRoute';
+import AuditDashboard from './pages/audit/AuditDashboard';
 
 function App() {
   useOnAuthStateChanged();
@@ -375,6 +376,11 @@ function App() {
             <Route
               path={PageRoutes.EMERGENCY_RESPONSE_LIST}
               Component={EmergResList}
+            />
+
+            <Route
+              path={PageRoutes.AUDIT_DASHBOARD}
+              Component={AuditDashboard}
             />
 
             <Route path={PageRoutes.HRM_HOME} Component={HrmHome} />
