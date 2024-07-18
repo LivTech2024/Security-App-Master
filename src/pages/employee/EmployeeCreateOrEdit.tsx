@@ -35,6 +35,7 @@ import { IEmpBankDetails } from '../../@types/database';
 import { EmpCertificates } from '../../component/employees/EmpCertificateDetails';
 import InputHeader from '../../common/inputs/InputHeader';
 import { MultiSelect } from '@mantine/core';
+import InputSelect from '../../common/inputs/InputSelect';
 
 const EmployeeCreateOrEdit = () => {
   const { employeeEditData } = useEditFormStore();
@@ -78,10 +79,6 @@ const EmployeeCreateOrEdit = () => {
     ''
   );
 
-  const [companyBranch, setCompanyBranch] = useState<string | null | undefined>(
-    null
-  );
-
   const [addEmpRoleModal, setAddEmpRoleModal] = useState(false);
 
   const [addCmpBranchModal, setAddCmpBranchModal] = useState(false);
@@ -94,23 +91,9 @@ const EmployeeCreateOrEdit = () => {
   }, [employeeRole]);
 
   useEffect(() => {
-    const branchId = companyBranches.find(
-      (b) => b.CompanyBranchName === companyBranch
-    )?.CompanyBranchId;
-    methods.setValue('EmployeeCompanyBranchId', branchId || null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyBranch]);
-
-  useEffect(() => {
     if (isEdit) {
       setEmployeeRole(employeeEditData.EmployeeRole);
       setEmpImageBase64(employeeEditData.EmployeeImg);
-      if (employeeEditData.EmployeeCompanyBranchId) {
-        const branchName = companyBranches.find(
-          (b) => b.CompanyBranchId === employeeEditData.EmployeeCompanyBranchId
-        )?.CompanyBranchName;
-        setCompanyBranch(branchName || null);
-      }
       if (employeeEditData.EmployeeLicenses) {
         setEmpLicenseDetails(
           employeeEditData?.EmployeeLicenses?.map((l) => {
@@ -127,7 +110,6 @@ const EmployeeCreateOrEdit = () => {
     } else {
       setEmployeeRole('');
       setEmpImageBase64('');
-      setCompanyBranch(null);
       setEmpLicenseDetails([]);
       setEmpBankDetails({
         BankAccNumber: '',
@@ -448,19 +430,22 @@ const EmployeeCreateOrEdit = () => {
               )}
 
               <div className="col-span-2 flex items-end justify-end w-full gap-4">
-                <InputAutoComplete
-                  readonly={isEdit}
-                  label="Branch (Optional)"
-                  value={companyBranch}
-                  onChange={setCompanyBranch}
-                  isFilterReq={true}
-                  data={companyBranches.map((branch) => {
-                    return {
-                      label: branch.CompanyBranchName,
-                      value: branch.CompanyBranchName,
-                    };
-                  })}
-                  dropDownHeader={
+                <InputSelect
+                  label="Select branch"
+                  data={[
+                    { label: 'All branch', value: '' },
+                    ...companyBranches.map((branches) => {
+                      return {
+                        label: branches.CompanyBranchName,
+                        value: branches.CompanyBranchId,
+                      };
+                    }),
+                  ]}
+                  value={methods.watch('EmployeeCompanyBranchId') || ''}
+                  onChange={(e) =>
+                    methods.setValue('EmployeeCompanyBranchId', e as string)
+                  }
+                  nothingFoundMessage={
                     <div
                       onClick={() => {
                         navigate(PageRoutes.COMPANY_BRANCHES);
@@ -476,10 +461,11 @@ const EmployeeCreateOrEdit = () => {
                   }
                   className="w-full"
                 />
+
                 <SwitchWithSideHeader
                   register={methods.register}
                   name="EmployeeIsBanned"
-                  className="w-full mb-2 font-medium"
+                  className="w-full font-medium bg-onHoverBg px-4 py-[10px] rounded"
                   label="Ban this employee"
                 />
               </div>

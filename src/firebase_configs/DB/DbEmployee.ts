@@ -554,6 +554,7 @@ class DbEmployee {
           EmployeeNameSearchIndex: fullTextSearchIndex(
             `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
           ),
+          EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
           EmployeeMaxHrsPerWeek: Number(empData.EmployeeMaxHrsPerWeek),
           EmployeePhone: empData.EmployeePhone,
           EmployeeEmail: empData.EmployeeEmail,
