@@ -1,11 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PageHeader from '../../common/PageHeader';
 import dayjs from 'dayjs';
 import Menus from '../../component/audit/dashboard/Menus';
 import TotalAmtCards from '../../component/audit/dashboard/TotalAmtCards';
-import IncomeVsExpenseChart from '../../component/audit/dashboard/charts/IncomeVsExpenseChart';
+
+import DbAudit from '../../firebase_configs/DB/DbAudit';
+import { useAuthState } from '../../store';
+import {
+  IClientsCollection,
+  IEmployeesCollection,
+  IEquipmentsCollection,
+  IInvoicesCollection,
+  IPayStubsCollection,
+} from '../../@types/database';
+import { toDate } from '../../utilities/misc';
+import IncomeChart from '../../component/audit/dashboard/charts/IncomeChart';
+import ExpenseChart from '../../component/audit/dashboard/charts/ExpenseChart';
 
 const AuditDashboard = () => {
+  const { company } = useAuthState();
+
   const [startDate, setStartDate] = useState<Date | string | null>(
     dayjs().startOf('month').toDate()
   );
@@ -15,6 +29,33 @@ const AuditDashboard = () => {
   );
 
   const [selectedBranchId, setSelectedBranchId] = useState('');
+
+  const [auditData, setAuditData] = useState<{
+    clients: IClientsCollection[];
+    employees: IEmployeesCollection[];
+    equipments: IEquipmentsCollection[];
+    payStubs: IPayStubsCollection[];
+    invoices: IInvoicesCollection[];
+  }>({
+    clients: [],
+    employees: [],
+    equipments: [],
+    invoices: [],
+    payStubs: [],
+  });
+
+  useEffect(() => {
+    if (!company || !endDate || !startDate) return;
+
+    DbAudit.getTotalAmounts({
+      cmpId: company.CompanyId,
+      endDate: endDate as Date,
+      startDate: startDate as Date,
+      branchId: selectedBranchId,
+    }).then((data) => {
+      setAuditData(data);
+    });
+  }, [startDate, endDate, selectedBranchId, company]);
   return (
     <div className="flex flex-col gap-4 p-6">
       <PageHeader title="Audit Dashboard" />
@@ -27,15 +68,54 @@ const AuditDashboard = () => {
         startDate={startDate}
       />
       <TotalAmtCards
-        startDate={startDate}
-        endDate={endDate}
-        selectedBranchId={selectedBranchId}
+        TotalClients={auditData.clients.length}
+        TotalEmployees={auditData.employees.length}
+        TotalEquipments={auditData.equipments.length}
+        TotalExpense={auditData.payStubs.reduce(
+          (acc, obj) => acc + Number(obj.PayStubNetPay.Amount),
+          0
+        )}
+        TotalIncome={auditData.invoices.reduce(
+          (acc, obj) => acc + obj.InvoiceReceivedAmount,
+          0
+        )}
       />
 
       <div className="flex gap-4 w-full">
         <div className="bg-surface p-4 rounded shadow w-1/2 flex flex-col gap-4">
-          <div className="font-semibold">Income v/s Expense Chart</div>
-          <IncomeVsExpenseChart />
+          <div className="font-semibold">Income Chart</div>
+          <IncomeChart
+            IncomeData={auditData.invoices
+              .sort(
+                (a, b) =>
+                  toDate(a.InvoiceDate).getTime() -
+                  toDate(b.InvoiceDate).getTime()
+              )
+              .map((res) => {
+                return {
+                  Amount: res.InvoiceReceivedAmount,
+                  Date: toDate(res.InvoiceDate),
+                };
+              })}
+          />
+        </div>
+        <div className="bg-surface p-4 rounded shadow w-1/2 flex flex-col gap-4">
+          <div className="font-semibold">Expense Chart</div>
+
+          <ExpenseChart
+            ExpenseData={auditData.payStubs
+              .sort(
+                (a, b) =>
+                  toDate(a.PayStubPayDate).getTime() -
+                  toDate(b.PayStubPayDate).getTime()
+              )
+              .map((res) => {
+                return {
+                  Amount: res.PayStubNetPay.Amount,
+                  Date: toDate(res.PayStubPayDate),
+                };
+              })}
+          />
         </div>
       </div>
     </div>

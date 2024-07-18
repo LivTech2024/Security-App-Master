@@ -1,20 +1,37 @@
 import ChartJS, { ChartData, ScriptableContext } from 'chart.js/auto';
+import 'chartjs-adapter-dayjs-4';
+import dayjs from 'dayjs';
 
 import { Line } from 'react-chartjs-2';
 
 ChartJS.register();
 
-const IncomeVsExpenseChart = () => {
-  const data: ChartData<'line', number[], string> = {
-    labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+interface ExpenseChartProps {
+  ExpenseData: { Amount: number; Date: Date }[];
+}
+
+const ExpenseChart = ({ ExpenseData }: ExpenseChartProps) => {
+  const data: ChartData<'line'> = {
     datasets: [
       {
-        label: 'Income',
-        data: [68, 69, 45, 67, 23, 56, 51],
-      },
-      {
         label: 'Expense',
-        data: [20, 29, 35, 77, 32, 36, 21],
+        data: [
+          {
+            x: dayjs(ExpenseData[0]?.Date)
+              .subtract(1, 'day')
+              .toDate() as unknown as number,
+            y: 0,
+          },
+          ...ExpenseData.map((res) => {
+            return { x: res.Date as unknown as number, y: res.Amount };
+          }),
+          {
+            x: dayjs(ExpenseData[ExpenseData.length - 1]?.Date)
+              .add(1, 'day')
+              .toDate() as unknown as number,
+            y: 0,
+          },
+        ],
         borderColor: '#ef4444',
         pointBackgroundColor: '#ef4444',
       },
@@ -80,12 +97,14 @@ const IncomeVsExpenseChart = () => {
             },
           },
           x: {
+            type: 'time',
             border: {
               color: '#0000001A',
             },
             grid: {
               display: false,
             },
+            time: { unit: 'day' },
 
             title: {
               display: true,
@@ -120,4 +139,4 @@ const IncomeVsExpenseChart = () => {
   );
 };
 
-export default IncomeVsExpenseChart;
+export default ExpenseChart;

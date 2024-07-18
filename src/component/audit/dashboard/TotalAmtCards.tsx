@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
 import AnimatedNumberTicker from '../../../common/NumberTicker';
 import { FaMoneyBill1Wave } from 'react-icons/fa6';
 import { GiExpense } from 'react-icons/gi';
@@ -6,13 +6,13 @@ import { FaPeopleCarry, FaTools } from 'react-icons/fa';
 import { MdPeopleAlt } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../../@types/enum';
-import { useAuthState } from '../../../store';
-import DbAudit from '../../../firebase_configs/DB/DbAudit';
 
 interface TotalAmtCardsProps {
-  startDate: string | Date | null;
-  endDate: string | Date | null;
-  selectedBranchId: string;
+  TotalIncome: number;
+  TotalExpense: number;
+  TotalEquipments: number;
+  TotalEmployees: number;
+  TotalClients: number;
 }
 
 interface CardProps {
@@ -54,60 +54,19 @@ const Cards = ({ amountValue, currency, icon, title, callback }: CardProps) => {
 };
 
 const TotalAmtCards = ({
-  endDate,
-  selectedBranchId,
-  startDate,
+  TotalClients,
+  TotalEmployees,
+  TotalEquipments,
+  TotalExpense,
+  TotalIncome,
 }: TotalAmtCardsProps) => {
   const navigate = useNavigate();
-
-  const { company } = useAuthState();
-
-  const [totalAmounts, setTotalAmounts] = useState<{
-    TotalIncome: number;
-    TotalExpense: number;
-    TotalEquipments: number;
-    TotalEmployees: number;
-    TotalClients: number;
-  }>({
-    TotalClients: 0,
-    TotalEmployees: 0,
-    TotalEquipments: 0,
-    TotalExpense: 0,
-    TotalIncome: 0,
-  });
-
-  useEffect(() => {
-    if (!company || !endDate || !startDate) return;
-
-    DbAudit.getTotalAmounts({
-      cmpId: company.CompanyId,
-      endDate: endDate as Date,
-      startDate: startDate as Date,
-      branchId: selectedBranchId,
-    }).then((data) => {
-      const {
-        TotalClients,
-        TotalEmployees,
-        TotalEquipments,
-        TotalExpense,
-        TotalIncome,
-      } = data;
-
-      setTotalAmounts({
-        TotalClients,
-        TotalEmployees,
-        TotalEquipments,
-        TotalExpense,
-        TotalIncome,
-      });
-    });
-  }, [startDate, endDate, selectedBranchId, company]);
 
   return (
     <div className="flex gap-4 w-full ">
       <Cards
         currency="$"
-        amountValue={totalAmounts.TotalIncome}
+        amountValue={TotalIncome}
         title="Total Income"
         icon={
           <FaMoneyBill1Wave className="text-textPrimaryGreen ml-auto size-9" />
@@ -116,19 +75,19 @@ const TotalAmtCards = ({
       />
       <Cards
         currency="$"
-        amountValue={totalAmounts.TotalExpense}
+        amountValue={TotalExpense}
         title="Total Expense"
         icon={<GiExpense className="text-textPrimaryRed ml-auto size-9" />}
         callback={() => navigate(PageRoutes.PAY_STUB_LIST)}
       />
       <Cards
-        amountValue={totalAmounts.TotalEquipments}
+        amountValue={TotalEquipments}
         title="Total Equipments"
         icon={<FaTools className="text-textPrimaryBlue ml-auto size-8" />}
         callback={() => navigate(PageRoutes.EQUIPMENT_LIST)}
       />
       <Cards
-        amountValue={totalAmounts.TotalEmployees}
+        amountValue={TotalEmployees}
         title="Total Employees"
         icon={
           <MdPeopleAlt className="text-textSecondaryBlue ml-auto size-10" />
@@ -136,7 +95,7 @@ const TotalAmtCards = ({
         callback={() => navigate(PageRoutes.EMPLOYEE_LIST)}
       />
       <Cards
-        amountValue={totalAmounts.TotalClients}
+        amountValue={TotalClients}
         title="Total Clients"
         icon={
           <FaPeopleCarry className="text-textPrimaryGreen ml-auto size-9" />

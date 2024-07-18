@@ -1,4 +1,7 @@
 import {
+  IClientsCollection,
+  IEmployeesCollection,
+  IEquipmentsCollection,
   IInvoicesCollection,
   IPayStubsCollection,
 } from '../../@types/database';
@@ -20,11 +23,11 @@ class DbAudit {
     cmpId: string;
     branchId?: string;
   }) => {
-    let TotalClients = 0,
-      TotalEmployees = 0,
-      TotalEquipments = 0,
-      TotalExpense = 0,
-      TotalIncome = 0;
+    let clients: IClientsCollection[] = [],
+      employees: IEmployeesCollection[] = [],
+      equipments: IEquipmentsCollection[] = [],
+      payStubs: IPayStubsCollection[] = [],
+      invoices: IInvoicesCollection[] = [];
 
     endDate = dayjs(endDate).endOf('day').toDate();
 
@@ -71,43 +74,41 @@ class DbAudit {
         clientTask,
       ]);
 
-      const invoiceData = invoiceSnapshot.docs.map(
+      invoices = invoiceSnapshot.docs.map(
         (doc) => doc.data() as IInvoicesCollection
       );
-      TotalIncome = invoiceData.reduce(
-        (acc, obj) => acc + obj.InvoiceReceivedAmount,
-        0
-      );
 
-      const payStubData = payStubSnapshot.docs.map(
+      payStubs = payStubSnapshot.docs.map(
         (doc) => doc.data() as IPayStubsCollection
       );
-      TotalExpense = payStubData.reduce(
-        (acc, obj) => acc + Number(obj.PayStubNetPay.Amount),
-        0
+
+      employees = employeesSnapshot.docs.map(
+        (doc) => doc.data() as IEmployeesCollection
       );
 
-      TotalEmployees = employeesSnapshot.size;
+      equipments = equipmentSnapshot.docs.map(
+        (doc) => doc.data() as IEquipmentsCollection
+      );
 
-      TotalEquipments = equipmentSnapshot.size;
-
-      TotalClients = clientSnapshot.size;
+      clients = clientSnapshot.docs.map(
+        (doc) => doc.data() as IClientsCollection
+      );
 
       return {
-        TotalClients,
-        TotalEmployees,
-        TotalEquipments,
-        TotalExpense,
-        TotalIncome,
+        clients,
+        employees,
+        equipments,
+        payStubs,
+        invoices,
       };
     } catch (error) {
       console.log(error, 'here');
       return {
-        TotalClients,
-        TotalEmployees,
-        TotalEquipments,
-        TotalExpense,
-        TotalIncome,
+        clients,
+        employees,
+        equipments,
+        payStubs,
+        invoices,
       };
     }
   };

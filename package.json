@@ -24,6 +24,7 @@
     "axios": "^1.6.8",
     "browser-image-compression": "^2.0.2",
     "chart.js": "^4.4.3",
+    "chartjs-adapter-dayjs-4": "^1.0.4",
     "dayjs": "^1.11.10",
     "emailjs-com": "^3.2.0",
     "firebase": "^10.9.0",
