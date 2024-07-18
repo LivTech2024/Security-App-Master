@@ -116,6 +116,7 @@ class DbClient {
       const newClient: IClientsCollection = {
         ClientId: clientId,
         ClientCompanyId: cmpId,
+        ClientCompanyBranchId: data.ClientCompanyBranchId || null,
         ClientName: data.ClientName,
         ClientNameSearchIndex,
         ClientEmail: data.ClientEmail,
@@ -208,6 +209,7 @@ class DbClient {
         const oldClientData = clientSnapshot.data() as IClientsCollection;
 
         const updatedClient: Partial<IClientsCollection> = {
+          ClientCompanyBranchId: data.ClientCompanyBranchId || null,
           ClientName: data.ClientName,
           ClientNameSearchIndex,
           ClientEmail: data.ClientEmail,
@@ -279,11 +281,13 @@ class DbClient {
 
   static getClients = ({
     cmpId,
+    branchId,
     lastDoc,
     lmt,
     searchQuery,
   }: {
     cmpId: string;
+    branchId?: string;
     lastDoc?: DocumentData | null;
     lmt?: number;
     searchQuery?: string;
@@ -303,6 +307,13 @@ class DbClient {
           'array-contains',
           searchQuery.toLocaleLowerCase()
         ),
+      ];
+    }
+
+    if (branchId && branchId.length > 0) {
+      queryParams = [
+        ...queryParams,
+        where('ClientCompanyBranchId', '==', branchId),
       ];
     }
 

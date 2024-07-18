@@ -12,13 +12,18 @@ import {
   showSnackbar,
 } from '../../utilities/TsxUtils';
 import DbClient from '../../firebase_configs/DB/DbClient';
-import { PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
+import {
+  LocalStorageKey,
+  PageRoutes,
+  REACT_QUERY_KEYS,
+} from '../../@types/enum';
 import { errorHandler } from '../../utilities/CustomError';
 import { openContextModal } from '@mantine/modals';
 import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FaImage } from 'react-icons/fa';
+import SelectBranch from '../../common/SelectBranch';
 
 const ClientCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -36,8 +41,12 @@ const ClientCreateOrEdit = () => {
           ClientName: clientEditData.ClientName,
           ClientPassword: clientEditData.ClientPassword,
           ClientPhone: clientEditData.ClientPhone,
+          ClientCompanyBranchId: clientEditData.ClientCompanyBranchId || '',
         }
-      : undefined,
+      : {
+          ClientCompanyBranchId:
+            localStorage.getItem(LocalStorageKey.SELECTED_BRANCH) || '',
+        },
   });
 
   const { company } = useAuthState();
@@ -223,6 +232,13 @@ const ClientCreateOrEdit = () => {
               register={methods.register}
               name="ClientPhone"
               error={methods.formState.errors.ClientPhone?.message}
+            />
+            <SelectBranch
+              label="Select branch"
+              selectedBranch={methods.watch('ClientCompanyBranchId') || ''}
+              setSelectedBranch={(e) =>
+                methods.setValue('ClientCompanyBranchId', e as string)
+              }
             />
             <InputWithTopHeader
               label="Client Email"

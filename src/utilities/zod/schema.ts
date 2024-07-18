@@ -291,6 +291,7 @@ export type CompanyBranchFormFields = z.infer<typeof companyBranchSchema>;
 export const invoiceSchema = z
   .object({
     InvoiceClientId: z.string().min(3, { message: 'Client is required' }),
+    InvoiceCompanyBranchId: z.string().nullable().optional(),
     InvoiceClientName: z
       .string()
       .min(2, { message: 'Client name should be at least 3 characters' }),
@@ -366,6 +367,7 @@ export const clientSchema = z.object({
     .string()
     .min(6, { message: 'Client password should be at least 6 characters' }),
   ClientAddress: z.string().nullable().optional(),
+  ClientCompanyBranchId: z.string().optional().nullable(),
 });
 
 export type ClientFormFields = z.infer<typeof clientSchema>;
@@ -505,6 +507,7 @@ export type TaskFormFields = z.infer<typeof taskSchema>;
 
 //*PayStub Schema
 export const payStubCreateSchema = z.object({
+  PayStubCompanyBranchId: z.string().optional().nullable(),
   PayStubEmpId: z.string().min(3, { message: 'Please select employee' }),
   PayStubEmpName: z.string().min(3, { message: 'Please select employee' }),
   PayStubEmpRole: z.string().min(3, { message: 'Please select employee' }),

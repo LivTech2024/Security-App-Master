@@ -360,6 +360,7 @@ export interface IInvoiceTaxList {
 export interface IInvoicesCollection {
   InvoiceId: string;
   InvoiceCompanyId: string;
+  InvoiceCompanyBranchId?: string | null;
   InvoiceClientId: string;
   InvoiceClientName: string;
   InvoiceClientPhone: string;
@@ -386,6 +387,7 @@ export interface IInvoicesCollection {
 export interface IClientsCollection {
   ClientId: string;
   ClientCompanyId: string;
+  ClientCompanyBranchId?: string | null;
   ClientHomePageBgImg?: string | null;
   ClientName: string;
   ClientPhone: string;
@@ -651,6 +653,7 @@ export interface IPayStubDeductionsChildCollection {
 export interface IPayStubsCollection {
   PayStubId: string;
   PayStubCompanyId: string;
+  PayStubCompanyBranchId?: string | null;
   PayStubEmpId: string;
   PayStubEmpName: string;
   PayStubEmpRole: string;

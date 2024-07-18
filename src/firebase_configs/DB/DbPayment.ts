@@ -115,6 +115,7 @@ class DbPayment {
       const newInvoice: IInvoicesCollection = {
         InvoiceId: invoiceId,
         InvoiceCompanyId: cmpId,
+        InvoiceCompanyBranchId: data.InvoiceCompanyBranchId || null,
         InvoiceClientId: data.InvoiceClientId,
         InvoiceClientName: data.InvoiceClientName,
         InvoiceClientPhone: data.InvoiceClientPhone,
@@ -203,6 +204,7 @@ class DbPayment {
       const oldInvoiceData = invoiceSnapshot.data() as IInvoicesCollection;
 
       const updatedInvoice: Partial<IInvoicesCollection> = {
+        InvoiceCompanyBranchId: data.InvoiceCompanyBranchId || null,
         InvoiceClientId: data.InvoiceClientId,
         InvoiceClientName: data.InvoiceClientName,
         InvoiceClientPhone: data.InvoiceClientPhone,
@@ -288,8 +290,10 @@ class DbPayment {
     isLifeTime,
     startDate,
     clientId,
+    branchId,
   }: {
     cmpId: string;
+    branchId?: string;
     lastDoc?: DocumentData | null;
     lmt?: number;
     startDate?: Date | string | null;
@@ -314,6 +318,12 @@ class DbPayment {
 
     if (clientId) {
       queryParams = [...queryParams, where('InvoiceClientId', '==', clientId)];
+    }
+    if (branchId) {
+      queryParams = [
+        ...queryParams,
+        where('InvoiceCompanyBranchId', '==', branchId),
+      ];
     }
 
     if (lastDoc) {
@@ -518,6 +528,7 @@ class DbPayment {
     const newPayStub: IPayStubsCollection = {
       PayStubId: payStubId,
       PayStubCompanyId: cmpId,
+      PayStubCompanyBranchId: data.PayStubCompanyBranchId,
       PayStubEmpId,
       PayStubEmpName,
       PayStubEmpRole,
@@ -593,6 +604,7 @@ class DbPayment {
         });
 
     const updatedPayStub: Partial<IPayStubsCollection> = {
+      PayStubCompanyBranchId: data.PayStubCompanyBranchId,
       PayStubEmpId,
       PayStubEmpName,
       PayStubEmpRole,
@@ -628,8 +640,10 @@ class DbPayment {
     endDate,
     isLifeTime,
     startDate,
+    branchId,
   }: {
     cmpId: string;
+    branchId?: string | null;
     lastDoc?: DocumentData | null;
     lmt?: number;
     startDate?: Date | string | null;
@@ -648,6 +662,13 @@ class DbPayment {
         ...queryParams,
         where('PayStubPayDate', '>=', startDate),
         where('PayStubPayDate', '<=', endDate),
+      ];
+    }
+
+    if (branchId && branchId.length > 0) {
+      queryParams = [
+        ...queryParams,
+        where('PayStubCompanyBranchId', '==', branchId),
       ];
     }
 

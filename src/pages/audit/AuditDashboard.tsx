@@ -25,7 +25,11 @@ const AuditDashboard = () => {
         setStartDate={setStartDate}
         startDate={startDate}
       />
-      <TotalAmtCards />
+      <TotalAmtCards
+        startDate={startDate}
+        endDate={endDate}
+        selectedBranchId={selectedBranchId}
+      />
     </div>
   );
 };

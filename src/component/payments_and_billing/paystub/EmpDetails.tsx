@@ -56,10 +56,18 @@ const EmpDetails = ({
       setValue('PayStubEmpId', selectedEmp?.EmployeeId);
       setValue('PayStubEmpName', selectedEmp?.EmployeeName);
       setValue('PayStubEmpRole', selectedEmp?.EmployeeRole);
+      setValue(
+        'PayStubCompanyBranchId',
+        selectedEmp?.EmployeeCompanyBranchId || null
+      );
     } else {
       setValue('PayStubEmpId', isEdit ? payStubEditData.PayStubEmpId : '');
       setValue('PayStubEmpName', isEdit ? payStubEditData.PayStubEmpName : '');
       setValue('PayStubEmpRole', isEdit ? payStubEditData.PayStubEmpRole : '');
+      setValue(
+        'PayStubCompanyBranchId',
+        isEdit ? payStubEditData?.PayStubCompanyBranchId || null : null
+      );
     }
   }, [empSearchQuery, isEdit]);
 
