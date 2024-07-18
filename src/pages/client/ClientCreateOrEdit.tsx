@@ -23,7 +23,7 @@ import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FaImage } from 'react-icons/fa';
-import SelectBranch from '../../common/SelectBranch';
+import InputSelect from '../../common/inputs/InputSelect';
 
 const ClientCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ const ClientCreateOrEdit = () => {
         },
   });
 
-  const { company } = useAuthState();
+  const { company, companyBranches } = useAuthState();
 
   const queryClient = useQueryClient();
 
@@ -233,13 +233,23 @@ const ClientCreateOrEdit = () => {
               name="ClientPhone"
               error={methods.formState.errors.ClientPhone?.message}
             />
-            <SelectBranch
+            <InputSelect
               label="Select branch"
-              selectedBranch={methods.watch('ClientCompanyBranchId') || ''}
-              setSelectedBranch={(e) =>
+              data={[
+                { label: 'All branch', value: '' },
+                ...companyBranches.map((branches) => {
+                  return {
+                    label: branches.CompanyBranchName,
+                    value: branches.CompanyBranchId,
+                  };
+                }),
+              ]}
+              value={methods.watch('ClientCompanyBranchId') || ''}
+              onChange={(e) =>
                 methods.setValue('ClientCompanyBranchId', e as string)
               }
             />
+
             <InputWithTopHeader
               label="Client Email"
               className="mx-0"
