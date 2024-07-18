@@ -11,6 +11,7 @@ import {
   IEmployeesCollection,
   IEquipmentsCollection,
   IInvoicesCollection,
+  IPatrolLogsCollection,
   IPayStubsCollection,
   IShiftsCollection,
 } from '../../@types/database';
@@ -18,6 +19,7 @@ import { toDate } from '../../utilities/misc';
 import IncomeChart from '../../component/audit/dashboard/charts/IncomeChart';
 import ExpenseChart from '../../component/audit/dashboard/charts/ExpenseChart';
 import ShiftChart from '../../component/audit/dashboard/charts/ShiftChart';
+import PatrolChart from '../../component/audit/dashboard/charts/PatrolChart';
 
 const AuditDashboard = () => {
   const { company } = useAuthState();
@@ -39,6 +41,7 @@ const AuditDashboard = () => {
     payStubs: IPayStubsCollection[];
     invoices: IInvoicesCollection[];
     shifts: IShiftsCollection[];
+    patrolLogs: IPatrolLogsCollection[];
   }>({
     clients: [],
     employees: [],
@@ -46,6 +49,7 @@ const AuditDashboard = () => {
     invoices: [],
     payStubs: [],
     shifts: [],
+    patrolLogs: [],
   });
 
   useEffect(() => {
@@ -133,6 +137,22 @@ const AuditDashboard = () => {
             shifts={auditData.shifts.sort(
               (a, b) =>
                 toDate(a.ShiftDate).getTime() - toDate(b.ShiftDate).getTime()
+            )}
+          />
+        </div>
+
+        <div className="bg-surface p-4 rounded shadow flex flex-col gap-4">
+          <div className="flex justify-between">
+            <div className="font-semibold">Patrol Chart</div>
+            <span className=" text-textSecondary font-semibold">
+              Total: {auditData.patrolLogs.length}
+            </span>
+          </div>
+
+          <PatrolChart
+            patrolLogs={auditData.patrolLogs.sort(
+              (a, b) =>
+                toDate(a.PatrolDate).getTime() - toDate(b.PatrolDate).getTime()
             )}
           />
         </div>

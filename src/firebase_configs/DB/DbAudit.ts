@@ -3,6 +3,8 @@ import {
   IEmployeesCollection,
   IEquipmentsCollection,
   IInvoicesCollection,
+  IPatrolLogsCollection,
+  IPatrolsCollection,
   IPayStubsCollection,
   IShiftsCollection,
 } from '../../@types/database';
@@ -32,6 +34,7 @@ class DbAudit {
       payStubs: IPayStubsCollection[] = [],
       invoices: IInvoicesCollection[] = [],
       shifts: IShiftsCollection[] = [];
+    const patrolLogs: IPatrolLogsCollection[] = [];
 
     endDate = dayjs(endDate).endOf('day').toDate();
 
@@ -69,7 +72,7 @@ class DbAudit {
         branchId,
       });
 
-      const patrolTask = DbPatrol.getPatrols({ cmpId });
+      const patrolTask = DbPatrol.getPatrols({ cmpId, branchId });
 
       //*Resolve all the task promise
 
@@ -80,6 +83,7 @@ class DbAudit {
         equipmentSnapshot,
         clientSnapshot,
         shiftSnapshot,
+        patrolSnapshot,
       ] = await Promise.all([
         invoiceTask,
         payStubTask,
@@ -87,6 +91,7 @@ class DbAudit {
         equipmentTask,
         clientTask,
         shiftTask,
+        patrolTask,
       ]);
 
       invoices = invoiceSnapshot.docs.map(
@@ -111,6 +116,23 @@ class DbAudit {
 
       shifts = shiftSnapshot.docs.map((doc) => doc.data() as IShiftsCollection);
 
+      const patrols = patrolSnapshot.docs.map(
+        (doc) => doc.data() as IPatrolsCollection
+      );
+
+      await Promise.all(
+        patrols.map(async (data) => {
+          const patrolLogsSnapshot = await DbPatrol.getPatrolLogs({
+            patrolId: data.PatrolId,
+            endDate,
+            startDate,
+          });
+          patrolLogsSnapshot.docs.forEach((doc) =>
+            patrolLogs.push(doc.data() as IPatrolLogsCollection)
+          );
+        })
+      );
+
       return {
         clients,
         employees,
@@ -118,6 +140,7 @@ class DbAudit {
         payStubs,
         invoices,
         shifts,
+        patrolLogs,
       };
     } catch (error) {
       console.log(error, 'here');
@@ -128,6 +151,7 @@ class DbAudit {
         payStubs,
         invoices,
         shifts,
+        patrolLogs,
       };
     }
   };

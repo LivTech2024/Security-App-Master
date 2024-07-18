@@ -3,18 +3,18 @@ import 'chartjs-adapter-dayjs-4';
 import dayjs from 'dayjs';
 
 import { Line } from 'react-chartjs-2';
-import { IShiftsCollection } from '../../../../@types/database';
+import { IPatrolLogsCollection } from '../../../../@types/database';
 import { useEffect, useState } from 'react';
 import { toDate } from '../../../../utilities/misc';
 
 ChartJS.register();
 
-interface ShiftChartProps {
-  shifts: IShiftsCollection[];
+interface PatrolChartProps {
+  patrolLogs: IPatrolLogsCollection[];
 }
 
-const ShiftChart = ({ shifts }: ShiftChartProps) => {
-  const [shiftChartData, setShiftChartData] = useState<
+const PatrolChart = ({ patrolLogs }: PatrolChartProps) => {
+  const [PatrolChartData, setPatrolChartData] = useState<
     {
       Date: Date;
       Amount: number;
@@ -22,22 +22,22 @@ const ShiftChart = ({ shifts }: ShiftChartProps) => {
   >([]);
 
   useEffect(() => {
-    const shiftChartDataTemp: {
+    const PatrolChartDataTemp: {
       Date: Date;
       Amount: number;
     }[] = [];
-    shifts.forEach((res) => {
-      const isExist = shiftChartDataTemp.find((d) =>
-        dayjs(d.Date).isSame(toDate(res.ShiftDate), 'day')
+    patrolLogs.forEach((res) => {
+      const isExist = PatrolChartDataTemp.find((d) =>
+        dayjs(d.Date).isSame(toDate(res.PatrolDate), 'day')
       );
       if (isExist) {
         isExist.Amount += 1;
       } else {
-        shiftChartDataTemp.push({ Date: toDate(res.ShiftDate), Amount: 1 });
+        PatrolChartDataTemp.push({ Date: toDate(res.PatrolDate), Amount: 1 });
       }
     });
-    setShiftChartData(shiftChartDataTemp);
-  }, [shifts]);
+    setPatrolChartData(PatrolChartDataTemp);
+  }, [patrolLogs]);
 
   const data: ChartData<'line'> = {
     datasets: [
@@ -45,23 +45,23 @@ const ShiftChart = ({ shifts }: ShiftChartProps) => {
         label: 'Shift',
         data: [
           {
-            x: dayjs(shiftChartData[0]?.Date)
+            x: dayjs(PatrolChartData[0]?.Date)
               .subtract(1, 'day')
               .toDate() as unknown as number,
             y: 0,
           },
-          ...shiftChartData.map((res) => {
+          ...PatrolChartData.map((res) => {
             return { x: res.Date as unknown as number, y: res.Amount };
           }),
           {
-            x: dayjs(shiftChartData[shiftChartData.length - 1]?.Date)
+            x: dayjs(PatrolChartData[PatrolChartData.length - 1]?.Date)
               .add(1, 'day')
               .toDate() as unknown as number,
             y: 0,
           },
         ],
-        borderColor: '#22c55e',
-        pointBackgroundColor: '#22c55e',
+        borderColor: '#fbbf39',
+        pointBackgroundColor: '#fbbf39',
       },
     ],
   };
@@ -167,4 +167,4 @@ const ShiftChart = ({ shifts }: ShiftChartProps) => {
   );
 };
 
-export default ShiftChart;
+export default PatrolChart;
