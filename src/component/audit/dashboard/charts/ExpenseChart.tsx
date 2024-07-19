@@ -115,6 +115,7 @@ const ExpenseChart = ({ ExpenseData }: ExpenseChartProps) => {
             },
             ticks: {
               color: '#000000',
+              maxRotation: 0,
             },
           },
         },

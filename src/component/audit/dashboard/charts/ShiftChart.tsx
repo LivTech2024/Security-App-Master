@@ -143,6 +143,7 @@ const ShiftChart = ({ shifts }: ShiftChartProps) => {
             },
             ticks: {
               color: '#000000',
+              maxRotation: 0,
             },
           },
         },

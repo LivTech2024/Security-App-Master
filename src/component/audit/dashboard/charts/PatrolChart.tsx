@@ -143,6 +143,7 @@ const PatrolChart = ({ patrolLogs }: PatrolChartProps) => {
             },
             ticks: {
               color: '#000000',
+              maxRotation: 0,
             },
           },
         },
