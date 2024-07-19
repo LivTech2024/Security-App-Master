@@ -149,7 +149,7 @@ export const addEmployeeFormSchema = z
     }),
     EmployeeSupervisorId: z.array(z.string()).nullable().optional(),
     EmployeeCompanyBranchId: z.string().nullable().optional(),
-    EmployeeIsBanned: z.boolean(),
+    EmployeeBannedLocationsId: z.array(z.string()),
     EmployeeSinNumber: z.string().optional().nullable(),
     EmployeeAddress: z.string().optional().nullable(),
     EmployeePostalCode: z.string().optional().nullable(),

@@ -30,12 +30,12 @@ import EmpUploadImgCard from '../../component/employees/EmpUploadImgCard';
 import EmployeeOtherDetails, {
   EmpLicenseDetails,
 } from '../../component/employees/EmployeeOtherDetails';
-import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader';
 import { IEmpBankDetails } from '../../@types/database';
 import { EmpCertificates } from '../../component/employees/EmpCertificateDetails';
 import InputHeader from '../../common/inputs/InputHeader';
 import { MultiSelect } from '@mantine/core';
 import InputSelect from '../../common/inputs/InputSelect';
+import useFetchLocations from '../../hooks/fetch/useFetchLocations';
 
 const EmployeeCreateOrEdit = () => {
   const { employeeEditData } = useEditFormStore();
@@ -61,7 +61,8 @@ const EmployeeCreateOrEdit = () => {
           ) as unknown as number,
           EmployeeSupervisorId: employeeEditData.EmployeeSupervisorId,
           EmployeeCompanyBranchId: employeeEditData.EmployeeCompanyBranchId,
-          EmployeeIsBanned: employeeEditData.EmployeeIsBanned,
+          EmployeeBannedLocationsId:
+            employeeEditData.EmployeeBannedLocationsId || [],
           EmployeeSinNumber: employeeEditData.EmployeeSinNumber,
           EmployeeAddress: employeeEditData.EmployeeAddress,
           EmployeeCity: employeeEditData.EmployeeCity,
@@ -125,6 +126,8 @@ const EmployeeCreateOrEdit = () => {
     limit: 100,
     empRole: 'SUPERVISOR',
   });
+
+  const { data: locations } = useFetchLocations({});
 
   const [empImageBase64, setEmpImageBase64] = useState<string | null>(null);
 
@@ -378,7 +381,37 @@ const EmployeeCreateOrEdit = () => {
                 error={methods.formState.errors.EmployeeMaxHrsPerWeek?.message}
                 decimalCount={2}
               />
-
+              <InputSelect
+                label="Select branch"
+                data={[
+                  { label: 'All branch', value: '' },
+                  ...companyBranches.map((branches) => {
+                    return {
+                      label: branches.CompanyBranchName,
+                      value: branches.CompanyBranchId,
+                    };
+                  }),
+                ]}
+                value={methods.watch('EmployeeCompanyBranchId') || ''}
+                onChange={(e) =>
+                  methods.setValue('EmployeeCompanyBranchId', e as string)
+                }
+                nothingFoundMessage={
+                  <div
+                    onClick={() => {
+                      navigate(PageRoutes.COMPANY_BRANCHES);
+                      setAddCmpBranchModal(true);
+                    }}
+                    className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <AiOutlinePlus size={18} />
+                      <span>Add new branch</span>
+                    </div>
+                  </div>
+                }
+                className="w-full"
+              />
               {employeeRole !== 'SUPERVISOR' && (
                 <div className="flex flex-col gap-1 col-span-2">
                   <InputHeader title="Supervisor" />
@@ -429,44 +462,49 @@ const EmployeeCreateOrEdit = () => {
                 </div>
               )}
 
-              <div className="col-span-2 flex items-end justify-end w-full gap-4">
-                <InputSelect
-                  label="Select branch"
-                  data={[
-                    { label: 'All branch', value: '' },
-                    ...companyBranches.map((branches) => {
-                      return {
-                        label: branches.CompanyBranchName,
-                        value: branches.CompanyBranchId,
-                      };
-                    }),
-                  ]}
-                  value={methods.watch('EmployeeCompanyBranchId') || ''}
+              <div className="flex flex-col gap-1 col-span-2">
+                <InputHeader title="Employee Banned Locations" />
+                <MultiSelect
+                  searchable
+                  data={locations.map((branch) => {
+                    return {
+                      label: branch.LocationName,
+                      value: branch.LocationId,
+                    };
+                  })}
+                  value={methods.watch('EmployeeBannedLocationsId') || []}
                   onChange={(e) =>
-                    methods.setValue('EmployeeCompanyBranchId', e as string)
+                    methods.setValue('EmployeeBannedLocationsId', e)
                   }
                   nothingFoundMessage={
                     <div
                       onClick={() => {
-                        navigate(PageRoutes.COMPANY_BRANCHES);
-                        setAddCmpBranchModal(true);
+                        navigate(PageRoutes.EMPLOYEE_LIST);
+                        setTimeout(
+                          () => navigate(PageRoutes.EMPLOYEE_CREATE_OR_EDIT),
+                          50
+                        );
                       }}
                       className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
                         <AiOutlinePlus size={18} />
-                        <span>Add new branch</span>
+                        <span>Add new supervisor</span>
                       </div>
                     </div>
                   }
-                  className="w-full"
-                />
-
-                <SwitchWithSideHeader
-                  register={methods.register}
-                  name="EmployeeIsBanned"
-                  className="w-full font-medium bg-onHoverBg px-4 py-[10px] rounded"
-                  label="Ban this employee"
+                  error={methods.formState.errors.EmployeeSupervisorId?.message}
+                  styles={{
+                    input: {
+                      border: `1px solid #0000001A`,
+                      fontWeight: 'normal',
+                      fontSize: '18px',
+                      borderRadius: '4px',
+                      background: '#FFFFFF',
+                      color: '#000000',
+                      padding: '8px 8px',
+                    },
+                  }}
                 />
               </div>
             </div>

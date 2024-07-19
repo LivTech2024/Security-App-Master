@@ -72,7 +72,7 @@ export interface IEmployeesCollection {
   EmployeeMaxHrsPerWeek: number;
   EmployeeIsAvailable: 'available' | 'out_of_reach' | 'on_vacation';
   EmployeeSupervisorId: string[] | null;
-  EmployeeIsBanned: boolean;
+  EmployeeBannedLocationsId: string[] | null;
   EmployeeCompanyId: string;
   EmployeeCompanyBranchId?: string | null;
   EmployeeLicenses: IEmpLicenseDetails[];
