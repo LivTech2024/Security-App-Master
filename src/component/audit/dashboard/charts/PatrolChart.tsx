@@ -97,7 +97,7 @@ const PatrolChart = ({ patrolLogs }: PatrolChartProps) => {
   };
 
   const [selectedChartType, setSelectedChartType] = useState<'line' | 'bar'>(
-    'line'
+    'bar'
   );
 
   return (

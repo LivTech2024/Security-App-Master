@@ -97,7 +97,7 @@ const ShiftChart = ({ shifts }: ShiftChartProps) => {
   };
 
   const [selectedChartType, setSelectedChartType] = useState<'line' | 'bar'>(
-    'line'
+    'bar'
   );
 
   return (
