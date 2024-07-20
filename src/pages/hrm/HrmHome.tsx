@@ -54,7 +54,9 @@ const HrmHome = () => {
             notifications to supervisors for approvals."
         />
         <HrmHomeItem
-          onClick={() => {}}
+          onClick={() => {
+            navigate(PageRoutes.PERFORMANCE_ASSURANCE);
+          }}
           icon={<FaClipboardCheck className="text-7xl text-yellow-500 -ml-2" />}
           title="Performance Reviews and Goal Tracking"
           description="Integrate performance review cycles with goal-setting features,

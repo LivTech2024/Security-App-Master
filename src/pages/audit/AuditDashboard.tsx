@@ -20,7 +20,6 @@ import IncomeChart from '../../component/audit/dashboard/charts/IncomeChart';
 import ExpenseChart from '../../component/audit/dashboard/charts/ExpenseChart';
 import ShiftChart from '../../component/audit/dashboard/charts/ShiftChart';
 import PatrolChart from '../../component/audit/dashboard/charts/PatrolChart';
-import InputSelect from '../../common/inputs/InputSelect';
 
 const AuditDashboard = () => {
   const { company } = useAuthState();
@@ -90,17 +89,6 @@ const AuditDashboard = () => {
           0
         )}
       />
-
-      <div className="flex gap-4 font-semibold items-center p-4 rounded bg-surface shadow">
-        <span>Chart Type</span>
-        <InputSelect
-          placeholder="Chart Type"
-          data={[
-            { label: 'Bar', value: 'bar' },
-            { label: 'Line', value: 'line' },
-          ]}
-        />
-      </div>
 
       <div className="grid grid-cols-2 gap-4 w-full">
         <IncomeChart
