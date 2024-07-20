@@ -714,3 +714,20 @@ export interface IEmergencyProtocolsCollection {
   EmergProtocolCreatedAt: Timestamp | FieldValue;
   EmergProtocolModifiedAt: Timestamp | FieldValue;
 }
+
+export interface ILeaveRequestsCollection {
+  LeaveReqId: string;
+  LeaveReqCompanyId: string;
+  LeaveReqCompanyBranchId?: string | null;
+  LeaveReqSupervisorId?: string | null;
+  LeaveReqEmpId: string;
+  LeaveReqEmpName: string;
+  LeaveReqFromDate: Timestamp | FieldValue;
+  LeaveReqToDate: Timestamp | FieldValue;
+  LeaveReqReason: string;
+  LeaveReqStatus: 'pending' | 'accepted' | 'rejected';
+  LeaveReqIsPaidLeave?: boolean; //*This will done from Admin Portal
+  LeaveReqPaidLeaveAmt?: number; //*This will done from Admin Portal
+  LeaveReqCreatedAt: string;
+  LeaveReqModifiedAt: string;
+}

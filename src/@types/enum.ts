@@ -34,6 +34,7 @@ export enum CollectionName {
   trainingAndCertifications = 'TrainingAndCertifications',
   trainCertsAllocation = 'TrainCertsAllocation',
   emergencyProtocols = 'EmergencyProtocols',
+  leaveRequests = 'LeaveRequests',
 }
 
 export const DisplayCount = {
