@@ -20,6 +20,7 @@ import IncomeChart from '../../component/audit/dashboard/charts/IncomeChart';
 import ExpenseChart from '../../component/audit/dashboard/charts/ExpenseChart';
 import ShiftChart from '../../component/audit/dashboard/charts/ShiftChart';
 import PatrolChart from '../../component/audit/dashboard/charts/PatrolChart';
+import InputSelect from '../../common/inputs/InputSelect';
 
 const AuditDashboard = () => {
   const { company } = useAuthState();
@@ -64,6 +65,7 @@ const AuditDashboard = () => {
       setAuditData(data);
     });
   }, [startDate, endDate, selectedBranchId, company]);
+
   return (
     <div className="flex flex-col gap-4 p-6">
       <PageHeader title="Audit Dashboard" />
@@ -89,73 +91,59 @@ const AuditDashboard = () => {
         )}
       />
 
+      <div className="flex gap-4 font-semibold items-center p-4 rounded bg-surface shadow">
+        <span>Chart Type</span>
+        <InputSelect
+          placeholder="Chart Type"
+          data={[
+            { label: 'Bar', value: 'bar' },
+            { label: 'Line', value: 'line' },
+          ]}
+        />
+      </div>
+
       <div className="grid grid-cols-2 gap-4 w-full">
-        <div className="bg-surface p-4 rounded shadow  flex flex-col gap-4">
-          <div className="font-semibold">Income Chart</div>
-          <IncomeChart
-            IncomeData={auditData.invoices
-              .sort(
-                (a, b) =>
-                  toDate(a.InvoiceDate).getTime() -
-                  toDate(b.InvoiceDate).getTime()
-              )
-              .map((res) => {
-                return {
-                  Amount: res.InvoiceReceivedAmount,
-                  Date: toDate(res.InvoiceDate),
-                };
-              })}
-          />
-        </div>
-        <div className="bg-surface p-4 rounded shadow  flex flex-col gap-4">
-          <div className="font-semibold">Expense Chart</div>
-
-          <ExpenseChart
-            ExpenseData={auditData.payStubs
-              .sort(
-                (a, b) =>
-                  toDate(a.PayStubPayDate).getTime() -
-                  toDate(b.PayStubPayDate).getTime()
-              )
-              .map((res) => {
-                return {
-                  Amount: res.PayStubNetPay.Amount,
-                  Date: toDate(res.PayStubPayDate),
-                };
-              })}
-          />
-        </div>
-        <div className="bg-surface p-4 rounded shadow flex flex-col gap-4">
-          <div className="flex justify-between">
-            <div className="font-semibold">Shift Chart</div>
-            <span className=" text-textSecondary font-semibold">
-              Total: {auditData.shifts.length}
-            </span>
-          </div>
-
-          <ShiftChart
-            shifts={auditData.shifts.sort(
+        <IncomeChart
+          IncomeData={auditData.invoices
+            .sort(
               (a, b) =>
-                toDate(a.ShiftDate).getTime() - toDate(b.ShiftDate).getTime()
-            )}
-          />
-        </div>
-
-        <div className="bg-surface p-4 rounded shadow flex flex-col gap-4">
-          <div className="flex justify-between">
-            <div className="font-semibold">Patrol Chart</div>
-            <span className=" text-textSecondary font-semibold">
-              Total: {auditData.patrolLogs.length}
-            </span>
-          </div>
-
-          <PatrolChart
-            patrolLogs={auditData.patrolLogs.sort(
+                toDate(a.InvoiceDate).getTime() -
+                toDate(b.InvoiceDate).getTime()
+            )
+            .map((res) => {
+              return {
+                Amount: res.InvoiceReceivedAmount,
+                Date: toDate(res.InvoiceDate),
+              };
+            })}
+        />
+        <ExpenseChart
+          ExpenseData={auditData.payStubs
+            .sort(
               (a, b) =>
-                toDate(a.PatrolDate).getTime() - toDate(b.PatrolDate).getTime()
-            )}
-          />
-        </div>
+                toDate(a.PayStubPayDate).getTime() -
+                toDate(b.PayStubPayDate).getTime()
+            )
+            .map((res) => {
+              return {
+                Amount: res.PayStubNetPay.Amount,
+                Date: toDate(res.PayStubPayDate),
+              };
+            })}
+        />
+        <ShiftChart
+          shifts={auditData.shifts.sort(
+            (a, b) =>
+              toDate(a.ShiftDate).getTime() - toDate(b.ShiftDate).getTime()
+          )}
+        />
+
+        <PatrolChart
+          patrolLogs={auditData.patrolLogs.sort(
+            (a, b) =>
+              toDate(a.PatrolDate).getTime() - toDate(b.PatrolDate).getTime()
+          )}
+        />
       </div>
     </div>
   );
