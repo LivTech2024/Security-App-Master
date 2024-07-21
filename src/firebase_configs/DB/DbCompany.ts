@@ -333,7 +333,7 @@ class DbCompany {
 
   static deleteUserLoggedInDoc = async (loggedInId: string) => {
     const loggedInRef = doc(db, CollectionName.loggedInUsers, loggedInId);
-    await deleteDoc(loggedInRef);
+    return deleteDoc(loggedInRef);
   };
 
   static addLocation = async (

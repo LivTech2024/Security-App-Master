@@ -52,14 +52,20 @@ const useOnAuthStateChanged = () => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
       try {
         setLoading(true);
-        if (!userAuth) {
-          console.log('userAuth not found -> signing out');
-          setLoading(false);
-          return;
-        }
         const loggedInUser = storage.getJson<LocalStorageLoggedInUserData>(
           LocalStorageKey.LOGGEDIN_USER
         );
+        if (!userAuth) {
+          console.log('userAuth not found -> signing out');
+          if (loggedInUser && loggedInUser?.LoggedInId) {
+            console.log('Deleting loggedIn user doc');
+            await DbCompany.deleteUserLoggedInDoc(loggedInUser?.LoggedInId);
+            storage.clear(LocalStorageKey.LOGGEDIN_USER);
+          }
+          setLoading(false);
+          return;
+        }
+
         if (!loggedInUser) {
           setLoading(false);
           return;
