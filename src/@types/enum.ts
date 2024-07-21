@@ -203,6 +203,7 @@ export const PageRoutes = {
   AUDIT_DASHBOARD: '/audit_dashboard',
 
   HRM_HOME: '/hrm_home',
+  HRM_LEAVE_REQ_LIST: '/hrm_leave_request_list',
 
   //Unprotected page
   PRIVACY_POLICY: '/unprotected/privacy_policy',

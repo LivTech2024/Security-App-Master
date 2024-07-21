@@ -47,7 +47,9 @@ const HrmHome = () => {
           description="Streamline onboarding with digital forms, e-learning modules, and automated task assignments."
         />
         <HrmHomeItem
-          onClick={() => {}}
+          onClick={() => {
+            navigate(PageRoutes.HRM_LEAVE_REQ_LIST);
+          }}
           icon={<FaCalendarAlt className="text-7xl text-blue-500 -ml-1" />}
           title="Leave Management and Approval Workflows"
           description=" Configure flexible workflows for leave requests, with automated

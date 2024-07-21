@@ -84,6 +84,7 @@ import TrainCertsCreateOrEdit from './pages/training_and_certification/TrainCert
 import EmergResList from './pages/emergency_response/EmergResList';
 import EmployeeRoute from './pages/employee/EmployeeRoute';
 import AuditDashboard from './pages/audit/AuditDashboard';
+import LeaveRequestList from './pages/hrm/leave_management/LeaveRequestList';
 
 function App() {
   useOnAuthStateChanged();
@@ -384,6 +385,10 @@ function App() {
             />
 
             <Route path={PageRoutes.HRM_HOME} Component={HrmHome} />
+            <Route
+              path={PageRoutes.HRM_LEAVE_REQ_LIST}
+              Component={LeaveRequestList}
+            />
           </Routes>
         </Layout>
       </ModalsProvider>
