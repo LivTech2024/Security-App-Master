@@ -314,9 +314,11 @@ class DbPatrol {
       PatrolLogCheckPoints.forEach((ch) => {
         const { CheckPointImage } = ch;
         if (CheckPointImage) {
-          CheckPointImage.forEach((img) => {
-            imageToBeDeleted.push(img);
-          });
+          Array.isArray(CheckPointImage)
+            ? CheckPointImage.forEach((img) => {
+                imageToBeDeleted.push(img);
+              })
+            : imageToBeDeleted.push(CheckPointImage);
         }
       });
 
