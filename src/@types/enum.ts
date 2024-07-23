@@ -63,6 +63,7 @@ export const DisplayCount = {
   TRAIN_CERTS_LIST: 20,
   TRAIN_CERTS_ALLOC_LIST: 20,
   EMERG_PROTOCOLS_LIST: 20,
+  LEAVE_REQ_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -94,6 +95,7 @@ export const REACT_QUERY_KEYS = {
   TRAIN_CERTS_LIST: 'train-certs-list',
   TRAIN_CERTS_ALLOC_LIST: 'train-certs-alloc-list',
   EMERG_PROTOCOLS_LIST: 'emerg-protocol-list',
+  LEAVE_REQ_LIST: 'leave-req-list',
 } as const;
 
 export const MinimumQueryCharacter = {
