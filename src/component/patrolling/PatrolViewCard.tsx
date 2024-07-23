@@ -87,23 +87,39 @@ const PatrolViewCard = ({
                       <span className="flex flex-col">
                         <span>Images: </span>
                         <div className="flex items-center gap-4 flex-wrap">
-                          {ch.CheckPointImage?.map((img) => {
-                            return (
-                              <a
-                                href={img}
-                                target="_blank"
-                                className="text-textPrimaryBlue"
-                              >
-                                <LazyLoad height={100}>
-                                  <img
-                                    src={img}
-                                    alt=""
-                                    className="w-[100px] h-[100px] rounded object-cover"
-                                  />
-                                </LazyLoad>
-                              </a>
-                            );
-                          })}{' '}
+                          {Array.isArray(ch.CheckPointImage) ? (
+                            ch.CheckPointImage?.map((img) => {
+                              return (
+                                <a
+                                  href={img}
+                                  target="_blank"
+                                  className="text-textPrimaryBlue"
+                                >
+                                  <LazyLoad height={100}>
+                                    <img
+                                      src={img}
+                                      alt=""
+                                      className="w-[100px] h-[100px] rounded object-cover"
+                                    />
+                                  </LazyLoad>
+                                </a>
+                              );
+                            })
+                          ) : (
+                            <a
+                              href={ch.CheckPointImage}
+                              target="_blank"
+                              className="text-textPrimaryBlue"
+                            >
+                              <LazyLoad height={100}>
+                                <img
+                                  src={ch.CheckPointImage}
+                                  alt=""
+                                  className="w-[100px] h-[100px] rounded object-cover"
+                                />
+                              </LazyLoad>
+                            </a>
+                          )}{' '}
                         </div>
                       </span>
                     ) : null}
