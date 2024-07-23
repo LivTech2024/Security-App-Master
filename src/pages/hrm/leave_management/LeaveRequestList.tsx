@@ -16,6 +16,7 @@ import NoSearchResult from '../../../common/NoSearchResult';
 import { formatDate } from '../../../utilities/misc';
 import { Status } from '../../../common/Status';
 import TableShimmer from '../../../common/shimmer/TableShimmer';
+import LeaveReqUpdateModal from '../../../component/hrm/modal/LeaveReqUpdateModal';
 
 const LeaveRequestList = () => {
   const { company } = useAuthState();
@@ -120,6 +121,11 @@ const LeaveRequestList = () => {
       fetchNextPage();
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
+
+  const [leaveReqUpdateModal, setLeaveReqUpdateModal] = useState(false);
+
+  const [selectedLeaveReq, setSelectedLeaveReq] =
+    useState<ILeaveRequestsCollection | null>(null);
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader title="Leave requests" />
@@ -184,7 +190,14 @@ const LeaveRequestList = () => {
           ) : (
             data.map((res) => {
               return (
-                <tr key={res.LeaveReqId} className="cursor-pointer">
+                <tr
+                  onClick={() => {
+                    setSelectedLeaveReq(res);
+                    setLeaveReqUpdateModal(true);
+                  }}
+                  key={res.LeaveReqId}
+                  className="cursor-pointer"
+                >
                   <td className="align-top px-4 py-2 text-start capitalize">
                     <span className="line-clamp-2">{res.LeaveReqEmpName}</span>
                   </td>
@@ -231,6 +244,12 @@ const LeaveRequestList = () => {
           </tr>
         </tbody>
       </table>
+
+      <LeaveReqUpdateModal
+        data={selectedLeaveReq}
+        opened={leaveReqUpdateModal}
+        setOpened={setLeaveReqUpdateModal}
+      />
     </div>
   );
 };

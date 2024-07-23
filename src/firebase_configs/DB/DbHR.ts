@@ -1,5 +1,6 @@
 import {
   collection,
+  doc,
   DocumentData,
   getDocs,
   limit,
@@ -7,10 +8,12 @@ import {
   query,
   QueryConstraint,
   startAfter,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 import { CollectionName } from '../../@types/enum';
 import { db } from '../config';
+import { ILeaveRequestsCollection } from '../../@types/database';
 
 class DbHR {
   static getLeaveRequests = ({
@@ -69,6 +72,28 @@ class DbHR {
     const docQuery = query(docRef, ...queryParams);
 
     return getDocs(docQuery);
+  };
+
+  static updateLeaveRequest = ({
+    isPaidLeave,
+    leaveStatus,
+    paidLeaveAmt,
+    reqId,
+  }: {
+    reqId: string;
+    isPaidLeave: boolean;
+    paidLeaveAmt: number;
+    leaveStatus: 'pending' | 'rejected' | 'accepted';
+  }) => {
+    const leaveReqRef = doc(db, CollectionName.leaveRequests, reqId);
+
+    const updatedLeaveReq: Partial<ILeaveRequestsCollection> = {
+      LeaveReqIsPaidLeave: isPaidLeave,
+      LeaveReqPaidLeaveAmt: isPaidLeave ? paidLeaveAmt : 0,
+      LeaveReqStatus: leaveStatus,
+    };
+
+    return updateDoc(leaveReqRef, updatedLeaveReq);
   };
 }
 
