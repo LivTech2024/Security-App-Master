@@ -329,6 +329,22 @@ class DbPatrol {
       await Promise.all(imageDeletePromise);
     });
   };
+
+  static createPatrolLogCopy = async (patrolLogId = '5ds9p3W22v8iJQkYyREn') => {
+    const docRef = doc(db, CollectionName.patrolLogs, patrolLogId);
+    const docSnapshot = await getDoc(docRef);
+    const docData = docSnapshot.data() as IPatrolLogsCollection;
+
+    const newPatrolLogId = getNewDocId(CollectionName.patrolLogs);
+    const newDocRef = doc(db, CollectionName.patrolLogs, newPatrolLogId);
+    const newDocData: IPatrolLogsCollection = {
+      ...docData,
+      PatrolLogId: newPatrolLogId,
+      PatrolLogCreatedAt: serverTimestamp(),
+    };
+
+    await setDoc(newDocRef, newDocData);
+  };
 }
 
 export default DbPatrol;

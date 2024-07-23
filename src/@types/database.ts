@@ -236,7 +236,7 @@ export interface IPatrolLogsCollection {
   PatrolLogFeedbackComment?: string | null;
   PatrolLogStatus: 'started' | 'completed';
   PatrolLogEndedAt: Timestamp | FieldValue;
-  PatrolLogCreatedAt: Timestamp;
+  PatrolLogCreatedAt: Timestamp | FieldValue;
 }
 
 export interface IReportCategoriesCollection {
