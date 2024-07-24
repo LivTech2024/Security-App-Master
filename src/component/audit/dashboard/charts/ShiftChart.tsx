@@ -104,7 +104,7 @@ const ShiftChart = ({ shifts }: ShiftChartProps) => {
     <div className="bg-surface p-4 rounded shadow  flex flex-col gap-4">
       <div className="flex justify-between">
         <div className="flex gap-4">
-          <div className="font-semibold">Income Chart</div>
+          <div className="font-semibold">Shift Chart</div>
           <ChartTypeDropdown
             selectedChartType={selectedChartType}
             setSelectedChartType={setSelectedChartType}
