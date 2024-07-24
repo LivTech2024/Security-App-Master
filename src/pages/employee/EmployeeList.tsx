@@ -118,6 +118,24 @@ const EmployeeList = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const getEmpStatus = (
+    status: 'on_board' | 'off_board' | 'leaved' | 'fired'
+  ) => {
+    switch (status) {
+      case 'on_board':
+        return 'Onboard';
+      case 'off_board':
+        return 'Offboard';
+      case 'leaved':
+        return 'Leaved';
+      case 'fired':
+        return 'Fired';
+
+      default:
+        return 'Onboard';
+    }
+  };
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
@@ -160,18 +178,19 @@ const EmployeeList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[10%] text-start">Image</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-center">
+            <th className="uppercase px-4 py-2 w-[8%] text-start">Image</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
               First Name
             </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-center">
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
               Last Name
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-center">Email</th>
-            <th className="uppercase px-4 py-2 w-[20%] text-center">
+            <th className="uppercase px-4 py-2 w-[20%] text-start">Email</th>
+            <th className="uppercase px-4 py-2 w-[17%] text-start">
               PHONE NUMBER
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-center">Role</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">Role</th>
+            <th className="uppercase px-4 py-2 w-[10%] text-end">Status</th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -204,12 +223,15 @@ const EmployeeList = () => {
                       className="rounded-full object-cover w-14 h-14"
                     />
                   </td>
-                  <td className="px-4 py-2 text-center">{firstName}</td>
-                  <td className="px-4 py-2 text-center">{lastName}</td>
-                  <td className="px-4 py-2 text-center">{emp.EmployeeEmail}</td>
-                  <td className="px-4 py-2 text-center">{emp.EmployeePhone}</td>
-                  <td className="px-4 py-2 text-center capitalize">
+                  <td className="px-4 py-2 text-start">{firstName}</td>
+                  <td className="px-4 py-2 text-start">{lastName}</td>
+                  <td className="px-4 py-2 text-start">{emp.EmployeeEmail}</td>
+                  <td className="px-4 py-2 text-start">{emp.EmployeePhone}</td>
+                  <td className="px-4 py-2 text-end capitalize">
                     {emp.EmployeeRole}
+                  </td>
+                  <td className="px-4 py-2 text-end capitalize">
+                    {getEmpStatus(emp.EmployeeStatus || 'on_board')}
                   </td>
                 </tr>
               );

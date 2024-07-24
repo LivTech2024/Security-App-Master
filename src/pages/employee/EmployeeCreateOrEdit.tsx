@@ -68,6 +68,7 @@ const EmployeeCreateOrEdit = () => {
           EmployeeCity: employeeEditData.EmployeeCity,
           EmployeePostalCode: employeeEditData.EmployeePostalCode,
           EmployeeProvince: employeeEditData.EmployeeProvince,
+          EmployeeStatus: employeeEditData?.EmployeeStatus || 'on_board',
         }
       : { EmployeeMaxHrsPerWeek: String(45) as unknown as number },
   });
@@ -411,6 +412,24 @@ const EmployeeCreateOrEdit = () => {
                   </div>
                 }
                 className="w-full"
+              />
+              <InputSelect
+                label="Employee Status"
+                data={[
+                  { label: 'Onboard', value: 'on_board' },
+                  { label: 'Offboard', value: 'off_board' },
+                  { label: 'Leaved', value: 'leaved' },
+                  { label: 'Fired', value: 'fired' },
+                ]}
+                value={methods.watch('EmployeeStatus') || 'on_board'}
+                onChange={(e) =>
+                  methods.setValue(
+                    'EmployeeStatus',
+                    e as 'on_board' | 'off_board' | 'leaved' | 'fired'
+                  )
+                }
+                className="w-full"
+                error={methods.formState.errors.EmployeeStatus?.message}
               />
               {employeeRole !== 'SUPERVISOR' && (
                 <div className="flex flex-col gap-1 col-span-2">

@@ -71,6 +71,7 @@ export interface IEmployeesCollection {
   EmployeePayRate: number;
   EmployeeMaxHrsPerWeek: number;
   EmployeeIsAvailable: 'available' | 'out_of_reach' | 'on_vacation';
+  EmployeeStatus: 'on_board' | 'off_board' | 'leaved' | 'fired';
   EmployeeSupervisorId: string[] | null;
   EmployeeBannedLocationsId: string[] | null;
   EmployeeCompanyId: string;
