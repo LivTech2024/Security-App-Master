@@ -2,6 +2,7 @@ import {
   DocumentData,
   GeoPoint,
   QueryConstraint,
+  Timestamp,
   collection,
   deleteDoc,
   doc,
@@ -21,6 +22,7 @@ import CloudStorageImageHandler, { getNewDocId } from './utils';
 import { db } from '../config';
 import {
   IPatrolCheckPointsChild,
+  IPatrolLogsCheckPointsChildCollection,
   IPatrolLogsCollection,
   IPatrolsCollection,
 } from '../../@types/database';
@@ -30,10 +32,12 @@ import {
   fullTextSearchIndex,
   getRandomNumbers,
   removeTimeFromDate,
+  toDate,
 } from '../../utilities/misc';
 import { htmlToPdf } from '../../API/HtmlToPdf';
 import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
 import { Company } from '../../store/slice/auth.slice';
+import dayjs from 'dayjs';
 
 class DbPatrol {
   static createPatrol = async ({
@@ -332,17 +336,40 @@ class DbPatrol {
     });
   };
 
-  static createPatrolLogCopy = async (patrolLogId = '5ds9p3W22v8iJQkYyREn') => {
+  static createPatrolLogCopy = async (patrolLogId: string) => {
     const docRef = doc(db, CollectionName.patrolLogs, patrolLogId);
     const docSnapshot = await getDoc(docRef);
     const docData = docSnapshot.data() as IPatrolLogsCollection;
 
     const newPatrolLogId = getNewDocId(CollectionName.patrolLogs);
     const newDocRef = doc(db, CollectionName.patrolLogs, newPatrolLogId);
+
+    const newCheckPoints: IPatrolLogsCheckPointsChildCollection[] =
+      docData.PatrolLogCheckPoints.map((res) => {
+        return {
+          ...res,
+          CheckPointReportedAt: dayjs(toDate(res.CheckPointReportedAt))
+            .add(1, 'day')
+            .toDate() as unknown as Timestamp,
+        };
+      });
+
     const newDocData: IPatrolLogsCollection = {
       ...docData,
       PatrolLogId: newPatrolLogId,
-      PatrolLogCreatedAt: serverTimestamp(),
+      PatrolLogCheckPoints: newCheckPoints,
+      PatrolDate: dayjs(toDate(docData.PatrolDate))
+        .add(1, 'day')
+        .toDate() as unknown as Timestamp,
+      PatrolLogStartedAt: dayjs(toDate(docData.PatrolLogStartedAt))
+        .add(1, 'day')
+        .toDate() as unknown as Timestamp,
+      PatrolLogEndedAt: dayjs(toDate(docData.PatrolLogEndedAt))
+        .add(1, 'day')
+        .toDate() as unknown as Timestamp,
+      PatrolLogCreatedAt: dayjs(toDate(docData.PatrolLogCreatedAt))
+        .add(1, 'day')
+        .toDate() as unknown as Timestamp,
     };
 
     await setDoc(newDocRef, newDocData);

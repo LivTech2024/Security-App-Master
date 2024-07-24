@@ -216,6 +216,15 @@ export interface IPatrolsCollection {
   PatrolModifiedAt: Timestamp | FieldValue;
 }
 
+export interface IPatrolLogsCheckPointsChildCollection {
+  CheckPointName: string;
+  CheckPointStatus: 'checked' | 'not_checked';
+  CheckPointReportedAt: Timestamp | FieldValue;
+  CheckPointFailureReason?: string;
+  CheckPointComment?: string | null;
+  CheckPointImage?: string[] | string;
+}
+
 export interface IPatrolLogsCollection {
   PatrolLogId: string;
   PatrolId: string;
@@ -225,14 +234,7 @@ export interface IPatrolLogsCollection {
   PatrolLogGuardName: string;
   PatrolLogStartedAt: Timestamp | FieldValue;
   PatrolLogPatrolCount: number;
-  PatrolLogCheckPoints: {
-    CheckPointName: string;
-    CheckPointStatus: 'checked' | 'not_checked';
-    CheckPointReportedAt: Timestamp | FieldValue;
-    CheckPointFailureReason?: string;
-    CheckPointComment?: string | null;
-    CheckPointImage?: string[] | string;
-  }[];
+  PatrolLogCheckPoints: IPatrolLogsCheckPointsChildCollection[];
   PatrolLogFeedbackComment?: string | null;
   PatrolLogStatus: 'started' | 'completed';
   PatrolLogEndedAt: Timestamp | FieldValue;
