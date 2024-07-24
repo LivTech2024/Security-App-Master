@@ -40,7 +40,7 @@ export const ContextConfirmModal = ({
             }}
             className="bg-surface font-medium px-5 py-1 rounded hover:bg-onHoverBg duration-200"
           >
-            {'Cancel'}
+            {innerProps.negativeLabel ? innerProps.negativeLabel : 'Cancel'}
           </button>
 
           <button

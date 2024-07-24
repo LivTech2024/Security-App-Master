@@ -34,6 +34,7 @@ import DbSuperAdmin from '../../firebase_configs/DB/DbSuperAdmin';
 import { FirebaseError } from 'firebase/app';
 import DbClient from '../../firebase_configs/DB/DbClient';
 import { Client } from '../../store/slice/editForm.slice';
+import ForgotPasswordModal from '../../component/login/modal/ForgotPasswordModal';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -152,6 +153,8 @@ const Login = () => {
     }
   };
 
+  const [forgotPasswordModal, setForgotPasswordModal] = useState(false);
+
   return (
     <div className="flex flex-col justify-center items-center min-h-[100vh]">
       <div className="bg-surface rounded shadow border border-gray-300 flex flex-col p-6  w-full sm:max-w-[30%]">
@@ -178,9 +181,17 @@ const Login = () => {
           className="py-2 mt-6"
         />
 
-        <div className="text-sm text-textPrimaryBlue mt-[4px] cursor-pointer font-medium">
+        <div
+          onClick={() => setForgotPasswordModal(true)}
+          className="text-sm text-textPrimaryBlue mt-[4px] cursor-pointer font-medium"
+        >
           Forgot password?
         </div>
+
+        <ForgotPasswordModal
+          opened={forgotPasswordModal}
+          setOpened={setForgotPasswordModal}
+        />
       </div>
     </div>
   );
