@@ -46,9 +46,8 @@ const NavItem = ({
           }
         >
           <div className="flex flex-col group">
-            {dropdownChildren
-              ?.filter((ch) => ch !== null)
-              .map((res, idx) => {
+            {dropdownChildren?.map((res, idx) => {
+              if (res) {
                 return (
                   <div
                     key={idx}
@@ -58,7 +57,8 @@ const NavItem = ({
                     {res.name}
                   </div>
                 );
-              })}
+              }
+            })}
           </div>
         </PopupMenu>
       </div>
