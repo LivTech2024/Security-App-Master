@@ -91,7 +91,8 @@ function App() {
 
   useFirebaseMessaging();
 
-  const { company, admin, loading, superAdmin, client } = useAuthState();
+  const { company, admin, loading, superAdmin, client, settings } =
+    useAuthState();
 
   const location = useLocation();
 
@@ -116,7 +117,6 @@ function App() {
           <Layout userType="guest">
             <ToastContainer />
             <Routes>
-              {' '}
               <Route
                 path={PageRoutes.PRIVACY_POLICY}
                 Component={PrivacyPolicy}
@@ -261,24 +261,41 @@ function App() {
               path={PageRoutes.EMPLOYEE_CREATE_OR_EDIT}
               Component={EmployeeCreateOrEdit}
             />
-
             <Route path={PageRoutes.EMPLOYEE_ROUTE} Component={EmployeeRoute} />
-            <Route path={PageRoutes.EMPLOYEE_DAR_LIST} Component={EmpDarList} />
-            <Route path={PageRoutes.EMPLOYEE_DAR_VIEW} Component={EmpDarView} />
 
-            <Route
-              path={PageRoutes.PATROLLING_LIST}
-              Component={PatrollingList}
-            />
-            <Route path={PageRoutes.PATROLLING_LOGS} Component={PatrolLogs} />
-            <Route
-              path={PageRoutes.PATROLLING_CREATE_OR_EDIT}
-              Component={PatrollingCreateOrEdit}
-            />
-            <Route
-              path={PageRoutes.PATROLLING_VIEW}
-              Component={PatrollingView}
-            />
+            {settings?.SettingIsEmpDarEnabled !== false && (
+              <>
+                <Route
+                  path={PageRoutes.EMPLOYEE_DAR_LIST}
+                  Component={EmpDarList}
+                />
+                <Route
+                  path={PageRoutes.EMPLOYEE_DAR_VIEW}
+                  Component={EmpDarView}
+                />
+              </>
+            )}
+
+            {settings?.SettingIsPatrollingEnabled !== false && (
+              <>
+                <Route
+                  path={PageRoutes.PATROLLING_LIST}
+                  Component={PatrollingList}
+                />
+                <Route
+                  path={PageRoutes.PATROLLING_LOGS}
+                  Component={PatrolLogs}
+                />
+                <Route
+                  path={PageRoutes.PATROLLING_CREATE_OR_EDIT}
+                  Component={PatrollingCreateOrEdit}
+                />
+                <Route
+                  path={PageRoutes.PATROLLING_VIEW}
+                  Component={PatrollingView}
+                />
+              </>
+            )}
 
             <Route path={PageRoutes.LOCATIONS} Component={Locations} />
             <Route
@@ -290,27 +307,37 @@ function App() {
               path={PageRoutes.COMPANY_BRANCHES}
               Component={CompanyBranches}
             />
-            <Route path={PageRoutes.REPORTS} Component={Reports} />
-            <Route path={PageRoutes.REPORT_VIEW} Component={ReportView} />
+
+            {settings?.SettingIsReportsEnabled !== false && (
+              <>
+                <Route path={PageRoutes.REPORTS} Component={Reports} />
+                <Route path={PageRoutes.REPORT_VIEW} Component={ReportView} />
+              </>
+            )}
 
             <Route path={PageRoutes.SETTINGS} Component={Settings} />
 
-            <Route
-              path={PageRoutes.PAYMENTS_AND_BILLING}
-              Component={PaymentsAndBilling}
-            />
-
-            <Route path={PageRoutes.INVOICE_LIST} Component={InvoiceList} />
-            <Route
-              path={PageRoutes.INVOICE_GENERATE}
-              Component={InvoiceGenerate}
-            />
-
-            <Route path={PageRoutes.PAY_STUB_LIST} Component={PayStubList} />
-            <Route
-              path={PageRoutes.PAY_STUB_GENERATE}
-              Component={PayStubGenerate}
-            />
+            {settings?.SettingIsPaymentsAndBillingEnabled !== false && (
+              <>
+                <Route
+                  path={PageRoutes.PAYMENTS_AND_BILLING}
+                  Component={PaymentsAndBilling}
+                />
+                <Route path={PageRoutes.INVOICE_LIST} Component={InvoiceList} />
+                <Route
+                  path={PageRoutes.INVOICE_GENERATE}
+                  Component={InvoiceGenerate}
+                />
+                <Route
+                  path={PageRoutes.PAY_STUB_LIST}
+                  Component={PayStubList}
+                />
+                <Route
+                  path={PageRoutes.PAY_STUB_GENERATE}
+                  Component={PayStubGenerate}
+                />
+              </>
+            )}
 
             <Route path={PageRoutes.CLIENTS} Component={Clients} />
             <Route path={PageRoutes.CLIENT_VIEW} Component={ClientView} />
@@ -319,76 +346,132 @@ function App() {
               Component={ClientCreateOrEdit}
             />
 
-            <Route
-              path={PageRoutes.DOCUMENT_REPOSITORY}
-              Component={DocumentRepository}
-            />
+            {settings?.SettingIsDocRepoEnabled !== false && (
+              <>
+                <Route
+                  path={PageRoutes.DOCUMENT_REPOSITORY}
+                  Component={DocumentRepository}
+                />
+              </>
+            )}
 
-            <Route path={PageRoutes.EQUIPMENT_LIST} Component={EquipmentList} />
-            <Route path={PageRoutes.EQUIPMENT_VIEW} Component={EquipmentView} />
+            {settings?.SettingIsEquipmentManagementEnabled !== false && (
+              <>
+                <Route
+                  path={PageRoutes.EQUIPMENT_LIST}
+                  Component={EquipmentList}
+                />
+                <Route
+                  path={PageRoutes.EQUIPMENT_VIEW}
+                  Component={EquipmentView}
+                />
+              </>
+            )}
 
-            <Route path={PageRoutes.KEY_LIST} Component={KeyList} />
-            <Route path={PageRoutes.KEY_VIEW} Component={KeyView} />
+            {settings?.SettingIsKeyManagementEnabled !== false && (
+              <>
+                <Route path={PageRoutes.KEY_LIST} Component={KeyList} />
+                <Route path={PageRoutes.KEY_VIEW} Component={KeyView} />
+              </>
+            )}
 
-            <Route path={PageRoutes.MESSAGING} Component={Messaging} />
+            {settings?.SettingIsCommunicationCenterEnabled !== false && (
+              <Route path={PageRoutes.MESSAGING} Component={Messaging} />
+            )}
 
-            <Route path={PageRoutes.VISITOR_LIST} Component={VisitorList} />
-            <Route path={PageRoutes.VISITOR_VIEW} Component={VisitorView} />
+            {settings?.SettingIsVisitorManagementEnabled !== false && (
+              <>
+                <Route path={PageRoutes.VISITOR_LIST} Component={VisitorList} />
+                <Route path={PageRoutes.VISITOR_VIEW} Component={VisitorView} />
+              </>
+            )}
 
-            <Route
-              path={PageRoutes.TRAINING_AND_CERTIFICATION_CREATE_OR_EDIT}
-              Component={TrainCertsCreateOrEdit}
-            />
-            <Route
-              path={PageRoutes.TRAINING_AND_CERTIFICATION_LIST}
-              Component={TrainCertsList}
-            />
-            <Route
-              path={PageRoutes.TRAINING_AND_CERTIFICATION_VIEW}
-              Component={TrainCertsView}
-            />
+            {settings?.SettingIsTrainingAndCertificationsEnabled !== false && (
+              <>
+                <Route
+                  path={PageRoutes.TRAINING_AND_CERTIFICATION_CREATE_OR_EDIT}
+                  Component={TrainCertsCreateOrEdit}
+                />
+                <Route
+                  path={PageRoutes.TRAINING_AND_CERTIFICATION_LIST}
+                  Component={TrainCertsList}
+                />
+                <Route
+                  path={PageRoutes.TRAINING_AND_CERTIFICATION_VIEW}
+                  Component={TrainCertsView}
+                />
+              </>
+            )}
 
-            <Route
-              path={PageRoutes.TIME_AND_ATTENDANCE_VIEW}
-              Component={TimeAndAttendanceView}
-            />
-            <Route
-              path={PageRoutes.TIME_AND_ATTENDANCE_LIST}
-              Component={TimeAndAttendanceList}
-            />
+            {settings?.SettingIsTimeAndAttendanceEnabled !== false && (
+              <>
+                <Route
+                  path={PageRoutes.TIME_AND_ATTENDANCE_VIEW}
+                  Component={TimeAndAttendanceView}
+                />
+                <Route
+                  path={PageRoutes.TIME_AND_ATTENDANCE_LIST}
+                  Component={TimeAndAttendanceList}
+                />
+              </>
+            )}
 
-            <Route
-              path={PageRoutes.PERFORMANCE_ASSURANCE}
-              Component={PerformanceAssurance}
-            />
+            {settings?.SettingIsPerformanceAssuranceEnabled !== false && (
+              <Route
+                path={PageRoutes.PERFORMANCE_ASSURANCE}
+                Component={PerformanceAssurance}
+              />
+            )}
 
-            <Route
-              path={PageRoutes.TASK_AND_TRACKING_LIST}
-              Component={TaskList}
-            />
-            <Route
-              path={PageRoutes.TASK_AND_TRACKING_LOGS}
-              Component={TaskLogs}
-            />
+            {settings?.SettingIsTaskAssignmentAndTrackingEnabled !== false && (
+              <>
+                <Route
+                  path={PageRoutes.TASK_AND_TRACKING_LIST}
+                  Component={TaskList}
+                />
+                <Route
+                  path={PageRoutes.TASK_AND_TRACKING_LOGS}
+                  Component={TaskLogs}
+                />
+              </>
+            )}
 
-            <Route path={PageRoutes.CALL_OUT_LIST} Component={CalloutList} />
-            <Route path={PageRoutes.CALL_OUT_VIEW} Component={CalloutView} />
+            {settings?.SettingIsCalloutEnabled !== false && (
+              <>
+                <Route
+                  path={PageRoutes.CALL_OUT_LIST}
+                  Component={CalloutList}
+                />
+                <Route
+                  path={PageRoutes.CALL_OUT_VIEW}
+                  Component={CalloutView}
+                />
+              </>
+            )}
 
-            <Route
-              path={PageRoutes.EMERGENCY_RESPONSE_LIST}
-              Component={EmergResList}
-            />
+            {settings?.SettingIsEmergencyResponseEnabled !== false && (
+              <Route
+                path={PageRoutes.EMERGENCY_RESPONSE_LIST}
+                Component={EmergResList}
+              />
+            )}
 
-            <Route
-              path={PageRoutes.AUDIT_DASHBOARD}
-              Component={AuditDashboard}
-            />
+            {settings?.SettingIsAuditEnabled !== false && (
+              <Route
+                path={PageRoutes.AUDIT_DASHBOARD}
+                Component={AuditDashboard}
+              />
+            )}
 
-            <Route path={PageRoutes.HRM_HOME} Component={HrmHome} />
-            <Route
-              path={PageRoutes.HRM_LEAVE_REQ_LIST}
-              Component={LeaveRequestList}
-            />
+            {settings?.SettingIsHRSystemEnabled !== false && (
+              <>
+                <Route path={PageRoutes.HRM_HOME} Component={HrmHome} />
+                <Route
+                  path={PageRoutes.HRM_LEAVE_REQ_LIST}
+                  Component={LeaveRequestList}
+                />
+              </>
+            )}
           </Routes>
         </Layout>
       </ModalsProvider>

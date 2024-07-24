@@ -49,7 +49,7 @@ const HomeItem = ({
 };
 
 const Home = () => {
-  const { company } = useAuthState();
+  const { company, settings } = useAuthState();
 
   const [selectedBranch, setSelectedBranch] = useState('');
 
@@ -96,104 +96,142 @@ const Home = () => {
           icon={<MdPeople className="text-4xl text-primaryGold" />}
           name="Employee Management"
         />
-        <HomeItem
-          path={PageRoutes.EMPLOYEE_DAR_LIST}
-          icon={<LuActivitySquare className="text-4xl text-primaryGold" />}
-          name="Employee DAR"
-        />
-        <HomeItem
-          path={PageRoutes.REPORTS}
-          icon={<FaExclamationTriangle className="text-3xl text-primaryGold" />}
-          name="Incident Reports"
-        />
+        {settings?.SettingIsEmpDarEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.EMPLOYEE_DAR_LIST}
+            icon={<LuActivitySquare className="text-4xl text-primaryGold" />}
+            name="Employee DAR"
+          />
+        )}
+        {settings?.SettingIsReportsEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.REPORTS}
+            icon={
+              <FaExclamationTriangle className="text-3xl text-primaryGold" />
+            }
+            name="Incident Reports"
+          />
+        )}
         <HomeItem
           path={PageRoutes.SCHEDULES}
           icon={<AiOutlineSchedule className="text-3xl text-primaryGold" />}
           name="Shift Scheduling"
         />
-        <HomeItem
-          path={PageRoutes.CALL_OUT_LIST}
-          icon={<VscCallOutgoing className="text-3xl text-primaryGold" />}
-          name="Callouts"
-        />
+        {settings?.SettingIsCalloutEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.CALL_OUT_LIST}
+            icon={<VscCallOutgoing className="text-3xl text-primaryGold" />}
+            name="Callouts"
+          />
+        )}
 
-        <HomeItem
-          path={PageRoutes.PATROLLING_LIST}
-          icon={<SiAdguard className="text-2xl text-primaryGold" />}
-          name="Patrol Tracking"
-        />
+        {settings?.SettingIsPatrollingEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.PATROLLING_LIST}
+            icon={<SiAdguard className="text-2xl text-primaryGold" />}
+            name="Patrol Tracking"
+          />
+        )}
 
-        <HomeItem
-          path={PageRoutes.EQUIPMENT_LIST}
-          icon={<FaToolbox className="text-2xl text-primaryGold" />}
-          name="Equipment Management"
-        />
-        <HomeItem
-          path={PageRoutes.KEY_LIST}
-          icon={<FaKey className="text-2xl text-primaryGold" />}
-          name="Key Management"
-        />
-        <HomeItem
-          path={PageRoutes.PAYMENTS_AND_BILLING}
-          icon={<RiBillLine className="text-2xl text-primaryGold" />}
-          name="Billing and Invoicing"
-        />
-        <HomeItem
-          path={PageRoutes.TRAINING_AND_CERTIFICATION_LIST}
-          name="Training & Certification"
-          icon={<GrCertificate className="text-2xl text-primaryGold" />}
-        />
-        <HomeItem
-          path={PageRoutes.VISITOR_LIST}
-          name="Visitor management"
-          icon={<FaPeopleGroup className="text-2xl text-primaryGold" />}
-        />
-        <HomeItem
-          path={PageRoutes.REPORTS}
-          name="Reports"
-          icon={<TbReport className="text-2xl text-primaryGold" />}
-        />
-        <HomeItem
-          path={PageRoutes.MESSAGING}
-          name="Communication center"
-          icon={<FaCommentDots className="text-2xl text-primaryGold" />}
-        />
-        <HomeItem
-          path={PageRoutes.DOCUMENT_REPOSITORY}
-          name="Document repository"
-          icon={<IoMdDocument className="text-3xl text-primaryGold" />}
-        />
-        <HomeItem
-          path={PageRoutes.EMERGENCY_RESPONSE_LIST}
-          name="Emergency response"
-          icon={<MdEmergencyShare className="text-2xl text-primaryGold" />}
-        />
+        {settings?.SettingIsEquipmentManagementEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.EQUIPMENT_LIST}
+            icon={<FaToolbox className="text-2xl text-primaryGold" />}
+            name="Equipment Management"
+          />
+        )}
+        {settings?.SettingIsKeyManagementEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.KEY_LIST}
+            icon={<FaKey className="text-2xl text-primaryGold" />}
+            name="Key Management"
+          />
+        )}
+        {settings?.SettingIsPaymentsAndBillingEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.PAYMENTS_AND_BILLING}
+            icon={<RiBillLine className="text-2xl text-primaryGold" />}
+            name="Billing and Invoicing"
+          />
+        )}
+        {settings?.SettingIsTrainingAndCertificationsEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.TRAINING_AND_CERTIFICATION_LIST}
+            name="Training & Certification"
+            icon={<GrCertificate className="text-2xl text-primaryGold" />}
+          />
+        )}
+        {settings?.SettingIsVisitorManagementEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.VISITOR_LIST}
+            name="Visitor management"
+            icon={<FaPeopleGroup className="text-2xl text-primaryGold" />}
+          />
+        )}
+        {settings?.SettingIsReportsEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.REPORTS}
+            name="Reports"
+            icon={<TbReport className="text-2xl text-primaryGold" />}
+          />
+        )}
+        {settings?.SettingIsCommunicationCenterEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.MESSAGING}
+            name="Communication center"
+            icon={<FaCommentDots className="text-2xl text-primaryGold" />}
+          />
+        )}
+        {settings?.SettingIsDocRepoEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.DOCUMENT_REPOSITORY}
+            name="Document repository"
+            icon={<IoMdDocument className="text-3xl text-primaryGold" />}
+          />
+        )}
+        {settings?.SettingIsEmergencyResponseEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.EMERGENCY_RESPONSE_LIST}
+            name="Emergency response"
+            icon={<MdEmergencyShare className="text-2xl text-primaryGold" />}
+          />
+        )}
 
-        <HomeItem
-          path={PageRoutes.TIME_AND_ATTENDANCE_LIST}
-          name="Time & Attendance"
-          icon={<FaClock className="text-2xl text-primaryGold" />}
-        />
-        <HomeItem
-          path={PageRoutes.AUDIT_DASHBOARD}
-          name="Audit"
-          icon={<AiOutlineAudit className="text-2xl text-primaryGold" />}
-        />
-        <HomeItem
-          path={PageRoutes.PERFORMANCE_ASSURANCE}
-          name="Performance Assurance"
-          icon={<MdAssuredWorkload className="text-2xl text-primaryGold" />}
-        />
-        <HomeItem
-          path={PageRoutes.TASK_AND_TRACKING_LIST}
-          name="Task assignment and tracking"
-          icon={<FaTasks className="text-2xl text-primaryGold" />}
-        />
-        <HomeItem
-          path={PageRoutes.HRM_HOME}
-          name="HR System"
-          icon={<GrResources className="text-3xl text-primaryGold" />}
-        />
+        {settings?.SettingIsTimeAndAttendanceEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.TIME_AND_ATTENDANCE_LIST}
+            name="Time & Attendance"
+            icon={<FaClock className="text-2xl text-primaryGold" />}
+          />
+        )}
+        {settings?.SettingIsAuditEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.AUDIT_DASHBOARD}
+            name="Audit"
+            icon={<AiOutlineAudit className="text-2xl text-primaryGold" />}
+          />
+        )}
+        {settings?.SettingIsPerformanceAssuranceEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.PERFORMANCE_ASSURANCE}
+            name="Performance Assurance"
+            icon={<MdAssuredWorkload className="text-2xl text-primaryGold" />}
+          />
+        )}
+        {settings?.SettingIsTaskAssignmentAndTrackingEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.TASK_AND_TRACKING_LIST}
+            name="Task assignment and tracking"
+            icon={<FaTasks className="text-2xl text-primaryGold" />}
+          />
+        )}
+        {settings?.SettingIsHRSystemEnabled !== false && (
+          <HomeItem
+            path={PageRoutes.HRM_HOME}
+            name="HR System"
+            icon={<GrResources className="text-3xl text-primaryGold" />}
+          />
+        )}
       </div>
     </div>
   );

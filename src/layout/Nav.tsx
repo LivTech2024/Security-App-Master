@@ -16,7 +16,7 @@ const NavItem = ({
   path?: string;
   callback?: () => void;
   isDropdownReq?: boolean;
-  dropdownChildren?: { name: string; path: string }[];
+  dropdownChildren?: ({ name: string; path: string } | null)[];
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,17 +46,19 @@ const NavItem = ({
           }
         >
           <div className="flex flex-col group">
-            {dropdownChildren?.map((res, idx) => {
-              return (
-                <div
-                  key={idx}
-                  onClick={() => navigate(res.path)}
-                  className="px-6 py-2 uppercase cursor-pointer duration-200 hover:bg-onHoverBg group"
-                >
-                  {res.name}
-                </div>
-              );
-            })}
+            {dropdownChildren
+              ?.filter((ch) => ch !== null)
+              .map((res, idx) => {
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => navigate(res.path)}
+                    className="px-6 py-2 uppercase cursor-pointer duration-200 hover:bg-onHoverBg group"
+                  >
+                    {res.name}
+                  </div>
+                );
+              })}
           </div>
         </PopupMenu>
       </div>
@@ -82,10 +84,8 @@ const Nav = ({
 }: {
   userType: 'admin' | 'client' | 'super_admin' | 'guest';
 }) => {
-  const { userSignOut } = useAuthState();
+  const { userSignOut, client, settings } = useAuthState();
   const navigate = useNavigate();
-
-  const { client } = useAuthState();
 
   return (
     <div
@@ -98,8 +98,9 @@ const Nav = ({
           <NavItem path={PageRoutes.HOME} name="Home" />
           <NavItem path={PageRoutes.SCHEDULES} name="Schedules" />
           <NavItem path={PageRoutes.EMPLOYEE_LIST} name="Employees" />
-          {/* <NavItem path={PageRoutes.SHIFT_LIST} name="Shifts" /> */}
-          <NavItem path={PageRoutes.PATROLLING_LIST} name="Patrolling" />
+          {settings?.SettingIsPatrollingEnabled !== false && (
+            <NavItem path={PageRoutes.PATROLLING_LIST} name="Patrolling" />
+          )}
           <NavItem
             name="Company"
             isDropdownReq
@@ -109,23 +110,37 @@ const Nav = ({
               { name: 'Manage Clients', path: PageRoutes.CLIENTS },
             ]}
           />
-          <NavItem
-            name="Assets"
-            isDropdownReq
-            dropdownChildren={[
-              {
-                name: 'Equipment Management',
-                path: PageRoutes.EQUIPMENT_LIST,
-              },
-              { name: 'Key Management', path: PageRoutes.KEY_LIST },
-            ]}
-          />
-          <NavItem path={PageRoutes.MESSAGING} name="Messaging" />
-          <NavItem path={PageRoutes.REPORTS} name="Reports" />
-          <NavItem
-            path={PageRoutes.PAYMENTS_AND_BILLING}
-            name="Payments & Billing"
-          />
+          {(settings?.SettingIsEquipmentManagementEnabled !== false ||
+            settings?.SettingIsKeyManagementEnabled !== false) && (
+            <NavItem
+              name="Assets"
+              isDropdownReq
+              dropdownChildren={[
+                settings?.SettingIsEquipmentManagementEnabled !== false
+                  ? {
+                      name: 'Equipment Management',
+                      path: PageRoutes.EQUIPMENT_LIST,
+                    }
+                  : null,
+                settings?.SettingIsKeyManagementEnabled !== false
+                  ? { name: 'Key Management', path: PageRoutes.KEY_LIST }
+                  : null,
+              ]}
+            />
+          )}
+          {settings?.SettingIsCommunicationCenterEnabled !== false && (
+            <NavItem path={PageRoutes.MESSAGING} name="Messaging" />
+          )}
+          {settings?.SettingIsReportsEnabled !== false && (
+            <NavItem path={PageRoutes.REPORTS} name="Reports" />
+          )}
+          {settings?.SettingIsPaymentsAndBillingEnabled !== false && (
+            <NavItem
+              path={PageRoutes.PAYMENTS_AND_BILLING}
+              name="Payments & Billing"
+            />
+          )}
+
           <NavItem path={PageRoutes.SETTINGS} name="Settings" />
         </>
       )}
