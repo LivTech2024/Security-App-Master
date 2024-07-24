@@ -91,7 +91,7 @@ const AdminInfo = () => {
             onClick={() => setUpdateAdminCredModal(true)}
             className="text-textPrimaryBlue font-medium cursor-pointer"
           >
-            Change Email/Password?
+            Change Password?
           </div>
 
           <UpdateAdminCredModal
