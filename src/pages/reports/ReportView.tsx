@@ -14,6 +14,7 @@ import { useAuthState } from '../../store';
 import { generateReportsHtml } from '../../utilities/pdf/generateReportsHtml';
 import { htmlToPdf } from '../../API/HtmlToPdf';
 import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
+import { Status } from '../../common/Status';
 
 const ReportView = () => {
   const { company } = useAuthState();
@@ -93,7 +94,7 @@ const ReportView = () => {
             </div>
             <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2">Report Status:</p>
-              <p>{data?.ReportStatus || 'N/A'}</p>
+              <Status status={data?.ReportStatus || 'pending'} />
             </div>
             <div className="flex items-center gap-4">
               <p className="font-semibold flex gap-2">Report Category:</p>
@@ -137,8 +138,10 @@ const ReportView = () => {
               </div>
             )}
 
-            <div className="flex items-start gap-4 col-span-2">
-              <p className="font-semibold flex gap-2">Report Data:</p>
+            <div className="flex flex-col items-start gap-1 col-span-2">
+              <p className="font-semibold flex gap-2 whitespace-nowrap">
+                Report Data:
+              </p>
               <p>{data.ReportData}</p>
             </div>
 
