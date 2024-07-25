@@ -7,7 +7,7 @@ import {
   showSnackbar,
 } from '../../../utilities/TsxUtils';
 
-import { errorHandler } from '../../../utilities/CustomError';
+import CustomError, { errorHandler } from '../../../utilities/CustomError';
 import PayStubDetails from '../../../component/payments_and_billing/paystub/PayStubDetails';
 import EmpDetails from '../../../component/payments_and_billing/paystub/EmpDetails';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -132,6 +132,9 @@ const PayStubGenerate = () => {
     if (!company) return;
 
     try {
+      if (isEdit && payStubEditData.PayStubIsPublished) {
+        throw new CustomError('This paystub is already published');
+      }
       setLoading(true);
 
       if (isEdit) {
@@ -173,6 +176,10 @@ const PayStubGenerate = () => {
   const onDelete = async () => {
     if (!isEdit) return;
     try {
+      if (isEdit && payStubEditData.PayStubIsPublished) {
+        throw new CustomError('This paystub is already published');
+      }
+
       setLoading(true);
 
       await DbPayment.deletePayStub(payStubEditData.PayStubId);
@@ -234,12 +241,14 @@ const PayStubGenerate = () => {
                       },
                     })
                   }
+                  disabled={isEdit && payStubEditData.PayStubIsPublished}
                 />
               )}
               <Button
                 label="Save"
                 onClick={methods.handleSubmit(onSubmit)}
                 type="black"
+                disabled={isEdit && payStubEditData.PayStubIsPublished}
               />
             </div>
           }

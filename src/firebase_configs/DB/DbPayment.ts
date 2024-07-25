@@ -534,6 +534,7 @@ class DbPayment {
       PayStubEmpRole,
       PayStubEarnings,
       PayStubDeductions,
+      PayStubIsPublished: false,
       PayStubPayPeriodStartDate: removeTimeFromDate(
         PayStubPayPeriodStartDate
       ) as unknown as Timestamp,
@@ -631,6 +632,11 @@ class DbPayment {
     const payStubRef = doc(db, CollectionName.payStubs, payStubId);
 
     return deleteDoc(payStubRef);
+  };
+
+  static publishPayStub = (payStubId: string) => {
+    const payStubRef = doc(db, CollectionName.payStubs, payStubId);
+    return updateDoc(payStubRef, { PayStubIsPublished: true });
   };
 
   static getPayStubs = ({

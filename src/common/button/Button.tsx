@@ -39,7 +39,7 @@ const Button = ({
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          'bg-primary hover:bg-blackButtonHoverBg active:bg-blackButtonActiveBg flex items-center justify-center gap-2 px-4 py-2 rounded-[4px]  text-surface whitespace-nowrap overflow-hidden font-semibold  disabled:bg-primaryVariantDark dark:disabled:bg-switchSecondaryBlueBg',
+          'bg-primary hover:bg-blackButtonHoverBg active:bg-blackButtonActiveBg flex items-center justify-center gap-2 px-4 py-2 rounded-[4px]  text-surface whitespace-nowrap overflow-hidden font-semibold  disabled:bg-primaryVariant ',
           className
         )}`}
       >
@@ -69,7 +69,7 @@ const Button = ({
         disabled={disabled}
         onClick={onClick}
         className={`${twMerge(
-          'bg-whiteButtonBg hover:bg-whiteButtonHoverBg active:bg-whiteButtonActiveBg flex items-center justify-center gap-2 px-4 py-2 rounded-[4px]  text-textPrimary whitespace-nowrap overflow-hidden font-semibold shadow',
+          'bg-whiteButtonBg hover:bg-whiteButtonHoverBg active:bg-whiteButtonActiveBg flex items-center justify-center gap-2 px-4 py-2 rounded-[4px]  text-textPrimary whitespace-nowrap overflow-hidden font-semibold shadow disabled:bg-onHoverBg',
           className
         )}`}
       >

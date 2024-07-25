@@ -7,7 +7,7 @@ import {
   REACT_QUERY_KEYS,
 } from '../../../@types/enum';
 import { useAuthState, useEditFormStore } from '../../../store';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import DbPayment from '../../../firebase_configs/DB/DbPayment';
@@ -29,6 +29,7 @@ import {
 import { getPaystubHtml } from '../../../utilities/pdf/getPaystubHtml';
 import { htmlToPdf } from '../../../API/HtmlToPdf';
 import { downloadPdf } from '../../../utilities/pdf/common/downloadPdf';
+import { openContextModal } from '@mantine/modals';
 
 const PayStubList = () => {
   const navigate = useNavigate();
@@ -147,6 +148,42 @@ const PayStubList = () => {
     }
   };
 
+  const queryClient = useQueryClient();
+
+  const [loading, setLoading] = useState(false);
+
+  const onPublish = async (paysStubId: string) => {
+    try {
+      setLoading(true);
+
+      await DbPayment.publishPayStub(paysStubId);
+
+      await queryClient.invalidateQueries({
+        queryKey: [REACT_QUERY_KEYS.PAY_STUB_LIST],
+      });
+
+      showSnackbar({
+        message: 'Paystub published successfully',
+        type: 'success',
+      });
+
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (loading) {
+      showModalLoader({});
+    } else {
+      closeModalLoader();
+    }
+    return () => closeModalLoader();
+  }, [loading]);
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
@@ -174,59 +211,121 @@ const PayStubList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[25%] text-start">
+            <th className="uppercase px-4 py-2 w-[20%] text-start">
               Employee Name
             </th>
-            <th className="uppercase px-4 py-2 w-[13%] text-start">Role</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">
+            <th className="uppercase px-4 py-2 w-[15%] text-start">Role</th>
+            <th className="uppercase px-4 py-2 w-[12%] text-start">
               start date
             </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">end date</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">pay date</th>
+            <th className="uppercase px-4 py-2 w-[12%] text-start">end date</th>
+            <th className="uppercase px-4 py-2 w-[12%] text-start">pay date</th>
 
-            <th className="uppercase px-4 py-2 w-[12%] text-end">Net Pay</th>
+            <th className="uppercase px-4 py-2 w-[12%] text-start">Net Pay</th>
+            <th className="uppercase px-4 py-2 w-[12%] text-end">Status</th>
+
             <th className="uppercase px-4 py-2 w-[5%] text-end"></th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={7}>
+              <td colSpan={8}>
                 <NoSearchResult />
               </td>
             </tr>
           ) : (
             data.map((payStub) => {
               return (
-                <tr
-                  onClick={() => {
-                    setPayStubEditData(payStub);
-                    navigate(PageRoutes.PAY_STUB_GENERATE);
-                  }}
-                  key={payStub.PayStubId}
-                >
-                  <td className="align-top cursor-pointer px-4 py-2 text-start ">
+                <tr key={payStub.PayStubId}>
+                  <td
+                    onClick={() => {
+                      setPayStubEditData(payStub);
+                      navigate(PageRoutes.PAY_STUB_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start "
+                  >
                     <span className="line-clamp-3">
                       {payStub.PayStubEmpName}
                     </span>
                   </td>
-                  <td className="align-top cursor-pointer px-4 py-2 text-start ">
+                  <td
+                    onClick={() => {
+                      setPayStubEditData(payStub);
+                      navigate(PageRoutes.PAY_STUB_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start "
+                  >
                     <span className="line-clamp-3">
                       {payStub.PayStubEmpRole ?? 'N/A'}
                     </span>
                   </td>
-                  <td className="align-top cursor-pointer px-4 py-2 text-start">
+                  <td
+                    onClick={() => {
+                      setPayStubEditData(payStub);
+                      navigate(PageRoutes.PAY_STUB_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start"
+                  >
                     {formatDate(payStub.PayStubPayPeriodStartDate)}
                   </td>
 
-                  <td className="align-top cursor-pointer px-4 py-2 text-start">
+                  <td
+                    onClick={() => {
+                      setPayStubEditData(payStub);
+                      navigate(PageRoutes.PAY_STUB_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start"
+                  >
                     {formatDate(payStub.PayStubPayPeriodEndDate)}
                   </td>
-                  <td className="align-top cursor-pointer px-4 py-2 text-start">
+                  <td
+                    onClick={() => {
+                      setPayStubEditData(payStub);
+                      navigate(PageRoutes.PAY_STUB_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start"
+                  >
                     {formatDate(payStub.PayStubPayDate)}
                   </td>
-                  <td className="align-top cursor-pointer px-4 py-2 text-end">
+                  <td
+                    onClick={() => {
+                      setPayStubEditData(payStub);
+                      navigate(PageRoutes.PAY_STUB_GENERATE);
+                    }}
+                    className="align-top cursor-pointer px-4 py-2 text-start"
+                  >
                     {numberFormatter(payStub.PayStubNetPay.Amount, true)}
+                  </td>
+                  <td className="align-top cursor-pointer px-4 py-2 text-end">
+                    {payStub.PayStubIsPublished ? (
+                      <span className="">Published</span>
+                    ) : (
+                      <span
+                        onClick={() =>
+                          openContextModal({
+                            modal: 'confirmModal',
+                            withCloseButton: false,
+                            centered: true,
+                            closeOnClickOutside: true,
+                            innerProps: {
+                              title: 'Confirm',
+                              body: 'Are you sure to publish this paystub, once you publish it cannot be edited or deleted ?',
+                              onConfirm: () => {
+                                onPublish(payStub.PayStubId);
+                              },
+                            },
+                            size: '30%',
+                            styles: {
+                              body: { padding: '0px' },
+                            },
+                          })
+                        }
+                        className="cursor-pointer text-textPrimaryBlue hover:underline"
+                      >
+                        Publish
+                      </span>
+                    )}
                   </td>
                   <td
                     onClick={() => downloadPayStub(payStub)}
@@ -241,7 +340,7 @@ const PayStubList = () => {
             })
           )}
           <tr ref={ref}>
-            <td colSpan={7}>
+            <td colSpan={8}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />

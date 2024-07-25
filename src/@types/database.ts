@@ -668,6 +668,7 @@ export interface IPayStubsCollection {
   PayStubPayPeriodEndDate: Timestamp | FieldValue;
   PayStubPayDate: Timestamp | FieldValue;
   PayStubNetPay: { Amount: number; YearToDateAmt: number };
+  PayStubIsPublished: boolean;
   PayStubCreatedAt: Timestamp | FieldValue;
   PayStubModifiedAt: Timestamp | FieldValue;
 }
