@@ -56,7 +56,7 @@ const Home = () => {
   /*  const test = async () => {
     try {
       showModalLoader({});
-
+      await DbPatrol.createPatrolLogCopy('jP29AGwqrVQ6DPoqba6z', 3);
       closeModalLoader();
     } catch (error) {
       console.log(error);

@@ -336,7 +336,10 @@ class DbPatrol {
     });
   };
 
-  static createPatrolLogCopy = async (patrolLogId: string) => {
+  static createPatrolLogCopy = async (
+    patrolLogId: string,
+    addDayCount: number
+  ) => {
     const docRef = doc(db, CollectionName.patrolLogs, patrolLogId);
     const docSnapshot = await getDoc(docRef);
     const docData = docSnapshot.data() as IPatrolLogsCollection;
@@ -349,7 +352,7 @@ class DbPatrol {
         return {
           ...res,
           CheckPointReportedAt: dayjs(toDate(res.CheckPointReportedAt))
-            .add(1, 'day')
+            .add(addDayCount, 'day')
             .toDate() as unknown as Timestamp,
         };
       });
@@ -359,16 +362,16 @@ class DbPatrol {
       PatrolLogId: newPatrolLogId,
       PatrolLogCheckPoints: newCheckPoints,
       PatrolDate: dayjs(toDate(docData.PatrolDate))
-        .add(1, 'day')
+        .add(addDayCount, 'day')
         .toDate() as unknown as Timestamp,
       PatrolLogStartedAt: dayjs(toDate(docData.PatrolLogStartedAt))
-        .add(1, 'day')
+        .add(addDayCount, 'day')
         .toDate() as unknown as Timestamp,
       PatrolLogEndedAt: dayjs(toDate(docData.PatrolLogEndedAt))
-        .add(1, 'day')
+        .add(addDayCount, 'day')
         .toDate() as unknown as Timestamp,
       PatrolLogCreatedAt: dayjs(toDate(docData.PatrolLogCreatedAt))
-        .add(1, 'day')
+        .add(addDayCount, 'day')
         .toDate() as unknown as Timestamp,
     };
 
