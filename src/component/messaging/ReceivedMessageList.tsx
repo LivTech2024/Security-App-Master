@@ -107,12 +107,15 @@ const ReceivedMessageList = ({ receiverId }: { receiverId: string }) => {
           })
         )}
 
-        {(isLoading || isFetchingNextPage) &&
-          Array.from({ length: 3 }).map((_, idx) => (
-            <div ref={ref} key={idx} className="animate-pulse w-full mt-2">
-              <div className="h-[150px] bg-shimmerColor w-full"></div>
-            </div>
-          ))}
+        <div ref={ref}>
+          <div>&nbsp;</div>
+          {(isLoading || isFetchingNextPage) &&
+            Array.from({ length: 5 }).map((_, idx) => (
+              <div key={idx} className="animate-pulse w-full mt-2">
+                <div className="h-[150px] bg-shimmerColor w-full"></div>
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );
