@@ -91,7 +91,11 @@ const EmpDetails = ({
       showModalLoader({});
 
       const isPayStubExistForThisPayPeriod =
-        await DbPayment.isPayStubExistForPayPeriod(empId, payStartDate);
+        await DbPayment.isPayStubExistForPayPeriod(
+          empId,
+          payStartDate,
+          payEndDate
+        );
 
       if (isPayStubExistForThisPayPeriod) {
         openContextModal({

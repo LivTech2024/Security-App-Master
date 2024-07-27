@@ -381,13 +381,15 @@ class DbPayment {
 
   static isPayStubExistForPayPeriod = async (
     empId: string,
-    startDate: Date
+    startDate: Date,
+    endDate: Date
   ) => {
     const payStubRef = collection(db, CollectionName.payStubs);
     const payStubQuery = query(
       payStubRef,
       where('PayStubEmpId', '==', empId),
-      where('PayStubPayPeriodStartDate', '>=', startDate),
+      where('PayStubPayPeriodStartDate', '<=', endDate),
+      where('PayStubPayPeriodEndDate', '>=', startDate),
       limit(1)
     );
 

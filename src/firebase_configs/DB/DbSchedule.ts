@@ -6,6 +6,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   query,
   runTransaction,
   updateDoc,
@@ -32,7 +33,7 @@ export interface IEmpScheduleForWeek {
   EmpWeekShifts: number;
   EmpWeekHours: number;
   EmpMaxWeekHours: number;
-  EmpIsAvailable: boolean;
+  EmpAvailabilityStatus: 'available' | 'on_shift' | 'on_vacation';
 }
 
 class DbSchedule {
@@ -136,6 +137,8 @@ class DbSchedule {
       const promise = employees
         .filter((emp) => emp.EmployeeStatus === 'on_board')
         .map(async (emp) => {
+          //*Fetch employee shifts
+
           const shiftRef = collection(db, CollectionName.shifts);
           const shiftQuery = query(
             shiftRef,
@@ -157,6 +160,35 @@ class DbSchedule {
             return totalHours + shiftHours;
           }, 0);
 
+          const isEmpOnShift = shifts.some((s) =>
+            dayjs(toDate(s.ShiftDate)).isSame(currentDate, 'date')
+          );
+
+          console.log(
+            dayjs(currentDate).startOf('day').toDate(),
+            dayjs(currentDate).endOf('day').toDate()
+          );
+
+          //*Fetch Employee leave status
+          const leaveRef = collection(db, CollectionName.leaveRequests);
+          const leaveQuery = query(
+            leaveRef,
+            where('LeaveReqEmpId', '==', emp.EmployeeId),
+            where(
+              'LeaveReqFromDate',
+              '<=',
+              dayjs(currentDate).endOf('day').toDate()
+            ),
+            where(
+              'LeaveReqToDate',
+              '>=',
+              dayjs(currentDate).startOf('day').toDate()
+            ),
+            limit(1)
+          );
+          const leaveSnapshot = await getDocs(leaveQuery);
+          const isEmpOnVacation = !leaveSnapshot.empty;
+
           employeesScheduleForWeek.push({
             EmpId: emp.EmployeeId,
             EmpName: emp.EmployeeName,
@@ -164,12 +196,11 @@ class DbSchedule {
             EmpPhone: emp.EmployeePhone,
             EmpEmail: emp.EmployeeEmail,
             EmpWeekShifts: shifts.length,
-            EmpIsAvailable:
-              shifts.some((s) =>
-                dayjs(toDate(s.ShiftDate)).isSame(currentDate, 'date')
-              ) || emp.EmployeeIsAvailable !== 'available'
-                ? false
-                : true,
+            EmpAvailabilityStatus: isEmpOnShift
+              ? 'on_shift'
+              : isEmpOnVacation
+                ? 'on_vacation'
+                : 'available',
             EmpWeekHours: totalWorkHours,
             EmpMaxWeekHours: emp.EmployeeMaxHrsPerWeek,
             EmpRole: emp.EmployeeRole,

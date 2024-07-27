@@ -544,9 +544,11 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
             </div>
             {selectedDate && (
               <div className="flex flex-col gap-4 p-4 bg-onHoverBg rounded shadow w-[30%] sticky top-0">
-                <div className="font-semibold">
-                  Available Employees ({dayjs(selectedDate).format('ddd MMM-D')}
-                  )
+                <div className="flex flex-col gap-2  w-full">
+                  <span className="font-semibold">
+                    Onboard Employees ({dayjs(selectedDate).format('ddd MMM-D')}
+                    )
+                  </span>
                 </div>
                 <Accordion variant="contained">
                   {empRoles
@@ -585,14 +587,21 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                                             data.EmpRole
                                           }`}
                                           callback={dropResult}
-                                          canDrag={data.EmpIsAvailable}
+                                          canDrag={
+                                            data.EmpAvailabilityStatus ===
+                                            'available'
+                                          }
                                           key={data.EmpId}
                                         >
                                           <div
                                             className={`flex items-center gap-2  p-2 rounded text-sm  ${
-                                              data.EmpIsAvailable
-                                                ? 'bg-primaryGold text-surface'
-                                                : 'bg-gray-200 cursor-not-allowed'
+                                              data.EmpAvailabilityStatus ===
+                                              'available'
+                                                ? 'bg-primaryGreen text-surface'
+                                                : data.EmpAvailabilityStatus ===
+                                                    'on_shift'
+                                                  ? 'bg-gray-200 cursor-not-allowed'
+                                                  : 'bg-textPrimaryRed cursor-not-allowed text-surface'
                                             }`}
                                           >
                                             <img

@@ -116,7 +116,7 @@ const AssignShiftModal = ({
 
   const handleRowClicked = (data: IEmpScheduleForWeek) => {
     if (
-      !data.EmpIsAvailable ||
+      data.EmpAvailabilityStatus !== 'available' ||
       (schedule?.shift?.ShiftAssignedUserId &&
         schedule?.shift?.ShiftAssignedUserId.length ===
           schedule.shift.ShiftRequiredEmp)
@@ -227,7 +227,7 @@ const AssignShiftModal = ({
                           <span className="font-semibold">
                             Currently assigned{' '}
                           </span>
-                        ) : data.EmpIsAvailable ? (
+                        ) : data.EmpAvailabilityStatus === 'available' ? (
                           <TiTick className="text-textPrimaryGreen text-xl" />
                         ) : (
                           <RxCross1 className="text-textPrimaryRed text-xl" />
