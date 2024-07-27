@@ -164,11 +164,6 @@ class DbSchedule {
             dayjs(toDate(s.ShiftDate)).isSame(currentDate, 'date')
           );
 
-          console.log(
-            dayjs(currentDate).startOf('day').toDate(),
-            dayjs(currentDate).endOf('day').toDate()
-          );
-
           //*Fetch Employee leave status
           const leaveRef = collection(db, CollectionName.leaveRequests);
           const leaveQuery = query(
