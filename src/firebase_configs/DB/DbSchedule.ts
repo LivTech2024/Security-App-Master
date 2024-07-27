@@ -6,7 +6,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  limit,
   query,
   runTransaction,
   updateDoc,
@@ -17,6 +16,7 @@ import { db } from '../config';
 import { IEmployeesCollection, IShiftsCollection } from '../../@types/database';
 import dayjs from 'dayjs';
 import { getHoursDiffInTwoTimeString, toDate } from '../../utilities/misc';
+import DbHR from './DbHR';
 
 export interface ISchedule {
   shift: IShiftsCollection;
@@ -163,24 +163,11 @@ class DbSchedule {
         );
 
         //*Fetch Employee leave status
-        const leaveRef = collection(db, CollectionName.leaveRequests);
-        const leaveQuery = query(
-          leaveRef,
-          where('LeaveReqEmpId', '==', emp.EmployeeId),
-          where(
-            'LeaveReqFromDate',
-            '<=',
-            dayjs(currentDate).endOf('day').toDate()
-          ),
-          where(
-            'LeaveReqToDate',
-            '>=',
-            dayjs(currentDate).startOf('day').toDate()
-          ),
-          limit(1)
+
+        const isEmpOnVacation = await DbHR.isEmpOnLeaveOnDate(
+          emp.EmployeeId,
+          currentDate
         );
-        const leaveSnapshot = await getDocs(leaveQuery);
-        const isEmpOnVacation = !leaveSnapshot.empty;
 
         employeesScheduleForWeek.push({
           EmpId: emp.EmployeeId,

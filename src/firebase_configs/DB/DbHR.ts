@@ -14,6 +14,7 @@ import {
 import { CollectionName } from '../../@types/enum';
 import { db } from '../config';
 import { ILeaveRequestsCollection } from '../../@types/database';
+import dayjs from 'dayjs';
 
 class DbHR {
   static getLeaveRequests = ({
@@ -94,6 +95,19 @@ class DbHR {
     };
 
     return updateDoc(leaveReqRef, updatedLeaveReq);
+  };
+
+  static isEmpOnLeaveOnDate = async (empId: string, date: Date) => {
+    const leaveRef = collection(db, CollectionName.leaveRequests);
+    const leaveQuery = query(
+      leaveRef,
+      where('LeaveReqEmpId', '==', empId),
+      where('LeaveReqFromDate', '<=', dayjs(date).endOf('day').toDate()),
+      where('LeaveReqToDate', '>=', dayjs(date).startOf('day').toDate()),
+      limit(1)
+    );
+    const leaveSnapshot = await getDocs(leaveQuery);
+    return !leaveSnapshot.empty;
   };
 }
 
