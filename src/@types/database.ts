@@ -1,5 +1,5 @@
 import type { FieldValue, GeoPoint, Timestamp } from 'firebase/firestore';
-import { IUserType } from './enum';
+import { IEmployeeStatus, IUserType } from './enum';
 
 export interface ICompaniesCollection {
   CompanyId: string;
@@ -71,7 +71,7 @@ export interface IEmployeesCollection {
   EmployeePayRate: number;
   EmployeeMaxHrsPerWeek: number;
   EmployeeIsAvailable: 'available' | 'out_of_reach' | 'on_vacation';
-  EmployeeStatus: 'on_board' | 'off_board' | 'leaved' | 'fired';
+  EmployeeStatus: IEmployeeStatus;
   EmployeeSupervisorId: string[] | null;
   EmployeeBannedLocationsId: string[] | null;
   EmployeeCompanyId: string;

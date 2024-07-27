@@ -13,7 +13,11 @@ import {
   showSnackbar,
 } from '../../utilities/TsxUtils';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
-import { PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
+import {
+  IEmployeeStatus,
+  PageRoutes,
+  REACT_QUERY_KEYS,
+} from '../../@types/enum';
 import { useNavigate } from 'react-router-dom';
 import { errorHandler } from '../../utilities/CustomError';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
@@ -68,7 +72,8 @@ const EmployeeCreateOrEdit = () => {
           EmployeeCity: employeeEditData.EmployeeCity,
           EmployeePostalCode: employeeEditData.EmployeePostalCode,
           EmployeeProvince: employeeEditData.EmployeeProvince,
-          EmployeeStatus: employeeEditData?.EmployeeStatus || 'on_board',
+          EmployeeStatus:
+            employeeEditData?.EmployeeStatus || IEmployeeStatus.ON_BOARD,
         }
       : { EmployeeMaxHrsPerWeek: String(45) as unknown as number },
   });
@@ -416,17 +421,16 @@ const EmployeeCreateOrEdit = () => {
               <InputSelect
                 label="Employee Status"
                 data={[
-                  { label: 'Onboard', value: 'on_board' },
-                  { label: 'Offboard', value: 'off_board' },
-                  { label: 'Leaved', value: 'leaved' },
-                  { label: 'Fired', value: 'fired' },
+                  { label: 'Onboard', value: IEmployeeStatus.ON_BOARD },
+                  { label: 'Offboard', value: IEmployeeStatus.OFF_BOARD },
+                  { label: 'Leaved', value: IEmployeeStatus.LEAVED },
+                  { label: 'Fired', value: IEmployeeStatus.FIRED },
                 ]}
-                value={methods.watch('EmployeeStatus') || 'on_board'}
+                value={
+                  methods.watch('EmployeeStatus') || IEmployeeStatus.ON_BOARD
+                }
                 onChange={(e) =>
-                  methods.setValue(
-                    'EmployeeStatus',
-                    e as 'on_board' | 'off_board' | 'leaved' | 'fired'
-                  )
+                  methods.setValue('EmployeeStatus', e as IEmployeeStatus)
                 }
                 className="w-full"
                 error={methods.formState.errors.EmployeeStatus?.message}

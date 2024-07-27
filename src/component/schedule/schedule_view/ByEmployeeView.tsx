@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuthState } from '../../../store';
 import DbSchedule, { ISchedule } from '../../../firebase_configs/DB/DbSchedule';
 import { useQuery } from '@tanstack/react-query';
-import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { IEmployeeStatus, REACT_QUERY_KEYS } from '../../../@types/enum';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import dayjs from 'dayjs';
@@ -73,7 +73,9 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
       const snapshot = await DbEmployee.getEmployees({
         cmpId: company!.CompanyId,
         branch: branchId,
-        additionalQuery: [where('EmployeeStatus', '==', 'on_board')],
+        additionalQuery: [
+          where('EmployeeStatus', '==', IEmployeeStatus.ON_BOARD),
+        ],
       });
       return snapshot.docs;
     },

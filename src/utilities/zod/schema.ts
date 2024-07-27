@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { numberString } from './helper';
 import { ConstRegex } from '../../constants/ConstRegex';
 import { TrainCertsCategories } from '../../@types/database';
+import { IEmployeeStatus } from '../../@types/enum';
 
 //*Admin  update schema
 export const adminUpdateSchema = z.object({
@@ -143,7 +144,12 @@ export const addEmployeeFormSchema = z
       .string()
       .min(6, { message: 'Min 6 character is required' }),
     EmployeeRole: z.string().min(1, { message: 'Employee role is required' }),
-    EmployeeStatus: z.enum(['on_board', 'off_board', 'leaved', 'fired']),
+    EmployeeStatus: z.enum([
+      IEmployeeStatus.ON_BOARD,
+      IEmployeeStatus.OFF_BOARD,
+      IEmployeeStatus.LEAVED,
+      IEmployeeStatus.FIRED,
+    ]),
     EmployeePayRate: numberString({ message: 'Employee pay rate is required' }),
     EmployeeMaxHrsPerWeek: numberString({
       message: 'Employee max week hours is required',

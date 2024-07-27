@@ -12,7 +12,7 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { CollectionName } from '../../@types/enum';
+import { CollectionName, IEmployeeStatus } from '../../@types/enum';
 import { db } from '../config';
 import { IEmployeesCollection, IShiftsCollection } from '../../@types/database';
 import dayjs from 'dayjs';
@@ -117,7 +117,7 @@ class DbSchedule {
       const empRef = collection(db, CollectionName.employees);
       let queryParams: QueryConstraint[] = [
         where('EmployeeCompanyId', '==', cmpId),
-        where('EmployeeStatus', '==', 'on_board'),
+        where('EmployeeStatus', '==', IEmployeeStatus.ON_BOARD),
       ];
       if (empRole) {
         queryParams = [...queryParams, where('EmployeeRole', '==', empRole)];

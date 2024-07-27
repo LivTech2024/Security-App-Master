@@ -4,6 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 import {
   DisplayCount,
+  IEmployeeStatus,
   MinimumQueryCharacter,
   PageRoutes,
   REACT_QUERY_KEYS,
@@ -118,17 +119,15 @@ const EmployeeList = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
-  const getEmpStatus = (
-    status: 'on_board' | 'off_board' | 'leaved' | 'fired'
-  ) => {
+  const getEmpStatus = (status: IEmployeeStatus) => {
     switch (status) {
-      case 'on_board':
+      case IEmployeeStatus.ON_BOARD:
         return 'Onboard';
-      case 'off_board':
+      case IEmployeeStatus.OFF_BOARD:
         return 'Offboard';
-      case 'leaved':
+      case IEmployeeStatus.LEAVED:
         return 'Leaved';
-      case 'fired':
+      case IEmployeeStatus.FIRED:
         return 'Fired';
 
       default:

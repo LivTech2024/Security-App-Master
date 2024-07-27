@@ -247,3 +247,10 @@ export enum PerformanceSortType {
   DARS = 'dars',
   REPORTS = 'reports',
 }
+
+export enum IEmployeeStatus {
+  ON_BOARD = 'on_board',
+  OFF_BOARD = 'off_board',
+  LEAVED = 'leaved',
+  FIRED = 'fired',
+}
