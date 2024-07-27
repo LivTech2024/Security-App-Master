@@ -15,6 +15,7 @@ import { Draggable, DropPoint } from '../../../utilities/DragAndDropHelper';
 import DbEmployee from '../../../firebase_configs/DB/DbEmployee';
 import {
   IEmployeesCollection,
+  ILeaveRequestsCollection,
   IShiftsCollection,
 } from '../../../@types/database';
 import {
@@ -26,9 +27,14 @@ import { errorHandler } from '../../../utilities/CustomError';
 import SelectBranch from '../../../common/SelectBranch';
 import { sendEmail } from '../../../API/SendEmail';
 import { where } from 'firebase/firestore';
+import DbHR from '../../../firebase_configs/DB/DbHR';
 
 interface ByEmployeeViewProps {
   datesArray: Date[];
+}
+
+interface EmployeesCollection extends IEmployeesCollection {
+  EmployeeLeaves: { LeaveStartDate: Date; LeaveEndDate: Date }[];
 }
 
 const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
@@ -65,28 +71,61 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
 
   //*Fetch all the employees
 
-  const [employees, setEmployees] = useState<IEmployeesCollection[]>([]);
+  const [employees, setEmployees] = useState<EmployeesCollection[]>([]);
 
   const { data: snapshotData, error: empError } = useQuery({
-    queryKey: [REACT_QUERY_KEYS.EMPLOYEE_LIST, company!.CompanyId, branchId],
+    queryKey: [
+      REACT_QUERY_KEYS.EMPLOYEE_LIST,
+      company!.CompanyId,
+      branchId,
+      datesArray,
+    ],
     queryFn: async () => {
-      const snapshot = await DbEmployee.getEmployees({
+      const empSnapshot = await DbEmployee.getEmployees({
         cmpId: company!.CompanyId,
         branch: branchId,
         additionalQuery: [
           where('EmployeeStatus', '==', IEmployeeStatus.ON_BOARD),
         ],
       });
-      return snapshot.docs;
+
+      const empData = empSnapshot.docs.map(
+        (doc) => doc.data() as IEmployeesCollection
+      );
+
+      const newEmpData: EmployeesCollection[] = [];
+
+      await Promise.all(
+        empData.map(async (emp) => {
+          const empLeavesSnapshot = await DbHR.getEmpLeaves(
+            emp.EmployeeId,
+            datesArray[0],
+            datesArray[datesArray.length - 1]
+          );
+
+          const empLeaveData = empLeavesSnapshot.docs.map(
+            (doc) => doc.data() as ILeaveRequestsCollection
+          );
+
+          newEmpData.push({
+            ...emp,
+            EmployeeLeaves: empLeaveData.map((leave) => {
+              return {
+                LeaveEndDate: toDate(leave.LeaveReqToDate),
+                LeaveStartDate: toDate(leave.LeaveReqFromDate),
+              };
+            }),
+          });
+        })
+      );
+      return { docs: empSnapshot.docs, docData: newEmpData };
     },
   });
 
   useEffect(() => {
     console.log(empError);
     if (snapshotData) {
-      setEmployees(
-        snapshotData.map((doc) => doc.data() as IEmployeesCollection)
-      );
+      setEmployees(snapshotData.docData);
     }
   }, [snapshotData, empError]);
 
@@ -295,6 +334,35 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
     });
   };
 
+  const isEmpOnLeave = (
+    empLeaves: { LeaveStartDate: Date; LeaveEndDate: Date }[],
+    date: Date
+  ) => {
+    if (
+      empLeaves.some((leave) => {
+        if (
+          (dayjs(leave.LeaveStartDate).isBefore(
+            dayjs(date).endOf('day').toDate()
+          ) ||
+            dayjs(leave.LeaveStartDate).isSame(
+              dayjs(date).endOf('day').toDate()
+            )) &&
+          (dayjs(leave.LeaveEndDate).isAfter(
+            dayjs(date).startOf('day').toDate()
+          ) ||
+            dayjs(leave.LeaveEndDate).isSame(
+              dayjs(date).startOf('day').toDate()
+            ))
+        ) {
+          return true;
+        }
+      })
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex flex-col gap-4">
@@ -366,15 +434,6 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                               <div className="">Not Scheduled</div>
                             )}
                           </span>
-                          {emp.EmployeeIsAvailable !== 'available' && (
-                            <span>
-                              {emp.EmployeeIsAvailable === 'on_vacation'
-                                ? 'On vacation'
-                                : emp.EmployeeIsAvailable === 'out_of_reach'
-                                  ? 'Out of reach'
-                                  : 'Available'}
-                            </span>
-                          )}
                         </div>
                       </td>
                       {datesArray.map((date, idx) => {
@@ -393,13 +452,17 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                                 </span>
                                 <span>{shift.ShiftPosition}</span>
                               </div>
+                            ) : isEmpOnLeave(emp.EmployeeLeaves, date) ? (
+                              <div className="bg-primaryRed/50 min-h-full rounded text-sm font-semibold py-2">
+                                On Leave
+                              </div>
                             ) : (
                               <DropPoint
                                 accept={`${formatDate(date, 'DDMMYYYY')}${emp.EmployeeRole}`}
                                 id={emp.EmployeeId}
                                 className="min-h-[60px]"
                               >
-                                <div>&nbsp;</div>
+                                &nbsp;
                               </DropPoint>
                             )}
                           </td>

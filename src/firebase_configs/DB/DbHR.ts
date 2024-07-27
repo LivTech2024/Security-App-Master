@@ -109,6 +109,17 @@ class DbHR {
     const leaveSnapshot = await getDocs(leaveQuery);
     return !leaveSnapshot.empty;
   };
+
+  static getEmpLeaves = (empId: string, startDate: Date, endDate: Date) => {
+    const leaveRef = collection(db, CollectionName.leaveRequests);
+    const leaveQuery = query(
+      leaveRef,
+      where('LeaveReqEmpId', '==', empId),
+      where('LeaveReqFromDate', '<=', dayjs(endDate).endOf('day').toDate()),
+      where('LeaveReqToDate', '>=', dayjs(startDate).startOf('day').toDate())
+    );
+    return getDocs(leaveQuery);
+  };
 }
 
 export default DbHR;
