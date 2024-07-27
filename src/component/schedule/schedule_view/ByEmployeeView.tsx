@@ -25,6 +25,7 @@ import {
 import { errorHandler } from '../../../utilities/CustomError';
 import SelectBranch from '../../../common/SelectBranch';
 import { sendEmail } from '../../../API/SendEmail';
+import { where } from 'firebase/firestore';
 
 interface ByEmployeeViewProps {
   datesArray: Date[];
@@ -72,6 +73,7 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
       const snapshot = await DbEmployee.getEmployees({
         cmpId: company!.CompanyId,
         branch: branchId,
+        additionalQuery: [where('EmployeeStatus', '==', 'on_board')],
       });
       return snapshot.docs;
     },

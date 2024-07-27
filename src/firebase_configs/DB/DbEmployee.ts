@@ -662,6 +662,7 @@ class DbEmployee {
     cmpId,
     empRole,
     branch,
+    additionalQuery,
   }: {
     lmt?: number;
     lastDoc?: DocumentData | null;
@@ -669,6 +670,7 @@ class DbEmployee {
     cmpId: string;
     empRole?: string | null;
     branch?: string;
+    additionalQuery?: QueryConstraint[];
   }) => {
     const empRef = collection(db, CollectionName.employees);
 
@@ -697,6 +699,10 @@ class DbEmployee {
         ...queryParams,
         where('EmployeeCompanyBranchId', '==', branch),
       ];
+    }
+
+    if (additionalQuery) {
+      queryParams = [...queryParams, ...additionalQuery];
     }
 
     if (lastDoc) {
