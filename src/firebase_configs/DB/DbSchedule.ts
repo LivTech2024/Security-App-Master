@@ -133,46 +133,48 @@ class DbSchedule {
         (doc) => doc.data() as IEmployeesCollection
       );
 
-      const promise = employees.map(async (emp) => {
-        const shiftRef = collection(db, CollectionName.shifts);
-        const shiftQuery = query(
-          shiftRef,
-          where('ShiftDate', '>=', startDate),
-          where('ShiftDate', '<=', endDate),
-          where('ShiftAssignedUserId', 'array-contains', emp.EmployeeId)
-        );
-        const shiftSnapshot = await getDocs(shiftQuery);
-        const shifts = shiftSnapshot.docs.map(
-          (doc) => doc.data() as IShiftsCollection
-        );
-
-        // Calculate total work hours for the week
-        const totalWorkHours = shifts.reduce((totalHours, shift) => {
-          const shiftHours = getHoursDiffInTwoTimeString(
-            shift.ShiftStartTime,
-            shift.ShiftEndTime
+      const promise = employees
+        .filter((emp) => emp.EmployeeStatus === 'on_board')
+        .map(async (emp) => {
+          const shiftRef = collection(db, CollectionName.shifts);
+          const shiftQuery = query(
+            shiftRef,
+            where('ShiftDate', '>=', startDate),
+            where('ShiftDate', '<=', endDate),
+            where('ShiftAssignedUserId', 'array-contains', emp.EmployeeId)
           );
-          return totalHours + shiftHours;
-        }, 0);
+          const shiftSnapshot = await getDocs(shiftQuery);
+          const shifts = shiftSnapshot.docs.map(
+            (doc) => doc.data() as IShiftsCollection
+          );
 
-        employeesScheduleForWeek.push({
-          EmpId: emp.EmployeeId,
-          EmpName: emp.EmployeeName,
-          EmpImg: emp.EmployeeImg,
-          EmpPhone: emp.EmployeePhone,
-          EmpEmail: emp.EmployeeEmail,
-          EmpWeekShifts: shifts.length,
-          EmpIsAvailable:
-            shifts.some((s) =>
-              dayjs(toDate(s.ShiftDate)).isSame(currentDate, 'date')
-            ) || emp.EmployeeIsAvailable !== 'available'
-              ? false
-              : true,
-          EmpWeekHours: totalWorkHours,
-          EmpMaxWeekHours: emp.EmployeeMaxHrsPerWeek,
-          EmpRole: emp.EmployeeRole,
+          // Calculate total work hours for the week
+          const totalWorkHours = shifts.reduce((totalHours, shift) => {
+            const shiftHours = getHoursDiffInTwoTimeString(
+              shift.ShiftStartTime,
+              shift.ShiftEndTime
+            );
+            return totalHours + shiftHours;
+          }, 0);
+
+          employeesScheduleForWeek.push({
+            EmpId: emp.EmployeeId,
+            EmpName: emp.EmployeeName,
+            EmpImg: emp.EmployeeImg,
+            EmpPhone: emp.EmployeePhone,
+            EmpEmail: emp.EmployeeEmail,
+            EmpWeekShifts: shifts.length,
+            EmpIsAvailable:
+              shifts.some((s) =>
+                dayjs(toDate(s.ShiftDate)).isSame(currentDate, 'date')
+              ) || emp.EmployeeIsAvailable !== 'available'
+                ? false
+                : true,
+            EmpWeekHours: totalWorkHours,
+            EmpMaxWeekHours: emp.EmployeeMaxHrsPerWeek,
+            EmpRole: emp.EmployeeRole,
+          });
         });
-      });
 
       await Promise.all(promise);
 

@@ -132,7 +132,7 @@ const EmployeeList = () => {
         return 'Fired';
 
       default:
-        return 'Onboard';
+        return 'N/A';
     }
   };
 
@@ -231,7 +231,7 @@ const EmployeeList = () => {
                     {emp.EmployeeRole}
                   </td>
                   <td className="px-4 py-2 text-end capitalize">
-                    {getEmpStatus(emp.EmployeeStatus || 'on_board')}
+                    {getEmpStatus(emp.EmployeeStatus || 'N/A')}
                   </td>
                 </tr>
               );
