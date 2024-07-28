@@ -140,7 +140,7 @@ const EmpDetails = ({
       }
       showModalLoader({});
 
-      const empEarningDetails = await DbPayment.getEmpEarning({
+      const { empEarningDetails, vacationPay } = await DbPayment.getEmpEarning({
         empId,
         startDate: payStartDate,
         endDate: payEndDate,
@@ -171,6 +171,18 @@ const EmpDetails = ({
         },
       ]);
 
+      if (vacationPay) {
+        setEarningsList((prev) => [
+          ...prev,
+          {
+            CurrentAmount: String(vacationPay || 0),
+            Type: 'Fixed',
+            Income: 'Vacation',
+            YTDAmount: '0',
+          },
+        ]);
+      }
+
       closeModalLoader();
     } catch (error) {
       errorHandler(error);
@@ -187,7 +199,7 @@ const EmpDetails = ({
         <InputSelect
           label="Select employee"
           data={employees.map((res) => {
-            return { label: res.EmployeeName, value: res.EmployeeName };
+            return { label: res.EmployeeName, value: res.EmployeeId };
           })}
           searchValue={empSearchQuery}
           onSearchChange={setEmpSearchQuery}

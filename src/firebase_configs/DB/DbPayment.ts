@@ -27,6 +27,7 @@ import {
   IInvoiceItems,
   IInvoiceTaxList,
   IInvoicesCollection,
+  ILeaveRequestsCollection,
   IPayStubDeductionsChildCollection,
   IPayStubEarningsChildCollection,
   IPayStubsCollection,
@@ -44,6 +45,7 @@ import {
   IDeductionList,
   IEarningList,
 } from '../../pages/payments_and_billing/paystub/PayStubGenerate';
+import DbHR from './DbHR';
 
 class DbPayment {
   static isInvoiceNumberExist = async (
@@ -412,6 +414,7 @@ class DbPayment {
       Rate: 0,
       Quantity: 0,
     };
+    let vacationPay = 0;
 
     try {
       const empDetails = await DbEmployee.getEmpById(empId);
@@ -447,17 +450,25 @@ class DbPayment {
         }
       });
 
+      //*Fetch Paid leaves
+      const leavesSnapshot = await DbHR.getEmpLeaves(empId, startDate, endDate);
+      const leavesData = leavesSnapshot.docs.map(
+        (doc) => doc.data() as ILeaveRequestsCollection
+      );
+      vacationPay = leavesData
+        .filter((req) => req.LeaveReqIsPaidLeave && req.LeaveReqPaidLeaveAmt)
+        .reduce((acc, obj) => acc + (obj.LeaveReqPaidLeaveAmt || 0), 0);
+
       empEarningDetails = {
         ...empEarningDetails,
         Rate: EmployeePayRate,
         Quantity: empTotalHrs,
       };
 
-      return empEarningDetails;
+      return { empEarningDetails, vacationPay };
     } catch (error) {
       console.log(error);
-      throw error;
-      return empEarningDetails;
+      return { empEarningDetails, vacationPay };
     }
   };
 
