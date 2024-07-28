@@ -414,7 +414,9 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                     <tr className="border-b border-gray-400">
                       <td className="py-4 px-2 border-l border-gray-400">
                         <div className="flex flex-col">
-                          <span>{emp.EmployeeName}</span>
+                          <span className="line-clamp-1">
+                            {emp.EmployeeName}
+                          </span>
                           <span className="font-semibold pl-1 text-sm">
                             {empShifts.length > 0 ? (
                               <div>
@@ -453,7 +455,7 @@ const ByEmployeeView = ({ datesArray }: ByEmployeeViewProps) => {
                                 <span>{shift.ShiftPosition}</span>
                               </div>
                             ) : isEmpOnLeave(emp.EmployeeLeaves, date) ? (
-                              <div className="bg-primaryRed/50 min-h-full rounded text-sm font-semibold py-2">
+                              <div className="bg-primaryRed/50 min-h-full rounded text-sm font-semibold py-2 text-surface">
                                 On Leave
                               </div>
                             ) : (
