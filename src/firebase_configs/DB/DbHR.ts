@@ -102,6 +102,7 @@ class DbHR {
     const leaveQuery = query(
       leaveRef,
       where('LeaveReqEmpId', '==', empId),
+      where('LeaveReqStatus', '==', 'accepted'),
       where('LeaveReqFromDate', '<=', dayjs(date).endOf('day').toDate()),
       where('LeaveReqToDate', '>=', dayjs(date).startOf('day').toDate()),
       limit(1)
@@ -115,6 +116,7 @@ class DbHR {
     const leaveQuery = query(
       leaveRef,
       where('LeaveReqEmpId', '==', empId),
+      where('LeaveReqStatus', '==', 'accepted'),
       where('LeaveReqFromDate', '<=', dayjs(endDate).endOf('day').toDate()),
       where('LeaveReqToDate', '>=', dayjs(startDate).startOf('day').toDate())
     );
