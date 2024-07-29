@@ -168,7 +168,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     };
     fetchEmpSchedule();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDate]);
+  }, [selectedDate, branch]);
 
   const dropResult = (draggableId: string, dropPointId: string) => {
     const selectedEmp = empAvailableForShift.find(
