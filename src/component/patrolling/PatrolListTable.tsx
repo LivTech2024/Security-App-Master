@@ -128,9 +128,9 @@ const PatrolListTable = ({
                           navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT);
                         }
                       }}
-                      className="px-4 py-2 text-end capitalize align-top flex justify-end"
+                      className="px-4 py-2 text-end capitalize align-top flex justify-end group"
                     >
-                      <MdEdit className="text-lg text-textPrimaryBlue cursor-pointer hover:scale-110 duration-150" />
+                      <MdEdit className="text-lg text-textPrimaryBlue cursor-pointer group-hover:scale-110 duration-150" />
                     </td>
                   </>
                 )}
