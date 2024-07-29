@@ -72,7 +72,7 @@ const PatrolListTable = ({
 
           {admin && company && (
             <>
-              <th className="uppercase px-4 py-2 w-[10%] text-end">QR PDF</th>
+              <th className="uppercase px-4 py-2 w-[10%] text-end">QR CODES</th>
               <th className="uppercase px-4 py-2 w-[5%] text-end">Edit</th>
             </>
           )}
