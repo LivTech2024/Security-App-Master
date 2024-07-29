@@ -49,6 +49,15 @@ interface CalendarViewProps {
 }
 
 const CalendarView = ({ datesArray }: CalendarViewProps) => {
+  const [resultToBePublished, setResultToBePublished] = useState<
+    {
+      shift: IShiftsCollection;
+      emp: IEmpScheduleForWeek;
+    }[]
+  >([]);
+
+  const [shiftToBeDeleted, setShiftToBeDeleted] = useState<string[]>([]);
+
   const [schedules, setSchedules] = useState<ISchedule[]>([]);
 
   const { company, empRoles } = useAuthState();
@@ -73,12 +82,42 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
       );
       return data;
     },
-    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
     console.log(error);
-    setSchedules(data || []);
+
+    setSchedules([]);
+
+    data?.forEach((s) => {
+      //*Check if this shift is in resultToBePublishedArray
+      if (
+        resultToBePublished.length > 0 &&
+        resultToBePublished.find((r) => r.shift.ShiftId === s.shift.ShiftId)
+      ) {
+        const prevShiftResultData = resultToBePublished.find(
+          (r) => r.shift.ShiftId === s.shift.ShiftId
+        );
+
+        const employee: Partial<IEmployeesCollection> = {
+          EmployeeId: prevShiftResultData?.emp?.EmpId,
+          EmployeeName: prevShiftResultData?.emp?.EmpName,
+          EmployeeImg: prevShiftResultData?.emp?.EmpImg,
+          EmployeeRole: prevShiftResultData?.emp?.EmpRole,
+          EmployeeEmail: prevShiftResultData?.emp?.EmpEmail,
+        };
+
+        setSchedules((prev) => [
+          ...prev,
+          {
+            shift: s.shift,
+            employee: [employee as IEmployeesCollection],
+          },
+        ]);
+      } else {
+        setSchedules((prev) => [...prev, s]);
+      }
+    });
   }, [data, error]);
 
   const [selectedSchedule, setSelectedSchedule] = useState<ISchedule | null>(
@@ -110,7 +149,15 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
           cmpBranchId: branch,
         });
         if (data) {
-          setEmpAvailableForShift(data);
+          const filteredData = data.filter(
+            (d) =>
+              !resultToBePublished.find(
+                (r) =>
+                  r.emp.EmpId === d.EmpId &&
+                  dayjs(toDate(r.shift?.ShiftDate)).isSame(selectedDate, 'day')
+              )
+          );
+          setEmpAvailableForShift(filteredData);
         }
         setIsEmpLoading(false);
       } catch (error) {
@@ -122,15 +169,6 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     fetchEmpSchedule();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
-
-  const [resultToBePublished, setResultToBePublished] = useState<
-    {
-      shift: IShiftsCollection;
-      emp: IEmpScheduleForWeek;
-    }[]
-  >([]);
-
-  const [shiftToBeDeleted, setShiftToBeDeleted] = useState<string[]>([]);
 
   const dropResult = (draggableId: string, dropPointId: string) => {
     const selectedEmp = empAvailableForShift.find(
