@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { formatDate, toDate } from '../../../utilities/misc';
+import { formatDate, formatDateRange, toDate } from '../../../utilities/misc';
 import DbSchedule, { ISchedule } from '../../../firebase_configs/DB/DbSchedule';
 import { PageRoutes, REACT_QUERY_KEYS } from '../../../@types/enum';
 import { useQuery } from '@tanstack/react-query';
@@ -391,7 +391,13 @@ const StatisticsView = () => {
           className="flex flex-col p-4 rounded-lg bg-surface shadow-md gap-4 w-full"
         >
           <div className="font-semibold text-xl">
-            Employees Scheduled This Week
+            Employees Scheduled{' : '}
+            {startDate &&
+              endDate &&
+              formatDateRange({
+                startDateString: startDate.toString(),
+                endDateString: endDate.toString(),
+              })}
           </div>
           <table>
             <thead>
