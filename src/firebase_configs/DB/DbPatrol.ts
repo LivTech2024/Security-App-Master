@@ -27,15 +27,12 @@ import {
   IPatrolsCollection,
 } from '../../@types/database';
 import { PatrollingFormFields } from '../../utilities/zod/schema';
-import { generateQrCodesHtml } from '../../utilities/pdf/generateQrCodesHtml';
 import {
   fullTextSearchIndex,
   getRandomNumbers,
   removeTimeFromDate,
   toDate,
 } from '../../utilities/misc';
-import { htmlToPdf } from '../../API/HtmlToPdf';
-import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
 import { Company } from '../../store/slice/auth.slice';
 import dayjs from 'dayjs';
 
@@ -92,26 +89,14 @@ class DbPatrol {
     };
 
     await setDoc(patrolRef, newPatrol);
-
-    const fileName = `${data.PatrolName}_qrcodes.pdf`;
-    const html = await generateQrCodesHtml(
-      PatrolCheckPoints.map((ch) => {
-        return { code: ch.CheckPointId, label: ch.CheckPointName };
-      }),
-      companyDetails
-    );
-    const response = await htmlToPdf({ file_name: fileName, html });
-    downloadPdf(response, fileName);
   };
 
   static updatePatrol = async ({
     patrolId,
     data,
-    companyDetails,
   }: {
     patrolId: string;
     data: PatrollingFormFields;
-    companyDetails: Company;
   }) => {
     await runTransaction(db, async (transaction) => {
       const patrolRef = doc(db, CollectionName.patrols, patrolId);
@@ -163,16 +148,6 @@ class DbPatrol {
       };
 
       transaction.update(patrolRef, updatedPatrol);
-
-      const fileName = `${data.PatrolName}_qrcodes.pdf`;
-      const html = await generateQrCodesHtml(
-        PatrolCheckPoints.map((ch) => {
-          return { code: ch.CheckPointId, label: ch.CheckPointName };
-        }),
-        companyDetails
-      );
-      const response = await htmlToPdf({ file_name: fileName, html });
-      downloadPdf(response, fileName);
     });
   };
 

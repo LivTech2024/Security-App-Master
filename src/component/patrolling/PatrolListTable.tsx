@@ -2,9 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { IPatrolsCollection } from '../../@types/database';
 import NoSearchResult from '../../common/NoSearchResult';
 import TableShimmer from '../../common/shimmer/TableShimmer';
-import { MdEdit } from 'react-icons/md';
+import { MdDownload, MdEdit } from 'react-icons/md';
 import { useAuthState, useEditFormStore } from '../../store';
 import { PageRoutes } from '../../@types/enum';
+import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
+import { errorHandler } from '../../utilities/CustomError';
+import { generateQrCodesHtml } from '../../utilities/pdf/generateQrCodesHtml';
+import { htmlToPdf } from '../../API/HtmlToPdf';
+import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
 
 interface PatrollingListTableProps {
   data: IPatrolsCollection[];
@@ -31,20 +36,45 @@ const PatrolListTable = ({
 
   const { admin, company } = useAuthState();
 
+  const handleDownload = async (patrol: IPatrolsCollection) => {
+    if (!company) return;
+    try {
+      showModalLoader({});
+      const fileName = `${patrol.PatrolName}_qrcodes.pdf`;
+      const html = await generateQrCodesHtml(
+        patrol.PatrolCheckPoints.map((ch) => {
+          return { code: ch.CheckPointId, label: ch.CheckPointName };
+        }),
+        company
+      );
+      const response = await htmlToPdf({ file_name: fileName, html });
+      downloadPdf(response, fileName);
+
+      closeModalLoader();
+    } catch (error) {
+      closeModalLoader();
+      console.log(error);
+      errorHandler(error);
+    }
+  };
+
   return (
     <table className="rounded overflow-hidden w-full">
       <thead className="bg-primary text-surface text-sm">
         <tr>
-          <th className="uppercase px-4 py-2 w-[20%] text-start">
+          <th className="uppercase px-4 py-2 w-[40%] text-start">
             Patrol Name
           </th>
-          <th className="uppercase px-4 py-2 w-[20%] text-start">Location</th>
+          <th className="uppercase px-4 py-2 w-[35%] text-start">Location</th>
           <th className="uppercase px-4 py-2 w-[10%] text-center">
             Checkpoints
           </th>
 
           {admin && company && (
-            <th className="uppercase px-4 py-2 w-[5%] text-end">&nbsp;</th>
+            <>
+              <th className="uppercase px-4 py-2 w-[10%] text-end">QR PDF</th>
+              <th className="uppercase px-4 py-2 w-[5%] text-end">Edit</th>
+            </>
           )}
         </tr>
       </thead>
@@ -69,7 +99,7 @@ const PatrolListTable = ({
                   onClick={() => handleRowClicked(patrol.PatrolId)}
                   className="px-4 py-2 text-start align-top "
                 >
-                  <span className="line-clamp-3">
+                  <span className="line-clamp-2">
                     {patrol.PatrolLocationName}
                   </span>
                 </td>
@@ -82,17 +112,27 @@ const PatrolListTable = ({
                 </td>
 
                 {admin && company && (
-                  <td
-                    onClick={() => {
-                      if (admin && company) {
-                        setPatrolEditData(patrol);
-                        navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT);
-                      }
-                    }}
-                    className="px-4 py-2 text-end capitalize align-top flex justify-end"
-                  >
-                    <MdEdit className="text-lg text-textPrimaryBlue cursor-pointer hover:scale-110 duration-150" />
-                  </td>
+                  <>
+                    <td
+                      onClick={() => handleDownload(patrol)}
+                      className="px-4 py-2 text-end align-top cursor-pointer group"
+                    >
+                      <span className="flex justify-end">
+                        <MdDownload className="text-xl text-textPrimaryBlue cursor-pointer group-hover:scale-110 duration-150" />
+                      </span>
+                    </td>
+                    <td
+                      onClick={() => {
+                        if (admin && company) {
+                          setPatrolEditData(patrol);
+                          navigate(PageRoutes.PATROLLING_CREATE_OR_EDIT);
+                        }
+                      }}
+                      className="px-4 py-2 text-end capitalize align-top flex justify-end"
+                    >
+                      <MdEdit className="text-lg text-textPrimaryBlue cursor-pointer hover:scale-110 duration-150" />
+                    </td>
+                  </>
                 )}
               </tr>
             );
