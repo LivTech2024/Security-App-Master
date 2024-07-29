@@ -113,9 +113,10 @@ class DbPatrol {
     data: PatrollingFormFields;
     companyDetails: Company;
   }) => {
-    const patrolRef = doc(db, CollectionName.patrols, patrolId);
-
     await runTransaction(db, async (transaction) => {
+      const patrolRef = doc(db, CollectionName.patrols, patrolId);
+      const patrolSnapshot = await transaction.get(patrolRef);
+      const oldPatrolData = patrolSnapshot.data() as IPatrolsCollection;
       const PatrolCheckPoints: IPatrolCheckPointsChild[] = [];
 
       data.PatrolCheckPoints.map((ch, idx) => {
@@ -129,7 +130,10 @@ class DbPatrol {
         PatrolCheckPoints.push({
           CheckPointId: checkPointId,
           CheckPointName: ch.name,
-          CheckPointStatus: [],
+          CheckPointStatus:
+            oldPatrolData?.PatrolCheckPoints?.find(
+              (ch) => ch.CheckPointId === checkPointId
+            )?.CheckPointStatus || [],
           CheckPointCategory: ch.category || null,
           CheckPointHint: ch.hint || null,
         });
@@ -139,7 +143,7 @@ class DbPatrol {
         data.PatrolName.trim().toLowerCase()
       );
 
-      const newPatrol: Partial<IPatrolsCollection> = {
+      const updatedPatrol: Partial<IPatrolsCollection> = {
         PatrolName: data.PatrolName,
         PatrolNameSearchIndex,
         PatrolLocation: new GeoPoint(
@@ -158,7 +162,7 @@ class DbPatrol {
         PatrolModifiedAt: serverTimestamp(),
       };
 
-      transaction.update(patrolRef, newPatrol);
+      transaction.update(patrolRef, updatedPatrol);
 
       const fileName = `${data.PatrolName}_qrcodes.pdf`;
       const html = await generateQrCodesHtml(
