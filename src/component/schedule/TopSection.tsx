@@ -89,11 +89,17 @@ const TopSection = ({
           <div className="flex items-center gap-4">
             <FaCircleChevronLeft
               className="text-2xl cursor-pointer"
-              onClick={() =>
+              onClick={() => {
+                if (!isSelectTenureDisabled && selectedTenure === 'monthly') {
+                  setSelectedDate((prev) =>
+                    dayjs(prev).subtract(1, 'month').toDate()
+                  );
+                  return;
+                }
                 setSelectedDate((prev) =>
                   dayjs(prev).subtract(1, 'week').toDate()
-                )
-              }
+                );
+              }}
             />
             <label
               htmlFor="date_picker"
@@ -118,9 +124,15 @@ const TopSection = ({
             </label>
             <FaCircleChevronRight
               className="text-2xl cursor-pointer"
-              onClick={() =>
-                setSelectedDate((prev) => dayjs(prev).add(1, 'week').toDate())
-              }
+              onClick={() => {
+                if (!isSelectTenureDisabled && selectedTenure === 'monthly') {
+                  setSelectedDate((prev) =>
+                    dayjs(prev).add(1, 'month').toDate()
+                  );
+                  return;
+                }
+                setSelectedDate((prev) => dayjs(prev).add(1, 'week').toDate());
+              }}
             />
           </div>
         )}
