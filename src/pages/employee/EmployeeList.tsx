@@ -11,11 +11,14 @@ import {
 } from '../../@types/enum';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
 import { DocumentData } from 'firebase/firestore';
-import { IEmployeesCollection } from '../../@types/database';
+import {
+  IEmpLicenseDetails,
+  IEmployeesCollection,
+} from '../../@types/database';
 import NoSearchResult from '../../common/NoSearchResult';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import { useAuthState, useEditFormStore } from '../../store';
-import { firebaseDataToObject, splitName } from '../../utilities/misc';
+import { firebaseDataToObject, splitName, toDate } from '../../utilities/misc';
 import { Employee } from '../../store/slice/editForm.slice';
 import Button from '../../common/button/Button';
 import AddEmpRoleModal from '../../component/employees/modal/AddEmpRoleModal';
@@ -24,6 +27,9 @@ import SearchBar from '../../common/inputs/SearchBar';
 import SelectBranch from '../../common/SelectBranch';
 import empDefaultPlaceHolder from '../../../public/assets/avatar.png';
 import PageHeader from '../../common/PageHeader';
+import dayjs from 'dayjs';
+import { Tooltip } from '@mantine/core';
+import { MdOutlineWarningAmber } from 'react-icons/md';
 
 const EmployeeList = () => {
   const navigate = useNavigate();
@@ -135,6 +141,23 @@ const EmployeeList = () => {
     }
   };
 
+  const empLicenseExpDetails = (empLicenses: IEmpLicenseDetails[]) => {
+    let text: string | null = null;
+    empLicenses.find((license) => {
+      const diff = dayjs(toDate(license.LicenseExpDate)).diff(
+        new Date(),
+        'day'
+      );
+      if (diff >= 0 && diff <= 3) {
+        text = `${license.LicenseType} license expiring in ${diff} days`;
+      } else if (diff < 0) {
+        text = `${license.LicenseType} license expired ${diff * -1} days ago`;
+      }
+    });
+
+    return text;
+  };
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
@@ -185,11 +208,12 @@ const EmployeeList = () => {
               Last Name
             </th>
             <th className="uppercase px-4 py-2 w-[20%] text-start">Email</th>
-            <th className="uppercase px-4 py-2 w-[17%] text-start">
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
               PHONE NUMBER
             </th>
             <th className="uppercase px-4 py-2 w-[15%] text-end">Role</th>
             <th className="uppercase px-4 py-2 w-[10%] text-end">Status</th>
+            <th className="w-[2%]"></th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -229,8 +253,33 @@ const EmployeeList = () => {
                   <td className="px-4 py-2 text-end capitalize">
                     {emp.EmployeeRole}
                   </td>
-                  <td className="px-4 py-2 text-end capitalize">
-                    {getEmpStatus(emp.EmployeeStatus || 'N/A')}
+                  <td className="px-4 py-2 capitalize">
+                    <div className="flex flex-col gap-2">
+                      <span className="text-end">
+                        {getEmpStatus(emp.EmployeeStatus || 'N/A')}
+                      </span>
+                    </div>
+                  </td>
+                  <td className=" py-2 px-2">
+                    {empLicenseExpDetails(emp.EmployeeLicenses) && (
+                      <Tooltip
+                        styles={{ tooltip: { padding: 0 } }}
+                        label={
+                          <div className="bg-surface shadow px-4 py-2 text-textPrimary font-semibold capitalize flex items-center gap-2">
+                            <span>
+                              <MdOutlineWarningAmber className="text-2xl text-textPrimaryRed animate-pulse font-semibold" />
+                            </span>
+                            <span>
+                              {empLicenseExpDetails(emp.EmployeeLicenses)}
+                            </span>
+                          </div>
+                        }
+                      >
+                        <div>
+                          <MdOutlineWarningAmber className="text-2xl text-textPrimaryRed animate-pulse font-semibold" />
+                        </div>
+                      </Tooltip>
+                    )}
                   </td>
                 </tr>
               );

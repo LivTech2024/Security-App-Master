@@ -18,6 +18,10 @@ import { Location } from '../../store/slice/editForm.slice';
 import PageHeader from '../../common/PageHeader';
 import Button from '../../common/button/Button';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+import { toDate } from '../../utilities/misc';
+import { Tooltip } from '@mantine/core';
+import { MdOutlineWarningAmber } from 'react-icons/md';
 
 const Locations = () => {
   const navigate = useNavigate();
@@ -107,6 +111,18 @@ const Locations = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const clientContractExpDetails = (contractEndDate: Date) => {
+    let text: string | null = null;
+    const diff = dayjs(toDate(contractEndDate)).diff(new Date(), 'day');
+    if (diff >= 0 && diff <= 3) {
+      text = `Contract expiring in ${diff} days`;
+    } else if (diff < 0) {
+      text = `Contract expired ${diff * -1} days ago`;
+    }
+
+    return text;
+  };
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
@@ -129,9 +145,10 @@ const Locations = () => {
             <th className="uppercase px-4 py-2 w-[20%] text-start">
               Location Name
             </th>
-            <th className="uppercase px-4 py-2 w-[30%] text-start">Address</th>
+            <th className="uppercase px-4 py-2 w-[35%] text-start">Address</th>
             <th className="uppercase px-4 py-2 w-[20%] text-end">Latitude</th>
             <th className="uppercase px-4 py-2 w-[20%] text-end">Longitude</th>
+            <th className="w-[2%]"></th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -163,6 +180,31 @@ const Locations = () => {
                   </td>
                   <td className="px-4 py-2 align-top text-end">
                     {loc.LocationCoordinates.longitude}
+                  </td>
+                  <td className="align-top py-2 px-2">
+                    {clientContractExpDetails(
+                      toDate(loc.LocationContractEndDate)
+                    ) && (
+                      <Tooltip
+                        styles={{ tooltip: { padding: 0 } }}
+                        label={
+                          <div className="bg-surface shadow px-4 py-2 text-textPrimary font-semibold capitalize flex items-center gap-2">
+                            <span>
+                              <MdOutlineWarningAmber className="text-2xl text-textPrimaryRed animate-pulse font-semibold" />
+                            </span>
+                            <span>
+                              {clientContractExpDetails(
+                                toDate(loc.LocationContractEndDate)
+                              )}
+                            </span>
+                          </div>
+                        }
+                      >
+                        <div>
+                          <MdOutlineWarningAmber className="text-2xl text-textPrimaryRed animate-pulse font-semibold" />
+                        </div>
+                      </Tooltip>
+                    )}
                   </td>
                 </tr>
               );
