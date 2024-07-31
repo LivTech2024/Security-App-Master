@@ -3,6 +3,7 @@ import {
   IEmployeesCollection,
   IEquipmentsCollection,
   IInvoicesCollection,
+  ILocationsCollection,
   IPatrolLogsCollection,
   IPatrolsCollection,
   IPayStubsCollection,
@@ -34,7 +35,8 @@ class DbAudit {
       payStubs: IPayStubsCollection[] = [],
       invoices: IInvoicesCollection[] = [],
       shifts: IShiftsCollection[] = [];
-    const patrolLogs: IPatrolLogsCollection[] = [];
+    const patrolLogs: IPatrolLogsCollection[] = [],
+      locations: ILocationsCollection[] = [];
 
     endDate = dayjs(endDate).endOf('day').toDate();
 
@@ -133,8 +135,21 @@ class DbAudit {
         })
       );
 
+      await Promise.all(
+        clients.map(async (data) => {
+          const locationSnapshot = await DbClient.getClientLocations(
+            data.ClientId
+          );
+
+          locationSnapshot.docs.forEach((doc) =>
+            locations.push(doc.data() as ILocationsCollection)
+          );
+        })
+      );
+
       return {
         clients,
+        locations,
         employees,
         equipments,
         payStubs,
@@ -146,6 +161,7 @@ class DbAudit {
       console.log(error, 'here');
       return {
         clients,
+        locations,
         employees,
         equipments,
         payStubs,

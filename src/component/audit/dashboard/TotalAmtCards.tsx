@@ -3,7 +3,11 @@ import AnimatedNumberTicker from '../../../common/NumberTicker';
 import { FaMoneyBill1Wave } from 'react-icons/fa6';
 import { GiExpense } from 'react-icons/gi';
 import { FaPeopleCarry, FaTools } from 'react-icons/fa';
-import { MdPeopleAlt } from 'react-icons/md';
+import {
+  MdLocationCity,
+  MdOutlineWarningAmber,
+  MdPeopleAlt,
+} from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../../@types/enum';
 
@@ -11,8 +15,9 @@ interface TotalAmtCardsProps {
   TotalIncome: number;
   TotalExpense: number;
   TotalEquipments: number;
-  TotalEmployees: number;
-  TotalClients: number;
+  Employees: { TotalEmployees: number; IsActionReq: boolean };
+  Clients: { TotalClients: number; IsActionReq: boolean };
+  Locations: { TotalLocations: number; IsActionReq: boolean };
 }
 
 interface CardProps {
@@ -21,9 +26,17 @@ interface CardProps {
   title: string;
   icon: ReactNode;
   callback: () => void;
+  isActionReq?: boolean;
 }
 
-const Cards = ({ amountValue, currency, icon, title, callback }: CardProps) => {
+const Cards = ({
+  amountValue,
+  currency,
+  icon,
+  title,
+  callback,
+  isActionReq = false,
+}: CardProps) => {
   return (
     <div
       onClick={callback}
@@ -32,6 +45,8 @@ const Cards = ({ amountValue, currency, icon, title, callback }: CardProps) => {
       <div className=" mr-0">
         {currency ? (
           <span className=" font-bold text-xl leading-5">{currency}</span>
+        ) : isActionReq ? (
+          <MdOutlineWarningAmber className="text-2xl text-textPrimaryRed animate-pulse" />
         ) : (
           <span>&nbsp;</span>
         )}
@@ -54,11 +69,12 @@ const Cards = ({ amountValue, currency, icon, title, callback }: CardProps) => {
 };
 
 const TotalAmtCards = ({
-  TotalClients,
-  TotalEmployees,
+  Clients,
+  Employees,
   TotalEquipments,
   TotalExpense,
   TotalIncome,
+  Locations,
 }: TotalAmtCardsProps) => {
   const navigate = useNavigate();
 
@@ -87,20 +103,31 @@ const TotalAmtCards = ({
         callback={() => navigate(PageRoutes.EQUIPMENT_LIST)}
       />
       <Cards
-        amountValue={TotalEmployees}
+        amountValue={Employees.TotalEmployees}
         title="Total Employees"
         icon={
           <MdPeopleAlt className="text-textSecondaryBlue ml-auto size-10" />
         }
         callback={() => navigate(PageRoutes.EMPLOYEE_LIST)}
+        isActionReq={Employees.IsActionReq}
       />
       <Cards
-        amountValue={TotalClients}
+        amountValue={Clients.TotalClients}
+        isActionReq={Clients.IsActionReq}
         title="Total Clients"
         icon={
           <FaPeopleCarry className="text-textPrimaryGreen ml-auto size-9" />
         }
         callback={() => navigate(PageRoutes.CLIENTS)}
+      />
+      <Cards
+        amountValue={Locations.TotalLocations}
+        isActionReq={Locations.IsActionReq}
+        title="Total Locations"
+        icon={
+          <MdLocationCity className="text-textPrimaryBlue ml-auto size-9" />
+        }
+        callback={() => navigate(PageRoutes.LOCATIONS)}
       />
     </div>
   );

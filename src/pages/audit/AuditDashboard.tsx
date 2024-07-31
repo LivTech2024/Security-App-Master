@@ -11,6 +11,7 @@ import {
   IEmployeesCollection,
   IEquipmentsCollection,
   IInvoicesCollection,
+  ILocationsCollection,
   IPatrolLogsCollection,
   IPayStubsCollection,
   IShiftsCollection,
@@ -36,6 +37,7 @@ const AuditDashboard = () => {
 
   const [auditData, setAuditData] = useState<{
     clients: IClientsCollection[];
+    locations: ILocationsCollection[];
     employees: IEmployeesCollection[];
     equipments: IEquipmentsCollection[];
     payStubs: IPayStubsCollection[];
@@ -44,6 +46,7 @@ const AuditDashboard = () => {
     patrolLogs: IPatrolLogsCollection[];
   }>({
     clients: [],
+    locations: [],
     employees: [],
     equipments: [],
     invoices: [],
@@ -77,8 +80,17 @@ const AuditDashboard = () => {
         startDate={startDate}
       />
       <TotalAmtCards
-        TotalClients={auditData.clients.length}
-        TotalEmployees={auditData.employees.length}
+        Clients={{ TotalClients: auditData.clients.length, IsActionReq: false }}
+        Employees={{
+          TotalEmployees: auditData.employees.length,
+          IsActionReq: auditData.employees.some((emp) =>
+            emp.EmployeeLicenses.some(
+              (l) =>
+                dayjs(toDate(l.LicenseExpDate)).isSame(new Date(), 'day') ||
+                dayjs(toDate(l.LicenseExpDate)).isBefore(new Date(), 'day')
+            )
+          ),
+        }}
         TotalEquipments={auditData.equipments.length}
         TotalExpense={auditData.payStubs.reduce(
           (acc, obj) => acc + Number(obj.PayStubNetPay.Amount),
@@ -88,6 +100,20 @@ const AuditDashboard = () => {
           (acc, obj) => acc + obj.InvoiceReceivedAmount,
           0
         )}
+        Locations={{
+          TotalLocations: auditData.locations.length,
+          IsActionReq: auditData.locations.some(
+            (loc) =>
+              dayjs(toDate(loc.LocationContractEndDate)).isSame(
+                new Date(),
+                'day'
+              ) ||
+              dayjs(toDate(loc.LocationContractEndDate)).isBefore(
+                new Date(),
+                'day'
+              )
+          ),
+        }}
       />
 
       <div className="grid grid-cols-2 gap-4 w-full">
