@@ -10,6 +10,7 @@ import {
 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../../@types/enum';
+import { Tooltip } from '@mantine/core';
 
 interface TotalAmtCardsProps {
   TotalIncome: number;
@@ -46,7 +47,18 @@ const Cards = ({
         {currency ? (
           <span className=" font-bold text-xl leading-5">{currency}</span>
         ) : isActionReq ? (
-          <MdOutlineWarningAmber className="text-2xl text-textPrimaryRed animate-pulse" />
+          <Tooltip
+            styles={{ tooltip: { padding: 0 } }}
+            label={
+              <div className="bg-surface shadow px-4 py-2 text-textPrimary font-semibold">
+                Action required
+              </div>
+            }
+          >
+            <div>
+              <MdOutlineWarningAmber className="text-2xl text-textPrimaryRed animate-pulse font-semibold" />
+            </div>
+          </Tooltip>
         ) : (
           <span>&nbsp;</span>
         )}
