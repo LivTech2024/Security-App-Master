@@ -1,21 +1,13 @@
-import { useAuthState } from '../../store';
+import favicon from '../../../public/favicon.png';
 
 const SplashScreen = () => {
-  const { company } = useAuthState();
   return (
-    <div className="flex h-screen items-center justify-center bg-surface dark:bg-surfaceDark ">
-      <div className="animate-bounce flex flex-col gap-4 items-center justify-center">
-        {company?.CompanyLogo && (
-          <img
-            alt="Loading"
-            src={company.CompanyLogo}
-            className="w-[120px] object-cover"
-          />
-        )}
-        <div className="text-3xl font-semibold  text-primary">
-          {company?.CompanyName ?? 'Loading'}
-        </div>
-      </div>
+    <div className="flex h-screen items-center justify-center bg-onSurface">
+      <img
+        src={favicon}
+        alt="TPS Logo"
+        className="animate-fadeIn scale-95 transform transition-transform duration-[2000ms] ease-in-out w-[200px]"
+      />
     </div>
   );
 };

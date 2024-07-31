@@ -309,7 +309,7 @@ const LocationCreateOrEdit = () => {
           }
         />
 
-        <div className="grid grid-cols-3 items-end gap-4 p-4 bg-surface shadow rounded">
+        <div className="grid grid-cols-3 items- gap-4 p-4 bg-surface shadow rounded">
           <InputWithTopHeader
             className="mx-0"
             label="Name (It should be unique)"

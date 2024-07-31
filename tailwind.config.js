@@ -54,6 +54,20 @@ export default {
         shimmerColor: '#e3e3e3',
         inputBorder: '#0000001A',
       },
+      animation: {
+        fadeIn: 'fadeIn 1s ease-in-out',
+        shine: 'shine 2s linear infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
+        shine: {
+          '0%': { backgroundPosition: '-200%' },
+          '100%': { backgroundPosition: '200%' },
+        },
+      },
     },
   },
   plugins: [],
