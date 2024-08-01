@@ -18,10 +18,14 @@ import CustomError from '../../utilities/CustomError';
 class DbUser {
   static updateLoggedInUserNotificationToken = async (
     loggedInId: string,
-    token: string
+    token: string,
+    cmpId: string
   ) => {
     const loggedInRef = doc(db, CollectionName.loggedInUsers, loggedInId);
-    return updateDoc(loggedInRef, { LoggedInNotifyFcmToken: token });
+    return updateDoc(loggedInRef, {
+      LoggedInNotifyFcmToken: token,
+      LoggedInCompanyId: cmpId,
+    });
   };
 
   static createDataDeletionRequest = async (

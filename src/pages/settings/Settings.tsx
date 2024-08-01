@@ -3,6 +3,7 @@ import CompanyInfo from '../../component/settings/CompanyInfo';
 import AdminInfo from '../../component/settings/AdminInfo';
 import AccountSettings from '../../component/settings/AccountSettings';
 import PageHeader from '../../common/PageHeader';
+import LoggedInUsers from '../../component/settings/LoggedInUsers';
 
 const account_settings = () => {
   return (
@@ -35,6 +36,14 @@ const account_settings = () => {
           >
             Account Settings
           </Tabs.Tab>
+          <Tabs.Tab
+            className="text-base mx-1"
+            value="loggedin_users"
+            bg={'#e5e7eb'}
+            color="#363738af"
+          >
+            LoggedIn Users
+          </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="company_info">
@@ -47,6 +56,9 @@ const account_settings = () => {
 
         <Tabs.Panel value="account_settings">
           <AccountSettings />
+        </Tabs.Panel>
+        <Tabs.Panel value="loggedin_users">
+          <LoggedInUsers />
         </Tabs.Panel>
       </Tabs>
     </div>

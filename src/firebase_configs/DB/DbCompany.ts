@@ -332,6 +332,34 @@ class DbCompany {
     return getDocs(loggedInQuery);
   };
 
+  static getLoggedInUserOfCompany = ({
+    cmpId,
+    lastDoc,
+    lmt,
+  }: {
+    lmt?: number;
+    lastDoc?: DocumentData | null;
+    cmpId: string;
+  }) => {
+    const loggedInUsersRef = collection(db, CollectionName.loggedInUsers);
+    let queryParams: QueryConstraint[] = [
+      where('LoggedInCompanyId', '==', cmpId),
+      orderBy('LoggedInCreatedAt', 'desc'),
+    ];
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const loggedInUsersQuery = query(loggedInUsersRef, ...queryParams);
+
+    return getDocs(loggedInUsersQuery);
+  };
+
   static deleteUserLoggedInDoc = async (loggedInId: string) => {
     const loggedInRef = doc(db, CollectionName.loggedInUsers, loggedInId);
     return deleteDoc(loggedInRef);

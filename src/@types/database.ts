@@ -348,7 +348,8 @@ export interface ILoggedInUsersCollection {
   LoggedInId: string;
   LoggedInUserId: string;
   IsLoggedIn: boolean;
-  LoggedInCrypt: string;
+  LoggedInCrypt?: string | null;
+  LoggedInCompanyId?: string;
   LoggedInUserType: IUserType;
   LoggedInCreatedAt: Timestamp | FieldValue;
   LoggedInNotifyFcmToken?: string;
