@@ -108,15 +108,6 @@ export const locationCreateSchema = z.object({
     CalloutCostInitialCost: z.coerce.number(),
     CalloutCostPerHour: z.coerce.number(),
   }),
-  LocationManagerName: z
-    .string()
-    .min(3, { message: 'Manager name should be at least 3 characters' }),
-  LocationManagerEmail: z
-    .string()
-    .min(1, { message: 'Email id is required' })
-    .regex(ConstRegex.EMAIL_OPTIONAL, {
-      message: 'Please enter a valid email id',
-    }),
   LocationSendEmailToClient: z.boolean(),
   LocationSendEmailForEachPatrol: z.boolean(),
   LocationSendEmailForEachShift: z.boolean(),

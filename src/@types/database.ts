@@ -310,6 +310,11 @@ export interface ILocationPostOrderChildCollection {
   PostOrderComment?: string | null;
 }
 
+export interface ILocationManagersChildCollection {
+  LocationManagerName: string;
+  LocationManagerEmail: string;
+}
+
 export interface ILocationsCollection {
   LocationId: string;
   LocationCompanyId: string;
@@ -329,8 +334,9 @@ export interface ILocationsCollection {
     CalloutCostInitialCost: number;
     CalloutCostPerHour: number;
   };
-  LocationManagerName: string;
-  LocationManagerEmail: string; //*All the email report will be sent to this email id
+  LocationManagers: ILocationManagersChildCollection[];
+  LocationManagerEmail?: string; //!Todo: Remove this fields
+  LocationManagerName?: string; //!Todo: Remove this fields
   LocationSendEmailToClient: boolean; //*by default true
   LocationSendEmailForEachPatrol: boolean; //*by default true
   LocationSendEmailForEachShift: boolean; //*by default true

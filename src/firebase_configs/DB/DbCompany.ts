@@ -15,6 +15,7 @@ import {
   IDocumentCategories,
   IDocumentsCollection,
   IEmergencyProtocolsCollection,
+  ILocationManagersChildCollection,
   ILocationsCollection,
   IReportCategoriesCollection,
   ITaskLogsCollection,
@@ -342,7 +343,8 @@ class DbCompany {
     postOrderData: {
       PostOrderPdf: string | File;
       PostOrderTitle: string;
-    } | null
+    } | null,
+    locationManagers: ILocationManagersChildCollection[]
   ) => {
     let postOrderFileUrl: string | null = null;
 
@@ -360,8 +362,6 @@ class DbCompany {
         LocationName,
         LocationClientId,
         LocationShiftHourlyRate,
-        LocationManagerEmail,
-        LocationManagerName,
         LocationSendEmailForEachPatrol,
         LocationSendEmailForEachShift,
         LocationSendEmailToClient,
@@ -403,8 +403,7 @@ class DbCompany {
         LocationPatrolPerHitRate,
         LocationPostOrder: null,
         LocationShiftHourlyRate,
-        LocationManagerEmail,
-        LocationManagerName,
+        LocationManagers: locationManagers,
         LocationSendEmailForEachPatrol,
         LocationSendEmailForEachShift,
         LocationSendEmailToClient,
@@ -439,7 +438,8 @@ class DbCompany {
     postOrderData: {
       PostOrderPdf: string | File;
       PostOrderTitle: string;
-    } | null
+    } | null,
+    locationManagers: ILocationManagersChildCollection[]
   ) => {
     const {
       LocationAddress,
@@ -451,8 +451,6 @@ class DbCompany {
       LocationName,
       LocationClientId,
       LocationShiftHourlyRate,
-      LocationManagerEmail,
-      LocationManagerName,
       LocationSendEmailForEachPatrol,
       LocationSendEmailForEachShift,
       LocationSendEmailToClient,
@@ -505,8 +503,7 @@ class DbCompany {
           LocationContractStartDate as unknown as Timestamp,
         LocationPatrolPerHitRate,
         LocationShiftHourlyRate,
-        LocationManagerEmail,
-        LocationManagerName,
+        LocationManagers: locationManagers,
         LocationSendEmailForEachPatrol,
         LocationSendEmailForEachShift,
         LocationSendEmailToClient,
