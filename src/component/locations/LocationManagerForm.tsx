@@ -56,7 +56,9 @@ const LocationManagerForm = ({
   };
   return (
     <div className="col-span-3 flex flex-col gap-4 w-full p-4 bg-onHoverBg rounded">
-      <div className="font-semibold">Add Location Managers</div>
+      <div className="font-semibold">
+        Add Location Manager / Supervisor / Site-Supervisor
+      </div>
       <div className="grid grid-cols-2 gap-4">
         {locationManagers.map((task, index) => (
           <div key={index} className="flex items-end gap-4">
@@ -69,7 +71,7 @@ const LocationManagerForm = ({
 
             <InputWithTopHeader
               className="mx-0"
-              label="Manager Name"
+              label="Name"
               value={task.LocationManagerName}
               onChange={(e) =>
                 handleChange(index, 'LocationManagerName', e.target.value)
@@ -78,7 +80,7 @@ const LocationManagerForm = ({
 
             <InputWithTopHeader
               className="mx-0"
-              label="Manager Email"
+              label="Email"
               value={task.LocationManagerEmail}
               onChange={(e) =>
                 handleChange(index, 'LocationManagerEmail', e.target.value)
