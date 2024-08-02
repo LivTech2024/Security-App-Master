@@ -13,7 +13,7 @@ import dayjs from 'dayjs';
 import { useInView } from 'react-intersection-observer';
 import NoSearchResult from '../../../common/NoSearchResult';
 import { useNavigate } from 'react-router-dom';
-import { formatDate } from '../../../utilities/misc';
+import { formatDate, toDate } from '../../../utilities/misc';
 import TableShimmer from '../../../common/shimmer/TableShimmer';
 import PageHeader from '../../../common/PageHeader';
 import EmpDarListMenus from '../../../component/emp_dar/EmpDarListMenus';
@@ -116,6 +116,48 @@ const ClientEmpDarList = () => {
       fetchNextPage();
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
+
+  function groupAndSortData(data: IEmployeeDARCollection[]) {
+    // Group data by EmpDarShiftId
+    const groupedData = data.reduce(
+      (acc, item) => {
+        const shiftId = item.EmpDarShiftId || item.EmpDarCalloutId;
+
+        if (typeof shiftId === 'string' && shiftId.trim()) {
+          if (!acc[shiftId]) {
+            acc[shiftId] = [];
+          }
+          acc[shiftId].push(item);
+        }
+
+        return acc;
+      },
+      {} as { [key: string]: IEmployeeDARCollection[] }
+    );
+
+    const sortedItems: IEmployeeDARCollection[] = [];
+
+    // Convert grouped data into an array and sort each group
+    Object.values(groupedData).forEach((items) => {
+      items.sort((a, b) => {
+        const dateComparison =
+          toDate(b.EmpDarDate).getTime() - toDate(a.EmpDarDate).getTime();
+
+        const startedAtTimeComparison =
+          toDate(b.EmpDarCreatedAt).getTime() -
+          toDate(a.EmpDarCreatedAt).getTime();
+        if (dateComparison !== 0) {
+          return dateComparison; // Sort by EmpDarDate first
+        }
+        // If EmpDarDate is the same, sort by EmpDarCreatedAt
+        return startedAtTimeComparison;
+      });
+
+      sortedItems.push(...items);
+    });
+
+    return sortedItems;
+  }
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader title="Employees daily activity report" />
@@ -135,22 +177,25 @@ const ClientEmpDarList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">
+            <th className="uppercase px-4 py-2 w-[30%] text-start">
               Employee Name
             </th>
             <th className="uppercase px-4 py-2 w-[15%] text-start">Date</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-end">Location</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
+              Created At
+            </th>
+            <th className="uppercase px-4 py-2 w-[50%] text-end">Location</th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={3}>
+              <td colSpan={4}>
                 <NoSearchResult />
               </td>
             </tr>
           ) : (
-            data.map((dar) => {
+            groupAndSortData(data).map((dar) => {
               return (
                 <tr
                   key={dar.EmpDarId}
@@ -171,6 +216,11 @@ const ClientEmpDarList = () => {
                       {formatDate(dar.EmpDarDate)}
                     </span>
                   </td>
+                  <td className="align-top px-4 py-2 text-start">
+                    <span className="line-clamp-2">
+                      {formatDate(dar.EmpDarCreatedAt, 'DD MMM-YY HH:mm')}
+                    </span>
+                  </td>
                   <td className="align-top px-4 py-2 text-end">
                     <span className="line-clamp-2">
                       {dar.EmpDarLocationName}
@@ -181,7 +231,7 @@ const ClientEmpDarList = () => {
             })
           )}
           <tr ref={ref}>
-            <td colSpan={3}>
+            <td colSpan={4}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />
