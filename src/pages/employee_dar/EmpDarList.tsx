@@ -112,6 +112,49 @@ const EmpDarList = () => {
       fetchNextPage();
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
+
+  function groupAndSortData(data: IEmployeeDARCollection[]) {
+    // Group data by EmpDarShiftId
+    const groupedData = data.reduce(
+      (acc, item) => {
+        const shiftId = item.EmpDarShiftId || item.EmpDarCalloutId;
+
+        if (typeof shiftId === 'string' && shiftId.trim()) {
+          if (!acc[shiftId]) {
+            acc[shiftId] = [];
+          }
+          acc[shiftId].push(item);
+        }
+
+        return acc;
+      },
+      {} as { [key: string]: IEmployeeDARCollection[] }
+    );
+
+    const sortedItems: IEmployeeDARCollection[] = [];
+
+    // Convert grouped data into an array and sort each group
+    Object.values(groupedData).forEach((items) => {
+      items.sort((a, b) => {
+        const dateComparison =
+          toDate(b.EmpDarDate).getTime() - toDate(a.EmpDarDate).getTime();
+
+        const startedAtTimeComparison =
+          toDate(b.EmpDarCreatedAt).getTime() -
+          toDate(a.EmpDarCreatedAt).getTime();
+        if (dateComparison !== 0) {
+          return dateComparison; // Sort by EmpDarDate first
+        }
+        // If EmpDarDate is the same, sort by EmpDarCreatedAt
+        return startedAtTimeComparison;
+      });
+
+      sortedItems.push(...items);
+    });
+
+    return sortedItems;
+  }
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader title="Employees daily activity report" />
@@ -151,56 +194,41 @@ const EmpDarList = () => {
               </td>
             </tr>
           ) : (
-            data
-              .sort((a, b) => {
-                const dateComparison =
-                  toDate(b.EmpDarDate).getTime() -
-                  toDate(a.EmpDarDate).getTime();
+            groupAndSortData(data).map((dar) => {
+              return (
+                <tr
+                  key={dar.EmpDarId}
+                  className="cursor-pointer"
+                  onClick={() =>
+                    navigate(
+                      PageRoutes.EMPLOYEE_DAR_VIEW + `?id=${dar.EmpDarId}`
+                    )
+                  }
+                >
+                  <td className="align-top px-4 py-2 text-start capitalize">
+                    <span className="line-clamp-2">{dar.EmpDarEmpName}</span>
+                  </td>
 
-                const startedAtTimeComparison =
-                  toDate(b.EmpDarCreatedAt).getTime() -
-                  toDate(a.EmpDarCreatedAt).getTime();
-                if (dateComparison !== 0) {
-                  return dateComparison; // Sort by PatrolDate first
-                }
-                // If PatrolDate is the same, sort by PatrolLogStartedAt
-                return startedAtTimeComparison;
-              })
-              .map((dar) => {
-                return (
-                  <tr
-                    key={dar.EmpDarId}
-                    className="cursor-pointer"
-                    onClick={() =>
-                      navigate(
-                        PageRoutes.EMPLOYEE_DAR_VIEW + `?id=${dar.EmpDarId}`
-                      )
-                    }
-                  >
-                    <td className="align-top px-4 py-2 text-start capitalize">
-                      <span className="line-clamp-2">{dar.EmpDarEmpName}</span>
-                    </td>
-
-                    <td className="align-top px-4 py-2 text-start">
-                      <span className="line-clamp-2">
-                        {formatDate(dar.EmpDarDate)}
-                      </span>
-                    </td>
-                    <td className="align-top px-4 py-2 text-start">
-                      <span className="line-clamp-2">
-                        {formatDate(dar.EmpDarCreatedAt, 'DD MMM-YY HH:mm')}
-                      </span>
-                    </td>
-                    <td className="align-top px-4 py-2 text-end">
-                      <span className="line-clamp-3">
-                        {dar.EmpDarLocationName.length > 1
-                          ? dar.EmpDarLocationName
-                          : 'N/A'}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })
+                  <td className="align-top px-4 py-2 text-start">
+                    <span className="line-clamp-2">
+                      {formatDate(dar.EmpDarDate)}
+                    </span>
+                  </td>
+                  <td className="align-top px-4 py-2 text-start">
+                    <span className="line-clamp-2">
+                      {formatDate(dar.EmpDarCreatedAt, 'DD MMM-YY HH:mm')}
+                    </span>
+                  </td>
+                  <td className="align-top px-4 py-2 text-end">
+                    <span className="line-clamp-3">
+                      {dar.EmpDarLocationName.length > 1
+                        ? dar.EmpDarLocationName
+                        : 'N/A'}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })
           )}
           <tr ref={ref}>
             <td colSpan={4}>
