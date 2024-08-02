@@ -4,6 +4,7 @@ import { useAuthState } from '../../store';
 import DbCompany from '../../firebase_configs/DB/DbCompany';
 import {
   IAdminsCollection,
+  IClientsCollection,
   ILoggedInUsersCollection,
 } from '../../@types/database';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
@@ -13,6 +14,7 @@ import { useInView } from 'react-intersection-observer';
 import { formatDate } from '../../utilities/misc';
 import { MdOutlinePhoneAndroid } from 'react-icons/md';
 import { FaApple, FaChrome } from 'react-icons/fa';
+import DbClient from '../../firebase_configs/DB/DbClient';
 
 export interface LoggedInUsersCollection extends ILoggedInUsersCollection {
   LoggedInUserName: string;
@@ -62,6 +64,12 @@ const LoggedInUsers = () => {
             LoggedInUserEmail = employee.EmployeeEmail;
             LoggedInUserName = employee.EmployeeName;
             LoggedInUserPhone = employee.EmployeePhone;
+          } else if (LoggedInUserType === IUserType.CLIENT) {
+            const clientSnapshot = await DbClient.getClientById(LoggedInUserId);
+            const client = clientSnapshot.data() as IClientsCollection;
+            LoggedInUserEmail = client.ClientEmail;
+            LoggedInUserName = client.ClientName;
+            LoggedInUserPhone = client.ClientPhone;
           }
 
           docData.push({
@@ -127,50 +135,53 @@ const LoggedInUsers = () => {
       <div className="font-semibold text-lg">LoggedIn Users</div>
       {/* Received Messages list */}
       <div className="grid grid-cols-2 h-full gap-4 overflow-auto remove-vertical-scrollbar">
-        {data.map((res) => {
-          return (
-            <div
-              key={res.LoggedInId}
-              className="grid-cols-2 grid bg-onHoverBg p-4 rounded w-full gap-2"
-            >
-              <div className="flex items-center gap-1">
-                <span>Name:</span>
-                <span className="font-semibold">
-                  {res.LoggedInUserName} ({res.LoggedInUserType.toUpperCase()})
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span>Email:</span>
-                <span className="font-semibold">{res.LoggedInUserEmail}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span>Phone:</span>
-                <span className="font-semibold uppercase">
-                  {res.LoggedInUserPhone}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span>LoggedIn Time:</span>
-                <span className="font-semibold uppercase">
-                  {formatDate(res.LoggedInCreatedAt, 'DD MMM-YY HH:mm')}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span>LoggedIn Platform:</span>
-                <div className="flex items-center gap-1 font-semibold">
-                  <span className="capitalize">{res.LoggedInPlatform}</span>
-                  {res?.LoggedInPlatform == 'android' ? (
-                    <MdOutlinePhoneAndroid className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
-                  ) : res.LoggedInPlatform === 'web' ? (
-                    <FaChrome className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
-                  ) : (
-                    <FaApple className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
-                  )}
+        {data
+          .sort((a, b) => a.LoggedInUserType.localeCompare(b.LoggedInUserType))
+          .map((res) => {
+            return (
+              <div
+                key={res.LoggedInId}
+                className="grid-cols-2 grid bg-onHoverBg p-4 rounded w-full gap-2"
+              >
+                <div className="flex items-center gap-1">
+                  <span>Name:</span>
+                  <span className="font-semibold">
+                    {res.LoggedInUserName} ({res.LoggedInUserType.toUpperCase()}
+                    )
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span>Email:</span>
+                  <span className="font-semibold">{res.LoggedInUserEmail}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span>Phone:</span>
+                  <span className="font-semibold uppercase">
+                    {res.LoggedInUserPhone}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span>LoggedIn Time:</span>
+                  <span className="font-semibold uppercase">
+                    {formatDate(res.LoggedInCreatedAt, 'DD MMM-YY HH:mm')}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span>LoggedIn Platform:</span>
+                  <div className="flex items-center gap-1 font-semibold">
+                    <span className="capitalize">{res.LoggedInPlatform}</span>
+                    {res?.LoggedInPlatform == 'android' ? (
+                      <MdOutlinePhoneAndroid className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
+                    ) : res.LoggedInPlatform === 'web' ? (
+                      <FaChrome className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
+                    ) : (
+                      <FaApple className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
 
         <div ref={ref}>
           <div>&nbsp;</div>
