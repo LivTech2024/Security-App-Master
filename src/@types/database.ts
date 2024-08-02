@@ -606,6 +606,15 @@ export interface ITaskLogsCollection {
 }
 
 //*Callout structure
+
+export interface ICalloutStatusChildCollection {
+  Status: 'pending' | 'started' | 'completed';
+  StatusEmpId: string;
+  StatusEmpName: string;
+  StatusStartedTime?: Timestamp | FieldValue;
+  StatusEndedTime?: Timestamp | FieldValue;
+}
+
 export interface ICalloutsCollection {
   CalloutId: string;
   CalloutCompanyId: string;
@@ -615,13 +624,7 @@ export interface ICalloutsCollection {
   CalloutLocationAddress: string;
   CalloutDateTime: Timestamp | FieldValue;
   CalloutAssignedEmpsId: string[]; //* Assigned Emp Ids
-  CalloutStatus: {
-    Status: 'pending' | 'started' | 'completed';
-    StatusEmpId: string;
-    StatusEmpName: string;
-    StatusStartedTime: Timestamp | FieldValue;
-    StatusEndedTime: Timestamp | FieldValue;
-  }[];
+  CalloutStatus: ICalloutStatusChildCollection[];
   CalloutCreatedAt: Timestamp | FieldValue;
   CalloutModifiedAt: Timestamp | FieldValue;
 }

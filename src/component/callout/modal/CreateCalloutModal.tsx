@@ -94,7 +94,7 @@ const CreateCalloutModal = ({
       await DbShift.createCallout({
         cmpId: company.CompanyId,
         data: {
-          CalloutAssignedEmpsId: assignedEmpsId.map((res) => res.id),
+          assignedEmpsId,
           CalloutDateTime: calloutDateTime,
           CalloutLocationName: selectedLocation?.LocationName,
           CalloutLocation: selectedLocation.LocationCoordinates,

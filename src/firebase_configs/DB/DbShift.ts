@@ -22,6 +22,7 @@ import { CollectionName } from '../../@types/enum';
 import { db } from '../config';
 import CloudStorageImageHandler, { getNewDocId } from './utils';
 import {
+  ICalloutStatusChildCollection,
   ICalloutsCollection,
   IShiftLinkedPatrolsChildCollection,
   IShiftTasksChild,
@@ -34,6 +35,7 @@ import { generateQrCodesHtml } from '../../utilities/pdf/generateQrCodesHtml';
 import { htmlToPdf } from '../../API/HtmlToPdf';
 import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
 import { Company } from '../../store/slice/auth.slice';
+import CustomError from '../../utilities/CustomError';
 
 class DbShift {
   static addShift = async ({
@@ -355,7 +357,7 @@ class DbShift {
   };
 
   //*Callouts
-  static createCallout = ({
+  static createCallout = async ({
     cmpId,
     data,
   }: {
@@ -365,7 +367,10 @@ class DbShift {
       CalloutLocationId: string;
       CalloutLocationName: string;
       CalloutLocationAddress: string;
-      CalloutAssignedEmpsId: string[];
+      assignedEmpsId: {
+        id: string;
+        name: string;
+      }[];
       CalloutDateTime: Date;
     };
   }) => {
@@ -373,13 +378,23 @@ class DbShift {
     const calloutRef = doc(db, CollectionName.callouts, calloutId);
 
     const {
-      CalloutAssignedEmpsId,
+      assignedEmpsId,
       CalloutDateTime,
       CalloutLocation,
       CalloutLocationAddress,
       CalloutLocationId,
       CalloutLocationName,
     } = data;
+
+    const CalloutStatus: ICalloutStatusChildCollection[] = assignedEmpsId.map(
+      (res) => {
+        return {
+          Status: 'pending',
+          StatusEmpId: res.id,
+          StatusEmpName: res.name,
+        };
+      }
+    );
 
     const newCallout: ICalloutsCollection = {
       CalloutId: calloutId,
@@ -392,13 +407,74 @@ class DbShift {
       CalloutLocationName,
       CalloutLocationAddress,
       CalloutDateTime: CalloutDateTime as unknown as Timestamp,
-      CalloutAssignedEmpsId,
-      CalloutStatus: [],
+      CalloutAssignedEmpsId: assignedEmpsId.map((res) => res.id),
+      CalloutStatus,
       CalloutCreatedAt: serverTimestamp(),
       CalloutModifiedAt: serverTimestamp(),
     };
 
     return setDoc(calloutRef, newCallout);
+  };
+
+  static updateCalloutStatus = async ({
+    calloutId,
+    empId,
+    field,
+    updatedTime,
+  }: {
+    calloutId: string;
+    empId: string;
+    field: 'start_time' | 'end_time';
+    updatedTime: Date;
+  }) => {
+    const calloutRef = doc(db, CollectionName.callouts, calloutId);
+    const calloutSnapshot = await getDoc(calloutRef);
+    const calloutData = calloutSnapshot.data() as ICalloutsCollection;
+
+    // Find the status object to be updated
+    const statusIndex = calloutData.CalloutStatus.findIndex(
+      (s) => s.StatusEmpId === empId
+    );
+
+    if (statusIndex === -1) {
+      throw new Error('Status not found for the given employee ID');
+    }
+
+    // Create a copy of the ShiftCurrentStatus array and update the specific status object
+    const updatedShiftCurrentStatus = [...calloutData.CalloutStatus];
+
+    if (field === 'start_time') {
+      updatedShiftCurrentStatus[statusIndex] = {
+        ...updatedShiftCurrentStatus[statusIndex],
+        StatusStartedTime: updatedTime as unknown as Timestamp,
+        Status:
+          updatedShiftCurrentStatus[statusIndex].Status === 'pending'
+            ? 'started'
+            : updatedShiftCurrentStatus[statusIndex].Status,
+      };
+    }
+
+    if (
+      field === 'end_time' &&
+      !updatedShiftCurrentStatus[statusIndex].StatusStartedTime
+    ) {
+      throw new CustomError('Please first enter started time');
+    }
+
+    if (field === 'end_time') {
+      updatedShiftCurrentStatus[statusIndex] = {
+        ...updatedShiftCurrentStatus[statusIndex],
+        StatusEndedTime: updatedTime as unknown as Timestamp,
+        Status:
+          updatedShiftCurrentStatus[statusIndex].Status === 'started'
+            ? 'completed'
+            : updatedShiftCurrentStatus[statusIndex].Status,
+      };
+    }
+
+    return updateDoc(calloutRef, {
+      CalloutStatus: updatedShiftCurrentStatus,
+    });
   };
 
   static getCallouts = ({

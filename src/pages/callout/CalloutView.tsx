@@ -21,6 +21,8 @@ import {
 } from '../../utilities/TsxUtils';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
+import { RxUpdate } from 'react-icons/rx';
+import UpdateCalloutStatusModal from '../../component/callout/modal/UpdateCalloutStatusModal';
 
 const CalloutView = () => {
   const queryClient = useQueryClient();
@@ -39,6 +41,8 @@ const CalloutView = () => {
 
   const [linkedReportId, setLinkedReportId] = useState<string | null>(null);
   const [linkedDarId, setLinkedDarId] = useState<string | null>(null);
+
+  const [shouldRefetch, setShouldRefetch] = useState(false);
 
   useEffect(() => {
     if (!calloutId) return;
@@ -74,7 +78,7 @@ const CalloutView = () => {
 
       setLoading(false);
     });
-  }, [calloutId]);
+  }, [calloutId, shouldRefetch]);
 
   const onDelete = async () => {
     if (!calloutId) return;
@@ -102,6 +106,13 @@ const CalloutView = () => {
     }
   };
 
+  const [updateCalloutTimeModal, setUpdateCalloutTimeModal] = useState(false);
+
+  const [updateCalloutTimeArgs, setUpdateCalloutTimeArgs] = useState<{
+    empId: string;
+    field: 'start_time' | 'end_time';
+  }>({ empId: '', field: 'start_time' });
+
   if (!data && !loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -120,136 +131,190 @@ const CalloutView = () => {
     );
   }
 
-  return (
-    <div className="flex flex-col w-full h-full p-6 gap-6 ">
-      <PageHeader
-        title="Callout Data"
-        rightSection={
-          <Button
-            label="Delete"
-            type="black"
-            onClick={() => {
-              openContextModal({
-                modal: 'confirmModal',
-                withCloseButton: false,
-                centered: true,
-                closeOnClickOutside: true,
-                innerProps: {
-                  title: 'Confirm',
-                  body: 'Are you sure to delete this callout',
-                  onConfirm: () => {
-                    onDelete();
+  if (data)
+    return (
+      <div className="flex flex-col w-full h-full p-6 gap-6 ">
+        <PageHeader
+          title="Callout Data"
+          rightSection={
+            <Button
+              label="Delete"
+              type="black"
+              onClick={() => {
+                openContextModal({
+                  modal: 'confirmModal',
+                  withCloseButton: false,
+                  centered: true,
+                  closeOnClickOutside: true,
+                  innerProps: {
+                    title: 'Confirm',
+                    body: 'Are you sure to delete this callout',
+                    onConfirm: () => {
+                      onDelete();
+                    },
                   },
-                },
-                size: '30%',
-                styles: {
-                  body: { padding: '0px' },
-                },
-              });
-            }}
-          />
-        }
-      />
-      <div className="bg-surface shadow-md rounded-lg p-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="font-semibold">Callout Location:</p>
-            <p>{data?.CalloutLocationName || 'N/A'}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Callout Address:</p>
-            <p>{data?.CalloutLocationAddress || 'N/A'}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Callout Time:</p>
-            <p>
-              {formatDate(data?.CalloutDateTime, 'DD MMM-YY HH:mm') || 'N/A'}
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold">Assigned Employees:</p>
-            <p>{assignedEmps.join(',')}</p>
-          </div>
-          {/* Callout Status */}
-          <div className="w-full flex flex-col col-span-2">
-            <p className="font-semibold">Callout Current Status</p>
-            {data?.CalloutStatus && data.CalloutStatus.length > 0 ? (
-              <div className="flex gap-4 overflow-x-auto shift-emp-scrollbar w-full">
-                {data?.CalloutStatus?.map((data, idx) => {
-                  return (
-                    <div
-                      key={idx}
-                      className="flex flex-col bg-onHoverBg p-4 rounded-md w-full min-w-[300px]"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold capitalize">
-                          Employee:
-                        </span>
-                        {data.StatusEmpName}
-                      </div>
-                      <div className="flex items-center gap-2 capitalize">
-                        <span className="font-semibold capitalize">
-                          Current Status:
-                        </span>
-                        {data.Status}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold capitalize">
-                          Started At:
-                        </span>
-                        {data.StatusStartedTime &&
-                          formatDate(data.StatusStartedTime, 'DD MMM-YY HH:mm')}
-                      </div>
+                  size: '30%',
+                  styles: {
+                    body: { padding: '0px' },
+                  },
+                });
+              }}
+            />
+          }
+        />
+        <div className="bg-surface shadow-md rounded-lg p-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="font-semibold">Callout Location:</p>
+              <p>{data?.CalloutLocationName || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Callout Address:</p>
+              <p>{data?.CalloutLocationAddress || 'N/A'}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Callout Time:</p>
+              <p>
+                {formatDate(data?.CalloutDateTime, 'DD MMM-YY HH:mm') || 'N/A'}
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold">Assigned Employees:</p>
+              <p>{assignedEmps.join(',')}</p>
+            </div>
+            {/* Callout Status */}
+            <div className="w-full flex flex-col col-span-2 gap-2">
+              <p className="font-semibold">Callout Current Status</p>
+              {data?.CalloutStatus && data.CalloutStatus.length > 0 ? (
+                <div className="flex gap-4 overflow-x-auto shift-emp-scrollbar w-full">
+                  {data?.CalloutStatus?.map((data, idx) => {
+                    return (
+                      <div
+                        key={idx}
+                        className="flex flex-col bg-onHoverBg p-4 rounded-md w-full min-w-[300px] gap-[2px]"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold capitalize">
+                            Employee:
+                          </span>
+                          {data.StatusEmpName}
+                        </div>
+                        <div className="flex items-center gap-2 capitalize">
+                          <span className="font-semibold capitalize">
+                            Current Status:
+                          </span>
+                          {data.Status}
+                        </div>
 
-                      {data.Status === 'completed' && (
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold capitalize">
+                            Started At:
+                          </span>
+                          <span>
+                            {data.StatusStartedTime
+                              ? formatDate(
+                                  data.StatusStartedTime,
+                                  'DD MMM-YY HH:mm'
+                                )
+                              : 'N/A'}
+                          </span>
+
+                          <div
+                            onClick={() => {
+                              if (!data.StatusEmpId) return;
+                              setUpdateCalloutTimeModal(true);
+                              setUpdateCalloutTimeArgs({
+                                empId: data.StatusEmpId,
+                                field: 'start_time',
+                              });
+                            }}
+                            className="flex text-sm items-center text-textPrimaryBlue cursor-pointer hover:underline gap-[2px]"
+                          >
+                            <span>Update</span>
+                            <RxUpdate className="" />
+                          </div>
+                        </div>
+
                         <div className="flex items-center gap-2">
                           <span className="font-semibold capitalize">
                             Ended At:
                           </span>
-                          {data.StatusEndedTime &&
-                            formatDate(data.StatusEndedTime, 'DD MMM-YY HH:mm')}
+                          <span>
+                            {data.StatusEndedTime
+                              ? formatDate(
+                                  data.StatusEndedTime,
+                                  'DD MMM-YY HH:mm'
+                                )
+                              : 'N/A'}
+                          </span>
+                          {data.StatusStartedTime && (
+                            <div
+                              onClick={() => {
+                                if (!data.StatusEmpId) return;
+                                setUpdateCalloutTimeModal(true);
+                                setUpdateCalloutTimeArgs({
+                                  empId: data.StatusEmpId,
+                                  field: 'end_time',
+                                });
+                              }}
+                              className="flex text-sm items-center text-textPrimaryBlue cursor-pointer hover:underline gap-[2px]"
+                            >
+                              <span>Update</span>
+                              <RxUpdate className="" />
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <Status status="pending" />
+              )}
+            </div>
+
+            <UpdateCalloutStatusModal
+              empId={updateCalloutTimeArgs.empId}
+              field={updateCalloutTimeArgs.field}
+              opened={updateCalloutTimeModal}
+              setOpened={setUpdateCalloutTimeModal}
+              setShouldRefetch={setShouldRefetch}
+              calloutId={data?.CalloutId}
+            />
+
+            {linkedReportId && (
+              <div>
+                <p className="font-semibold">Linked Report:</p>
+                <p
+                  onClick={() =>
+                    navigate(PageRoutes.REPORT_VIEW + `?id=${linkedReportId}`)
+                  }
+                  className="text-textPrimaryBlue cursor-pointer underline"
+                >
+                  Click here to view
+                </p>
               </div>
-            ) : (
-              <Status status="pending" />
+            )}
+
+            {linkedDarId && (
+              <div>
+                <p className="font-semibold">Linked DAR:</p>
+                <p
+                  onClick={() =>
+                    navigate(
+                      PageRoutes.EMPLOYEE_DAR_VIEW + `?id=${linkedDarId}`
+                    )
+                  }
+                  className="text-textPrimaryBlue cursor-pointer underline"
+                >
+                  Click here to view
+                </p>
+              </div>
             )}
           </div>
-
-          {linkedReportId && (
-            <div>
-              <p className="font-semibold">Linked Report:</p>
-              <p
-                onClick={() =>
-                  navigate(PageRoutes.REPORT_VIEW + `?id=${linkedReportId}`)
-                }
-                className="text-textPrimaryBlue cursor-pointer underline"
-              >
-                Click here to view
-              </p>
-            </div>
-          )}
-
-          {linkedDarId && (
-            <div>
-              <p className="font-semibold">Linked DAR:</p>
-              <p
-                onClick={() =>
-                  navigate(PageRoutes.EMPLOYEE_DAR_VIEW + `?id=${linkedDarId}`)
-                }
-                className="text-textPrimaryBlue cursor-pointer underline"
-              >
-                Click here to view
-              </p>
-            </div>
-          )}
         </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default CalloutView;
