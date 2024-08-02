@@ -11,10 +11,10 @@ const useFirebaseMessaging = () => {
     LocalStorageKey.LOGGEDIN_USER
   );
 
-  const { company } = useAuthState();
+  const { company, client } = useAuthState();
 
   useEffect(() => {
-    if (!loggedInUser || !company) return;
+    if (!loggedInUser || (!company && !client)) return;
     const saveTokenToDB = (token: string) => {
       console.log(`Saving token to db: ${token}`);
       if (token && typeof token === 'string') {
@@ -23,7 +23,7 @@ const useFirebaseMessaging = () => {
         DbUser.updateLoggedInUserNotificationToken(
           loggedInUser.LoggedInId,
           token,
-          company.CompanyId
+          company ? company.CompanyId : client ? client.ClientCompanyId : ''
         ).catch((err) => {
           console.log(err, 'Error while updating firebase fcm token');
         });
