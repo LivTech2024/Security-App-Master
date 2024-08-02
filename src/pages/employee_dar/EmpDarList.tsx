@@ -11,7 +11,7 @@ import { IEmployeeDARCollection } from '../../@types/database';
 import { useInView } from 'react-intersection-observer';
 import NoSearchResult from '../../common/NoSearchResult';
 import { useNavigate } from 'react-router-dom';
-import { formatDate } from '../../utilities/misc';
+import { formatDate, toDate } from '../../utilities/misc';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 
 const EmpDarList = () => {
@@ -131,52 +131,79 @@ const EmpDarList = () => {
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">
           <tr>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">
+            <th className="uppercase px-4 py-2 w-[30%] text-start">
               Employee Name
             </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">Date</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-end">Location</th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
+              Shift Date
+            </th>
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
+              Created At
+            </th>
+            <th className="uppercase px-4 py-2 w-[50%] text-end">Location</th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={3}>
+              <td colSpan={4}>
                 <NoSearchResult />
               </td>
             </tr>
           ) : (
-            data.map((dar) => {
-              return (
-                <tr
-                  key={dar.EmpDarId}
-                  className="cursor-pointer"
-                  onClick={() =>
-                    navigate(
-                      PageRoutes.EMPLOYEE_DAR_VIEW + `?id=${dar.EmpDarId}`
-                    )
-                  }
-                >
-                  <td className="align-top px-4 py-2 text-start capitalize">
-                    <span className="line-clamp-2">{dar.EmpDarEmpName}</span>
-                  </td>
+            data
+              .sort((a, b) => {
+                const dateComparison =
+                  toDate(b.EmpDarDate).getTime() -
+                  toDate(a.EmpDarDate).getTime();
 
-                  <td className="align-top px-4 py-2 text-start">
-                    <span className="line-clamp-2">
-                      {formatDate(dar.EmpDarDate)}
-                    </span>
-                  </td>
-                  <td className="align-top px-4 py-2 text-end">
-                    <span className="line-clamp-2">
-                      {dar.EmpDarLocationName}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })
+                const startedAtTimeComparison =
+                  toDate(b.EmpDarCreatedAt).getTime() -
+                  toDate(a.EmpDarCreatedAt).getTime();
+                if (dateComparison !== 0) {
+                  return dateComparison; // Sort by PatrolDate first
+                }
+                // If PatrolDate is the same, sort by PatrolLogStartedAt
+                return startedAtTimeComparison;
+              })
+              .map((dar) => {
+                return (
+                  <tr
+                    key={dar.EmpDarId}
+                    className="cursor-pointer"
+                    onClick={() =>
+                      navigate(
+                        PageRoutes.EMPLOYEE_DAR_VIEW + `?id=${dar.EmpDarId}`
+                      )
+                    }
+                  >
+                    <td className="align-top px-4 py-2 text-start capitalize">
+                      <span className="line-clamp-2">{dar.EmpDarEmpName}</span>
+                    </td>
+
+                    <td className="align-top px-4 py-2 text-start">
+                      <span className="line-clamp-2">
+                        {formatDate(dar.EmpDarDate)}
+                      </span>
+                    </td>
+                    <td className="align-top px-4 py-2 text-start">
+                      <span className="line-clamp-2">
+                        {formatDate(dar.EmpDarCreatedAt, 'DD MMM-YY HH:mm')}
+                      </span>
+                    </td>
+                    <td className="align-top px-4 py-2 text-end">
+                      <span className="line-clamp-3">
+                        {dar.EmpDarLocationName.length > 1
+                          ? dar.EmpDarLocationName
+                          : 'N/A'}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })
           )}
           <tr ref={ref}>
-            <td colSpan={3}>
+            <td colSpan={4}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />
