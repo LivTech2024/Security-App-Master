@@ -416,6 +416,44 @@ class DbShift {
     return setDoc(calloutRef, newCallout);
   };
 
+  static updateCallout = async ({
+    calloutId,
+    data,
+  }: {
+    calloutId: string;
+    data: {
+      CalloutLocation: GeoPoint;
+      CalloutLocationId: string;
+      CalloutLocationName: string;
+      CalloutLocationAddress: string;
+      CalloutDateTime: Date;
+    };
+  }) => {
+    const calloutRef = doc(db, CollectionName.callouts, calloutId);
+
+    const {
+      CalloutDateTime,
+      CalloutLocation,
+      CalloutLocationAddress,
+      CalloutLocationId,
+      CalloutLocationName,
+    } = data;
+
+    const newCallout: Partial<ICalloutsCollection> = {
+      CalloutLocation: new GeoPoint(
+        CalloutLocation.latitude,
+        CalloutLocation.longitude
+      ),
+      CalloutLocationId,
+      CalloutLocationName,
+      CalloutLocationAddress,
+      CalloutDateTime: CalloutDateTime as unknown as Timestamp,
+      CalloutModifiedAt: serverTimestamp(),
+    };
+
+    return updateDoc(calloutRef, newCallout);
+  };
+
   static updateCalloutStatus = async ({
     calloutId,
     empId,
