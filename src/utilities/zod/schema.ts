@@ -135,19 +135,21 @@ export const addEmployeeFormSchema = z
       .string()
       .min(6, { message: 'Min 6 character is required' }),
     EmployeeRole: z.string().min(1, { message: 'Employee role is required' }),
-    EmployeeStatus: z.enum([
-      IEmployeeStatus.ON_BOARD,
-      IEmployeeStatus.OFF_BOARD,
-      IEmployeeStatus.LEAVED,
-      IEmployeeStatus.FIRED,
-    ]),
+    EmployeeStatus: z
+      .enum([
+        IEmployeeStatus.ON_BOARD,
+        IEmployeeStatus.OFF_BOARD,
+        IEmployeeStatus.LEAVED,
+        IEmployeeStatus.FIRED,
+      ])
+      .default(IEmployeeStatus.ON_BOARD),
     EmployeePayRate: numberString({ message: 'Employee pay rate is required' }),
     EmployeeMaxHrsPerWeek: numberString({
       message: 'Employee max week hours is required',
     }),
     EmployeeSupervisorId: z.array(z.string()).nullable().optional(),
     EmployeeCompanyBranchId: z.string().nullable().optional(),
-    EmployeeBannedLocationsId: z.array(z.string()),
+    EmployeeBannedLocationsId: z.array(z.string()).default([]),
     EmployeeSinNumber: z.string().optional().nullable(),
     EmployeeAddress: z.string().optional().nullable(),
     EmployeePostalCode: z.string().optional().nullable(),

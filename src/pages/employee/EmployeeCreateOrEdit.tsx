@@ -75,7 +75,11 @@ const EmployeeCreateOrEdit = () => {
           EmployeeStatus:
             employeeEditData?.EmployeeStatus || IEmployeeStatus.ON_BOARD,
         }
-      : { EmployeeMaxHrsPerWeek: String(45) as unknown as number },
+      : {
+          EmployeeMaxHrsPerWeek: String(45) as unknown as number,
+          EmployeeBannedLocationsId: [],
+          EmployeeStatus: IEmployeeStatus.ON_BOARD,
+        },
   });
 
   const navigate = useNavigate();
@@ -234,6 +238,9 @@ const EmployeeCreateOrEdit = () => {
       errorHandler(error);
     }
   };
+
+  console.log(methods.formState.errors, 'here');
+
   return (
     <div className="flex flex-col gap-4 p-6">
       <div className="flex items-center justify-between w-full bg-primaryGold rounded p-4 shadow">
@@ -516,7 +523,9 @@ const EmployeeCreateOrEdit = () => {
                       </div>
                     </div>
                   }
-                  error={methods.formState.errors.EmployeeSupervisorId?.message}
+                  error={
+                    methods.formState.errors.EmployeeBannedLocationsId?.message
+                  }
                   styles={{
                     input: {
                       border: `1px solid #0000001A`,

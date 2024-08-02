@@ -10,7 +10,6 @@ import DbEmployee from '../../firebase_configs/DB/DbEmployee';
 import { DocumentData } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import NoSearchResult from '../../common/NoSearchResult';
 import { formatDate } from '../../utilities/misc';
 import { MdOutlinePhoneAndroid } from 'react-icons/md';
 import { FaApple, FaChrome } from 'react-icons/fa';
@@ -128,57 +127,50 @@ const LoggedInUsers = () => {
       <div className="font-semibold text-lg">LoggedIn Users</div>
       {/* Received Messages list */}
       <div className="grid grid-cols-2 h-full gap-4 overflow-auto remove-vertical-scrollbar">
-        {data.length === 0 && !isLoading ? (
-          <div className="flex items-center justify-between w-full">
-            <NoSearchResult text="No sent messages" />
-          </div>
-        ) : (
-          data.map((res) => {
-            return (
-              <div
-                key={res.LoggedInId}
-                className="grid-cols-2 grid bg-onHoverBg p-4 rounded w-full gap-2"
-              >
-                <div className="flex items-center gap-1">
-                  <span>Name:</span>
-                  <span className="font-semibold">
-                    {res.LoggedInUserName} ({res.LoggedInUserType.toUpperCase()}
-                    )
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span>Email:</span>
-                  <span className="font-semibold">{res.LoggedInUserEmail}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span>Phone:</span>
-                  <span className="font-semibold uppercase">
-                    {res.LoggedInUserPhone}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span>LoggedIn Time:</span>
-                  <span className="font-semibold uppercase">
-                    {formatDate(res.LoggedInCreatedAt, 'DD MMM-YY HH:mm')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span>LoggedIn Platform:</span>
-                  <div className="flex items-center gap-1 font-semibold">
-                    <span className="capitalize">{res.LoggedInPlatform}</span>
-                    {res?.LoggedInPlatform == 'android' ? (
-                      <MdOutlinePhoneAndroid className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
-                    ) : res.LoggedInPlatform === 'web' ? (
-                      <FaChrome className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
-                    ) : (
-                      <FaApple className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
-                    )}
-                  </div>
+        {data.map((res) => {
+          return (
+            <div
+              key={res.LoggedInId}
+              className="grid-cols-2 grid bg-onHoverBg p-4 rounded w-full gap-2"
+            >
+              <div className="flex items-center gap-1">
+                <span>Name:</span>
+                <span className="font-semibold">
+                  {res.LoggedInUserName} ({res.LoggedInUserType.toUpperCase()})
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>Email:</span>
+                <span className="font-semibold">{res.LoggedInUserEmail}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>Phone:</span>
+                <span className="font-semibold uppercase">
+                  {res.LoggedInUserPhone}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>LoggedIn Time:</span>
+                <span className="font-semibold uppercase">
+                  {formatDate(res.LoggedInCreatedAt, 'DD MMM-YY HH:mm')}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>LoggedIn Platform:</span>
+                <div className="flex items-center gap-1 font-semibold">
+                  <span className="capitalize">{res.LoggedInPlatform}</span>
+                  {res?.LoggedInPlatform == 'android' ? (
+                    <MdOutlinePhoneAndroid className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
+                  ) : res.LoggedInPlatform === 'web' ? (
+                    <FaChrome className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
+                  ) : (
+                    <FaApple className="text-lg text-textSecondaryLight dark:text-textSecondaryDark" />
+                  )}
                 </div>
               </div>
-            );
-          })
-        )}
+            </div>
+          );
+        })}
 
         <div ref={ref}>
           <div>&nbsp;</div>
