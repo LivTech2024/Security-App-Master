@@ -20,7 +20,7 @@ import TableShimmer from '../../common/shimmer/TableShimmer';
 import AddEquipmentModal from '../../component/equipment_management/modal/AddEquipmentModal';
 import EquipAllocationModal from '../../component/equipment_management/modal/EquipAllocationModal';
 import { numberFormatter } from '../../utilities/NumberFormater';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../common/PageHeader';
 
 const EquipmentList = () => {
@@ -117,7 +117,18 @@ const EquipmentList = () => {
 
   //*Modal states
   const [addEquipmentModal, setAddEquipmentModal] = useState(false);
+
   const [equipAllocationModal, setEquipAllocationModal] = useState(false);
+
+  const [searchParams] = useSearchParams();
+
+  const action = searchParams.get('action');
+
+  useEffect(() => {
+    if (action === 'create') {
+      setAddEquipmentModal(true);
+    }
+  }, [action]);
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">

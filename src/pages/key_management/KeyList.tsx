@@ -4,7 +4,7 @@ import SelectBranch from '../../common/SelectBranch';
 import Button from '../../common/button/Button';
 import SearchBar from '../../common/inputs/SearchBar';
 import { useDebouncedValue } from '@mantine/hooks';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthState, useEditFormStore } from '../../store';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import {
@@ -35,6 +35,21 @@ const KeyList = () => {
   const [branchId, setBranchId] = useState('');
 
   const [debouncedQuery] = useDebouncedValue(query, 200);
+
+  //modal states
+  const [addKeyModal, setAddKeyModal] = useState(false);
+
+  const [keyAllocModal, setKeyAllocModal] = useState(false);
+
+  const [searchParams] = useSearchParams();
+
+  const action = searchParams.get('action');
+
+  useEffect(() => {
+    if (action === 'create') {
+      setAddKeyModal(true);
+    }
+  }, [action]);
 
   const {
     data: snapshotData,
@@ -115,9 +130,6 @@ const KeyList = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
-  //modal states
-  const [addKeyModal, setAddKeyModal] = useState(false);
-  const [keyAllocModal, setKeyAllocModal] = useState(false);
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader

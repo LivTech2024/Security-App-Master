@@ -4,6 +4,7 @@ import { useAuthState } from '../store';
 import { openContextModal } from '@mantine/modals';
 import PopupMenu from '../common/PopupMenu';
 import { useState } from 'react';
+import KeyboardShortcutModal from '../common/modals/KeyboardShortcutModal';
 
 const NavItem = ({
   name,
@@ -16,7 +17,11 @@ const NavItem = ({
   path?: string;
   callback?: () => void;
   isDropdownReq?: boolean;
-  dropdownChildren?: ({ name: string; path: string } | null)[];
+  dropdownChildren?: ({
+    name: string;
+    path?: string;
+    callback?: () => void;
+  } | null)[];
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,7 +56,11 @@ const NavItem = ({
                 return (
                   <div
                     key={idx}
-                    onClick={() => navigate(res.path)}
+                    onClick={() =>
+                      res.path
+                        ? navigate(res.path)
+                        : res.callback && res.callback()
+                    }
                     className="px-6 py-2 uppercase cursor-pointer duration-200 hover:bg-onHoverBg group"
                   >
                     {res.name}
@@ -86,6 +95,8 @@ const Nav = ({
 }) => {
   const { userSignOut, client, settings } = useAuthState();
   const navigate = useNavigate();
+
+  const [keyboardShortcutModal, setKeyboardShortcutModal] = useState(false);
 
   return (
     <div
@@ -141,7 +152,17 @@ const Nav = ({
             />
           )}
 
-          <NavItem path={PageRoutes.SETTINGS} name="Settings" />
+          <NavItem
+            name="My Account"
+            isDropdownReq
+            dropdownChildren={[
+              { name: 'Settings', path: PageRoutes.SETTINGS },
+              {
+                name: 'Shortcuts',
+                callback: () => setKeyboardShortcutModal(true),
+              },
+            ]}
+          />
         </>
       )}
 
@@ -206,6 +227,11 @@ const Nav = ({
           />
         </>
       )}
+
+      <KeyboardShortcutModal
+        opened={keyboardShortcutModal}
+        setOpened={setKeyboardShortcutModal}
+      />
     </div>
   );
 };
