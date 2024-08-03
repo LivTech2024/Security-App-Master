@@ -13,20 +13,27 @@ import {
   showSnackbar,
 } from '../../../utilities/TsxUtils';
 import DbShift from '../../../firebase_configs/DB/DbShift';
-import { useAuthState } from '../../../store';
+import { useAuthState, useEditFormStore } from '../../../store';
 import { useQueryClient } from '@tanstack/react-query';
 import { REACT_QUERY_KEYS } from '../../../@types/enum';
+import { toDate } from '../../../utilities/misc';
 
 const CreateCalloutModal = ({
   opened,
   setOpened,
+  setShouldRefetch,
 }: {
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
+  setShouldRefetch?: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const queryClient = useQueryClient();
 
   const { company } = useAuthState();
+
+  const { calloutEditData } = useEditFormStore();
+
+  const isEdit = !!calloutEditData;
 
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
 
@@ -77,6 +84,25 @@ const CreateCalloutModal = ({
     setSelectedLocation(null);
   };
 
+  useEffect(() => {
+    if (isEdit) {
+      setSelectedLocation({
+        LocationId: calloutEditData.CalloutLocationId,
+        LocationName: calloutEditData.CalloutLocationName,
+        LocationAddress: calloutEditData.CalloutLocationAddress,
+        LocationCoordinates: calloutEditData.CalloutLocation,
+      } as ILocationsCollection);
+      setCalloutDateTime(toDate(calloutEditData.CalloutDateTime));
+      setAssignedEmpsId(
+        calloutEditData.CalloutStatus.map((res) => {
+          return { id: res.StatusEmpId, name: res.StatusEmpName };
+        })
+      );
+      return;
+    }
+    resetForm();
+  }, [opened, isEdit]);
+
   const onSubmit = async () => {
     if (!company) return;
     try {
@@ -91,26 +117,44 @@ const CreateCalloutModal = ({
       }
       showModalLoader({});
 
-      await DbShift.createCallout({
-        cmpId: company.CompanyId,
-        data: {
-          assignedEmpsId,
-          CalloutDateTime: calloutDateTime,
-          CalloutLocationName: selectedLocation?.LocationName,
-          CalloutLocation: selectedLocation.LocationCoordinates,
-          CalloutLocationAddress: selectedLocation.LocationAddress,
-          CalloutLocationId: selectedLocation.LocationId,
-        },
-      });
+      if (isEdit) {
+        await DbShift.updateCallout({
+          calloutId: calloutEditData.CalloutId,
+          data: {
+            CalloutDateTime: calloutDateTime,
+            CalloutLocationName: selectedLocation?.LocationName,
+            CalloutLocation: selectedLocation.LocationCoordinates,
+            CalloutLocationAddress: selectedLocation.LocationAddress,
+            CalloutLocationId: selectedLocation.LocationId,
+          },
+        });
+        showSnackbar({
+          message: 'Callout updated successfully',
+          type: 'success',
+        });
+      } else {
+        await DbShift.createCallout({
+          cmpId: company.CompanyId,
+          data: {
+            assignedEmpsId,
+            CalloutDateTime: calloutDateTime,
+            CalloutLocationName: selectedLocation?.LocationName,
+            CalloutLocation: selectedLocation.LocationCoordinates,
+            CalloutLocationAddress: selectedLocation.LocationAddress,
+            CalloutLocationId: selectedLocation.LocationId,
+          },
+        });
+        showSnackbar({
+          message: 'Callout created successfully',
+          type: 'success',
+        });
+      }
 
       await queryClient.invalidateQueries({
         queryKey: [REACT_QUERY_KEYS.CALLOUT_LIST],
       });
 
-      showSnackbar({
-        message: 'Callout created successfully',
-        type: 'success',
-      });
+      setShouldRefetch && setShouldRefetch((prev) => !prev);
 
       closeModalLoader();
       resetForm();
@@ -153,6 +197,7 @@ const CreateCalloutModal = ({
           data={locations.map((res) => {
             return { label: res.LocationName, value: res.LocationId };
           })}
+          clearable
         />
 
         <InputDate
@@ -173,6 +218,7 @@ const CreateCalloutModal = ({
           onSearchChange={setEmpSearchQuery}
           onChange={(e) => setSelectedEmployee(e as string)}
           searchable
+          disabled={isEdit}
         />
 
         <div className="flex flex-col col-span-2">
@@ -187,11 +233,18 @@ const CreateCalloutModal = ({
                   </span>
                   <MdClose
                     className="text-textPrimaryRed text-xl cursor-pointer"
-                    onClick={() =>
+                    onClick={() => {
+                      if (isEdit) {
+                        showSnackbar({
+                          message: 'Cannot edit assigned employees',
+                          type: 'error',
+                        });
+                        return;
+                      }
                       setAssignedEmpsId((prev) =>
                         prev.filter((i) => i.id !== rec.id)
-                      )
-                    }
+                      );
+                    }}
                   />
                 </span>
               );

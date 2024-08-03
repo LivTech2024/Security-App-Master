@@ -23,8 +23,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
 import { RxUpdate } from 'react-icons/rx';
 import UpdateCalloutStatusModal from '../../component/callout/modal/UpdateCalloutStatusModal';
+import { useEditFormStore } from '../../store';
+import CreateCalloutModal from '../../component/callout/modal/CreateCalloutModal';
 
 const CalloutView = () => {
+  const { setCalloutEditData } = useEditFormStore();
+
   const queryClient = useQueryClient();
 
   const navigate = useNavigate();
@@ -32,6 +36,8 @@ const CalloutView = () => {
   const [searchParam] = useSearchParams();
 
   const calloutId = searchParam.get('id');
+
+  const [createCalloutModal, setCreateCalloutModal] = useState(false);
 
   const [loading, setLoading] = useState(true);
 
@@ -137,31 +143,50 @@ const CalloutView = () => {
         <PageHeader
           title="Callout Data"
           rightSection={
-            <Button
-              label="Delete"
-              type="black"
-              onClick={() => {
-                openContextModal({
-                  modal: 'confirmModal',
-                  withCloseButton: false,
-                  centered: true,
-                  closeOnClickOutside: true,
-                  innerProps: {
-                    title: 'Confirm',
-                    body: 'Are you sure to delete this callout',
-                    onConfirm: () => {
-                      onDelete();
+            <div className="flex items-center gap-4">
+              <Button
+                label="Edit"
+                onClick={() => {
+                  setCalloutEditData(data);
+                  setCreateCalloutModal(true);
+                }}
+                type="white"
+                className="px-10"
+              />
+              <Button
+                label="Delete"
+                type="black"
+                onClick={() => {
+                  openContextModal({
+                    modal: 'confirmModal',
+                    withCloseButton: false,
+                    centered: true,
+                    closeOnClickOutside: true,
+                    innerProps: {
+                      title: 'Confirm',
+                      body: 'Are you sure to delete this callout',
+                      onConfirm: () => {
+                        onDelete();
+                      },
                     },
-                  },
-                  size: '30%',
-                  styles: {
-                    body: { padding: '0px' },
-                  },
-                });
-              }}
-            />
+                    size: '30%',
+                    styles: {
+                      body: { padding: '0px' },
+                    },
+                  });
+                }}
+                className="px-8"
+              />
+            </div>
           }
         />
+
+        <CreateCalloutModal
+          opened={createCalloutModal}
+          setOpened={setCreateCalloutModal}
+          setShouldRefetch={setShouldRefetch}
+        />
+
         <div className="bg-surface shadow-md rounded-lg p-4">
           <div className="grid grid-cols-2 gap-4">
             <div>

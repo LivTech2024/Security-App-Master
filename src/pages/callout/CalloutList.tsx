@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import PageHeader from '../../common/PageHeader';
 import Button from '../../common/button/Button';
 import CreateCalloutModal from '../../component/callout/modal/CreateCalloutModal';
-import { useAuthState } from '../../store';
+import { useAuthState, useEditFormStore } from '../../store';
 import dayjs from 'dayjs';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { DisplayCount, PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
@@ -23,6 +23,8 @@ const CalloutList = () => {
   const navigate = useNavigate();
 
   const { company } = useAuthState();
+
+  const { setCalloutEditData } = useEditFormStore();
 
   const [selectedLocation, setSelectedLocation] = useState('');
 
@@ -125,6 +127,7 @@ const CalloutList = () => {
             label="Create Callout"
             type="black"
             onClick={() => {
+              setCalloutEditData(null);
               setCreateCalloutModal(true);
             }}
           />

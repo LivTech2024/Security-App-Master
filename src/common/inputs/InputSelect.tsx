@@ -16,6 +16,7 @@ interface InputSelectProps {
   clearable?: boolean;
   nothingFoundMessage?: React.ReactNode;
   limit?: number;
+  disabled?: boolean;
 }
 
 const InputSelect = ({
@@ -33,6 +34,7 @@ const InputSelect = ({
   searchable,
   nothingFoundMessage,
   limit,
+  disabled,
 }: InputSelectProps) => {
   return (
     <div className={` gap-1 flex flex-col ${className}`}>
@@ -41,6 +43,7 @@ const InputSelect = ({
       ) : null}
 
       <Select
+        disabled={disabled}
         error={error}
         placeholder={placeholder}
         allowDeselect={false}

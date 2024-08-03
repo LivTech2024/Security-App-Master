@@ -1,5 +1,6 @@
 import { StateCreator } from 'zustand';
 import {
+  ICalloutsCollection,
   IClientsCollection,
   IDocumentsCollection,
   IEmergencyProtocolsCollection,
@@ -164,6 +165,9 @@ interface EditFormState {
   setEmergProtocolEditData: (
     task: IEmergencyProtocolsCollection | null
   ) => void;
+
+  calloutEditData: ICalloutsCollection | null;
+  setCalloutEditData: (callout: ICalloutsCollection | null) => void;
 }
 
 export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
@@ -249,4 +253,9 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   emergProtocolEditData: null,
   setEmergProtocolEditData: (protocol) =>
     set((state) => ({ ...state, emergProtocolEditData: protocol })),
+
+  //callout
+  calloutEditData: null,
+  setCalloutEditData: (callout) =>
+    set((state) => ({ ...state, calloutEditData: callout })),
 });
