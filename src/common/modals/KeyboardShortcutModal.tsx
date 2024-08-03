@@ -368,12 +368,10 @@ const KeyboardShortcutModal = ({
       .map((shortcut, index) => (
         <div
           key={index}
-          className="flex items-center justify-between w-full border-b border-inputBorderLight dark:border-inputBorderDark p-2 text-sm"
+          className="flex items-center justify-between w-full border-b border-inputBorder p-2 text-sm"
         >
-          <div className="text-textSecondaryLight dark:text-textSecondaryDark">
-            {shortcut.functionality}
-          </div>
-          <div className="bg-dialogCardBg dark:bg-primaryVariantDark p-2 w-1/4 min-w-fit flex justify-center rounded border border-cardBorder dark:border-inputBorderDark font-medium font-sfProTextMedium text-textSecondaryLight dark:text-textSecondaryDark">
+          <div className="text-textSecondary">{shortcut.functionality}</div>
+          <div className="bg-dialogCardBg  p-2 w-1/4 min-w-fit flex justify-center rounded border border-inputBorder font-semibold text-textSecondary ">
             {shortcut.keyCombination.mainKey}
             {shortcut.keyCombination.childKey &&
               ' + ' + shortcut.keyCombination.childKey}{' '}
@@ -398,19 +396,19 @@ const KeyboardShortcutModal = ({
     >
       <div className="grid grid-cols-3 gap-4">
         <div className="flex flex-col">
-          <div className="font-medium font-sfProTextMedium p-2 border-b border-inputBorderLight dark:border-inputBorderDark sticky top-0">
+          <div className="font-semibold p-2 border-b border-inputBorder sticky top-0">
             Navigation
           </div>
           {getColumnShortcuts('Navigation')}
         </div>
         <div className="flex flex-col">
-          <div className="font-medium font-sfProTextMedium p-2 border-b border-inputBorderLight dark:border-inputBorderDark sticky top-0">
+          <div className="font-semibold p-2 border-b border-inputBorder sticky top-0">
             Actions
           </div>
           {getColumnShortcuts('Actions')}
         </div>
         <div className="flex flex-col">
-          <div className="font-medium font-sfProTextMedium p-2 border-b border-inputBorderLight dark:border-inputBorderDark sticky top-0">
+          <div className="font-semibold p-2 border-b border-inputBorder sticky top-0">
             Activities
           </div>
           {getColumnShortcuts('Activities')}
