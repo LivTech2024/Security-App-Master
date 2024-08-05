@@ -25,12 +25,14 @@ class DbMessaging {
     senderId,
     receiversId,
     senderName,
+    senderType,
   }: {
     cmpId: string;
     data: string;
     senderId: string;
     senderName: string;
     receiversId: string[];
+    senderType: 'client' | 'admin';
   }) => {
     const messageId = getNewDocId(CollectionName.messages);
     const messageRef = doc(db, CollectionName.messages, messageId);
@@ -58,6 +60,7 @@ class DbMessaging {
       MessageId: messageId,
       MessageCompanyId: cmpId,
       MessageType: 'message',
+      MessageCreatorType: senderType,
       MessageData: data,
       MessageCreatedById: senderId,
       MessageCreatedByName: senderName,

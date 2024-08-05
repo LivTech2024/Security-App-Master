@@ -75,6 +75,7 @@ const SendMessageModal = ({
         receiversId: receivers.map((rec) => rec.id),
         senderId: client.ClientId,
         senderName: client.ClientName,
+        senderType: 'client',
       });
 
       await queryClient.invalidateQueries({

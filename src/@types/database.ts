@@ -297,6 +297,7 @@ export interface IMessagesCollection {
   MessageCompanyId: string;
   MessageType: 'message' | 'panic';
   MessageData: string;
+  MessageCreatorType: 'admin' | 'client' | 'employee' | 'system';
   MessageCreatedById: string;
   MessageCreatedByName: string;
   MessageReceiversId: string[];
