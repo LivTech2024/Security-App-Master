@@ -81,16 +81,30 @@ class DbMessaging {
     receiverId,
     lastDoc,
     lmt,
+    endDate,
+    isLifeTime,
+    startDate,
   }: {
     lmt?: number;
     lastDoc?: DocumentData | null;
     receiverId: string;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
   }) => {
     const messageRef = collection(db, CollectionName.messages);
     let queryParams: QueryConstraint[] = [
       where('MessageReceiversId', 'array-contains', receiverId),
       orderBy('MessageCreatedAt', 'desc'),
     ];
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('MessageCreatedAt', '>=', startDate),
+        where('MessageCreatedAt', '<=', endDate),
+      ];
+    }
 
     if (lastDoc) {
       queryParams = [...queryParams, startAfter(lastDoc)];
@@ -109,16 +123,30 @@ class DbMessaging {
     senderId,
     lastDoc,
     lmt,
+    endDate,
+    isLifeTime,
+    startDate,
   }: {
     lmt?: number;
     lastDoc?: DocumentData | null;
     senderId: string;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
   }) => {
     const messageRef = collection(db, CollectionName.messages);
     let queryParams: QueryConstraint[] = [
       where('MessageCreatedById', '==', senderId),
       orderBy('MessageCreatedAt', 'desc'),
     ];
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('MessageCreatedAt', '>=', startDate),
+        where('MessageCreatedAt', '<=', endDate),
+      ];
+    }
 
     if (lastDoc) {
       queryParams = [...queryParams, startAfter(lastDoc)];

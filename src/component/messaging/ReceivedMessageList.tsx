@@ -8,7 +8,19 @@ import { useInView } from 'react-intersection-observer';
 import { formatDate } from '../../utilities/misc';
 import NoSearchResult from '../../common/NoSearchResult';
 
-const ReceivedMessageList = ({ receiverId }: { receiverId: string }) => {
+interface ReceivedMessageListProps {
+  receiverId: string;
+  startDate: string | Date | null;
+  endDate: string | Date | null;
+  isLifeTime: boolean;
+}
+
+const ReceivedMessageList = ({
+  receiverId,
+  endDate,
+  isLifeTime,
+  startDate,
+}: ReceivedMessageListProps) => {
   const {
     data: snapshotData,
     fetchNextPage,
@@ -18,12 +30,21 @@ const ReceivedMessageList = ({ receiverId }: { receiverId: string }) => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.MESSAGE_RECEIVED_LIST, receiverId],
+    queryKey: [
+      REACT_QUERY_KEYS.MESSAGE_RECEIVED_LIST,
+      receiverId,
+      endDate,
+      isLifeTime,
+      startDate,
+    ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbMessaging.getReceivedMessages({
         lmt: DisplayCount.MESSAGE_RECEIVED_LIST,
         lastDoc: pageParam,
         receiverId: receiverId,
+        endDate,
+        isLifeTime,
+        startDate,
       });
       return snapshot.docs;
     },

@@ -23,7 +23,19 @@ export interface ISentMessagesCollection
   MessageReceiversId: { id: string; name: string }[];
 }
 
-const SentMessageList = ({ senderId }: { senderId: string }) => {
+interface SentMessageListProps {
+  senderId: string;
+  startDate: string | Date | null;
+  endDate: string | Date | null;
+  isLifeTime: boolean;
+}
+
+const SentMessageList = ({
+  senderId,
+  endDate,
+  isLifeTime,
+  startDate,
+}: SentMessageListProps) => {
   const {
     data: snapshotData,
     fetchNextPage,
@@ -33,12 +45,21 @@ const SentMessageList = ({ senderId }: { senderId: string }) => {
     isFetching,
     error,
   } = useInfiniteQuery({
-    queryKey: [REACT_QUERY_KEYS.MESSAGE_SENT_LIST, senderId],
+    queryKey: [
+      REACT_QUERY_KEYS.MESSAGE_SENT_LIST,
+      senderId,
+      endDate,
+      isLifeTime,
+      startDate,
+    ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbMessaging.getSentMessages({
         lmt: DisplayCount.MESSAGE_SENT_LIST,
         lastDoc: pageParam,
         senderId: senderId,
+        endDate,
+        isLifeTime,
+        startDate,
       });
 
       const docData: ISentMessagesCollection[] = [];
