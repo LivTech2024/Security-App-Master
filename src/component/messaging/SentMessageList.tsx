@@ -17,6 +17,7 @@ import {
 } from '../../utilities/TsxUtils';
 import { openContextModal } from '@mantine/modals';
 import { errorHandler } from '../../utilities/CustomError';
+import { useAuthState } from '../../store';
 
 export interface ISentMessagesCollection
   extends Omit<IMessagesCollection, 'MessageReceiversId'> {
@@ -38,6 +39,8 @@ const SentMessageList = ({
   startDate,
   selectedCreatorType,
 }: SentMessageListProps) => {
+  const { client } = useAuthState();
+
   const {
     data: snapshotData,
     fetchNextPage,
@@ -88,6 +91,8 @@ const SentMessageList = ({
                   (!selectedCreatorType || selectedCreatorType === 'client')
                 ) {
                   newRecList.push({ id, name: clientData.ClientName });
+                } else if (client && client.ClientId === senderId) {
+                  newRecList.push({ id, name: 'Admin' });
                 }
               }
             })
