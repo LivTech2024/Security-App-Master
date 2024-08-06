@@ -12,6 +12,7 @@ import { MdClose } from 'react-icons/md';
 import { RiEqualFill } from 'react-icons/ri';
 import { useEditFormStore } from '../../../store';
 import { useEffect } from 'react';
+import { roundNumber } from '../../../utilities/misc';
 
 interface EarningDetailsProps {
   earningsList: IEarningList[];
@@ -180,9 +181,9 @@ const EarningDetails = ({
                       <RiEqualFill className="text-xl" />
                       <InputWithTopHeader
                         className="mx-0"
-                        value={
+                        value={roundNumber(
                           Number(data.Rate ?? 0) * Number(data.Quantity ?? 0)
-                        }
+                        )}
                         onChange={(e) =>
                           onFieldChange(idx, 'CurrentAmount', e.target.value)
                         }

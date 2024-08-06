@@ -35,17 +35,15 @@ import {
 } from '../../@types/database';
 import CustomError from '../../utilities/CustomError';
 import { getNewDocId } from './utils';
-import {
-  formatDate,
-  getHoursDiffInTwoTimeString,
-  removeTimeFromDate,
-} from '../../utilities/misc';
+import { removeTimeFromDate } from '../../utilities/misc';
 import DbEmployee from './DbEmployee';
 import {
   IDeductionList,
   IEarningList,
 } from '../../pages/payments_and_billing/paystub/PayStubGenerate';
 import DbHR from './DbHR';
+import { getShiftActualHours } from '../../utilities/scheduleHelper';
+import dayjs from 'dayjs';
 
 class DbPayment {
   static isInvoiceNumberExist = async (
@@ -404,10 +402,12 @@ class DbPayment {
     empId,
     endDate,
     startDate,
+    shiftTimeMargin,
   }: {
     empId: string;
     startDate: Date;
     endDate: Date;
+    shiftTimeMargin: number;
   }) => {
     let empEarningDetails = {
       Name: 'Regular Hours',
@@ -424,7 +424,7 @@ class DbPayment {
         shiftRef,
         where('ShiftAssignedUserId', 'array-contains', empId),
         where('ShiftDate', '>=', startDate),
-        where('ShiftDate', '<=', endDate)
+        where('ShiftDate', '<=', dayjs(endDate).endOf('day').toDate())
       );
 
       const shiftSnapshot = await getDocs(shiftQuery);
@@ -437,17 +437,12 @@ class DbPayment {
       let empTotalHrs = 0;
 
       shiftData.forEach((data) => {
-        const shiftStatusForEmp = data.ShiftCurrentStatus.find(
-          (status) => status.StatusReportedById === empId
-        );
-        if (shiftStatusForEmp && shiftStatusForEmp.Status === 'completed') {
-          const hrs = getHoursDiffInTwoTimeString(
-            formatDate(shiftStatusForEmp.StatusStartedTime, 'HH:mm'),
-            formatDate(shiftStatusForEmp.StatusReportedTime, 'HH:mm')
-          );
-
-          empTotalHrs += hrs;
-        }
+        const { actualShiftHrsSpent } = getShiftActualHours({
+          shift: data,
+          timeMarginInMins: shiftTimeMargin,
+          empId,
+        });
+        empTotalHrs += actualShiftHrsSpent;
       });
 
       //*Fetch Paid leaves

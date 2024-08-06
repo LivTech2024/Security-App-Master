@@ -11,7 +11,7 @@ import { IEarningList } from '../../../pages/payments_and_billing/paystub/PayStu
 import { IPayStubsCollection } from '../../../@types/database';
 import { roundNumber } from '../../../utilities/misc';
 import { openContextModal } from '@mantine/modals';
-import { useEditFormStore } from '../../../store';
+import { useAuthState, useEditFormStore } from '../../../store';
 
 const EmpDetails = ({
   setEarningsList,
@@ -22,6 +22,8 @@ const EmpDetails = ({
     React.SetStateAction<IPayStubsCollection | null>
   >;
 }) => {
+  const { settings } = useAuthState();
+
   const { payStubEditData } = useEditFormStore();
 
   const isEdit = !!payStubEditData;
@@ -144,6 +146,7 @@ const EmpDetails = ({
         empId,
         startDate: payStartDate,
         endDate: payEndDate,
+        shiftTimeMargin: settings?.SettingEmpShiftTimeMarginInMins || 0,
       });
 
       const prevPayStub = await DbPayment.getPrevPayStub(empId, payStartDate);
