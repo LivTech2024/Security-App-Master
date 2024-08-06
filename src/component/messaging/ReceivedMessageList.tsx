@@ -13,6 +13,7 @@ interface ReceivedMessageListProps {
   startDate: string | Date | null;
   endDate: string | Date | null;
   isLifeTime: boolean;
+  selectedCreatorType?: 'employee' | 'client' | 'system';
 }
 
 const ReceivedMessageList = ({
@@ -20,6 +21,7 @@ const ReceivedMessageList = ({
   endDate,
   isLifeTime,
   startDate,
+  selectedCreatorType,
 }: ReceivedMessageListProps) => {
   const {
     data: snapshotData,
@@ -36,6 +38,7 @@ const ReceivedMessageList = ({
       endDate,
       isLifeTime,
       startDate,
+      selectedCreatorType,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbMessaging.getReceivedMessages({
@@ -45,6 +48,7 @@ const ReceivedMessageList = ({
         endDate,
         isLifeTime,
         startDate,
+        selectedCreatorType,
       });
       return snapshot.docs;
     },
@@ -119,7 +123,17 @@ const ReceivedMessageList = ({
                   </span>
                 </div>
 
-                <span>{msg.MessageData}</span>
+                <span className="flex items-start">
+                  {msg.MessageType === 'panic' ? (
+                    <span className="bg-primaryRed text-surface font-semibold px-[10px] py-[4px] rounded w-fit text-sm flex items-center justify-center mr-2">
+                      Panic
+                    </span>
+                  ) : (
+                    <span className="mr-1">Message:</span>
+                  )}
+                  <span>{msg.MessageData}</span>
+                </span>
+
                 <span className="text-sm mt-2 font-medium">
                   {formatDate(msg.MessageCreatedAt, 'HH:mm - DD MMM')}
                 </span>

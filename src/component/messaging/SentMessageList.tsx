@@ -5,7 +5,7 @@ import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
 import DbMessaging from '../../firebase_configs/DB/DbMessaging';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
-import { formatDate } from '../../utilities/misc';
+import { formatDate, toDate } from '../../utilities/misc';
 import NoSearchResult from '../../common/NoSearchResult';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
 import DbClient from '../../firebase_configs/DB/DbClient';
@@ -28,6 +28,7 @@ interface SentMessageListProps {
   startDate: string | Date | null;
   endDate: string | Date | null;
   isLifeTime: boolean;
+  selectedCreatorType?: 'employee' | 'client' | 'system';
 }
 
 const SentMessageList = ({
@@ -35,6 +36,7 @@ const SentMessageList = ({
   endDate,
   isLifeTime,
   startDate,
+  selectedCreatorType,
 }: SentMessageListProps) => {
   const {
     data: snapshotData,
@@ -51,6 +53,7 @@ const SentMessageList = ({
       endDate,
       isLifeTime,
       startDate,
+      selectedCreatorType,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbMessaging.getSentMessages({
@@ -72,15 +75,19 @@ const SentMessageList = ({
           await Promise.all(
             MessageReceiversId.map(async (id) => {
               const emp = await DbEmployee.getEmpById(id);
-              if (emp) {
+              if (
+                emp &&
+                (!selectedCreatorType || selectedCreatorType === 'employee')
+              ) {
                 newRecList.push({ id, name: emp.EmployeeName });
               } else {
                 const clientSnapshot = await DbClient.getClientById(id);
                 const clientData = clientSnapshot?.data() as IClientsCollection;
-                if (clientData) {
+                if (
+                  clientData &&
+                  (!selectedCreatorType || selectedCreatorType === 'client')
+                ) {
                   newRecList.push({ id, name: clientData.ClientName });
-                } else {
-                  newRecList.push({ id, name: 'Admin' });
                 }
               }
             })
@@ -88,7 +95,20 @@ const SentMessageList = ({
           docData.push({ ...data, MessageReceiversId: newRecList });
         })
       );
-      return { docs: snapshot.docs, docData: docData };
+      return {
+        docs: snapshot.docs,
+        docData: docData
+          .filter((res) =>
+            res.MessageReceiversId.some(
+              (r) => r.name.length > 0 && r.id.length > 0
+            )
+          )
+          .sort(
+            (a, b) =>
+              toDate(b.MessageCreatedAt).getTime() -
+              toDate(a.MessageCreatedAt).getTime()
+          ),
+      };
     },
     getNextPageParam: (lastPage) => {
       if (lastPage.docs?.length === 0) {

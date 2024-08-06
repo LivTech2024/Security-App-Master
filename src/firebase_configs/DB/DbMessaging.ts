@@ -84,6 +84,7 @@ class DbMessaging {
     endDate,
     isLifeTime,
     startDate,
+    selectedCreatorType,
   }: {
     lmt?: number;
     lastDoc?: DocumentData | null;
@@ -91,6 +92,7 @@ class DbMessaging {
     startDate?: Date | string | null;
     endDate?: Date | string | null;
     isLifeTime?: boolean;
+    selectedCreatorType?: 'client' | 'employee' | 'system';
   }) => {
     const messageRef = collection(db, CollectionName.messages);
     let queryParams: QueryConstraint[] = [
@@ -103,6 +105,13 @@ class DbMessaging {
         ...queryParams,
         where('MessageCreatedAt', '>=', startDate),
         where('MessageCreatedAt', '<=', endDate),
+      ];
+    }
+
+    if (selectedCreatorType) {
+      queryParams = [
+        ...queryParams,
+        where('MessageCreatorType', '==', selectedCreatorType),
       ];
     }
 
