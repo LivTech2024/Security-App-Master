@@ -141,7 +141,7 @@ class DbSchedule {
         const shiftQuery = query(
           shiftRef,
           where('ShiftDate', '>=', startDate),
-          where('ShiftDate', '<=', endDate),
+          where('ShiftDate', '<=', dayjs(endDate).endOf('day').toDate()),
           where('ShiftAssignedUserId', 'array-contains', emp.EmployeeId)
         );
         const shiftSnapshot = await getDocs(shiftQuery);

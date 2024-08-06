@@ -36,6 +36,7 @@ import { htmlToPdf } from '../../API/HtmlToPdf';
 import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
 import { Company } from '../../store/slice/auth.slice';
 import CustomError from '../../utilities/CustomError';
+import dayjs from 'dayjs';
 
 class DbShift {
   static addShift = async ({
@@ -317,7 +318,7 @@ class DbShift {
       queryParams = [
         ...queryParams,
         where('ShiftDate', '>=', startDate),
-        where('ShiftDate', '<=', endDate),
+        where('ShiftDate', '<=', dayjs(endDate).endOf('day').toDate()),
       ];
     }
 

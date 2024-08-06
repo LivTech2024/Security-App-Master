@@ -345,7 +345,7 @@ class DbClient {
       shiftRef,
       where('ShiftClientId', '==', clientId),
       where('ShiftDate', '>=', startDate),
-      where('ShiftDate', '<=', endDate)
+      where('ShiftDate', '<=', dayjs(endDate).endOf('day').toDate())
     );
 
     return getDocs(shiftQuery);
@@ -371,7 +371,7 @@ class DbClient {
       shiftRef,
       where('ShiftLocationId', '==', locationId),
       where('ShiftDate', '>=', startDate),
-      where('ShiftDate', '<=', endDate)
+      where('ShiftDate', '<=', dayjs(endDate).endOf('day').toDate())
     );
 
     return getDocs(shiftQuery);
@@ -562,7 +562,7 @@ class DbClient {
       queryParams = [
         ...queryParams,
         where('ShiftDate', '>=', startDate),
-        where('ShiftDate', '<=', endDate),
+        where('ShiftDate', '<=', dayjs(endDate).endOf('day').toDate()),
       ];
     }
 

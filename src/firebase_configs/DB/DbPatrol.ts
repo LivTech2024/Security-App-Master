@@ -227,7 +227,6 @@ class DbPatrol {
   static getAssignedGuardOfPatrol = (locationId: string) => {
     const shiftRef = collection(db, CollectionName.shifts);
     const currDate = removeTimeFromDate(new Date());
-    console.log(currDate, 'current date');
     const shiftQuery = query(
       shiftRef,
       where('ShiftLocationId', '==', locationId),
