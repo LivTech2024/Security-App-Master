@@ -192,7 +192,10 @@ const PayStubList = () => {
           <Button
             label="Generate paystub"
             type="black"
-            onClick={() => navigate(PageRoutes.PAY_STUB_GENERATE)}
+            onClick={() => {
+              setPayStubEditData(null);
+              navigate(PageRoutes.PAY_STUB_GENERATE);
+            }}
           />
         }
       />

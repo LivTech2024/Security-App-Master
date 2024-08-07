@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import InputSelect from '../../../common/inputs/InputSelect';
 import useFetchEmployees from '../../../hooks/fetch/useFetchEmployees';
 import { useFormContext } from 'react-hook-form';
 import { PayStubCreateFormFields } from '../../../utilities/zod/schema';
@@ -12,6 +11,7 @@ import { IPayStubsCollection } from '../../../@types/database';
 import { roundNumber } from '../../../utilities/misc';
 import { openContextModal } from '@mantine/modals';
 import { useAuthState, useEditFormStore } from '../../../store';
+import EmpAutoCompleteInput from '../../../common/custom_inputs/EmpAutoCompleteInput';
 
 const EmpDetails = ({
   setEarningsList,
@@ -36,6 +36,8 @@ const EmpDetails = ({
 
   const [empSearchQuery, setEmpSearchQuery] = useState('');
 
+  const [selectedEmpId, setSelectedEmpId] = useState('');
+
   const { data: employees } = useFetchEmployees({
     limit: 5,
     searchQuery: empSearchQuery,
@@ -46,13 +48,16 @@ const EmpDetails = ({
   useEffect(() => {
     if (isEdit) {
       setEmpSearchQuery(payStubEditData.PayStubEmpName);
+      setSelectedEmpId(payStubEditData.PayStubEmpId);
     }
   }, [isEdit]);
 
   useEffect(() => {
     const selectedEmp = employees.find(
-      (emp) => emp.EmployeeName === empSearchQuery
+      (emp) => emp.EmployeeId === selectedEmpId
     );
+
+    console.log(selectedEmp, selectedEmpId, 'here');
 
     if (selectedEmp) {
       setValue('PayStubEmpId', selectedEmp?.EmployeeId);
@@ -71,7 +76,7 @@ const EmpDetails = ({
         isEdit ? payStubEditData?.PayStubCompanyBranchId || null : null
       );
     }
-  }, [empSearchQuery, isEdit]);
+  }, [selectedEmpId, isEdit]);
 
   const [payStartDate, payEndDate, empId] = watch([
     'PayStubPayPeriodStartDate',
@@ -199,15 +204,12 @@ const EmpDetails = ({
       <div className="flex flex-col gap-4 items-start w-full">
         <div className="font-semibold">Employee Details</div>
 
-        <InputSelect
-          label="Select employee"
-          data={employees.map((res) => {
-            return { label: res.EmployeeName, value: res.EmployeeId };
-          })}
-          searchValue={empSearchQuery}
-          onSearchChange={setEmpSearchQuery}
-          searchable
-          className="w-full"
+        <EmpAutoCompleteInput
+          employees={employees}
+          searchQuery={empSearchQuery}
+          setSearchQuery={setEmpSearchQuery}
+          selectedEmpId={selectedEmpId}
+          setSelectedEmpId={setSelectedEmpId}
           error={errors.PayStubEmpId?.message}
         />
 
