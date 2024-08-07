@@ -10,7 +10,7 @@ export const useTitle = (title: string) => {
     if (document.title !== title) document.title = title;
 
     return () => {
-      document.title = originalTitle.current || 'Tacttik - Admin App';
+      document.title = originalTitle.current || 'Tacttik';
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title]);

@@ -101,7 +101,9 @@ function App() {
     showSnackbar({ message: payload.notification?.body, type: 'info' });
   });
 
-  useTitle(`Tacttik - ${client ? 'Client Portal' : 'Admin Portal'}`);
+  useTitle(
+    `Tacttik ${client ? '- Client Portal' : admin ? '- Admin Portal' : ''}`
+  );
 
   if (loading) {
     return <SplashScreen />;
