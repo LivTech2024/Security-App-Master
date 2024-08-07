@@ -57,8 +57,6 @@ const EmpDetails = ({
       (emp) => emp.EmployeeId === selectedEmpId
     );
 
-    console.log(selectedEmp, selectedEmpId, 'here');
-
     if (selectedEmp) {
       setValue('PayStubEmpId', selectedEmp?.EmployeeId);
       setValue('PayStubEmpName', selectedEmp?.EmployeeName);
