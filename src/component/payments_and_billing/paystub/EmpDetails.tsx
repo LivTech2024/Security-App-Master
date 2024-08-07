@@ -209,6 +209,7 @@ const EmpDetails = ({
           selectedEmpId={selectedEmpId}
           setSelectedEmpId={setSelectedEmpId}
           error={errors.PayStubEmpId?.message}
+          label="Select Employee"
         />
 
         {selectedEmpRole && (

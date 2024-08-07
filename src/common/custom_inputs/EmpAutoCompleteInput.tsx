@@ -67,7 +67,7 @@ const EmpAutoCompleteInput = ({
 
   return (
     <div className={` gap-1 flex flex-col w-full`}>
-      {label ? <InputHeader title={label} /> : null}
+      {label ? <InputHeader title={label ?? 'Select Employee'} /> : null}
       <Select
         placeholder="Search employee"
         data={data}
