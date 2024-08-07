@@ -1,4 +1,4 @@
-import favicon from '../../../public/favicon.png';
+import favicon from '../../../public/favicon.jpg';
 
 const SplashScreen = () => {
   return (
