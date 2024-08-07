@@ -1,7 +1,8 @@
 import { IEmployeesCollection } from '../../@types/database';
 import empDefaultPlaceHolder from '../../../public/assets/avatar.png';
-import { Avatar, Group, Select, SelectProps, Text } from '@mantine/core';
+import { Avatar, Select, SelectProps, Text } from '@mantine/core';
 import InputHeader from '../inputs/InputHeader';
+import { MdCheck } from 'react-icons/md';
 
 interface EmpAutoCompleteInputProps {
   employees: IEmployeesCollection[];
@@ -41,16 +42,20 @@ const EmpAutoCompleteInput = ({
   // Custom render option function
   const renderAutocompleteOption: SelectProps['renderOption'] = ({
     option,
+    checked,
   }) => (
-    <Group gap="sm">
+    <div className="flex items-center gap-2 w-full">
       <Avatar src={employeesData[option.value].image} size={36} radius="xl" />
-      <div>
-        <Text size="sm">{option?.label}</Text>
-        <Text size="xs" opacity={0.8}>
-          {employeesData[option.value]?.email}
-        </Text>
+      <div className="flex items-center justify-between w-full">
+        <div className="flex flex-col">
+          <Text size="sm">{option?.label}</Text>
+          <Text size="xs" opacity={0.8}>
+            {employeesData[option.value]?.email}
+          </Text>
+        </div>
+        {checked && <MdCheck className="ml-auto text-lg text-textSecondary" />}
       </div>
-    </Group>
+    </div>
   );
 
   const data = employees.map((employee) => ({
