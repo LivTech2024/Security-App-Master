@@ -5,14 +5,14 @@ import dayjs from 'dayjs';
 import { useAuthState } from '../../store';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
-import { DisplayCount } from '../../@types/enum';
+import { DisplayCount, PageRoutes } from '../../@types/enum';
 import { DocumentData } from 'firebase/firestore';
 import { IShiftsCollection } from '../../@types/database';
 import { useInView } from 'react-intersection-observer';
 import TableShimmer from '../../common/shimmer/TableShimmer';
 import NoSearchResult from '../../common/NoSearchResult';
 import { formatDate } from '../../utilities/misc';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getShiftActualHours } from '../../utilities/scheduleHelper';
 import { numberFormatter } from '../../utilities/NumberFormater';
 
@@ -103,6 +103,8 @@ const TimeAndAttendance = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader title="Time & Attendance View" />
@@ -152,7 +154,13 @@ const TimeAndAttendance = () => {
                 (s) => s.StatusReportedById === selectedEmpId
               );
               return (
-                <tr key={shift.ShiftId} className="cursor-pointer">
+                <tr
+                  key={shift.ShiftId}
+                  onClick={() =>
+                    navigate(PageRoutes.SHIFT_VIEW + `?id=${shift.ShiftId}`)
+                  }
+                  className="cursor-pointer"
+                >
                   <td className="align-top px-4 py-2 text-start">
                     <span className="line-clamp-3">{shift.ShiftName}</span>
                   </td>
