@@ -108,10 +108,30 @@ const TimeAndAttendance = () => {
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader title="Time & Attendance View" />
-      <div className="flex items-center justify-between w-full gap-4 p-4 rounded bg-surface shadow">
-        <div className="text-lg">
-          Employee Name:{' '}
-          <span className="font-semibold">{selectedEmpName}</span>
+      <div className="flex items-start justify-between w-full gap-4 p-4 rounded bg-surface shadow">
+        <div className="flex flex-col">
+          <div className="text-lg">
+            Employee Name:{' '}
+            <span className="font-semibold">{selectedEmpName}</span>
+          </div>
+          <div className="text-lg">
+            Total Hrs:{' '}
+            <span className="font-semibold">
+              {numberFormatter(
+                data.reduce(
+                  (acc, shift) =>
+                    acc +
+                    getShiftActualHours({
+                      shift,
+                      empId: selectedEmpId,
+                      timeMarginInMins:
+                        settings?.SettingEmpShiftTimeMarginInMins || 0,
+                    }).actualShiftHrsSpent,
+                  0
+                )
+              )}
+            </span>
+          </div>
         </div>
         <DateFilterDropdown
           endDate={endDate}
