@@ -40,9 +40,13 @@ import useFetchEmployees from '../../hooks/fetch/useFetchEmployees';
 import InputHeader from '../../common/inputs/InputHeader';
 import TextareaWithTopHeader from '../../common/inputs/TextareaWithTopHeader';
 import { sendShiftDetailsEmail } from '../../utilities/scheduleHelper';
-import { IShiftLinkedPatrolsChildCollection } from '../../@types/database';
+import {
+  IClientsCollection,
+  IShiftLinkedPatrolsChildCollection,
+} from '../../@types/database';
 import ShiftLinkPatrolForm from '../../component/shifts/ShiftLinkPatrolForm';
 import PageHeader from '../../common/PageHeader';
+import DbClient from '../../firebase_configs/DB/DbClient';
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -223,6 +227,12 @@ const ShiftCreateOrEdit = () => {
         shiftEditData?.ShiftLinkedPatrols?.length
       ) {
         setShiftLinkedPatrols(shiftEditData.ShiftLinkedPatrols);
+      }
+      if (shiftEditData.ShiftClientId) {
+        DbClient.getClientById(shiftEditData.ShiftClientId).then((snap) => {
+          const clientData = snap.data() as IClientsCollection;
+          setClientSearchValue(clientData.ClientName);
+        });
       }
       return;
     }
