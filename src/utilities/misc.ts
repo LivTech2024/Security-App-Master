@@ -248,3 +248,11 @@ export const reorderArray = (
   result.splice(endIndex, 0, removed);
   return result;
 };
+
+export const scrollToDiv = (id: string) => {
+  if (!id) return;
+  const element = document.querySelector('#' + id);
+  if (element) {
+    element.scrollIntoView({ behavior: 'auto', inline: 'nearest' });
+  }
+};
