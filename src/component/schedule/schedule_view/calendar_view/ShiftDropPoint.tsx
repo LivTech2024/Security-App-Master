@@ -247,7 +247,7 @@ const ShiftDropPoint = ({
         className="font-semibold cursor-pointer text-textPrimaryBlue sticky top-0 bg-background justify-center flex w-full px-2 pt-4"
       >
         <Button
-          label={dayjs(date).format('ddd MMM-DD')}
+          label={`${dayjs(date).format('ddd MMM-DD')} ${getScheduleForDay(datesArray[index], schedules).length ? '(' + getScheduleForDay(datesArray[index], schedules).length + ')' : ''}`}
           type="blue"
           onClick={() => setSelectedDate(date)}
           className="w-full text-sm rounded-full  border-[1px] border-[#02829b] bg-gradient-to-b from-[#7ed7df] to-[#00a9d0] hover:scale-[1.02] duration-200"
