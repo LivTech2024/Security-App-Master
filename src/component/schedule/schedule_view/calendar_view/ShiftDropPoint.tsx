@@ -298,7 +298,7 @@ const ShiftDropPoint = ({
                 >
                   <span
                     onClick={() => handleCopyClicked(data.shift)}
-                    className={`${copiedShifts.find((prev) => prev.ShiftId === data.shift.ShiftId) ? 'text-textSecondary' : 'text-textPrimaryBlue'}  cursor-pointer pt-1`}
+                    className={`${copiedShifts.find((prev) => prev.ShiftId === data.shift.ShiftId) ? 'text-textSecondary' : 'text-textPrimaryBlue'}  cursor-pointer pt-1 mr-1`}
                   >
                     <MdContentCopy />
                   </span>
