@@ -47,17 +47,13 @@ export const getColorAccToShiftStatus = (
   const { hour: startHour, minute: startMinute } = parseTime(ShiftStartTime);
   const { hour: endHour, minute: endMinute } = parseTime(ShiftEndTime);
 
-  const shiftStartTimeWithDate = dayjs()
-    .date(toDate(ShiftDate).getDate())
-    .month(toDate(ShiftDate).getMonth())
+  const shiftStartTimeWithDate = dayjs(toDate(ShiftDate))
     .hour(startHour)
     .minute(startMinute)
     .second(0)
     .toDate();
 
-  let shiftEndTimeWithDate = dayjs()
-    .date(toDate(ShiftDate).getDate())
-    .month(toDate(ShiftDate).getMonth())
+  let shiftEndTimeWithDate = dayjs(toDate(ShiftDate))
     .hour(endHour)
     .minute(endMinute)
     .second(0)
