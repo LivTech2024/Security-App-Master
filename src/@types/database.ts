@@ -85,6 +85,8 @@ export interface IEmployeesCollection {
   EmployeeCity?: string | null;
   EmployeeProvince?: string | null;
   EmployeeCurrentLocation?: GeoPoint;
+  EmployeeIsUploadFromGalleryEnabled: boolean;
+  EmployeeIsTimeStampForPatrolImagesEnabled: boolean;
   EmployeeCreatedAt: Timestamp | FieldValue;
   EmployeeModifiedAt: Timestamp | FieldValue;
 }

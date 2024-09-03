@@ -40,6 +40,7 @@ import InputHeader from '../../common/inputs/InputHeader';
 import { MultiSelect } from '@mantine/core';
 import InputSelect from '../../common/inputs/InputSelect';
 import useFetchLocations from '../../hooks/fetch/useFetchLocations';
+import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader';
 
 const EmployeeCreateOrEdit = () => {
   const { employeeEditData } = useEditFormStore();
@@ -61,7 +62,7 @@ const EmployeeCreateOrEdit = () => {
             employeeEditData.EmployeePayRate
           ) as unknown as number,
           EmployeeMaxHrsPerWeek: String(
-            employeeEditData.EmployeeMaxHrsPerWeek || 40
+            employeeEditData.EmployeeMaxHrsPerWeek || 44
           ) as unknown as number,
           EmployeeSupervisorId: employeeEditData.EmployeeSupervisorId,
           EmployeeCompanyBranchId: employeeEditData.EmployeeCompanyBranchId,
@@ -74,9 +75,14 @@ const EmployeeCreateOrEdit = () => {
           EmployeeProvince: employeeEditData.EmployeeProvince,
           EmployeeStatus:
             employeeEditData?.EmployeeStatus || IEmployeeStatus.ON_BOARD,
+          EmployeeIsTimeStampForPatrolImagesEnabled:
+            employeeEditData?.EmployeeIsTimeStampForPatrolImagesEnabled ??
+            false,
+          EmployeeIsUploadFromGalleryEnabled:
+            employeeEditData?.EmployeeIsUploadFromGalleryEnabled ?? false,
         }
       : {
-          EmployeeMaxHrsPerWeek: String(45) as unknown as number,
+          EmployeeMaxHrsPerWeek: String(44) as unknown as number,
           EmployeeBannedLocationsId: [],
           EmployeeStatus: IEmployeeStatus.ON_BOARD,
         },
@@ -539,6 +545,27 @@ const EmployeeCreateOrEdit = () => {
                   }}
                 />
               </div>
+
+              <SwitchWithSideHeader
+                label="Enable photo upload from gallery"
+                register={methods.register}
+                name="EmployeeIsUploadFromGalleryEnabled"
+                errors={
+                  methods.formState.errors?.EmployeeIsUploadFromGalleryEnabled
+                    ?.message
+                }
+                className="bg-onHoverBg px-4 py-2 rounded col-span-2"
+              />
+              <SwitchWithSideHeader
+                label="Enable timestamp for patrol images"
+                register={methods.register}
+                name="EmployeeIsTimeStampForPatrolImagesEnabled"
+                errors={
+                  methods.formState.errors
+                    ?.EmployeeIsTimeStampForPatrolImagesEnabled?.message
+                }
+                className="bg-onHoverBg px-4 py-2 rounded col-span-2"
+              />
             </div>
           </div>
         </form>

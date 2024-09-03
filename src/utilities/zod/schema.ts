@@ -155,6 +155,8 @@ export const addEmployeeFormSchema = z
     EmployeePostalCode: z.string().optional().nullable(),
     EmployeeCity: z.string().optional().nullable(),
     EmployeeProvince: z.string().optional().nullable(),
+    EmployeeIsUploadFromGalleryEnabled: z.boolean(),
+    EmployeeIsTimeStampForPatrolImagesEnabled: z.boolean(),
   })
   .superRefine(({ EmployeeRole, EmployeeSupervisorId }, ctx) => {
     if (

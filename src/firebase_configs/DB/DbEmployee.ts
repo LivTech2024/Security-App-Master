@@ -347,6 +347,10 @@ class DbEmployee {
           EmployeeProvince: empData.EmployeeProvince || null,
           EmployeeCertificates,
           EmployeeLicenses,
+          EmployeeIsTimeStampForPatrolImagesEnabled:
+            empData.EmployeeIsTimeStampForPatrolImagesEnabled,
+          EmployeeIsUploadFromGalleryEnabled:
+            empData.EmployeeIsUploadFromGalleryEnabled,
           EmployeeCreatedAt: serverTimestamp(),
           EmployeeModifiedAt: serverTimestamp(),
         };
@@ -574,6 +578,10 @@ class DbEmployee {
           EmployeeCity: empData.EmployeeCity || null,
           EmployeePostalCode: empData.EmployeePostalCode || null,
           EmployeeProvince: empData.EmployeeProvince || null,
+          EmployeeIsTimeStampForPatrolImagesEnabled:
+            empData.EmployeeIsTimeStampForPatrolImagesEnabled,
+          EmployeeIsUploadFromGalleryEnabled:
+            empData.EmployeeIsUploadFromGalleryEnabled,
           EmployeeModifiedAt: serverTimestamp(),
         };
 
