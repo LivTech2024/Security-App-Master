@@ -97,7 +97,7 @@ export function generateInvoiceHTML({
 
             <p>Invoice Number: ${invoiceData.InvoiceNumber}</p>
 
-            ${invoiceData?.InvoicePONumber && `<p>PO Number: ${invoiceData.InvoicePONumber}</p>`}
+            ${invoiceData?.InvoicePONumber ? `<p>PO Number: ${invoiceData.InvoicePONumber}</p>` : ''}
 
             <p>Invoice Date: ${formatDate(invoiceData.InvoiceDate)}</p>
 

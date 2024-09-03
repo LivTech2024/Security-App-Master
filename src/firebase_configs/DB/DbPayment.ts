@@ -121,7 +121,7 @@ class DbPayment {
         InvoiceClientPhone: data.InvoiceClientPhone,
         InvoiceClientAddress: data.InvoiceClientAddress || null,
         InvoiceCompanyEmail: data.InvoiceCompanyEmail,
-        InvoiceCompanyPhone: data.InvoiceClientPhone,
+        InvoiceCompanyPhone: data.InvoiceCompanyPhone,
         InvoiceLocationId: data.InvoiceLocationId || null,
         InvoiceLocationName: data.InvoiceLocationName || null,
         InvoiceNumber: data.InvoiceNumber,
