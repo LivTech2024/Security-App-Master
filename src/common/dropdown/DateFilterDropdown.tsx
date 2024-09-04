@@ -134,6 +134,17 @@ const DateFilterDropdown = ({
           <span
             onClick={() => {
               setDateFilterDropdown(false);
+              setStartDate(dayjs().subtract(1, 'month').startOf('M').toDate());
+              setEndDate(dayjs().subtract(1, 'month').endOf('M').toDate());
+              setIsLifetime && setIsLifetime(false);
+            }}
+            className="px-4 py-[8px] w-full text-sm cursor-pointer hover:bg-onHoverBg capitalize"
+          >
+            Previous month
+          </span>
+          <span
+            onClick={() => {
+              setDateFilterDropdown(false);
               setStartDate(dayjs().startOf('Q').toDate());
               setEndDate(dayjs().endOf('Q').toDate());
               setIsLifetime && setIsLifetime(false);
