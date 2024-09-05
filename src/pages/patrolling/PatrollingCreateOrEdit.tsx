@@ -25,6 +25,8 @@ import InputSelect from '../../common/inputs/InputSelect';
 import useFetchClients from '../../hooks/fetch/useFetchClients';
 import { openContextModal } from '@mantine/modals';
 import Button from '../../common/button/Button';
+import DbClient from '../../firebase_configs/DB/DbClient';
+import { IClientsCollection } from '../../@types/database';
 
 const PatrollingCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -167,6 +169,12 @@ const PatrollingCreateOrEdit = () => {
         latitude: String(patrolEditData.PatrolLocation.latitude),
         longitude: String(patrolEditData.PatrolLocation.longitude),
       });
+      if (patrolEditData.PatrolClientId) {
+        DbClient.getClientById(patrolEditData.PatrolClientId).then((snap) => {
+          const clientData = snap.data() as IClientsCollection;
+          setClientSearchValue(clientData.ClientName);
+        });
+      }
     }
   }, [isEdit, patrolEditData]);
 
