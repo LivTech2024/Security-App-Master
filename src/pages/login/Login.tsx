@@ -157,7 +157,10 @@ const Login = () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-[100vh]">
-      <div className="bg-surface rounded shadow border border-gray-300 flex flex-col p-6  w-full sm:max-w-[30%]">
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className="bg-surface rounded shadow border border-gray-300 flex flex-col p-6  w-full sm:max-w-[30%]"
+      >
         <div className="font-semibold text-lg">Login</div>
         <InputWithTopHeader
           className="mx-0 mt-6"
@@ -179,6 +182,7 @@ const Login = () => {
           disabled={!email || !password}
           type="blue"
           className="py-2 mt-6"
+          buttonType="submit"
         />
 
         <div
@@ -192,7 +196,7 @@ const Login = () => {
           opened={forgotPasswordModal}
           setOpened={setForgotPasswordModal}
         />
-      </div>
+      </form>
     </div>
   );
 };
