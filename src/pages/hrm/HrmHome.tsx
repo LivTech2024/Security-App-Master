@@ -2,6 +2,7 @@ import {
   FaCalendarAlt,
   FaClipboardCheck,
   FaFileAlt,
+  FaPeopleCarry,
   FaUserPlus,
 } from 'react-icons/fa';
 import PageHeader from '../../common/PageHeader';
@@ -42,7 +43,7 @@ const HrmHome = () => {
         {/* Employee Onboarding and Offboarding */}
         <HrmHomeItem
           onClick={() => navigate(PageRoutes.EMPLOYEE_LIST)}
-          icon={<FaUserPlus className="text-7xl text-green-500" />}
+          icon={<FaUserPlus className="text-7xl text-textPrimaryGreen" />}
           title="Employee Onboarding and Offboarding"
           description="Streamline onboarding with digital forms, e-learning modules, and automated task assignments."
         />
@@ -50,7 +51,9 @@ const HrmHome = () => {
           onClick={() => {
             navigate(PageRoutes.HRM_LEAVE_REQ_LIST);
           }}
-          icon={<FaCalendarAlt className="text-7xl text-blue-500 -ml-1" />}
+          icon={
+            <FaCalendarAlt className="text-7xl text-textPrimaryBlue -ml-1" />
+          }
           title="Leave Management and Approval Workflows"
           description=" Configure flexible workflows for leave requests, with automated
             notifications to supervisors for approvals."
@@ -59,7 +62,9 @@ const HrmHome = () => {
           onClick={() => {
             navigate(PageRoutes.PERFORMANCE_ASSURANCE);
           }}
-          icon={<FaClipboardCheck className="text-7xl text-yellow-500 -ml-2" />}
+          icon={
+            <FaClipboardCheck className="text-7xl text-primaryGold -ml-2" />
+          }
           title="Performance Reviews and Goal Tracking"
           description="Integrate performance review cycles with goal-setting features,
             ensuring continuous improvement and career development."
@@ -68,10 +73,18 @@ const HrmHome = () => {
           onClick={() => {
             navigate(PageRoutes.DOCUMENT_REPOSITORY);
           }}
-          icon={<FaFileAlt className="text-7xl text-red-500 -ml-2" />}
+          icon={<FaFileAlt className="text-7xl text-textPrimaryRed -ml-2" />}
           title="HR Policies and Document Management"
           description="Implement an easily accessible repository for HR policies, ensuring
             that employees can review and acknowledge them digitally."
+        />
+        <HrmHomeItem
+          onClick={() => navigate(PageRoutes.EMPLOYEE_LIST)}
+          icon={
+            <FaPeopleCarry className="text-7xl text-textPrimaryBlue -ml-[1px]" />
+          }
+          title="Promote and Demote employees"
+          description="Easily promote or demote employees, change their role/position, wages, etc."
         />
       </div>
     </div>
