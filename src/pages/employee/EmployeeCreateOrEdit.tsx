@@ -21,7 +21,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { errorHandler } from '../../utilities/CustomError';
 import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
-import InputAutoComplete from '../../common/inputs/InputAutocomplete';
 import { AiOutlinePlus } from 'react-icons/ai';
 import AddEmpRoleModal from '../../component/employees/modal/AddEmpRoleModal';
 import { IoArrowBackCircle } from 'react-icons/io5';
@@ -188,6 +187,11 @@ const EmployeeCreateOrEdit = () => {
             (c) => c.CertificateName && c.CertificateDoc
           ),
         });
+
+        showSnackbar({
+          message: 'Employee updated successfully',
+          type: 'success',
+        });
       } else {
         await DbEmployee.addEmployee({
           empData: data,
@@ -199,6 +203,11 @@ const EmployeeCreateOrEdit = () => {
             (c) => c.CertificateName && c.CertificateDoc
           ),
         });
+
+        showSnackbar({
+          message: 'Employee created successfully',
+          type: 'success',
+        });
       }
 
       await queryClient.invalidateQueries({
@@ -207,10 +216,7 @@ const EmployeeCreateOrEdit = () => {
 
       setLoading(false);
       navigate(PageRoutes.EMPLOYEE_LIST);
-      showSnackbar({
-        message: 'Employee created successfully',
-        type: 'success',
-      });
+
       methods.reset();
     } catch (error) {
       console.log(error);
@@ -245,7 +251,7 @@ const EmployeeCreateOrEdit = () => {
     }
   };
 
-  console.log(methods.formState.errors, 'here');
+  console.log(methods.formState.errors, 'errors');
 
   return (
     <div className="flex flex-col gap-4 p-6">
@@ -354,19 +360,17 @@ const EmployeeCreateOrEdit = () => {
                 disabled={isEdit}
               />
 
-              <InputAutoComplete
-                readonly={isEdit}
+              <InputSelect
                 label="Role"
-                value={employeeRole}
+                value={employeeRole || ''}
                 onChange={setEmployeeRole}
-                isFilterReq={true}
                 data={empRoles.map((role) => {
                   return {
                     label: role.EmployeeRoleName,
                     value: role.EmployeeRoleName,
                   };
                 })}
-                dropDownHeader={
+                nothingFoundMessage={
                   <div
                     onClick={() => {
                       navigate(PageRoutes.EMPLOYEE_LIST);
@@ -381,6 +385,8 @@ const EmployeeCreateOrEdit = () => {
                   </div>
                 }
                 error={methods.formState.errors.EmployeeRole?.message}
+                searchable
+                clearable
               />
 
               <InputWithTopHeader
