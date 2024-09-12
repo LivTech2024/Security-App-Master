@@ -1,16 +1,19 @@
+/* eslint-disable no-unused-vars */
 import dayjs from 'dayjs';
-import Button from '../../../../common/button/Button';
 import { DropPoint } from '../../../../utilities/DragAndDropHelper';
 import {
   formatDate,
   getRandomNumbers,
   removeTimeFromDate,
-  toDate,
 } from '../../../../utilities/misc';
 import DbSchedule, {
   ISchedule,
 } from '../../../../firebase_configs/DB/DbSchedule';
-import { getColorAccToShiftStatus } from '../../../../utilities/scheduleHelper';
+import {
+  getColorAccToShiftStatus,
+  getScheduleForDay,
+  isAnyShiftStartedForTheDay,
+} from '../../../../utilities/scheduleHelper';
 import { useAuthState } from '../../../../store';
 import { FaRegTrashAlt, FaUndo } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -81,25 +84,6 @@ const ShiftDropPoint = ({
   const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
-
-  const getScheduleForDay = (date: Date, schedules?: ISchedule[]) => {
-    if (!schedules) return [];
-    return schedules
-      .filter((schedule) =>
-        dayjs(toDate(schedule.shift.ShiftDate)).isSame(date, 'date')
-      )
-      ?.sort(
-        (a, b) =>
-          Number(
-            a?.shift.ShiftStartTime?.split(':')[0] +
-              a?.shift.ShiftStartTime?.split(':')[1] || 0
-          ) -
-          Number(
-            b?.shift.ShiftStartTime?.split(':')[0] +
-              b?.shift.ShiftStartTime?.split(':')[1] || 0
-          )
-      );
-  };
 
   const removeEmpFromPublishedShift = async (
     shiftId: string,
@@ -246,12 +230,22 @@ const ShiftDropPoint = ({
         onClick={() => setSelectedDate(date)}
         className="font-semibold cursor-pointer text-textPrimaryBlue sticky top-0 bg-background justify-center flex w-full px-2 pt-4"
       >
-        <Button
-          label={`${dayjs(date).format('ddd MMM-DD')} ${getScheduleForDay(datesArray[index], schedules).length ? '(' + getScheduleForDay(datesArray[index], schedules).length + ')' : ''}`}
-          type="blue"
+        <button
           onClick={() => setSelectedDate(date)}
-          className="w-full text-sm rounded-full  border-[1px] border-[#02829b] bg-gradient-to-b from-[#7ed7df] to-[#00a9d0] hover:scale-[1.02] duration-200"
-        />
+          className="w-full text-sm rounded-full  border-[1px] border-[#02829b] bg-gradient-to-b from-[#7ed7df] to-[#00a9d0] hover:scale-[1.02] duration-200 text-surface bg-secondary hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg flex items-center justify-center gap-2 px-4 py-2  whitespace-nowrap overflow-hidden font-semibold  disabled:bg-secondaryBlueBg"
+        >
+          {isAnyShiftStartedForTheDay(date, schedules) && (
+            <Tooltip label="Some shift/s are started">
+              <span className="bg-primaryGold size-4 rounded-full animate-pulse"></span>
+            </Tooltip>
+          )}
+          {dayjs(date).format('ddd MMM-DD')}
+          {getScheduleForDay(datesArray[index], schedules).length
+            ? ' (' +
+              getScheduleForDay(datesArray[index], schedules).length +
+              ')'
+            : ''}
+        </button>
       </div>
 
       {isLoading ? (
@@ -350,11 +344,12 @@ const ShiftDropPoint = ({
                     {data.employee.length > 0 &&
                     data.employee.length === data.shift.ShiftRequiredEmp ? (
                       data.employee.map((emp) => {
-                        const colors = getColorAccToShiftStatus(
-                          data.shift,
-                          settings?.SettingEmpShiftTimeMarginInMins || 10,
-                          emp.EmployeeId
-                        );
+                        const { color: colors, isStarted } =
+                          getColorAccToShiftStatus(
+                            data.shift,
+                            settings?.SettingEmpShiftTimeMarginInMins || 10,
+                            emp.EmployeeId
+                          );
 
                         const backgroundStyle =
                           colors.length > 1
@@ -375,7 +370,7 @@ const ShiftDropPoint = ({
                           >
                             <div
                               style={backgroundStyle}
-                              className=" py-[2px] w-full text-center line-clamp-1 flex justify-between items-center gap-1 border-2 border-gray-500 rounded-full px-1 min-w-full mt-1"
+                              className={`py-[2px] w-full text-center line-clamp-1 flex justify-between items-center gap-1 border-2 border-gray-500 rounded-full px-1 min-w-full mt-1 ${isStarted && 'animate-pulse'}`}
                             >
                               <img
                                 src={
@@ -386,7 +381,7 @@ const ShiftDropPoint = ({
                                 className="w-8 h-8 rounded-full"
                               />
 
-                              <span className="line-clamp-1">
+                              <span className={`line-clamp-1`}>
                                 {emp.EmployeeName}
                               </span>
 

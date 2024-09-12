@@ -2,6 +2,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { IShiftsCollection } from '../@types/database';
 import { sendEmail } from '../API/SendEmail';
 import { parseTime, toDate } from './misc';
+import { ISchedule } from '../firebase_configs/DB/DbSchedule';
 
 interface SendShiftDetailsEmailArgs {
   empEmail: string;
@@ -40,6 +41,8 @@ export const getColorAccToShiftStatus = (
   timeMarginInMins: number,
   empId: string
 ) => {
+  let isStarted = false;
+
   let color = ['#e5e7eb'];
 
   const { ShiftDate, ShiftStartTime, ShiftEndTime } = shift;
@@ -81,6 +84,7 @@ export const getColorAccToShiftStatus = (
       //*Started
       if (empShiftStatus.Status === 'started') {
         color = ['#fbcfe8'];
+        isStarted = true;
       }
 
       //*Completed
@@ -139,10 +143,10 @@ export const getColorAccToShiftStatus = (
       }
     }
 
-    return color;
+    return { color, isStarted };
   } catch (error) {
     console.log(error);
-    return color;
+    return { color, isStarted };
   }
 };
 
@@ -221,4 +225,35 @@ export const getShiftActualHours = ({
   }
 
   return { shiftHours, actualShiftHrsSpent };
+};
+
+export const getScheduleForDay = (date: Date, schedules?: ISchedule[]) => {
+  if (!schedules) return [];
+  return schedules
+    .filter((schedule) =>
+      dayjs(toDate(schedule.shift.ShiftDate)).isSame(date, 'date')
+    )
+    ?.sort(
+      (a, b) =>
+        Number(
+          a?.shift.ShiftStartTime?.split(':')[0] +
+            a?.shift.ShiftStartTime?.split(':')[1] || 0
+        ) -
+        Number(
+          b?.shift.ShiftStartTime?.split(':')[0] +
+            b?.shift.ShiftStartTime?.split(':')[1] || 0
+        )
+    );
+};
+
+export const isAnyShiftStartedForTheDay = (
+  date: Date,
+  schedules: ISchedule[]
+) => {
+  const scheduleForDay = getScheduleForDay(date, schedules);
+  return scheduleForDay.some((s) =>
+    s.shift.ShiftCurrentStatus.some(
+      (status) => status.StatusReportedById && status.Status === 'started'
+    )
+  );
 };
