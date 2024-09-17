@@ -108,6 +108,12 @@ const ShiftViewCard = ({
           <p className="font-semibold">Shift Acknowledged By Employees:</p>
           <ul>{acknowledgedUsers.join(' , ') || 'N/A'}</ul>
         </div>
+
+        <div>
+          <p className="font-semibold">Is special shift:</p>
+          <ul>{data.ShiftIsSpecialShift ? 'Yes' : 'No'}</ul>
+        </div>
+
         {/* Show Shift Current Status */}
         <div className="w-full flex flex-col col-span-2">
           <p className="font-semibold">Shift Current Status</p>
@@ -290,7 +296,8 @@ const ShiftViewCard = ({
         </div>
       ) : null}
 
-      {data.ShiftTask.length > 0 ? (
+      {data.ShiftTask.length > 0 &&
+      data.ShiftTask.some((t) => t.ShiftTaskReturnReq) ? (
         <div className="flex flex-col gap-1 mt-4">
           <p className="font-semibold">Shift End Tasks</p>
           <div className="flex gap-6 overflow-x-auto shift-emp-scrollbar">
@@ -406,7 +413,7 @@ const ShiftViewCard = ({
               const empRoute = empRoutes.find(
                 (route) => route.EmpRouteEmpId === res.EmpId
               );
-              if (empRoute && empRoute.EmpRouteLocations?.length > 0)
+              if (empRoute && empRoute.EmpRouteLocations?.length > 0) {
                 return (
                   <div key={res.EmpId} className="flex flex-col">
                     <div
@@ -422,6 +429,9 @@ const ShiftViewCard = ({
                     </div>
                   </div>
                 );
+              } else {
+                return <span>N/A</span>;
+              }
             })}
           </div>
         </div>
