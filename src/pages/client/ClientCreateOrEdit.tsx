@@ -24,6 +24,8 @@ import InputWithTopHeader from '../../common/inputs/InputWithTopHeader';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FaImage } from 'react-icons/fa';
 import InputSelect from '../../common/inputs/InputSelect';
+import InputDate from '../../common/inputs/InputDate';
+import { removeTimeFromDate, toDate } from '../../utilities/misc';
 
 const ClientCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -57,19 +59,49 @@ const ClientCreateOrEdit = () => {
     null
   );
 
+  const [clientPortalStartDate, setClientPortalStartDate] =
+    useState<Date | null>(null);
+
+  const [clientPortalEndDate, setClientPortalEndDate] = useState<Date | null>(
+    null
+  );
+
+  //*Sync local state with formState
   useEffect(() => {
-    console.log(methods.formState.errors);
-  }, [methods.formState.errors]);
+    methods.setValue(
+      'ClientPortalShowDataFromDate',
+      clientPortalStartDate ? removeTimeFromDate(clientPortalStartDate) : null
+    );
+  }, [clientPortalStartDate]);
+
+  useEffect(() => {
+    methods.setValue(
+      'ClientPortalShowDataTillDate',
+      clientPortalEndDate ? removeTimeFromDate(clientPortalEndDate) : null
+    );
+  }, [clientPortalEndDate]);
 
   useEffect(() => {
     if (isEdit) {
       if (clientEditData.ClientHomePageBgImg) {
         setClientHomeBgImage(clientEditData.ClientHomePageBgImg);
       }
+      if (clientEditData?.ClientPortalShowDataFromDate) {
+        setClientPortalStartDate(
+          toDate(clientEditData?.ClientPortalShowDataFromDate)
+        );
+      }
+      if (clientEditData?.ClientPortalShowDataTillDate) {
+        setClientPortalEndDate(
+          toDate(clientEditData?.ClientPortalShowDataTillDate)
+        );
+      }
 
       return;
     }
     setClientHomeBgImage(null);
+    setClientPortalStartDate(null);
+    setClientPortalEndDate(null);
   }, [isEdit]);
 
   const [loading, setLoading] = useState(false);
@@ -165,6 +197,8 @@ const ClientCreateOrEdit = () => {
     return () => closeModalLoader();
   }, [loading]);
 
+  console.log(methods.formState.errors);
+
   return (
     <div className="flex flex-col gap-4 p-6">
       <div className="flex items-center justify-between w-full bg-primaryGold rounded p-4 shadow">
@@ -250,23 +284,48 @@ const ClientCreateOrEdit = () => {
               }
             />
 
-            <InputWithTopHeader
-              label="Client Email"
-              className="mx-0"
-              register={methods.register}
-              name="ClientEmail"
-              error={methods.formState.errors.ClientEmail?.message}
-            />
+            <div className="flex flex-col col-span-2 w-full gap-4">
+              <div className="flex items-center gap-4 w-full">
+                <InputWithTopHeader
+                  label="Client Email"
+                  className="mx-0 w-full"
+                  register={methods.register}
+                  name="ClientEmail"
+                  error={methods.formState.errors.ClientEmail?.message}
+                />
 
-            <InputWithTopHeader
-              label="Client Password"
-              inputType="password"
-              className="mx-0"
-              register={methods.register}
-              name="ClientPassword"
-              error={methods.formState.errors.ClientPassword?.message}
-              disabled={isEdit}
-            />
+                <InputWithTopHeader
+                  label="Client Password"
+                  inputType="password"
+                  className="mx-0 w-full"
+                  register={methods.register}
+                  name="ClientPassword"
+                  error={methods.formState.errors.ClientPassword?.message}
+                  disabled={isEdit}
+                />
+              </div>
+              <div className="flex flex-col gap-4 col-span-2 w-full p-4 bg-onHoverBg rounded">
+                <div className="font-semibold">
+                  Show data in client portal (Optional)
+                </div>
+
+                <div className="flex gap-4 items-center">
+                  <InputDate
+                    label="From"
+                    value={clientPortalStartDate}
+                    setValue={setClientPortalStartDate}
+                    clearable
+                  />
+
+                  <InputDate
+                    label="Till"
+                    value={clientPortalEndDate}
+                    setValue={setClientPortalEndDate}
+                    clearable
+                  />
+                </div>
+              </div>
+            </div>
 
             <TextareaWithTopHeader
               title="Client Address (Optional)"
@@ -277,7 +336,7 @@ const ClientCreateOrEdit = () => {
             />
           </form>
           <div className="flex flex-col gap-4 bg-onHoverBg p-4 rounded mt-4">
-            <div className="font-semibold">Client Portal Background Image</div>
+            <div className="font-semibold">Client Portal background image</div>
             <label
               htmlFor="img"
               className="flex flex-col items-center justify-center border border-dashed border-black rounded-md p-4 cursor-pointer"

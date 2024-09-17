@@ -371,6 +371,8 @@ export const clientSchema = z.object({
     .min(6, { message: 'Client password should be at least 6 characters' }),
   ClientAddress: z.string().nullable().optional(),
   ClientCompanyBranchId: z.string().optional().nullable(),
+  ClientPortalShowDataFromDate: z.date().nullable().optional(),
+  ClientPortalShowDataTillDate: z.date().nullable().optional(),
 });
 
 export type ClientFormFields = z.infer<typeof clientSchema>;

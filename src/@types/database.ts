@@ -410,6 +410,8 @@ export interface IClientsCollection {
   ClientPassword: string; //* This will be used for client portal login
   ClientAddress: string | null;
   ClientBalance: number;
+  ClientPortalShowDataFromDate?: Timestamp | FieldValue | null;
+  ClientPortalShowDataTillDate?: Timestamp | FieldValue | null;
   ClientCreatedAt: Timestamp | FieldValue;
   ClientModifiedAt: Timestamp | FieldValue;
 }

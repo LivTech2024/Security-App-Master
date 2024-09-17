@@ -14,6 +14,7 @@ interface InputDateProps {
   error?: string;
   id?: string;
   type?: 'default' | 'range' | 'date_time';
+  clearable?: boolean;
 }
 
 const InputDate = ({
@@ -25,6 +26,7 @@ const InputDate = ({
   type = 'default',
   rangeOnChange,
   rangeValue,
+  clearable,
 }: InputDateProps) => {
   return (
     <div className={`gap-1 flex flex-col w-full h-full`}>
@@ -69,6 +71,7 @@ const InputDate = ({
               },
             },
           }}
+          clearable={clearable}
         />
       ) : type === 'range' ? (
         <DatePickerInput
@@ -105,6 +108,7 @@ const InputDate = ({
               },
             },
           }}
+          clearable={clearable}
         />
       ) : (
         type === 'date_time' && (
@@ -116,6 +120,7 @@ const InputDate = ({
             }
             value={value}
             onChange={setValue}
+            clearable={clearable}
             className="focus-within:ring-[2px] rounded px-2 py-[6px]  border border-inputBorder"
             popoverProps={{
               styles: {

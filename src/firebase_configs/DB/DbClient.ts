@@ -1,6 +1,7 @@
 import {
   DocumentData,
   QueryConstraint,
+  Timestamp,
   collection,
   doc,
   endAt,
@@ -125,6 +126,12 @@ class DbClient {
         ClientBalance: 0,
         ClientPassword: data.ClientPassword,
         ClientHomePageBgImg: clientHomeBgImageUrl,
+        ClientPortalShowDataFromDate: data.ClientPortalShowDataFromDate
+          ? (data.ClientPortalShowDataFromDate as unknown as Timestamp)
+          : null,
+        ClientPortalShowDataTillDate: data.ClientPortalShowDataTillDate
+          ? (data.ClientPortalShowDataTillDate as unknown as Timestamp)
+          : null,
         ClientCreatedAt: serverTimestamp(),
         ClientModifiedAt: serverTimestamp(),
       };
@@ -217,6 +224,12 @@ class DbClient {
           ClientAddress: data.ClientAddress || null,
           ClientModifiedAt: serverTimestamp(),
           ClientHomePageBgImg: clientHomeBgImageUrl,
+          ClientPortalShowDataFromDate: data.ClientPortalShowDataFromDate
+            ? (data.ClientPortalShowDataFromDate as unknown as Timestamp)
+            : null,
+          ClientPortalShowDataTillDate: data.ClientPortalShowDataTillDate
+            ? (data.ClientPortalShowDataTillDate as unknown as Timestamp)
+            : null,
         };
 
         transaction.update(clientRefRef, updatedClient);
