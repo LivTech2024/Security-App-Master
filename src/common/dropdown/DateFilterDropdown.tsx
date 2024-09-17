@@ -1,12 +1,13 @@
 import dayjs from 'dayjs';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GoCalendar } from 'react-icons/go';
 import { MdArrowDropDown } from 'react-icons/md';
 import PopupMenu from '../PopupMenu';
-import { formatDateRange } from '../../utilities/misc';
+import { formatDateRange, toDate } from '../../utilities/misc';
 import Dialog from '../Dialog';
 import InputDate from '../inputs/InputDate';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
+import { useAuthState } from '../../store';
 
 interface DateFilterPopupProps {
   startDate: Date | string | null;
@@ -27,6 +28,8 @@ const DateFilterDropdown = ({
   setStartDate,
   startDate,
 }: DateFilterPopupProps) => {
+  const { client } = useAuthState();
+
   const [dateFilterDropdown, setDateFilterDropdown] = useState(false);
 
   const [customDateRangeModal, setCustomDateRangeModal] = useState(false);
@@ -43,6 +46,27 @@ const DateFilterDropdown = ({
     setStartDate(dayjs(value[0]).toDate());
     setEndDate(dayjs(value[1]).toDate());
   };
+
+  useEffect(() => {
+    if (client?.ClientPortalShowDataFromDate) {
+      if (
+        dayjs(toDate(client.ClientPortalShowDataFromDate)).isAfter(startDate)
+      ) {
+        setStartDate(toDate(client.ClientPortalShowDataFromDate));
+      }
+    }
+
+    if (client?.ClientPortalShowDataTillDate) {
+      if (
+        dayjs(toDate(client.ClientPortalShowDataTillDate)).isBefore(endDate) ||
+        dayjs(toDate(endDate)).isBefore(
+          toDate(client.ClientPortalShowDataFromDate)
+        )
+      ) {
+        setEndDate(toDate(client.ClientPortalShowDataTillDate));
+      }
+    }
+  }, [client, startDate, endDate]);
 
   return (
     <>
@@ -164,7 +188,7 @@ const DateFilterDropdown = ({
           >
             this year
           </span>
-          {setIsLifetime && (
+          {setIsLifetime && !client && (
             <span
               onClick={() => {
                 setDateFilterDropdown(false);
