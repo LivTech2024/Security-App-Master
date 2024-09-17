@@ -3,6 +3,7 @@ import { numberString } from './helper';
 import { ConstRegex } from '../../constants/ConstRegex';
 import { TrainCertsCategories } from '../../@types/database';
 import { IEmployeeStatus } from '../../@types/enum';
+import dayjs from 'dayjs';
 
 //*Admin  update schema
 export const adminUpdateSchema = z.object({
@@ -353,27 +354,64 @@ export const invoiceSchema = z
 export type InvoiceFormFields = z.infer<typeof invoiceSchema>;
 
 //*client  create schema
-export const clientSchema = z.object({
-  ClientName: z
-    .string()
-    .min(2, { message: 'Client name should be at least 2 characters' }),
-  ClientPhone: z
-    .string()
-    .min(8, { message: 'Client phone should be at least 8 characters' }),
-  ClientEmail: z
-    .string()
-    .min(3, { message: 'Client email is required' })
-    .regex(ConstRegex.EMAIL_OPTIONAL, {
-      message: 'Invalid email',
-    }),
-  ClientPassword: z
-    .string()
-    .min(6, { message: 'Client password should be at least 6 characters' }),
-  ClientAddress: z.string().nullable().optional(),
-  ClientCompanyBranchId: z.string().optional().nullable(),
-  ClientPortalShowDataFromDate: z.date().nullable().optional(),
-  ClientPortalShowDataTillDate: z.date().nullable().optional(),
-});
+export const clientSchema = z
+  .object({
+    ClientName: z
+      .string()
+      .min(2, { message: 'Client name should be at least 2 characters' }),
+    ClientPhone: z
+      .string()
+      .min(8, { message: 'Client phone should be at least 8 characters' }),
+    ClientEmail: z
+      .string()
+      .min(3, { message: 'Client email is required' })
+      .regex(ConstRegex.EMAIL_OPTIONAL, {
+        message: 'Invalid email',
+      }),
+    ClientPassword: z
+      .string()
+      .min(6, { message: 'Client password should be at least 6 characters' }),
+    ClientAddress: z.string().nullable().optional(),
+    ClientCompanyBranchId: z.string().optional().nullable(),
+    ClientPortalShowDataFromDate: z.date().nullable().optional(),
+    ClientPortalShowDataTillDate: z.date().nullable().optional(),
+  })
+  .superRefine(
+    ({ ClientPortalShowDataFromDate, ClientPortalShowDataTillDate }, ctx) => {
+      if (ClientPortalShowDataFromDate && !ClientPortalShowDataTillDate) {
+        ctx.addIssue({
+          path: ['ClientPortalShowDataTillDate'],
+          message: `Please enter end date also`,
+          code: 'custom',
+        });
+      }
+      if (!ClientPortalShowDataFromDate && ClientPortalShowDataTillDate) {
+        ctx.addIssue({
+          path: ['ClientPortalShowDataFromDate'],
+          message: `Please enter start date also`,
+          code: 'custom',
+        });
+      }
+      if (ClientPortalShowDataFromDate && ClientPortalShowDataTillDate) {
+        if (
+          dayjs(ClientPortalShowDataFromDate).isAfter(
+            ClientPortalShowDataTillDate
+          )
+        ) {
+          ctx.addIssue({
+            path: ['ClientPortalShowDataFromDate'],
+            message: `Start date cannot be greater than end date`,
+            code: 'custom',
+          });
+          ctx.addIssue({
+            path: ['ClientPortalShowDataTillDate'],
+            message: `End date cannot be smaller than start date`,
+            code: 'custom',
+          });
+        }
+      }
+    }
+  );
 
 export type ClientFormFields = z.infer<typeof clientSchema>;
 

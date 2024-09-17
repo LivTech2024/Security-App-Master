@@ -315,6 +315,10 @@ const ClientCreateOrEdit = () => {
                     value={clientPortalStartDate}
                     setValue={setClientPortalStartDate}
                     clearable
+                    error={
+                      methods.formState.errors?.ClientPortalShowDataFromDate
+                        ?.message
+                    }
                   />
 
                   <InputDate
@@ -322,6 +326,10 @@ const ClientCreateOrEdit = () => {
                     value={clientPortalEndDate}
                     setValue={setClientPortalEndDate}
                     clearable
+                    error={
+                      methods.formState.errors?.ClientPortalShowDataTillDate
+                        ?.message
+                    }
                   />
                 </div>
               </div>
