@@ -78,6 +78,16 @@ export function generateInvoiceHTML({
             box-sizing: border-box;
           }
 
+          .section {
+           page-break-inside:avoid;
+           page-break-after:auto;
+          }
+
+          .heading {
+            font-weight:600;
+            color: #3E3F43;
+          }
+
         </style>
       </head>
       <body>
@@ -104,7 +114,7 @@ export function generateInvoiceHTML({
             <p>Invoice Due Date: ${formatDate(invoiceData.InvoiceDueDate)}</p>
           </div>
         </div>
-        <table>
+        <table class="section">
           <thead>
             <tr>
               <th style="width:35%;">Description</th>
@@ -122,7 +132,7 @@ export function generateInvoiceHTML({
         </div>
         ${
           invoiceData.InvoiceTaxList.length > 0
-            ? `<table>
+            ? `<table class="section">
           <thead>
             <tr>
               <th>Tax Name</th>
@@ -135,7 +145,7 @@ export function generateInvoiceHTML({
         </table>`
             : '<div></div>'
         }
-        <div style="padding-bottom:20px">
+        <div class="section" style="padding-bottom:20px">
           <p>Total Amount: ${numberFormatter(
             invoiceData.InvoiceTotalAmount,
             true
@@ -146,15 +156,15 @@ export function generateInvoiceHTML({
           )}</p>
           <p>Amount Due: ${numberFormatter(clientBalance, true)}</p>
         </div>
-        <div style="padding:20px 0;">
+        <div class="section" style="padding:20px 0;">
           ${
             invoiceData.InvoiceDescription
-              ? `<p>Description: ${invoiceData.InvoiceDescription || '-'}</p>`
+              ? `<p> <span class="heading"> Description:</span> ${invoiceData.InvoiceDescription || '-'}</p>`
               : ''
           }
           ${
             invoiceData.InvoiceTerms
-              ? `<p>Terms & Conditions: ${invoiceData.InvoiceTerms || '-'}</p>`
+              ? `<p><span class="heading">Terms & Conditions:</span> ${invoiceData.InvoiceTerms || '-'}</p>`
               : ''
           }
         </div>
