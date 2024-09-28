@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
-import { IInvoiceItems, IInvoiceTaxList } from '../../../@types/database';
+import {
+  IInvoiceItems,
+  IInvoiceTaxList,
+  ILocationsCollection,
+} from '../../../@types/database';
 import {
   InvoiceFormFields,
   invoiceSchema,
@@ -33,6 +37,8 @@ import PageHeader from '../../../common/PageHeader';
 import { roundNumber, toDate } from '../../../utilities/misc';
 import { openContextModal } from '@mantine/modals';
 import ClientCostCalculationModal from '../../../component/payments_and_billing/modal/ClientCostCalculationModal';
+import InputSelect from '../../../common/inputs/InputSelect';
+import useFetchLocations from '../../../hooks/fetch/useFetchLocations';
 
 const numberToString = (value: number) => {
   return String(value) as unknown as number;
@@ -106,6 +112,8 @@ const InvoiceGenerate = () => {
       setInvoiceDueDate(toDate(invoiceEditData.InvoiceDueDate));
       setInvoiceTaxList(invoiceEditData.InvoiceTaxList);
       setClientSearchQuery(invoiceEditData.InvoiceClientName);
+      setLocationId(invoiceEditData.InvoiceLocationId || '');
+      setLocationSearchQuery(invoiceEditData.InvoiceLocationName || '');
     }
   }, [isEdit, invoiceEditData]);
 
@@ -322,10 +330,35 @@ const InvoiceGenerate = () => {
 
   const clientId = methods.watch('InvoiceClientId');
 
-  const locationName = methods.watch('InvoiceLocationName');
-
   const [clientCostCalculationModal, setClientCostCalculationModal] =
     useState(false);
+
+  //*For location selection
+  const [locationSearchQuery, setLocationSearchQuery] = useState('');
+
+  const [locationId, setLocationId] = useState('');
+
+  const [selectedLocation, setSelectedLocation] =
+    useState<ILocationsCollection | null>(null);
+
+  const { data: locations } = useFetchLocations({
+    clientId: clientId,
+    searchQuery: locationSearchQuery,
+    limit: 5,
+  });
+
+  useEffect(() => {
+    const selectedLoc = locations.find((loc) => loc.LocationId === locationId);
+    if (selectedLoc) {
+      methods.setValue('InvoiceLocationId', locationId);
+      methods.setValue('InvoiceLocationName', selectedLoc.LocationName);
+      setSelectedLocation(selectedLoc);
+    } else {
+      methods.setValue('InvoiceLocationId', null);
+      methods.setValue('InvoiceLocationName', null);
+      setSelectedLocation(null);
+    }
+  }, [locationId, locations]);
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -389,19 +422,33 @@ const InvoiceGenerate = () => {
               />
 
               {clientId && (
+                <InputSelect
+                  label="Select Location"
+                  value={locationId}
+                  onChange={(e) => setLocationId(e as string)}
+                  data={locations.map((res) => {
+                    return { label: res.LocationName, value: res.LocationId };
+                  })}
+                  searchValue={locationSearchQuery}
+                  onSearchChange={setLocationSearchQuery}
+                  searchable
+                  clearable
+                  className="col-span-2"
+                />
+              )}
+
+              {clientId && locationId && (
                 <Button
-                  label="Calculate Client Cost"
+                  label="Calculate Location Cost"
                   type="black"
                   onClick={() => setClientCostCalculationModal(true)}
                 />
               )}
 
-              {locationName && <div>Location: {locationName}</div>}
-
               <ClientCostCalculationModal
                 opened={clientCostCalculationModal}
                 setOpened={setClientCostCalculationModal}
-                clientId={clientId}
+                selectedLocation={selectedLocation}
                 setInvoiceItems={setInvoiceItems}
               />
             </div>

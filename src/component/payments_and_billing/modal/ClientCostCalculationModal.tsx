@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Dialog from '../../../common/Dialog';
-import useFetchLocations from '../../../hooks/fetch/useFetchLocations';
-import InputSelect from '../../../common/inputs/InputSelect';
 import {
   ICalloutsCollection,
   IInvoiceItems,
+  ILocationsCollection,
   IPatrolsCollection,
   IShiftsCollection,
 } from '../../../@types/database';
@@ -20,33 +19,19 @@ import {
 } from '../../../utilities/misc';
 import DbPatrol from '../../../firebase_configs/DB/DbPatrol';
 import dayjs from 'dayjs';
-import { useFormContext } from 'react-hook-form';
-import { InvoiceFormFields } from '../../../utilities/zod/schema';
 import { getShiftActualHours } from '../../../utilities/scheduleHelper';
 
 const ClientCostCalculationModal = ({
   opened,
   setOpened,
-  clientId,
+  selectedLocation,
   setInvoiceItems,
 }: {
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
-  clientId: string;
+  selectedLocation: ILocationsCollection | null;
   setInvoiceItems: React.Dispatch<React.SetStateAction<IInvoiceItems[]>>;
 }) => {
-  const { setValue } = useFormContext<InvoiceFormFields>();
-
-  const [locationSearchQuery, setLocationSearchQuery] = useState('');
-
-  const [locationId, setLocationId] = useState('');
-
-  const { data: locations } = useFetchLocations({
-    clientId: clientId,
-    searchQuery: locationSearchQuery,
-    limit: 5,
-  });
-
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
@@ -65,16 +50,8 @@ const ClientCostCalculationModal = ({
         throw new CustomError('Start and end dates are required');
       }
 
-      if (!locationId) {
-        throw new CustomError('Please select location');
-      }
-
-      const selectedLocation = locations.find(
-        (loc) => loc.LocationId === locationId
-      );
-
       if (!selectedLocation) {
-        throw new CustomError('Please select location');
+        throw new CustomError('Please select a location');
       }
 
       if (
@@ -98,11 +75,12 @@ const ClientCostCalculationModal = ({
         LocationShiftHourlyRate,
         LocationPatrolPerHitRate,
         LocationCalloutDetails,
+        LocationId,
       } = selectedLocation;
 
       if (isCalculationReqForShift) {
         const shiftSnapshot = await DbClient.getAllShiftsOfLocation(
-          locationId,
+          LocationId,
           startDate as Date,
           endDate as Date
         );
@@ -147,7 +125,7 @@ const ClientCostCalculationModal = ({
 
       if (isCalculationReqForPatrol) {
         const patrolSnapshot =
-          await DbClient.getAllPatrolsOfLocation(locationId);
+          await DbClient.getAllPatrolsOfLocation(LocationId);
         const patrolData = patrolSnapshot.docs.map(
           (doc) => doc.data() as IPatrolsCollection
         );
@@ -180,7 +158,7 @@ const ClientCostCalculationModal = ({
 
       if (isCalculationReqForCallout) {
         const calloutSnapshot = await DbClient.getAllCalloutsOfLocation(
-          locationId,
+          LocationId,
           startDate,
           endDate
         );
@@ -248,19 +226,6 @@ const ClientCostCalculationModal = ({
     }
   };
 
-  useEffect(() => {
-    const selectedLocation = locations.find(
-      (loc) => loc.LocationId === locationId
-    );
-    if (selectedLocation) {
-      setValue('InvoiceLocationId', locationId);
-      setValue('InvoiceLocationName', selectedLocation.LocationName);
-    } else {
-      setValue('InvoiceLocationId', null);
-      setValue('InvoiceLocationName', null);
-    }
-  }, [locationId]);
-
   return (
     <Dialog
       opened={opened}
@@ -272,20 +237,6 @@ const ClientCostCalculationModal = ({
       isFormModal
     >
       <div className="grid grid-cols-2 gap-4">
-        <InputSelect
-          label="Select Location"
-          value={locationId}
-          onChange={(e) => setLocationId(e as string)}
-          data={locations.map((res) => {
-            return { label: res.LocationName, value: res.LocationId };
-          })}
-          searchValue={locationSearchQuery}
-          onSearchChange={setLocationSearchQuery}
-          searchable
-          clearable
-          className="col-span-2"
-        />
-
         <InputDate
           label="Start Date"
           value={startDate}
