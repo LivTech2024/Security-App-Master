@@ -275,7 +275,7 @@ const StatisticsView = () => {
           />
         </div>
       </div>
-      <div className="flex  w-full justify-between items-start gap-8">
+      <div className="flex  w-full justify-between items-start gap-4">
         <div
           id="shiftsSummary"
           className="flex flex-col p-4 rounded-lg bg-surface shadow-md gap-4 w-full"
