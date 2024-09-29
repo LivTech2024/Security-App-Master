@@ -22,6 +22,7 @@ interface IEmpShifts {
   empActualHoursSpent: number;
   empPayRate: number;
   empApproxCost: number;
+  empCurrentCost: number;
 }
 
 const StatisticsView = () => {
@@ -99,29 +100,27 @@ const StatisticsView = () => {
   };
 
   const getShiftsCost = (schedule: ISchedule[]) => {
-    if (schedule.length === 0) return 0;
+    let approxCost = 0,
+      currentCost = 0;
 
-    let allShiftsCost = 0;
+    if (schedule.length === 0) return { approxCost, currentCost };
 
     schedule.forEach((sch) => {
       const { employee, shift } = sch;
 
-      allShiftsCost += employee.reduce((acc, obj) => {
+      employee.forEach((obj) => {
         const { shiftHours, actualShiftHrsSpent } = getShiftActualHours({
           shift,
           timeMarginInMins: settings?.SettingEmpShiftTimeMarginInMins || 0,
           empId: obj.EmployeeId,
         });
 
-        return (
-          acc +
-          obj.EmployeePayRate *
-            (actualShiftHrsSpent ? actualShiftHrsSpent : shiftHours)
-        );
+        approxCost += obj.EmployeePayRate * shiftHours;
+        currentCost += obj.EmployeePayRate * actualShiftHrsSpent;
       }, 0);
     });
 
-    return allShiftsCost;
+    return { approxCost, currentCost };
   };
 
   const getTotals = () => {
@@ -130,7 +129,8 @@ const StatisticsView = () => {
       assignedShiftTotal = 0,
       assignedShiftHours = 0,
       assignedShiftActualHours = 0,
-      totalCost = 0;
+      totalApproxCost = 0,
+      totalCurrentCost = 0;
 
     datesArray.forEach((date) => {
       const unAssigned = getUnassignedShiftForDay(date);
@@ -146,7 +146,8 @@ const StatisticsView = () => {
 
       assignedShiftActualHours += getShiftHours(assigned).actualHrsSpent;
 
-      totalCost += getShiftsCost(assigned);
+      totalApproxCost += getShiftsCost(assigned).approxCost;
+      totalCurrentCost += getShiftsCost(assigned).currentCost;
     });
 
     return {
@@ -154,8 +155,9 @@ const StatisticsView = () => {
       unAssignedShiftTotal,
       assignedShiftHours,
       assignedShiftTotal,
-      totalCost,
+      totalApproxCost,
       assignedShiftActualHours,
+      totalCurrentCost,
     };
   };
 
@@ -189,16 +191,19 @@ const StatisticsView = () => {
                 actualShiftHrsSpent,
               empApproxCost:
                 updatedEmpHavingShifts[existingEmpIndex].empApproxCost +
-                (actualShiftHrsSpent ? actualShiftHrsSpent : shiftHours) *
+                shiftHours *
+                  updatedEmpHavingShifts[existingEmpIndex].empPayRate,
+              empCurrentCost:
+                updatedEmpHavingShifts[existingEmpIndex].empCurrentCost +
+                actualShiftHrsSpent *
                   updatedEmpHavingShifts[existingEmpIndex].empPayRate,
             };
           } else {
             updatedEmpHavingShifts.push({
               empId: emp.EmployeeId,
               empName: emp.EmployeeName,
-              empApproxCost:
-                (actualShiftHrsSpent ? actualShiftHrsSpent : shiftHours) *
-                emp.EmployeePayRate,
+              empApproxCost: shiftHours * emp.EmployeePayRate,
+              empCurrentCost: actualShiftHrsSpent * emp.EmployeePayRate,
               empHours: shiftHours,
               empActualHoursSpent: actualShiftHrsSpent,
               empPayRate: emp.EmployeePayRate,
@@ -215,36 +220,23 @@ const StatisticsView = () => {
   const getShiftHours = (schedule: ISchedule[]) => {
     let shiftHrs = 0,
       actualHrsSpent = 0;
-    schedule.forEach((obj) => {
-      const { shift } = obj;
 
-      const { shiftHours } = getShiftActualHours({
-        shift: shift,
-        timeMarginInMins: 0,
+    if (schedule.length === 0) return { shiftHrs, actualHrsSpent };
+
+    schedule.forEach((sch) => {
+      const { employee, shift } = sch;
+
+      employee.forEach((obj) => {
+        const { shiftHours, actualShiftHrsSpent } = getShiftActualHours({
+          shift,
+          timeMarginInMins: settings?.SettingEmpShiftTimeMarginInMins || 0,
+          empId: obj.EmployeeId,
+        });
+
+        shiftHrs += shiftHours;
+        actualHrsSpent += actualShiftHrsSpent;
       });
-
-      shiftHrs += shiftHours * (shift.ShiftAssignedUserId.length || 1);
-
-      if (
-        obj?.shift?.ShiftCurrentStatus &&
-        Array.isArray(obj?.shift?.ShiftCurrentStatus) &&
-        obj?.shift?.ShiftCurrentStatus.length > 0
-      ) {
-        actualHrsSpent += obj.shift.ShiftCurrentStatus.reduce((acc, obj) => {
-          const { StatusStartedTime, StatusReportedTime } = obj;
-          let actualHrsSpent = 0;
-          if (StatusStartedTime && StatusReportedTime) {
-            const { actualShiftHrsSpent } = getShiftActualHours({
-              shift: shift,
-              timeMarginInMins: settings?.SettingEmpShiftTimeMarginInMins || 0,
-              empId: obj.StatusReportedById,
-            });
-            actualHrsSpent = actualShiftHrsSpent;
-          }
-          return acc + actualHrsSpent;
-        }, 0);
-      }
-    }, 0);
+    });
 
     return { shiftHrs, actualHrsSpent };
   };
@@ -283,7 +275,7 @@ const StatisticsView = () => {
           />
         </div>
       </div>
-      <div className="flex w-full justify-between items-start gap-8">
+      <div className="flex  w-full justify-between items-start gap-8">
         <div
           id="shiftsSummary"
           className="flex flex-col p-4 rounded-lg bg-surface shadow-md gap-4 w-full"
@@ -313,6 +305,7 @@ const StatisticsView = () => {
                 <th className="px-2 text-center pt-1">Hours</th>
                 <th className="px-2 text-center pt-1">Spent Hrs</th>
                 <th className="px-2 text-end pt-1">Approx Cost</th>
+                <th className="px-2 text-end pt-1">Current Cost</th>
               </tr>
             </thead>
             <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -353,7 +346,16 @@ const StatisticsView = () => {
                       )}
                     </td>
                     <td className="px-2 py-2 text-end">
-                      {numberFormatter(getShiftsCost(assigned), true)}
+                      {numberFormatter(
+                        getShiftsCost(assigned).approxCost,
+                        true
+                      )}
+                    </td>
+                    <td className="px-2 py-2 text-end">
+                      {numberFormatter(
+                        getShiftsCost(assigned).currentCost,
+                        true
+                      )}
                     </td>
                   </tr>
                 );
@@ -363,24 +365,26 @@ const StatisticsView = () => {
               <tr className="border-t border-gray-400 font-semibold">
                 <td className="p-2">Total</td>
                 <td className="p-2 text-center">
-                  {getTotals().unAssignedShiftTotal.toFixed(2)}
+                  {numberFormatter(getTotals().unAssignedShiftTotal)}
                 </td>
                 <td className="p-2 text-center">
-                  {getTotals().unAssignedShiftHours.toFixed(2)}
+                  {numberFormatter(getTotals().unAssignedShiftHours)}
                 </td>
 
                 <td className="p-2 text-center">
-                  {getTotals().assignedShiftTotal.toFixed(2)}
+                  {numberFormatter(getTotals().assignedShiftTotal)}
                 </td>
                 <td className="p-2 text-center">
-                  {getTotals().assignedShiftHours.toFixed(2)}
+                  {numberFormatter(getTotals().assignedShiftHours)}
                 </td>
                 <td className="p-2 text-center">
-                  {getTotals().assignedShiftActualHours.toFixed(2)}
+                  {numberFormatter(getTotals().assignedShiftActualHours)}
                 </td>
                 <td className="p-2 text-end">
-                  {' '}
-                  {numberFormatter(getTotals().totalCost, true)}
+                  {numberFormatter(getTotals().totalApproxCost, true)}
+                </td>
+                <td className="p-2 text-end">
+                  {numberFormatter(getTotals().totalCurrentCost, true)}
                 </td>
               </tr>
             </tfoot>
@@ -402,12 +406,13 @@ const StatisticsView = () => {
           <table>
             <thead>
               <tr className="bg-onHoverBg border-b border-gray-400">
-                <th className="px-2 py-1 text-start">Employee Name</th>
-                <th className="px-2 py-1 text-center">Shifts</th>
-                <th className="px-2 py-1 text-center">Hours</th>
-                <th className="px-2 py-1 text-center">Spent Hrs</th>
-                <th className="px-2 py-1 text-center">Pay Rate</th>
-                <th className="px-2 py-1 text-end">Approx Cost</th>
+                <th className="px-2 py-1 text-start w-[20%]">Name</th>
+                <th className="px-2 py-1 text-center w-[5%]">Shifts</th>
+                <th className="px-2 py-1 text-center w-[10%]">Hours</th>
+                <th className="px-2 py-1 text-center w-[15%]">Spent Hrs</th>
+                <th className="px-2 py-1 text-center w-[14%]">Rate</th>
+                <th className="px-2 py-1 text-end w-[18%]">Approx Cost</th>
+                <th className="px-2 py-1 text-end w-[18%]">Current Cost</th>
               </tr>
             </thead>
             <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
@@ -437,6 +442,9 @@ const StatisticsView = () => {
                     </td>
                     <td className="px-2 py-2 text-end">
                       {numberFormatter(data.empApproxCost, true)}
+                    </td>
+                    <td className="px-2 py-2 text-end">
+                      {numberFormatter(data.empCurrentCost, true)}
                     </td>
                   </tr>
                 );
@@ -468,6 +476,15 @@ const StatisticsView = () => {
                   {numberFormatter(
                     empHavingShifts.reduce(
                       (acc, obj) => acc + obj.empApproxCost,
+                      0
+                    ),
+                    true
+                  )}
+                </td>
+                <td className="px-2 py-2 text-end">
+                  {numberFormatter(
+                    empHavingShifts.reduce(
+                      (acc, obj) => acc + obj.empCurrentCost,
                       0
                     ),
                     true
