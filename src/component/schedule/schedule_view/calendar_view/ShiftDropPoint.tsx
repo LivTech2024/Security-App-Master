@@ -235,7 +235,7 @@ const ShiftDropPoint = ({
           className="w-full text-sm rounded-full  border-[1px] border-[#02829b] bg-gradient-to-b from-[#7ed7df] to-[#00a9d0] hover:scale-[1.02] duration-200 text-surface bg-secondary hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg flex items-center justify-center gap-2 px-4 py-2  whitespace-nowrap overflow-hidden font-semibold  disabled:bg-secondaryBlueBg"
         >
           {isAnyShiftStartedForTheDay(date, schedules) && (
-            <Tooltip label="Some shift/s are started">
+            <Tooltip label="Some shift/s are running">
               <span className="bg-primaryGold size-4 rounded-full animate-pulse"></span>
             </Tooltip>
           )}
