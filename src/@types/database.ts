@@ -172,7 +172,7 @@ export interface IShiftsCollection {
   }[];
   ShiftLinkedPatrols: IShiftLinkedPatrolsChildCollection[];
   ShiftIsSpecialShift: boolean;
-  ShiftIsPublished: boolean;
+  ShiftIsPublished?: boolean;
   ShiftCreatedAt: Timestamp | FieldValue;
   ShiftModifiedAt: Timestamp | FieldValue;
 }
