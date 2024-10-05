@@ -4,15 +4,17 @@ import { FaAngleDown } from 'react-icons/fa';
 import { openContextModal } from '@mantine/modals';
 
 interface SaveAndPublishButtonProps {
-  isDisabled: boolean;
-  saveCallback: () => void;
-  saveAndPublishCallback: () => void;
+  isSaveDisabled: boolean;
+  isSaveAndPublishDisabled: boolean;
+  isPublishDisabled: boolean;
+  callback: (action: 'save' | 'save_publish' | 'publish') => void;
 }
 
 const SaveAndPublishButton = ({
-  isDisabled,
-  saveAndPublishCallback,
-  saveCallback,
+  isSaveDisabled,
+  isSaveAndPublishDisabled,
+  isPublishDisabled,
+  callback,
 }: SaveAndPublishButtonProps) => {
   const [opened, setOpened] = useState(false);
 
@@ -21,10 +23,9 @@ const SaveAndPublishButton = ({
       target={
         <div
           onClick={() => {
-            if (isDisabled) return;
             setOpened(!opened);
           }}
-          className={` px-6 py-2 rounded flex items-center gap-4 bg-secondary text-surface text-sm font-semibold justify-between ${isDisabled ? 'bg-secondaryBlueBg cursor-default' : 'cursor-pointer'}`}
+          className={` px-6 py-2 rounded flex items-center gap-4 bg-secondary text-surface text-sm font-semibold justify-between cursor-pointer`}
         >
           <span> Save & Publish</span>
           <FaAngleDown />
@@ -38,7 +39,7 @@ const SaveAndPublishButton = ({
       <div className="flex flex-col bg-surface w-full shadow-lg">
         <span
           onClick={() => {
-            if (isDisabled) return;
+            if (isSaveDisabled) return;
             openContextModal({
               modal: 'confirmModal',
               withCloseButton: false,
@@ -48,7 +49,7 @@ const SaveAndPublishButton = ({
                 title: 'Confirm',
                 body: 'Are you sure to save this schedule',
                 onConfirm: () => {
-                  saveCallback();
+                  callback('save');
                 },
                 onCancel: () => {
                   setOpened(true);
@@ -60,13 +61,13 @@ const SaveAndPublishButton = ({
               },
             });
           }}
-          className="px-4 pt-4 pb-2 hover:bg-onHoverBg cursor-pointer"
+          className={`px-4 pt-4 pb-2  ${isSaveDisabled ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-onHoverBg'}`}
         >
           Save
         </span>
         <span
           onClick={() => {
-            if (isDisabled) return;
+            if (isSaveAndPublishDisabled) return;
             openContextModal({
               modal: 'confirmModal',
               withCloseButton: false,
@@ -76,7 +77,7 @@ const SaveAndPublishButton = ({
                 title: 'Confirm',
                 body: 'Are you sure to save and publish this schedule',
                 onConfirm: () => {
-                  saveAndPublishCallback();
+                  callback('save_publish');
                 },
                 onCancel: () => {
                   setOpened(true);
@@ -88,9 +89,37 @@ const SaveAndPublishButton = ({
               },
             });
           }}
-          className="px-4 pt-2 pb-4 hover:bg-onHoverBg cursor-pointer"
+          className={`px-4 pt-2 pb-2 ${isSaveAndPublishDisabled ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-onHoverBg'}`}
         >
           Save & Publish
+        </span>
+        <span
+          onClick={() => {
+            if (isPublishDisabled) return;
+            openContextModal({
+              modal: 'confirmModal',
+              withCloseButton: false,
+              centered: true,
+              closeOnClickOutside: true,
+              innerProps: {
+                title: 'Confirm',
+                body: 'Are you sure to publish this schedule',
+                onConfirm: () => {
+                  callback('publish');
+                },
+                onCancel: () => {
+                  setOpened(true);
+                },
+              },
+              size: '30%',
+              styles: {
+                body: { padding: '0px' },
+              },
+            });
+          }}
+          className={`px-4 pt-2 pb-4 ${isPublishDisabled ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-onHoverBg'}`}
+        >
+          Publish
         </span>
       </div>
     </PopupMenu>

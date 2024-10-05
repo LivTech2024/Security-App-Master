@@ -23,13 +23,9 @@ import {
   IShiftTasksChild,
   IShiftsCollection,
 } from '../../../../@types/database';
-import {
-  closeModalLoader,
-  showModalLoader,
-  showSnackbar,
-} from '../../../../utilities/TsxUtils';
+import { showSnackbar } from '../../../../utilities/TsxUtils';
 import { errorHandler } from '../../../../utilities/CustomError';
-import { useAuthState } from '../../../../store';
+import { useAuthState, useUIState } from '../../../../store';
 import AssignShiftModal from '../../modal/AssignShiftModal';
 import SelectBranch from '../../../../common/SelectBranch';
 import { Accordion } from '@mantine/core';
@@ -50,6 +46,8 @@ interface CalendarViewProps {
 }
 
 const CalendarView = ({ datesArray }: CalendarViewProps) => {
+  const { setLoading } = useUIState();
+
   const [resultToBePublished, setResultToBePublished] = useState<
     {
       shift: IShiftsCollection;
@@ -133,6 +131,13 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(datesArray[0]);
 
+  const [unPublishedShifts, setUnPublishedShifts] = useState<
+    {
+      shift: IShiftsCollection;
+      emp: IEmployeesCollection;
+    }[]
+  >([]);
+
   useEffect(() => {
     setSelectedDate(new Date());
   }, []);
@@ -170,6 +175,22 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     fetchEmpSchedule();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, branch]);
+
+  useEffect(() => {
+    if (!schedules || schedules.length === 0) return;
+    const unPublished = schedules.filter(
+      (s) =>
+        s.shift.ShiftIsPublished === false &&
+        s.shift.ShiftAssignedUserId.length === 1 &&
+        s.employee.length === 1
+    );
+
+    setUnPublishedShifts(
+      unPublished.map((s) => {
+        return { emp: s.employee[0], shift: s.shift };
+      })
+    );
+  }, [schedules]);
 
   const dropResult = (draggableId: string, dropPointId: string) => {
     const selectedEmp = empAvailableForShift.find(
@@ -243,18 +264,76 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
     });
   };
 
-  const onPublish = async () => {
+  const onSavePublish = async (action: 'save' | 'save_publish' | 'publish') => {
     try {
-      showModalLoader({});
+      setLoading(true);
 
-      if (resultToBePublished.length > 0) {
+      if (resultToBePublished.length > 0 && action !== 'publish') {
         const shiftAssignPromise = resultToBePublished.map(async (result) => {
-          return DbSchedule.assignShiftToEmp(result.shift.ShiftId, [
-            result.emp.EmpId,
-          ]);
+          return DbSchedule.assignShiftToEmp(
+            result.shift.ShiftId,
+            [result.emp.EmpId],
+            action === 'save_publish' ? true : false
+          );
         });
 
         await Promise.all(shiftAssignPromise);
+
+        if (action === 'save_publish') {
+          const aggregatedEmails: {
+            empEmail: string;
+            empName: string;
+            message: string;
+          }[] = [];
+
+          resultToBePublished.forEach((data) => {
+            const { emp, shift } = data;
+            const isExistIndex = aggregatedEmails.findIndex(
+              (d) => d.empEmail === emp.EmpEmail
+            );
+            if (isExistIndex !== -1) {
+              const prevMessage = aggregatedEmails[isExistIndex].message;
+              aggregatedEmails[isExistIndex].message =
+                `${prevMessage}\n\nShift Name: ${
+                  shift.ShiftName
+                } \n Date: ${formatDate(shift.ShiftDate)} \nTiming: ${
+                  shift.ShiftStartTime
+                }-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
+            } else {
+              aggregatedEmails.push({
+                empEmail: emp.EmpEmail,
+                empName: emp.EmpName,
+                message: `You have been assigned for the following shift.\n\n Shift Name: ${
+                  shift.ShiftName
+                } \n Date: ${formatDate(shift.ShiftDate)} \n Timing: ${
+                  shift.ShiftStartTime
+                }-${shift.ShiftEndTime} \n Address: ${shift.ShiftLocationAddress}`,
+              });
+            }
+          });
+
+          await Promise.all(
+            aggregatedEmails.map(async (res) => {
+              return sendEmail({
+                to_email: res.empEmail,
+                text: res.message,
+                subject: 'Your schedule update',
+                from_name: company!.CompanyName,
+              });
+            })
+          );
+        }
+
+        setResultToBePublished([]);
+      }
+
+      if (unPublishedShifts.length > 0 && action === 'publish') {
+        console.log('Publishing shifts');
+        const shiftPublishedPromise = unPublishedShifts.map(async (result) => {
+          return DbSchedule.markShiftAsPublished(result.shift.ShiftId, true);
+        });
+
+        await Promise.all(shiftPublishedPromise);
 
         const aggregatedEmails: {
           empEmail: string;
@@ -262,10 +341,10 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
           message: string;
         }[] = [];
 
-        resultToBePublished.forEach((data) => {
+        unPublishedShifts.forEach((data) => {
           const { emp, shift } = data;
           const isExistIndex = aggregatedEmails.findIndex(
-            (d) => d.empEmail === emp.EmpEmail
+            (d) => d.empEmail === emp.EmployeeEmail
           );
           if (isExistIndex !== -1) {
             const prevMessage = aggregatedEmails[isExistIndex].message;
@@ -277,8 +356,8 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
               }-${shift.ShiftEndTime}\nAddress: ${shift.ShiftLocationAddress}`;
           } else {
             aggregatedEmails.push({
-              empEmail: emp.EmpEmail,
-              empName: emp.EmpName,
+              empEmail: emp.EmployeeEmail,
+              empName: emp.EmployeeName,
               message: `You have been assigned for the following shift.\n\n Shift Name: ${
                 shift.ShiftName
               } \n Date: ${formatDate(shift.ShiftDate)} \n Timing: ${
@@ -299,9 +378,8 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
           })
         );
 
-        setResultToBePublished([]);
+        setUnPublishedShifts([]);
       }
-
       if (shiftToBeDeleted.length > 0) {
         const shiftDeletePromise = shiftToBeDeleted.map(async (result) => {
           return DbShift.deleteShift(result);
@@ -317,12 +395,12 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
       });
 
       showSnackbar({
-        message: 'Schedule published successfully',
+        message: `Schedule ${action === 'save' ? 'saved' : action === 'save_publish' ? 'saved and published' : 'published'} successfully`,
         type: 'success',
       });
-      closeModalLoader();
+      setLoading(false);
     } catch (error) {
-      closeModalLoader();
+      setLoading(false);
       errorHandler(error);
       console.log(error);
     }
@@ -387,8 +465,6 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
   const [assignMultipleEmpModal, setAssignMultipleEmpModal] = useState(false);
 
   /***************Shift Copy Feature********************* */
-
-  const [loading, setLoading] = useState(false);
 
   const onCopyShiftCopy = async () => {
     const isWeekly = datesArray.length === 7;
@@ -457,15 +533,6 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
       errorHandler(error);
     }
   };
-
-  useEffect(() => {
-    if (loading) {
-      showModalLoader({});
-    } else {
-      closeModalLoader();
-    }
-    return () => closeModalLoader();
-  }, [loading]);
 
   //* Emp search feature
   const [searchQuery, setSearchQuery] = useState('');
@@ -545,23 +612,18 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
               >
                 UNDO Drag/Drop
               </button>
-              {/* <button
-                onClick={onPublish}
-                disabled={
-                  resultToBePublished.length === 0 &&
-                  shiftToBeDeleted.length === 0
-                }
-                className="bg-secondary py-2 px-[88px] rounded text-sm text-surface font-semibold hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg disabled:bg-secondaryBlueBg"
-              >
-                Publish
-              </button> */}
+
               <SaveAndPublishButton
-                isDisabled={
+                isSaveAndPublishDisabled={
                   resultToBePublished.length === 0 &&
                   shiftToBeDeleted.length === 0
                 }
-                saveAndPublishCallback={onPublish}
-                saveCallback={onPublish}
+                isSaveDisabled={
+                  resultToBePublished.length === 0 &&
+                  shiftToBeDeleted.length === 0
+                }
+                isPublishDisabled={unPublishedShifts.length === 0}
+                callback={onSavePublish}
               />
             </div>
           </div>

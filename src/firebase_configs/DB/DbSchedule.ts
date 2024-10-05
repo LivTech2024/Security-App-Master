@@ -195,10 +195,28 @@ class DbSchedule {
     }
   };
 
-  static assignShiftToEmp = async (shiftId: string, empId: string[]) => {
+  static assignShiftToEmp = async (
+    shiftId: string,
+    empId: string[],
+    isPublished: boolean = true
+  ) => {
     const shiftRef = doc(db, CollectionName.shifts, shiftId);
 
-    return updateDoc(shiftRef, { ShiftAssignedUserId: arrayUnion(...empId) });
+    return updateDoc(shiftRef, {
+      ShiftAssignedUserId: arrayUnion(...empId),
+      ShiftIsPublished: isPublished,
+    });
+  };
+
+  static markShiftAsPublished = async (
+    shiftId: string,
+    isPublished: boolean
+  ) => {
+    const shiftRef = doc(db, CollectionName.shifts, shiftId);
+
+    return updateDoc(shiftRef, {
+      ShiftIsPublished: isPublished,
+    });
   };
 
   static removeEmpFromShift = async (

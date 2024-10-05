@@ -17,7 +17,7 @@ import PatrollingCreateOrEdit from './pages/patrolling/PatrollingCreateOrEdit';
 import PatrollingView from './pages/patrolling/PatrollingView';
 
 import { showSnackbar } from './utilities/TsxUtils';
-import { useAuthState } from './store';
+import { useAuthState, useUIState } from './store';
 import Login from './pages/login/Login';
 import useOnAuthStateChanged from './hooks/useOnAuthStateChanged';
 import SplashScreen from './component/splash_screen/SplashScreen';
@@ -85,6 +85,7 @@ import EmergResList from './pages/emergency_response/EmergResList';
 import EmployeeRoute from './pages/employee/EmployeeRoute';
 import AuditDashboard from './pages/audit/AuditDashboard';
 import LeaveRequestList from './pages/hrm/leave_management/LeaveRequestList';
+import { useShowLoader } from './hooks/useShowLoader';
 
 function App() {
   useOnAuthStateChanged();
@@ -94,7 +95,11 @@ function App() {
   const { company, admin, loading, superAdmin, client, settings } =
     useAuthState();
 
+  const { loading: loader } = useUIState();
+
   const location = useLocation();
+
+  useShowLoader(loader);
 
   //*Foreground message
   onMessage(messaging, (payload) => {
