@@ -43,6 +43,7 @@ import { getNewDocId } from '../../../../firebase_configs/DB/utils';
 import { db } from '../../../../firebase_configs/config';
 import SearchBar from '../../../../common/inputs/SearchBar';
 import ColorPelletTooltip from './ColorPelletTooltip';
+import SaveAndPublishButton from './SaveAndPublishButton';
 
 interface CalendarViewProps {
   datesArray: Date[];
@@ -544,7 +545,7 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
               >
                 UNDO Drag/Drop
               </button>
-              <button
+              {/* <button
                 onClick={onPublish}
                 disabled={
                   resultToBePublished.length === 0 &&
@@ -553,7 +554,15 @@ const CalendarView = ({ datesArray }: CalendarViewProps) => {
                 className="bg-secondary py-2 px-[88px] rounded text-sm text-surface font-semibold hover:bg-blueButtonHoverBg active:bg-blueButtonActiveBg disabled:bg-secondaryBlueBg"
               >
                 Publish
-              </button>
+              </button> */}
+              <SaveAndPublishButton
+                isDisabled={
+                  resultToBePublished.length === 0 &&
+                  shiftToBeDeleted.length === 0
+                }
+                saveAndPublishCallback={onPublish}
+                saveCallback={onPublish}
+              />
             </div>
           </div>
 
