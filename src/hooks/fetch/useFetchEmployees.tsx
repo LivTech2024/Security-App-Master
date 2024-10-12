@@ -2,14 +2,21 @@ import { useEffect, useState } from 'react';
 import { useAuthState } from '../../store';
 import { IEmployeesCollection } from '../../@types/database';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
+import { QueryConstraint } from 'firebase/firestore';
 
 interface Props {
   limit?: number;
   empRole?: string | null;
   searchQuery?: string | null;
+  additionalQuery?: QueryConstraint[];
 }
 
-const useFetchEmployees = ({ limit, searchQuery, empRole }: Props) => {
+const useFetchEmployees = ({
+  limit,
+  searchQuery,
+  empRole,
+  additionalQuery,
+}: Props) => {
   const [data, setData] = useState<IEmployeesCollection[]>([]);
 
   const { company } = useAuthState();
@@ -33,6 +40,7 @@ const useFetchEmployees = ({ limit, searchQuery, empRole }: Props) => {
             : undefined,
         cmpId: company.CompanyId,
         empRole: empRole,
+        additionalQuery,
       });
       return snapshot.docs
         .map((doc) => {

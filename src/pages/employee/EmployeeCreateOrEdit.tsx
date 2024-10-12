@@ -442,7 +442,7 @@ const EmployeeCreateOrEdit = () => {
                 data={[
                   { label: 'Onboard', value: IEmployeeStatus.ON_BOARD },
                   { label: 'Offboard', value: IEmployeeStatus.OFF_BOARD },
-                  { label: 'Leaved', value: IEmployeeStatus.LEAVED },
+                  { label: 'Left', value: IEmployeeStatus.LEAVED },
                   { label: 'Fired', value: IEmployeeStatus.FIRED },
                 ]}
                 value={

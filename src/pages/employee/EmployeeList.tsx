@@ -132,7 +132,7 @@ const EmployeeList = () => {
       case IEmployeeStatus.OFF_BOARD:
         return 'Offboard';
       case IEmployeeStatus.LEAVED:
-        return 'Leaved';
+        return 'Left';
       case IEmployeeStatus.FIRED:
         return 'Fired';
 

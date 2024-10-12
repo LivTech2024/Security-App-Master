@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import {
+  IEmployeeStatus,
   LocalStorageKey,
   PageRoutes,
   REACT_QUERY_KEYS,
@@ -47,6 +48,7 @@ import {
 import ShiftLinkPatrolForm from '../../component/shifts/ShiftLinkPatrolForm';
 import PageHeader from '../../common/PageHeader';
 import DbClient from '../../firebase_configs/DB/DbClient';
+import { where } from 'firebase/firestore';
 
 const ShiftCreateOrEdit = () => {
   const navigate = useNavigate();
@@ -149,6 +151,7 @@ const ShiftCreateOrEdit = () => {
   const { data: employees } = useFetchEmployees({
     empRole: isSpecialShift ? null : shiftPosition || null,
     searchQuery: empSearchQuery,
+    additionalQuery: [where('EmployeeStatus', '==', IEmployeeStatus.ON_BOARD)],
   });
 
   useEffect(() => {
