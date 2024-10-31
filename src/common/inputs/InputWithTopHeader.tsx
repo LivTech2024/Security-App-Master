@@ -35,6 +35,7 @@ interface InputWithTopHeaderProps<FormFields extends Record<string, unknown>> {
     | 'none'
     | 'numeric'
     | 'decimal';
+  autocomplete?: React.HTMLInputAutoCompleteAttribute;
 }
 
 const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
@@ -59,6 +60,7 @@ const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
   inputMode = 'text',
   inputMaxLength,
   decimalCount,
+  autocomplete,
 }: InputWithTopHeaderProps<FormFields>) => {
   const [isInputHidden, setIsInputHidden] = useState(
     inputType === 'password' ? true : false
@@ -129,6 +131,7 @@ const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
             placeholder={placeholder}
             disabled={disabled}
             inputMode={inputMode}
+            autoComplete={autocomplete}
           />
         ) : (
           <input
@@ -153,6 +156,7 @@ const InputWithTopHeader = <FormFields extends Record<string, unknown>>({
             placeholder={placeholder}
             disabled={disabled}
             inputMode={inputMode}
+            autoComplete={autocomplete}
           />
         )}
         {inputType === 'password' && isInputHidden ? (

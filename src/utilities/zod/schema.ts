@@ -313,8 +313,8 @@ export const invoiceSchema = z
       .min(8, {
         message: 'Company phone number should be at least 8 characters',
       })
-      .max(16, {
-        message: 'Company phone number should be at most 16 characters',
+      .max(24, {
+        message: 'Company phone number should be at most 24 characters',
       }),
     InvoiceCompanyEmail: z
       .string()

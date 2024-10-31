@@ -348,6 +348,7 @@ const EmployeeCreateOrEdit = () => {
                 register={methods.register}
                 name="EmployeeEmail"
                 error={methods.formState.errors.EmployeeEmail?.message}
+                autocomplete="off"
               />
 
               <InputWithTopHeader
@@ -358,6 +359,7 @@ const EmployeeCreateOrEdit = () => {
                 error={methods.formState.errors.EmployeePassword?.message}
                 inputType="password"
                 disabled={isEdit}
+                autocomplete="off"
               />
 
               <InputSelect
