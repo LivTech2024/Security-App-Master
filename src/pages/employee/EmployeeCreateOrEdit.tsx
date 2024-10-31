@@ -304,6 +304,7 @@ const EmployeeCreateOrEdit = () => {
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
           className="flex flex-col gap-4"
+          autoComplete="off"
         >
           <div className="flex  gap-4 w-full">
             <div className="flex flex-col gap-4 w-[50%] bg-surface shadow p-4 rounded">
@@ -348,7 +349,7 @@ const EmployeeCreateOrEdit = () => {
                 register={methods.register}
                 name="EmployeeEmail"
                 error={methods.formState.errors.EmployeeEmail?.message}
-                autocomplete="emp-email"
+                autocomplete="off"
               />
 
               <InputWithTopHeader
@@ -359,7 +360,7 @@ const EmployeeCreateOrEdit = () => {
                 error={methods.formState.errors.EmployeePassword?.message}
                 inputType="password"
                 disabled={isEdit}
-                autocomplete="emp-password"
+                autocomplete="off"
               />
 
               <InputSelect
