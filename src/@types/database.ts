@@ -62,6 +62,7 @@ export interface IEmpCertificatesDetails {
 export interface IEmployeesCollection {
   EmployeeId: string;
   EmployeeName: string;
+  EmployeeUniqueId: string; //to be auto generated or can be entered by user
   EmployeeNameSearchIndex: string[];
   EmployeePhone: string;
   EmployeeEmail: string;
