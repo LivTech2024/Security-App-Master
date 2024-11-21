@@ -352,7 +352,7 @@ class DbEmployee {
           EmployeeUniqueId: empData.EmployeeUniqueId,
           EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
           EmployeeNameSearchIndex: fullTextSearchIndex(
-            `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
+            `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}${empData.EmployeeUniqueId.trim().toLowerCase()}`
           ),
           EmployeeImg: empImageUrl[0]?.length > 3 ? empImageUrl[0] : null,
           EmployeePhone: empData.EmployeePhone,
@@ -595,7 +595,7 @@ class DbEmployee {
           EmployeeImg: empImageUrl || null,
           EmployeeUniqueId: empData.EmployeeUniqueId,
           EmployeeNameSearchIndex: fullTextSearchIndex(
-            `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
+            `${empData.EmployeeFirstName.trim().toLowerCase()}${empData.EmployeeLastName.trim().toLowerCase()}${empData.EmployeeUniqueId.trim().toLowerCase()}`
           ),
           EmployeeCompanyBranchId: empData.EmployeeCompanyBranchId || null,
           EmployeeMaxHrsPerWeek: Number(empData.EmployeeMaxHrsPerWeek),

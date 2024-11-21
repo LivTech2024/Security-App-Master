@@ -207,11 +207,12 @@ const EmployeeList = () => {
             <th className="uppercase px-4 py-2 w-[15%] text-start">
               Last Name
             </th>
-            <th className="uppercase px-4 py-2 w-[20%] text-start">Email</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-start">
+            <th className="uppercase px-4 py-2 w-[12%] text-start">ID</th>
+            <th className="uppercase px-4 py-2 w-[18%] text-start">Email</th>
+            <th className="uppercase px-4 py-2 w-[10%] text-start">
               PHONE NUMBER
             </th>
-            <th className="uppercase px-4 py-2 w-[15%] text-end">Role</th>
+            <th className="uppercase px-4 py-2 w-[10%] text-end">Role</th>
             <th className="uppercase px-4 py-2 w-[10%] text-end">Status</th>
             <th className="w-[2%]"></th>
           </tr>
@@ -248,6 +249,9 @@ const EmployeeList = () => {
                   </td>
                   <td className="px-4 py-2 text-start">{firstName}</td>
                   <td className="px-4 py-2 text-start">{lastName}</td>
+                  <td className="px-4 py-2 text-start">
+                    {emp.EmployeeUniqueId ?? '-'}
+                  </td>
                   <td className="px-4 py-2 text-start">{emp.EmployeeEmail}</td>
                   <td className="px-4 py-2 text-start">{emp.EmployeePhone}</td>
                   <td className="px-4 py-2 text-end capitalize">
