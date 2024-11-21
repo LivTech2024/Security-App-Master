@@ -27,7 +27,7 @@ import { IoArrowBackCircle } from 'react-icons/io5';
 import Button from '../../common/button/Button';
 import { openContextModal } from '@mantine/modals';
 import AddBranchModal from '../../component/company_branches/modal/AddBranchModal';
-import { splitName, toDate } from '../../utilities/misc';
+import { getEmpUniqueId, splitName, toDate } from '../../utilities/misc';
 import useFetchEmployees from '../../hooks/fetch/useFetchEmployees';
 import EmpUploadImgCard from '../../component/employees/EmpUploadImgCard';
 import EmployeeOtherDetails, {
@@ -54,6 +54,7 @@ const EmployeeCreateOrEdit = () => {
           EmployeeFirstName: splitName(employeeEditData?.EmployeeName)
             .firstName,
           EmployeeLastName: splitName(employeeEditData?.EmployeeName).lastName,
+          EmployeeUniqueId: employeeEditData.EmployeeUniqueId,
           EmployeePassword: employeeEditData.EmployeePassword,
           EmployeePhone: employeeEditData.EmployeePhone,
           EmployeeRole: employeeEditData.EmployeeRole,
@@ -253,6 +254,20 @@ const EmployeeCreateOrEdit = () => {
 
   console.log(methods.formState.errors, 'errors');
 
+  const handleIDGenerate = () => {
+    const firstNameLetter = methods.watch('EmployeeFirstName').slice(0, 1);
+    const lastNameLetter = methods.watch('EmployeeLastName').slice(0, 1);
+    if (!firstNameLetter || !lastNameLetter) {
+      showSnackbar({
+        message: 'Please enter first and last name before generating ID',
+        type: 'error',
+      });
+      return;
+    }
+    const id = getEmpUniqueId(`${firstNameLetter}${lastNameLetter}`);
+    methods.setValue('EmployeeUniqueId', id);
+  };
+
   return (
     <div className="flex flex-col gap-4 p-6">
       <div className="flex items-center justify-between w-full bg-primaryGold rounded p-4 shadow">
@@ -341,6 +356,21 @@ const EmployeeCreateOrEdit = () => {
                 register={methods.register}
                 name="EmployeePhone"
                 error={methods.formState.errors.EmployeePhone?.message}
+              />
+              <InputWithTopHeader
+                className="mx-0"
+                label="Unique ID"
+                register={methods.register}
+                name="EmployeeUniqueId"
+                error={methods.formState.errors.EmployeeUniqueId?.message}
+                tailIcon={
+                  <Button
+                    label="Generate"
+                    type="black"
+                    onClick={handleIDGenerate}
+                    className="text-sm"
+                  />
+                }
               />
               <InputWithTopHeader
                 className="mx-0"

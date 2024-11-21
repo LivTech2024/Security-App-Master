@@ -256,3 +256,9 @@ export const scrollToDiv = (id: string) => {
     element.scrollIntoView({ behavior: 'auto', inline: 'nearest' });
   }
 };
+
+export const getEmpUniqueId = (prefix: string) => {
+  const uniqueNumber = new Date().getTime();
+
+  return `${prefix.toUpperCase()}${new Date().getFullYear().toString().slice(2, 4)}${uniqueNumber.toString().slice(7, 13)}`;
+};

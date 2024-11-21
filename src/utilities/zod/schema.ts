@@ -126,6 +126,10 @@ export const addEmployeeFormSchema = z
     EmployeeFirstName: z.string().min(2, { message: 'First name is required' }),
     EmployeeLastName: z.string().min(2, { message: 'Last name is required' }),
     EmployeePhone: z.string().min(10, { message: 'Phone number is required' }),
+    EmployeeUniqueId: z
+      .string()
+      .min(10, { message: 'Unique ID must be of 10 character' })
+      .max(10, { message: 'Unique ID must be of 10 character' }),
     EmployeeEmail: z
       .string()
       .min(3, { message: 'Email is required' })

@@ -189,6 +189,24 @@ class DbEmployee {
     return snapshot.size > 0;
   };
 
+  static isEmpIdExist = async (id: string, empId: string | null) => {
+    const empDocRef = collection(db, CollectionName.employees);
+
+    let queryParams: QueryConstraint[] = [where('EmployeeUniqueId', '==', id)];
+
+    if (empId) {
+      queryParams = [...queryParams, where('EmployeeId', '!=', empId)];
+    }
+
+    queryParams = [...queryParams, limit(1)];
+
+    const empQuery = query(empDocRef, ...queryParams);
+
+    const snapshot = await getDocs(empQuery);
+
+    return snapshot.size > 0;
+  };
+
   static addEmployee = async ({
     cmpId,
     empData,
@@ -216,10 +234,19 @@ class DbEmployee {
           cmpId
         );
 
+        const isEmpIdExist = await this.isEmpIdExist(
+          empData.EmployeeUniqueId,
+          null
+        );
+
         if (isEmpExist) {
           throw new CustomError(
             'Employee with this email and role already exist'
           );
+        }
+
+        if (isEmpIdExist) {
+          throw new CustomError('This employee ID already exist');
         }
 
         const empId = getNewDocId(CollectionName.employees);
@@ -322,6 +349,7 @@ class DbEmployee {
 
         const newEmployee: IEmployeesCollection = {
           EmployeeId: empId,
+          EmployeeUniqueId: empData.EmployeeUniqueId,
           EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
           EmployeeNameSearchIndex: fullTextSearchIndex(
             `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
@@ -411,6 +439,15 @@ class DbEmployee {
         empId,
         cmpId
       );
+
+      const isEmpIdExist = await this.isEmpIdExist(
+        empData.EmployeeUniqueId,
+        empId
+      );
+
+      if (isEmpIdExist) {
+        throw new CustomError('This employee ID already exist');
+      }
 
       if (isEmpExist) {
         throw new CustomError(
@@ -556,6 +593,7 @@ class DbEmployee {
         const newEmployee: Partial<IEmployeesCollection> = {
           EmployeeName: `${empData.EmployeeFirstName} ${empData.EmployeeLastName}`,
           EmployeeImg: empImageUrl || null,
+          EmployeeUniqueId: empData.EmployeeUniqueId,
           EmployeeNameSearchIndex: fullTextSearchIndex(
             `${empData.EmployeeFirstName.trim().toLowerCase()} ${empData.EmployeeLastName.trim().toLowerCase()}`
           ),
