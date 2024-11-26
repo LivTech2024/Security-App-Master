@@ -7,6 +7,7 @@ import {
 import DbShift from '../../firebase_configs/DB/DbShift';
 import Button from '../../common/button/Button';
 import CompletePatrolModal from './modal/CompletePatrolModal';
+import { useAuthState } from '../../store';
 
 interface ShiftPatrolCardProps {
   data: IShiftsCollection;
@@ -14,6 +15,8 @@ interface ShiftPatrolCardProps {
 }
 
 const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
+  const { settings } = useAuthState();
+
   const [patrolLogsOfShift, setPatrolLogsOfShift] = useState<
     IPatrolLogsCollection[]
   >([]);
@@ -114,21 +117,22 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
                         </span>{' '}
                         {completedCount}
                       </div>
-                      {completedCount < patrol.LinkedPatrolReqHitCount && (
-                        <Button
-                          label="Complete"
-                          onClick={() => {
-                            setCompletePatrolModal(true);
-                            setSelectedPatrol({
-                              linkedPatrol: patrol,
-                              empDetails: user,
-                              hitCount: completedCount + 1,
-                            });
-                          }}
-                          type="black"
-                          className="mt-1 text-xs px-2 py-[6px]"
-                        />
-                      )}
+                      {completedCount < patrol.LinkedPatrolReqHitCount &&
+                        settings?.SettingIsPatrolCompleteOptionEnabled && (
+                          <Button
+                            label="Complete"
+                            onClick={() => {
+                              setCompletePatrolModal(true);
+                              setSelectedPatrol({
+                                linkedPatrol: patrol,
+                                empDetails: user,
+                                hitCount: completedCount + 1,
+                              });
+                            }}
+                            type="black"
+                            className="mt-1 text-xs px-2 py-[6px]"
+                          />
+                        )}
                     </div>
                   );
                 })}

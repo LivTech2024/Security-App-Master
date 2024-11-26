@@ -442,6 +442,7 @@ export interface ISettingsCollection {
   SettingIsPerformanceAssuranceEnabled: boolean;
   SettingIsTaskAssignmentAndTrackingEnabled: boolean;
   SettingIsHRSystemEnabled: boolean;
+  SettingIsPatrolCompleteOptionEnabled: boolean;
 }
 
 export interface IEquipmentsCollection {

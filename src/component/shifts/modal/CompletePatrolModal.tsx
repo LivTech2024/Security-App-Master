@@ -10,6 +10,7 @@ import { toDate } from '../../../utilities/misc';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import InputDate from '../../../common/inputs/InputDate';
 import { errorHandler } from '../../../utilities/CustomError';
+import { useAuthState } from '../../../store';
 
 interface CompletePatrolModalProps {
   opened: boolean;
@@ -30,6 +31,8 @@ const CompletePatrolModal = ({
   hitCount,
   shouldRefetch,
 }: CompletePatrolModalProps) => {
+  const { settings } = useAuthState();
+
   const [loading, setLoading] = useState(false);
 
   const [startedAt, setStartedAt] = useState<Date | null>(null);
@@ -37,7 +40,14 @@ const CompletePatrolModal = ({
   const [endedAt, setEndedAt] = useState<Date | null>(null);
 
   const onSubmit = async () => {
-    if (!linkedPatrol || !shift || !empDetails || !startedAt || !endedAt)
+    if (
+      !linkedPatrol ||
+      !shift ||
+      !empDetails ||
+      !startedAt ||
+      !endedAt ||
+      !settings?.SettingIsPatrolCompleteOptionEnabled
+    )
       return;
     try {
       const reqHitCount = linkedPatrol.LinkedPatrolReqHitCount;
@@ -74,7 +84,11 @@ const CompletePatrolModal = ({
       title={`Complete patrol`}
       size="60%"
       positiveCallback={onSubmit}
-      disableSubmit={!startedAt || !endedAt}
+      disableSubmit={
+        !startedAt ||
+        !endedAt ||
+        !settings?.SettingIsPatrolCompleteOptionEnabled
+      }
     >
       <div className="flex flex-col gap-4">
         {/* Patrol details */}
