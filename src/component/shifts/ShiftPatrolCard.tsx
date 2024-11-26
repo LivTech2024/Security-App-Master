@@ -30,6 +30,12 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
     });
   }, [data]);
 
+  const getEmpPatrolLog = (patrolId: string, empId: string) => {
+    return patrolLogsOfShift.filter(
+      (log) => log.PatrolId === patrolId && log.PatrolLogGuardId === empId
+    );
+  };
+
   return (
     <div className="bg-surface shadow-md rounded-lg p-4 flex flex-col gap-4">
       <div className="font-semibold text-lg">
@@ -54,10 +60,19 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
               <div className="font-semibold mt-2">Status:</div>
               <div className="flex flex-col gap-2">
                 {assignedUsers.map((user) => {
+                  const completedCount =
+                    getEmpPatrolLog(patrol.LinkedPatrolId, user.EmpId).length ||
+                    0;
                   return (
                     <div
                       key={user.EmpId}
-                      className="bg-primaryGold/50 py-2 px-[10px] rounded mt-2"
+                      className={`py-2 px-[10px] rounded mt-2 ${
+                        completedCount === 0
+                          ? 'bg-pending'
+                          : completedCount === patrol.LinkedPatrolReqHitCount
+                            ? 'bg-completed'
+                            : 'bg-started'
+                      }`}
                     >
                       <div className="flex items-center gap-1">
                         <span className="font-semibold">Employee:</span>{' '}
@@ -67,13 +82,7 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
                         <span className="font-semibold">
                           Completed Hit count:
                         </span>{' '}
-                        {
-                          patrolLogsOfShift.filter(
-                            (log) =>
-                              log.PatrolId === patrol.LinkedPatrolId &&
-                              log.PatrolLogGuardId === user.EmpId
-                          ).length
-                        }
+                        {completedCount}
                       </div>
                     </div>
                   );
