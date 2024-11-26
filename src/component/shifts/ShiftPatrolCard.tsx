@@ -28,7 +28,7 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
     }, 0);
     DbShift.getPatrolLogsOfShift({
       shiftId: data.ShiftId,
-      lmt: totalPatrol,
+      lmt: totalPatrol ? totalPatrol : 1,
     })
       .then((snapshot) => {
         const logs = snapshot.docs.map(
@@ -55,7 +55,12 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
     hitCount: number;
   }>({ empDetails: null, linkedPatrol: null, hitCount: 0 });
 
-  if (loading) {
+  if (
+    loading ||
+    !data.ShiftLinkedPatrols.reduce((acc, obj) => {
+      return acc + obj.LinkedPatrolReqHitCount;
+    }, 0)
+  ) {
     return <div></div>;
   }
 
