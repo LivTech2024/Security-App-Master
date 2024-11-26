@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
   IPatrolLogsCollection,
+  IShiftLinkedPatrolsChildCollection,
   IShiftsCollection,
 } from '../../@types/database';
 import DbShift from '../../firebase_configs/DB/DbShift';
+import Button from '../../common/button/Button';
+import CompletePatrolModal from './modal/CompletePatrolModal';
 
 interface ShiftPatrolCardProps {
   data: IShiftsCollection;
@@ -15,6 +18,8 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
     IPatrolLogsCollection[]
   >([]);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const totalPatrol = data.ShiftLinkedPatrols.reduce((acc, obj) => {
       return acc + obj.LinkedPatrolReqHitCount;
@@ -22,12 +27,18 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
     DbShift.getPatrolLogsOfShift({
       shiftId: data.ShiftId,
       lmt: totalPatrol,
-    }).then((snapshot) => {
-      const logs = snapshot.docs.map(
-        (doc) => doc.data() as IPatrolLogsCollection
-      );
-      setPatrolLogsOfShift(logs);
-    });
+    })
+      .then((snapshot) => {
+        const logs = snapshot.docs.map(
+          (doc) => doc.data() as IPatrolLogsCollection
+        );
+        setPatrolLogsOfShift(logs);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
   }, [data]);
 
   const getEmpPatrolLog = (patrolId: string, empId: string) => {
@@ -35,6 +46,18 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
       (log) => log.PatrolId === patrolId && log.PatrolLogGuardId === empId
     );
   };
+
+  const [completePatrolModal, setCompletePatrolModal] = useState(false);
+
+  const [selectedPatrol, setSelectedPatrol] = useState<{
+    linkedPatrol: IShiftLinkedPatrolsChildCollection | null;
+    empDetails: { EmpName: string; EmpId: string } | null;
+    hitCount: number;
+  }>({ empDetails: null, linkedPatrol: null, hitCount: 0 });
+
+  if (loading) {
+    return <div></div>;
+  }
 
   return (
     <div className="bg-surface shadow-md rounded-lg p-4 flex flex-col gap-4">
@@ -84,6 +107,21 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
                         </span>{' '}
                         {completedCount}
                       </div>
+                      {completedCount < patrol.LinkedPatrolReqHitCount && (
+                        <Button
+                          label="Complete"
+                          onClick={() => {
+                            setCompletePatrolModal(true);
+                            setSelectedPatrol({
+                              linkedPatrol: patrol,
+                              empDetails: user,
+                              hitCount: completedCount + 1,
+                            });
+                          }}
+                          type="black"
+                          className="mt-1 text-xs px-2 py-[6px]"
+                        />
+                      )}
                     </div>
                   );
                 })}
@@ -91,6 +129,14 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
             </div>
           );
         })}
+        <CompletePatrolModal
+          opened={completePatrolModal}
+          setOpened={setCompletePatrolModal}
+          linkedPatrol={selectedPatrol?.linkedPatrol}
+          empDetails={selectedPatrol?.empDetails}
+          shift={data}
+          hitCount={selectedPatrol.hitCount}
+        />
       </div>
     </div>
   );

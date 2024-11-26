@@ -3,6 +3,7 @@ import {
   GeoPoint,
   QueryConstraint,
   Timestamp,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -21,6 +22,7 @@ import { CollectionName } from '../../@types/enum';
 import CloudStorageImageHandler, { getNewDocId } from './utils';
 import { db } from '../config';
 import {
+  IEmployeeDARCollection,
   IPatrolCheckPointsChild,
   IPatrolLogsCheckPointsChildCollection,
   IPatrolLogsCollection,
@@ -29,6 +31,7 @@ import {
 import { PatrollingFormFields } from '../../utilities/zod/schema';
 import {
   fullTextSearchIndex,
+  getHourRange,
   getRandomNumbers,
   removeTimeFromDate,
   toDate,
@@ -354,6 +357,242 @@ class DbPatrol {
     };
 
     await setDoc(newDocRef, newDocData);
+  };
+
+  static getRecentPatrolLog = (patrolId: string) => {
+    const patrolLogRef = collection(db, CollectionName.patrolLogs);
+    const patrolLogQuery = query(
+      patrolLogRef,
+      where('PatrolId', '==', patrolId),
+      orderBy('PatrolLogCreatedAt', 'desc'),
+      limit(1)
+    );
+
+    return getDocs(patrolLogQuery);
+  };
+
+  static getCheckPointReportedAtTime = ({
+    endedAt,
+    startedAt,
+    totalCheckpoints,
+  }: {
+    totalCheckpoints: number;
+    startedAt: Date;
+    endedAt: Date;
+  }): Date[] => {
+    if (totalCheckpoints <= 0) {
+      throw new Error('Total checkpoints must be greater than zero.');
+    }
+
+    const startTime = startedAt.getTime();
+    const endTime = endedAt.getTime();
+
+    if (endTime <= startTime) {
+      throw new Error('EndedAt must be greater than StartedAt.');
+    }
+
+    const interval = (endTime - startTime) / (totalCheckpoints - 1); // Interval between checkpoints
+    const checkpoints: Date[] = [];
+
+    for (let i = 0; i < totalCheckpoints; i++) {
+      const checkpointTime = new Date(startTime + i * interval);
+      checkpoints.push(checkpointTime);
+    }
+
+    return checkpoints;
+  };
+
+  static getEmpShiftDar = ({
+    empId,
+    shiftId,
+  }: {
+    shiftId: string;
+    empId: string;
+  }) => {
+    const empDarRef = collection(db, CollectionName.employeesDAR);
+    const empDarQuery = query(
+      empDarRef,
+      where('EmpDarShiftId', '==', shiftId),
+      where('EmpDarEmpId', '==', empId),
+      limit(2)
+    );
+
+    return getDocs(empDarQuery);
+  };
+
+  static createPatrolLog = async ({
+    empDetails,
+    patrolId,
+    shiftId,
+    endedAt,
+    shiftDate,
+    startedAt,
+    hitCount,
+    reqHitCount,
+  }: {
+    shiftId: string;
+    shiftDate: Date;
+    empDetails: { EmpName: string; EmpId: string };
+    patrolId: string;
+    startedAt: Date;
+    endedAt: Date;
+    hitCount: number;
+    reqHitCount: number;
+  }) => {
+    const docSnapshot = await this.getRecentPatrolLog(patrolId);
+    const docData = docSnapshot?.docs[0]?.data() as IPatrolLogsCollection;
+
+    const newPatrolLogId = getNewDocId(CollectionName.patrolLogs);
+    const newDocRef = doc(db, CollectionName.patrolLogs, newPatrolLogId);
+
+    const checkpointsTime = this.getCheckPointReportedAtTime({
+      startedAt,
+      endedAt,
+      totalCheckpoints: docData.PatrolLogCheckPoints.length,
+    });
+
+    const newCheckPoints: IPatrolLogsCheckPointsChildCollection[] =
+      docData.PatrolLogCheckPoints.map((res, idx) => {
+        return {
+          ...res,
+          CheckPointReportedAt: checkpointsTime[idx] as unknown as Timestamp,
+        };
+      });
+
+    const newDocData: IPatrolLogsCollection = {
+      ...docData,
+      PatrolLogId: newPatrolLogId,
+      PatrolLogCheckPoints: newCheckPoints,
+      PatrolDate: shiftDate as unknown as Timestamp,
+      PatrolLogStartedAt: startedAt as unknown as Timestamp,
+      PatrolLogEndedAt: endedAt as unknown as Timestamp,
+      PatrolLogCreatedAt: serverTimestamp(),
+      PatrolLogShiftId: shiftId,
+      PatrolLogGuardId: empDetails.EmpId,
+      PatrolLogGuardName: empDetails.EmpName,
+      PatrolLogPatrolCount: hitCount,
+    };
+
+    const patrolRef = doc(db, CollectionName.patrols, patrolId);
+
+    await runTransaction(db, async (transaction) => {
+      //fetch patrol to update current status
+      const patrolSnap = await transaction.get(patrolRef);
+      const patrolData = patrolSnap.data() as IPatrolsCollection;
+
+      //fetch empDar for updation
+      const empDarSnap = await this.getEmpShiftDar({
+        empId: empDetails.EmpId,
+        shiftId,
+      });
+      const empDar = empDarSnap.docs.map(
+        (doc) => doc.data() as IEmployeeDARCollection
+      );
+
+      const { PatrolCurrentStatus } = patrolData;
+
+      const patrolCurrStatus = PatrolCurrentStatus.find(
+        (status) =>
+          status.StatusShiftId === shiftId &&
+          status.StatusReportedById === empDetails.EmpId
+      );
+
+      if (patrolCurrStatus) {
+        const updatedPatrolCurrentStatus = PatrolCurrentStatus.map((status) => {
+          if (
+            status.StatusShiftId === shiftId &&
+            status.StatusReportedById === empDetails.EmpId
+          ) {
+            return {
+              ...status,
+              StatusCompletedCount: (status.StatusCompletedCount || 0) + 1,
+              Status: hitCount === reqHitCount ? 'completed' : 'pending',
+            };
+          }
+          return status;
+        });
+        transaction.update(patrolRef, {
+          PatrolCurrentStatus: updatedPatrolCurrentStatus,
+        });
+      } else {
+        const newStatus = {
+          Status: 'pending',
+          StatusCompletedCount: 1,
+          StatusReportedById: empDetails.EmpId,
+          StatusReportedByName: empDetails.EmpName,
+          StatusReportedTime: endedAt as unknown as Timestamp,
+          StatusShiftId: shiftId,
+        };
+
+        transaction.update(patrolRef, {
+          PatrolCurrentStatus: arrayUnion(newStatus),
+        });
+      }
+
+      if (empDar) {
+        //Update the emp dar
+        const firstDar = empDar[0];
+        const secondDar = empDar[1];
+
+        const hourRange = getHourRange(startedAt);
+
+        if (firstDar.EmpDarTile.find((tile) => tile.TileTime == hourRange)) {
+          const updatedTile = firstDar.EmpDarTile.map((tile) => {
+            if (tile.TileTime === hourRange) {
+              return {
+                ...tile,
+                TilePatrol: [
+                  {
+                    TilePatrolData: `Patrol Started At ${dayjs(startedAt).format('HH:mm')} Patrol Ended At ${dayjs(endedAt).format('HH:mm')}`,
+                    TilePatrolId: patrolId,
+                    TilePatrolName: patrolData.PatrolName,
+                    TilePatrolImage: [],
+                  },
+                ],
+              };
+            }
+            return tile;
+          });
+
+          const empDarRef = doc(
+            db,
+            CollectionName.employeesDAR,
+            firstDar.EmpDarId
+          );
+
+          transaction.update(empDarRef, { EmpDarTile: updatedTile });
+        } else if (
+          secondDar.EmpDarTile.find((tile) => tile.TileTime == hourRange)
+        ) {
+          const updatedTile = secondDar.EmpDarTile.map((tile) => {
+            if (tile.TileTime === hourRange) {
+              return {
+                ...tile,
+                TilePatrol: [
+                  {
+                    TilePatrolData: `Patrol Started At ${dayjs(startedAt).format('HH:mm')} Patrol Ended At ${dayjs(endedAt).format('HH:mm')}`,
+                    TilePatrolId: patrolId,
+                    TilePatrolName: patrolData.PatrolName,
+                    TilePatrolImage: [],
+                  },
+                ],
+              };
+            }
+            return tile;
+          });
+
+          const empDarRef = doc(
+            db,
+            CollectionName.employeesDAR,
+            secondDar.EmpDarId
+          );
+
+          transaction.update(empDarRef, { EmpDarTile: updatedTile });
+        }
+      }
+
+      transaction.set(newDocRef, newDocData);
+    });
   };
 }
 
