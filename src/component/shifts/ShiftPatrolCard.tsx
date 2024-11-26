@@ -22,6 +22,8 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
 
   const [completePatrolModal, setCompletePatrolModal] = useState(false);
 
+  const [shouldRefetch, setShouldRefetch] = useState(false);
+
   useEffect(() => {
     const totalPatrol = data.ShiftLinkedPatrols.reduce((acc, obj) => {
       return acc + obj.LinkedPatrolReqHitCount;
@@ -41,7 +43,7 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
         console.log(err);
         setLoading(false);
       });
-  }, [data, completePatrolModal]);
+  }, [data, shouldRefetch]);
 
   const getEmpPatrolLog = (patrolId: string, empId: string) => {
     return patrolLogsOfShift.filter(
@@ -141,6 +143,7 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
           empDetails={selectedPatrol?.empDetails}
           shift={data}
           hitCount={selectedPatrol.hitCount}
+          shouldRefetch={setShouldRefetch}
         />
       </div>
     </div>

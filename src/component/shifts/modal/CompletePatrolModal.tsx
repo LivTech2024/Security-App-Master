@@ -18,6 +18,7 @@ interface CompletePatrolModalProps {
   empDetails: { EmpName: string; EmpId: string } | null;
   shift: IShiftsCollection;
   hitCount: number;
+  shouldRefetch: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CompletePatrolModal = ({
@@ -27,6 +28,7 @@ const CompletePatrolModal = ({
   empDetails,
   shift,
   hitCount,
+  shouldRefetch,
 }: CompletePatrolModalProps) => {
   const [loading, setLoading] = useState(false);
 
@@ -47,10 +49,11 @@ const CompletePatrolModal = ({
         shiftDate: toDate(shift.ShiftDate),
         endedAt,
         startedAt,
-        hitCount: 0,
+        hitCount,
         patrolId: linkedPatrol.LinkedPatrolId,
       });
       setLoading(false);
+      shouldRefetch((prev) => !prev);
     } catch (error) {
       errorHandler(error);
       console.log(error);

@@ -472,8 +472,8 @@ class DbPatrol {
       PatrolDate: shiftDate as unknown as Timestamp,
       PatrolLogStartedAt: startedAt as unknown as Timestamp,
       PatrolLogEndedAt: endedAt as unknown as Timestamp,
-      PatrolLogCreatedAt: serverTimestamp(),
-      PatrolLogShiftId: shiftId,
+      PatrolLogCreatedAt: endedAt as unknown as Timestamp,
+      PatrolShiftId: shiftId,
       PatrolLogGuardId: empDetails.EmpId,
       PatrolLogGuardName: empDetails.EmpName,
       PatrolLogPatrolCount: hitCount,
@@ -517,7 +517,8 @@ class DbPatrol {
             return {
               ...status,
               StatusCompletedCount: (status.StatusCompletedCount || 0) + 1,
-              Status: hitCount === reqHitCount ? 'completed' : 'pending',
+              Status: hitCount === reqHitCount ? 'completed' : 'started',
+              StatusReportedTime: endedAt as unknown as Timestamp,
             };
           }
           return status;
@@ -527,7 +528,7 @@ class DbPatrol {
         });
       } else {
         const newStatus = {
-          Status: 'pending',
+          Status: 'started',
           StatusCompletedCount: 1,
           StatusReportedById: empDetails.EmpId,
           StatusReportedByName: empDetails.EmpName,
