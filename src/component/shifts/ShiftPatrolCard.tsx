@@ -8,6 +8,8 @@ import DbShift from '../../firebase_configs/DB/DbShift';
 import Button from '../../common/button/Button';
 import CompletePatrolModal from './modal/CompletePatrolModal';
 import { useAuthState } from '../../store';
+import { useSearchParams } from 'react-router-dom';
+import { IDevelopmentDetails } from '../../@types/enum';
 
 interface ShiftPatrolCardProps {
   data: IShiftsCollection;
@@ -16,6 +18,10 @@ interface ShiftPatrolCardProps {
 
 const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
   const { settings } = useAuthState();
+
+  const [searchParam] = useSearchParams();
+
+  const dev = searchParam.get('dev');
 
   const [patrolLogsOfShift, setPatrolLogsOfShift] = useState<
     IPatrolLogsCollection[]
@@ -118,7 +124,8 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
                         {completedCount}
                       </div>
                       {completedCount < patrol.LinkedPatrolReqHitCount &&
-                        settings?.SettingIsPatrolCompleteOptionEnabled && (
+                        settings?.SettingIsPatrolCompleteOptionEnabled &&
+                        dev == IDevelopmentDetails.DEV_NAME && (
                           <Button
                             label="Complete"
                             onClick={() => {
