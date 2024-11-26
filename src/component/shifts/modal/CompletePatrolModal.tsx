@@ -9,6 +9,7 @@ import DbPatrol from '../../../firebase_configs/DB/DbPatrol';
 import { toDate } from '../../../utilities/misc';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
 import InputDate from '../../../common/inputs/InputDate';
+import { errorHandler } from '../../../utilities/CustomError';
 
 interface CompletePatrolModalProps {
   opened: boolean;
@@ -51,6 +52,7 @@ const CompletePatrolModal = ({
       });
       setLoading(false);
     } catch (error) {
+      errorHandler(error);
       console.log(error);
       setLoading(false);
     }

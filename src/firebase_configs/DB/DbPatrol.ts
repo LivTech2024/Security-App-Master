@@ -38,6 +38,7 @@ import {
 } from '../../utilities/misc';
 import { Company } from '../../store/slice/auth.slice';
 import dayjs from 'dayjs';
+import CustomError from '../../utilities/CustomError';
 
 class DbPatrol {
   static createPatrol = async ({
@@ -440,6 +441,11 @@ class DbPatrol {
     reqHitCount: number;
   }) => {
     const docSnapshot = await this.getRecentPatrolLog(patrolId);
+
+    if (docSnapshot.empty) {
+      throw new CustomError('No previous patrol log found to copy');
+    }
+
     const docData = docSnapshot?.docs[0]?.data() as IPatrolLogsCollection;
 
     const newPatrolLogId = getNewDocId(CollectionName.patrolLogs);
@@ -485,6 +491,11 @@ class DbPatrol {
         empId: empDetails.EmpId,
         shiftId,
       });
+
+      if (empDarSnap.empty) {
+        throw new CustomError('Please create DAR first');
+      }
+
       const empDar = empDarSnap.docs.map(
         (doc) => doc.data() as IEmployeeDARCollection
       );
