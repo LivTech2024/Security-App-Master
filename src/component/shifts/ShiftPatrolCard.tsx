@@ -20,6 +20,8 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
 
   const [loading, setLoading] = useState(true);
 
+  const [completePatrolModal, setCompletePatrolModal] = useState(false);
+
   useEffect(() => {
     const totalPatrol = data.ShiftLinkedPatrols.reduce((acc, obj) => {
       return acc + obj.LinkedPatrolReqHitCount;
@@ -39,15 +41,13 @@ const ShiftPatrolCard = ({ assignedUsers, data }: ShiftPatrolCardProps) => {
         console.log(err);
         setLoading(false);
       });
-  }, [data]);
+  }, [data, completePatrolModal]);
 
   const getEmpPatrolLog = (patrolId: string, empId: string) => {
     return patrolLogsOfShift.filter(
       (log) => log.PatrolId === patrolId && log.PatrolLogGuardId === empId
     );
   };
-
-  const [completePatrolModal, setCompletePatrolModal] = useState(false);
 
   const [selectedPatrol, setSelectedPatrol] = useState<{
     linkedPatrol: IShiftLinkedPatrolsChildCollection | null;
