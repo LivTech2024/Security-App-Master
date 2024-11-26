@@ -66,6 +66,7 @@ export const companyCreateSchema = z.object({
   SettingIsPerformanceAssuranceEnabled: z.boolean(),
   SettingIsTaskAssignmentAndTrackingEnabled: z.boolean(),
   SettingIsHRSystemEnabled: z.boolean(),
+  SettingIsPatrolCompleteOptionEnabled: z.boolean(),
 });
 
 export type CompanyCreateFormFields = z.infer<typeof companyCreateSchema>;

@@ -53,6 +53,11 @@ export default {
 
         shimmerColor: '#e3e3e3',
         inputBorder: '#0000001A',
+
+        //status
+        pending: '#fed7aa',
+        started: '#fbcfe8',
+        completed: '#4ade80',
       },
       animation: {
         fadeIn: 'fadeIn 1s ease-in-out',

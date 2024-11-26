@@ -678,6 +678,23 @@ class DbShift {
       ShiftCurrentStatus: updatedShiftCurrentStatus,
     });
   };
+
+  static getPatrolLogsOfShift = ({
+    shiftId,
+    lmt,
+  }: {
+    shiftId: string;
+    lmt: number;
+  }) => {
+    const patrolLogsRef = collection(db, CollectionName.patrolLogs);
+    const patrolLogsQuery = query(
+      patrolLogsRef,
+      where('PatrolShiftId', '==', shiftId),
+      limit(lmt)
+    );
+
+    return getDocs(patrolLogsQuery);
+  };
 }
 
 export default DbShift;

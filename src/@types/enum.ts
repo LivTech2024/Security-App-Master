@@ -256,3 +256,8 @@ export enum IEmployeeStatus {
   LEAVED = 'leaved',
   FIRED = 'fired',
 }
+
+//Development related details
+export enum IDevelopmentDetails {
+  DEV_NAME = 'yuvraj',
+}

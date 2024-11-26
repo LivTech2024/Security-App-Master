@@ -233,7 +233,7 @@ export interface IPatrolLogsCheckPointsChildCollection {
 export interface IPatrolLogsCollection {
   PatrolLogId: string;
   PatrolId: string;
-  PatrolLogShiftId: string;
+  PatrolShiftId: string;
   PatrolDate: Timestamp | FieldValue; //*Same as ShiftDate
   PatrolLogGuardId: string;
   PatrolLogGuardName: string;
@@ -442,6 +442,7 @@ export interface ISettingsCollection {
   SettingIsPerformanceAssuranceEnabled: boolean;
   SettingIsTaskAssignmentAndTrackingEnabled: boolean;
   SettingIsHRSystemEnabled: boolean;
+  SettingIsPatrolCompleteOptionEnabled: boolean;
 }
 
 export interface IEquipmentsCollection {

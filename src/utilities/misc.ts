@@ -262,3 +262,11 @@ export const getEmpUniqueId = (prefix: string) => {
 
   return `${prefix.toUpperCase()}${new Date().getFullYear().toString().slice(2, 4)}${uniqueNumber.toString().slice(7, 13)}`;
 };
+
+export function getHourRange(date: Date): string {
+  const hour = date.getHours(); // Get the hour from the Date object
+  const start = hour.toString().padStart(2, '0') + ':00';
+  const end = (hour + 1).toString().padStart(2, '0') + ':00';
+
+  return `${start} - ${end}`;
+}

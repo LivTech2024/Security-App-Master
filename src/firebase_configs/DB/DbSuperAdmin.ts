@@ -239,6 +239,7 @@ class DbSuperAdmin {
           SettingIsReportsEnabled,
           SettingIsPerformanceAssuranceEnabled,
           SettingIsPaymentsAndBillingEnabled,
+          SettingIsPatrolCompleteOptionEnabled,
         } = data;
 
         const settingId = getNewDocId(CollectionName.settings);
@@ -265,6 +266,7 @@ class DbSuperAdmin {
           SettingIsTimeAndAttendanceEnabled,
           SettingIsTrainingAndCertificationsEnabled,
           SettingIsVisitorManagementEnabled,
+          SettingIsPatrolCompleteOptionEnabled,
         };
 
         transaction.set(settingRef, newSetting);

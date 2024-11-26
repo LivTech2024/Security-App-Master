@@ -391,6 +391,12 @@ const CreateNewCompany = () => {
               register={methods.register}
               name="SettingIsHRSystemEnabled"
             />
+            <SwitchWithSideHeader
+              className="mx-0 bg-onHoverBg px-4 py-2 rounded"
+              label="Allow admin to complete patrol from admin portal"
+              register={methods.register}
+              name="SettingIsPatrolCompleteOptionEnabled"
+            />
           </div>
         </div>
       </form>

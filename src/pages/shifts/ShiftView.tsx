@@ -14,6 +14,7 @@ import Button from '../../common/button/Button';
 import ShiftViewCard from '../../component/shifts/ShiftViewCard';
 import DbEmployee from '../../firebase_configs/DB/DbEmployee';
 import PageHeader from '../../common/PageHeader';
+import ShiftPatrolCard from '../../component/shifts/ShiftPatrolCard';
 
 const ShiftView = () => {
   const { setShiftEditData } = useEditFormStore();
@@ -139,6 +140,7 @@ const ShiftView = () => {
           empRoutes={empRoutes}
           setShouldRefetch={setShouldRefetch}
         />
+        <ShiftPatrolCard data={data} assignedUsers={assignedUsers} />
       </div>
     );
 };
