@@ -19,7 +19,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { CollectionName } from '../../@types/enum';
-import CloudStorageImageHandler, { getNewDocId } from './utils';
+import { getNewDocId } from './utils';
 import { db } from '../config';
 import {
   IEmployeeDARCollection,
@@ -31,7 +31,7 @@ import {
 import { PatrollingFormFields } from '../../utilities/zod/schema';
 import {
   fullTextSearchIndex,
-  getHourRange,
+  getMatchingRange,
   getRandomNumbers,
   removeTimeFromDate,
   toDate,
@@ -291,31 +291,7 @@ class DbPatrol {
 
   static deletePatrolLog = async (patrolLogId: string) => {
     const patrolRef = doc(db, CollectionName.patrolLogs, patrolLogId);
-    await runTransaction(db, async (transaction) => {
-      const snapshot = await transaction.get(patrolRef);
-      const patrolLogData = snapshot.data() as IPatrolLogsCollection;
-      const { PatrolLogCheckPoints } = patrolLogData;
-      const imageToBeDeleted: string[] = [];
-
-      PatrolLogCheckPoints.forEach((ch) => {
-        const { CheckPointImage } = ch;
-        if (CheckPointImage) {
-          Array.isArray(CheckPointImage)
-            ? CheckPointImage.forEach((img) => {
-                imageToBeDeleted.push(img);
-              })
-            : imageToBeDeleted.push(CheckPointImage);
-        }
-      });
-
-      transaction.delete(patrolRef);
-
-      const imageDeletePromise = imageToBeDeleted.map((img) => {
-        return CloudStorageImageHandler.deleteImageByUrl(img);
-      });
-
-      await Promise.all(imageDeletePromise);
-    });
+    return deleteDoc(patrolRef);
   };
 
   static createPatrolLogCopy = async (
@@ -462,6 +438,9 @@ class DbPatrol {
         return {
           ...res,
           CheckPointReportedAt: checkpointsTime[idx] as unknown as Timestamp,
+          CheckPointComment: `${empDetails.EmpName} commenced patrol, everything ok`,
+          CheckPointFailureReason: '',
+          CheckPointStatus: 'checked',
         };
       });
 
@@ -477,6 +456,7 @@ class DbPatrol {
       PatrolLogGuardId: empDetails.EmpId,
       PatrolLogGuardName: empDetails.EmpName,
       PatrolLogPatrolCount: hitCount,
+      PatrolLogFeedbackComment: `${empDetails.EmpName} commenced patrol, everything ok`,
     };
 
     const patrolRef = doc(db, CollectionName.patrols, patrolId);
@@ -496,7 +476,7 @@ class DbPatrol {
         throw new CustomError('Please create DAR first');
       }
 
-      const empDar = empDarSnap.docs.map(
+      const empDar = empDarSnap?.docs.map(
         (doc) => doc.data() as IEmployeeDARCollection
       );
 
@@ -541,12 +521,15 @@ class DbPatrol {
         });
       }
 
-      if (empDar) {
+      if (empDar && empDar.length > 0) {
         //Update the emp dar
         const firstDar = empDar[0];
         const secondDar = empDar[1];
 
-        const hourRange = getHourRange(startedAt);
+        const hourRange = getMatchingRange(startedAt, [
+          ...firstDar.EmpDarTile.map((tile) => tile.TileTime),
+          ...secondDar.EmpDarTile.map((tile) => tile.TileTime),
+        ]);
 
         if (firstDar.EmpDarTile.find((tile) => tile.TileTime == hourRange)) {
           const updatedTile = firstDar.EmpDarTile.map((tile) => {
