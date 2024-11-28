@@ -270,3 +270,21 @@ export function getHourRange(date: Date): string {
 
   return `${start} - ${end}`;
 }
+
+export function getMatchingRange(date: Date, ranges: string[]): string | null {
+  const timeInMinutes = date.getHours() * 60 + date.getMinutes(); // Convert time to minutes since midnight
+
+  for (const range of ranges) {
+    const [start, end] = range.split(' - ').map((time) => {
+      const [hours, minutes] = time.split(':').map(Number);
+      return hours * 60 + minutes; // Convert range times to minutes
+    });
+
+    // Check if the time falls in the range (inclusive start, exclusive end)
+    if (timeInMinutes >= start && timeInMinutes < end) {
+      return range;
+    }
+  }
+
+  return null; // Return null if no range matches
+}
