@@ -548,15 +548,24 @@ class DbPatrol {
             ) {
               return {
                 ...tile,
-                TilePatrol: [
-                  ...tile.TilePatrol,
-                  {
-                    TilePatrolData: `Patrol Started At ${dayjs(startedAt).format('HH:mm')} Patrol Ended At ${dayjs(endedAt).format('HH:mm')}`,
-                    TilePatrolId: patrolId,
-                    TilePatrolName: patrolData.PatrolName,
-                    TilePatrolImage: [],
-                  },
-                ],
+                TilePatrol: tile?.TilePatrol?.length
+                  ? [
+                      ...tile.TilePatrol,
+                      {
+                        TilePatrolData: `Patrol Started At ${dayjs(startedAt).format('HH:mm')} Patrol Ended At ${dayjs(endedAt).format('HH:mm')}`,
+                        TilePatrolId: patrolId,
+                        TilePatrolName: patrolData.PatrolName,
+                        TilePatrolImage: [],
+                      },
+                    ]
+                  : [
+                      {
+                        TilePatrolData: `Patrol Started At ${dayjs(startedAt).format('HH:mm')} Patrol Ended At ${dayjs(endedAt).format('HH:mm')}`,
+                        TilePatrolId: patrolId,
+                        TilePatrolName: patrolData.PatrolName,
+                        TilePatrolImage: [],
+                      },
+                    ],
               };
             }
             return tile;
@@ -582,15 +591,24 @@ class DbPatrol {
             ) {
               return {
                 ...tile,
-                TilePatrol: [
-                  ...tile.TilePatrol,
-                  {
-                    TilePatrolData: `Patrol Started At ${dayjs(startedAt).format('HH:mm')} Patrol Ended At ${dayjs(endedAt).format('HH:mm')}`,
-                    TilePatrolId: patrolId,
-                    TilePatrolName: patrolData.PatrolName,
-                    TilePatrolImage: [],
-                  },
-                ],
+                TilePatrol: tile?.TilePatrol?.length
+                  ? [
+                      ...tile.TilePatrol,
+                      {
+                        TilePatrolData: `Patrol Started At ${dayjs(startedAt).format('HH:mm')} Patrol Ended At ${dayjs(endedAt).format('HH:mm')}`,
+                        TilePatrolId: patrolId,
+                        TilePatrolName: patrolData.PatrolName,
+                        TilePatrolImage: [],
+                      },
+                    ]
+                  : [
+                      {
+                        TilePatrolData: `Patrol Started At ${dayjs(startedAt).format('HH:mm')} Patrol Ended At ${dayjs(endedAt).format('HH:mm')}`,
+                        TilePatrolId: patrolId,
+                        TilePatrolName: patrolData.PatrolName,
+                        TilePatrolImage: [],
+                      },
+                    ],
               };
             }
             return tile;
