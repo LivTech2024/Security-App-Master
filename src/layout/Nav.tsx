@@ -195,7 +195,7 @@ const Nav = ({
               closeOnClickOutside: true,
               innerProps: {
                 title: 'Confirm',
-                body: 'Are you sure to sign out',
+                body: 'Are you sure to sign out?',
                 onConfirm: () => {
                   navigate(PageRoutes.HOME);
                   userSignOut();

@@ -526,17 +526,30 @@ class DbPatrol {
         const firstDar = empDar[0];
         const secondDar = empDar[1];
 
-        const hourRange = getMatchingRange(startedAt, [
+        const hourRangeStart = getMatchingRange(startedAt, [
+          ...firstDar.EmpDarTile.map((tile) => tile.TileTime),
+          ...secondDar.EmpDarTile.map((tile) => tile.TileTime),
+        ]);
+        const hourRangeEnd = getMatchingRange(endedAt, [
           ...firstDar.EmpDarTile.map((tile) => tile.TileTime),
           ...secondDar.EmpDarTile.map((tile) => tile.TileTime),
         ]);
 
-        if (firstDar.EmpDarTile.find((tile) => tile.TileTime == hourRange)) {
+        if (
+          firstDar.EmpDarTile.find(
+            (tile) =>
+              tile.TileTime === hourRangeStart || tile.TileTime === hourRangeEnd
+          )
+        ) {
           const updatedTile = firstDar.EmpDarTile.map((tile) => {
-            if (tile.TileTime === hourRange) {
+            if (
+              tile.TileTime === hourRangeStart ||
+              tile.TileTime === hourRangeEnd
+            ) {
               return {
                 ...tile,
                 TilePatrol: [
+                  ...tile.TilePatrol,
                   {
                     TilePatrolData: `Patrol Started At ${dayjs(startedAt).format('HH:mm')} Patrol Ended At ${dayjs(endedAt).format('HH:mm')}`,
                     TilePatrolId: patrolId,
@@ -557,13 +570,20 @@ class DbPatrol {
 
           transaction.update(empDarRef, { EmpDarTile: updatedTile });
         } else if (
-          secondDar.EmpDarTile.find((tile) => tile.TileTime == hourRange)
+          secondDar.EmpDarTile.find(
+            (tile) =>
+              tile.TileTime === hourRangeStart || tile.TileTime === hourRangeEnd
+          )
         ) {
           const updatedTile = secondDar.EmpDarTile.map((tile) => {
-            if (tile.TileTime === hourRange) {
+            if (
+              tile.TileTime === hourRangeStart ||
+              tile.TileTime === hourRangeEnd
+            ) {
               return {
                 ...tile,
                 TilePatrol: [
+                  ...tile.TilePatrol,
                   {
                     TilePatrolData: `Patrol Started At ${dayjs(startedAt).format('HH:mm')} Patrol Ended At ${dayjs(endedAt).format('HH:mm')}`,
                     TilePatrolId: patrolId,
