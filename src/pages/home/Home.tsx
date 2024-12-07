@@ -21,6 +21,8 @@ import { IoMdDocument } from 'react-icons/io';
 import { GrCertificate, GrResources } from 'react-icons/gr';
 import { FaPeopleGroup } from 'react-icons/fa6';
 import { TbReport } from 'react-icons/tb';
+/* import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
+import DbPatrol from '../../firebase_configs/DB/DbPatrol'; */
 
 const HomeItem = ({
   name,
@@ -53,10 +55,10 @@ const Home = () => {
 
   const [selectedBranch, setSelectedBranch] = useState('');
 
-  /*  const test = async () => {
+  /*   const test = async () => {
     try {
       showModalLoader({});
-      await DbPatrol.createPatrolLogCopy('jP29AGwqrVQ6DPoqba6z', 3);
+      await DbPatrol.createEmpDarCopy('quf4gikmb0HuaJZLwndt');
       closeModalLoader();
     } catch (error) {
       console.log(error);
@@ -85,7 +87,7 @@ const Home = () => {
             />
           </div>
         </div>
-        {/* <button onClick={test} className="text-white">
+        {/*  <button onClick={test} className="text-white">
           test email
         </button> */}
       </div>

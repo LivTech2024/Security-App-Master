@@ -336,6 +336,24 @@ class DbPatrol {
     await setDoc(newDocRef, newDocData);
   };
 
+  static createEmpDarCopy = async (empDarId: string) => {
+    const docRef = doc(db, CollectionName.employeesDAR, empDarId);
+    const docSnapshot = await getDoc(docRef);
+    const docData = docSnapshot.data() as IEmployeeDARCollection;
+
+    const newEmpDarId = getNewDocId(CollectionName.employeesDAR);
+    const newDocRef = doc(db, CollectionName.employeesDAR, newEmpDarId);
+
+    const newDocData: IEmployeeDARCollection = {
+      ...docData,
+      EmpDarId: newEmpDarId,
+      EmpDarDate: serverTimestamp(),
+      EmpDarCreatedAt: serverTimestamp(),
+    };
+
+    await setDoc(newDocRef, newDocData);
+  };
+
   static getRecentPatrolLog = (patrolId: string) => {
     const patrolLogRef = collection(db, CollectionName.patrolLogs);
     const patrolLogQuery = query(
