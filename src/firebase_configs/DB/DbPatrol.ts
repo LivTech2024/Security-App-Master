@@ -553,16 +553,18 @@ class DbPatrol {
           ...secondDar.EmpDarTile.map((tile) => tile.TileTime),
         ]);
 
+        console.log(hourRangeStart, hourRangeEnd, 'here start and end range');
+
         if (
           firstDar.EmpDarTile.find(
             (tile) =>
-              tile.TileTime === hourRangeStart || tile.TileTime === hourRangeEnd
+              tile.TileTime == hourRangeStart || tile.TileTime == hourRangeEnd
           )
         ) {
           const updatedTile = firstDar.EmpDarTile.map((tile) => {
             if (
-              tile.TileTime === hourRangeStart ||
-              tile.TileTime === hourRangeEnd
+              tile.TileTime == hourRangeStart ||
+              tile.TileTime == hourRangeEnd
             ) {
               return {
                 ...tile,
@@ -599,13 +601,13 @@ class DbPatrol {
         } else if (
           secondDar.EmpDarTile.find(
             (tile) =>
-              tile.TileTime === hourRangeStart || tile.TileTime === hourRangeEnd
+              tile.TileTime == hourRangeStart || tile.TileTime == hourRangeEnd
           )
         ) {
           const updatedTile = secondDar.EmpDarTile.map((tile) => {
             if (
-              tile.TileTime === hourRangeStart ||
-              tile.TileTime === hourRangeEnd
+              tile.TileTime == hourRangeStart ||
+              tile.TileTime == hourRangeEnd
             ) {
               return {
                 ...tile,
