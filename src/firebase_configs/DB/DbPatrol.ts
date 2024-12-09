@@ -544,14 +544,22 @@ class DbPatrol {
         const firstDar = empDar[0];
         const secondDar = empDar[1];
 
-        const hourRangeStart = getMatchingRange(startedAt, [
-          ...firstDar.EmpDarTile.map((tile) => tile.TileTime),
-          ...secondDar.EmpDarTile.map((tile) => tile.TileTime),
-        ]);
-        const hourRangeEnd = getMatchingRange(endedAt, [
-          ...firstDar.EmpDarTile.map((tile) => tile.TileTime),
-          ...secondDar.EmpDarTile.map((tile) => tile.TileTime),
-        ]);
+        console.log(startedAt, firstDar, secondDar);
+
+        let timeRanges: string[] = [];
+
+        if (firstDar) {
+          timeRanges = [...firstDar.EmpDarTile.map((tile) => tile.TileTime)];
+        }
+        if (secondDar) {
+          timeRanges = [
+            ...timeRanges,
+            ...secondDar.EmpDarTile.map((tile) => tile.TileTime),
+          ];
+        }
+
+        const hourRangeStart = getMatchingRange(startedAt, timeRanges);
+        const hourRangeEnd = getMatchingRange(endedAt, timeRanges);
 
         console.log(hourRangeStart, hourRangeEnd, 'here start and end range');
 
