@@ -336,6 +336,24 @@ class DbPatrol {
     await setDoc(newDocRef, newDocData);
   };
 
+  static createEmpDarCopy = async (empDarId: string) => {
+    const docRef = doc(db, CollectionName.employeesDAR, empDarId);
+    const docSnapshot = await getDoc(docRef);
+    const docData = docSnapshot.data() as IEmployeeDARCollection;
+
+    const newEmpDarId = getNewDocId(CollectionName.employeesDAR);
+    const newDocRef = doc(db, CollectionName.employeesDAR, newEmpDarId);
+
+    const newDocData: IEmployeeDARCollection = {
+      ...docData,
+      EmpDarId: newEmpDarId,
+      EmpDarDate: serverTimestamp(),
+      EmpDarCreatedAt: serverTimestamp(),
+    };
+
+    await setDoc(newDocRef, newDocData);
+  };
+
   static getRecentPatrolLog = (patrolId: string) => {
     const patrolLogRef = collection(db, CollectionName.patrolLogs);
     const patrolLogQuery = query(
@@ -526,25 +544,35 @@ class DbPatrol {
         const firstDar = empDar[0];
         const secondDar = empDar[1];
 
-        const hourRangeStart = getMatchingRange(startedAt, [
-          ...firstDar.EmpDarTile.map((tile) => tile.TileTime),
-          ...secondDar.EmpDarTile.map((tile) => tile.TileTime),
-        ]);
-        const hourRangeEnd = getMatchingRange(endedAt, [
-          ...firstDar.EmpDarTile.map((tile) => tile.TileTime),
-          ...secondDar.EmpDarTile.map((tile) => tile.TileTime),
-        ]);
+        console.log(startedAt, firstDar, secondDar);
+
+        let timeRanges: string[] = [];
+
+        if (firstDar) {
+          timeRanges = [...firstDar.EmpDarTile.map((tile) => tile.TileTime)];
+        }
+        if (secondDar) {
+          timeRanges = [
+            ...timeRanges,
+            ...secondDar.EmpDarTile.map((tile) => tile.TileTime),
+          ];
+        }
+
+        const hourRangeStart = getMatchingRange(startedAt, timeRanges);
+        const hourRangeEnd = getMatchingRange(endedAt, timeRanges);
+
+        console.log(hourRangeStart, hourRangeEnd, 'here start and end range');
 
         if (
           firstDar.EmpDarTile.find(
             (tile) =>
-              tile.TileTime === hourRangeStart || tile.TileTime === hourRangeEnd
+              tile.TileTime == hourRangeStart || tile.TileTime == hourRangeEnd
           )
         ) {
           const updatedTile = firstDar.EmpDarTile.map((tile) => {
             if (
-              tile.TileTime === hourRangeStart ||
-              tile.TileTime === hourRangeEnd
+              tile.TileTime == hourRangeStart ||
+              tile.TileTime == hourRangeEnd
             ) {
               return {
                 ...tile,
@@ -581,13 +609,13 @@ class DbPatrol {
         } else if (
           secondDar.EmpDarTile.find(
             (tile) =>
-              tile.TileTime === hourRangeStart || tile.TileTime === hourRangeEnd
+              tile.TileTime == hourRangeStart || tile.TileTime == hourRangeEnd
           )
         ) {
           const updatedTile = secondDar.EmpDarTile.map((tile) => {
             if (
-              tile.TileTime === hourRangeStart ||
-              tile.TileTime === hourRangeEnd
+              tile.TileTime == hourRangeStart ||
+              tile.TileTime == hourRangeEnd
             ) {
               return {
                 ...tile,
