@@ -220,6 +220,7 @@ export const addShiftFormSchema = z
     ShiftPhotoUploadIntervalInMinutes: z.coerce.number().nullable().optional(),
     ShiftAssignedUserId: z.array(z.string()).default([]).optional(),
     ShiftIsSpecialShift: z.boolean(),
+    ShiftIsFLHARequired: z.boolean(),
   })
   .superRefine(
     ({ ShiftRequiredEmp, ShiftIsSpecialShift, ShiftAssignedUserId }, ctx) => {
