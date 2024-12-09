@@ -61,6 +61,7 @@ const ShiftCreateOrEdit = () => {
     resolver: zodResolver(addShiftFormSchema),
     defaultValues: isEdit
       ? {
+          ShiftIsFLHARequired: shiftEditData?.ShiftIsFLHARequired || false,
           ShiftLocationAddress: shiftEditData.ShiftLocationAddress ?? null,
           ShiftEnableRestrictedRadius:
             shiftEditData.ShiftEnableRestrictedRadius,
@@ -627,9 +628,16 @@ const ShiftCreateOrEdit = () => {
 
             <TextareaWithTopHeader
               title="Description (Optional)"
-              className="mx-0"
+              className="mx-0 row-span-2"
               register={methods.register}
               name="ShiftDescription"
+            />
+
+            <SwitchWithSideHeader
+              register={methods.register}
+              name="ShiftIsFLHARequired"
+              className=" font-medium bg-onHoverBg rounded px-4 py-[10px]"
+              label="FLHA Required"
             />
 
             <div className="col-span-2">

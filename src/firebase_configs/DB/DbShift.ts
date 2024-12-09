@@ -106,6 +106,7 @@ class DbShift {
         ShiftEnableRestrictedRadius: shiftData.ShiftEnableRestrictedRadius,
         ShiftLinkedPatrols: shiftLinkedPatrols,
         ShiftIsSpecialShift: shiftData.ShiftIsSpecialShift,
+        ShiftIsFLHARequired: shiftData.ShiftIsFLHARequired,
         ShiftCreatedAt: serverTimestamp(),
         ShiftModifiedAt: serverTimestamp(),
       };
@@ -208,6 +209,7 @@ class DbShift {
         ShiftLinkedPatrols: shiftLinkedPatrols,
         ShiftAssignedUserId: shiftData.ShiftAssignedUserId,
         ShiftIsSpecialShift: shiftData.ShiftIsSpecialShift,
+        ShiftIsFLHARequired: shiftData.ShiftIsFLHARequired,
         ShiftModifiedAt: serverTimestamp(),
       };
 
