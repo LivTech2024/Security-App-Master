@@ -10,6 +10,8 @@ interface GenerateInvoiceHTMLArgs {
   clientBalance: number;
 }
 
+const showDue = false;
+
 export function generateInvoiceHTML({
   companyDetails,
   invoiceData,
@@ -154,7 +156,7 @@ export function generateInvoiceHTML({
             invoiceData.InvoiceReceivedAmount,
             true
           )}</p>
-          <p>Amount Due: ${numberFormatter(clientBalance, true)}</p>
+          ${showDue ? `<p>Amount Due: ${numberFormatter(clientBalance, true)}</p>` : ''}
         </div>
         <div class="section" style="padding:20px 0;">
           ${
