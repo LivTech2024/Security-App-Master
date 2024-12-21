@@ -131,6 +131,7 @@ export interface IShiftLinkedPatrolsChildCollection {
   LinkedPatrolName: string;
   LinkedPatrolId: string;
   LinkedPatrolReqHitCount: number;
+  LinkedPatrolCompletedHitCount?: number;
 }
 
 export interface IShiftsCollection {
