@@ -249,6 +249,7 @@ class DbSuperAdmin {
           SettingCompanyId: companyId,
           SettingEmpWellnessIntervalInMins: 60,
           SettingEmpShiftTimeMarginInMins: 10,
+          SettingShowAmountDueInInvoices: true,
           SettingIsAuditEnabled,
           SettingIsCalloutEnabled,
           SettingIsCommunicationCenterEnabled,

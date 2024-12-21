@@ -424,6 +424,7 @@ export interface ISettingsCollection {
   SettingCompanyId: string;
   SettingEmpWellnessIntervalInMins: number;
   SettingEmpShiftTimeMarginInMins: number;
+  SettingShowAmountDueInInvoices: boolean;
 
   //*Only Super Admin accessible settings
   SettingIsPatrollingEnabled: boolean;
