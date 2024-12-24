@@ -776,6 +776,7 @@ export interface IFLHACollection {
   FLHAShiftEndTime: string;
   FLHAShiftStartTime: string;
   FLHAShiftId: string;
+  FLHAShiftName: string;
   FLHATasks: {
     controlHazards: string;
     hazards: string;

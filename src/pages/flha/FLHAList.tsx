@@ -111,7 +111,7 @@ const FLHAList = () => {
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
   return (
     <div className="flex flex-col gap-4 p-6">
-      <PageHeader title="FLHA" />
+      <PageHeader title="Field Level Hazard Assessments" />
 
       <div className="flex justify-between w-full p-4 rounded bg-surface shadow items-center">
         <DateFilterDropdown

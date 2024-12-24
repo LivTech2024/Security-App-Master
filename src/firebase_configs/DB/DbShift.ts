@@ -746,6 +746,11 @@ class DbShift {
 
     return getDocs(calloutQuery);
   };
+
+  static getFLHAById = (flhaId: string) => {
+    const flhaRef = doc(db, CollectionName.flha, flhaId);
+    return getDoc(flhaRef);
+  };
 }
 
 export default DbShift;
