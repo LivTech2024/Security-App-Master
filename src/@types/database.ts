@@ -101,7 +101,7 @@ export interface IEmployeeRouteCollection {
   }[];
   EmpRouteEmpId: string;
   EmpRouteShiftId: string;
-  EmpRouteCreatedAt: Timestamp;
+  EmpRouteCreatedAt: Timestamp | FieldValue;
 }
 
 export interface IShiftTasksChild {
@@ -755,4 +755,58 @@ export interface ILeaveRequestsCollection {
   LeaveReqPaidLeaveAmt?: number; //*This will done from Admin Portal
   LeaveReqCreatedAt: string;
   LeaveReqModifiedAt: string;
+}
+
+export interface IFLHACollection {
+  FLHAID: string;
+  FLHAClientId: string;
+  FLHAEmployeeId: string;
+  FLHALocationId: string;
+  FLHALocationName: string;
+  FLHAModifiedAt: Timestamp | FieldValue;
+  FLHADate: Timestamp | FieldValue;
+  FLHACreatedAt: Timestamp | FieldValue;
+  FLHACompanyId: string;
+  FLHAEmployeeName: string;
+  FLHATemperature: string;
+  FLHAFeelsLike: string;
+  FLHAWeatherChanges: string;
+  FLHAWindDirection: string;
+  FLHAWindSpeed: number;
+  FLHAShiftEndTime: string;
+  FLHAShiftStartTime: string;
+  FLHAShiftId: string;
+  FLHATasks: {
+    controlHazards: string;
+    hazards: string;
+    name: string;
+    priority: string;
+  }[];
+  FLHAEnvironmentalHazards: {
+    id: string;
+    isChecked: boolean;
+    title: string;
+  }[];
+  FLHAAccessHazards: {
+    id: string;
+    isChecked: boolean;
+    title: string;
+  }[];
+  FLHAPersonalLimitationHazards: {
+    id: string;
+    isChecked: boolean;
+    title: string;
+  }[];
+  FLHAShiftCompletion: {
+    details: string;
+    question: string;
+    response: 'YES' | 'NO';
+  }[];
+  FLHAEmployeeSignature: string; //url of the signature image
+  FLHASupervisorSignature: string; //url of the signature image
+  FLHAAdditionalSignatures: {
+    date: Timestamp | FieldValue;
+    name: string;
+    url: string; //url of the signature image
+  }[];
 }
