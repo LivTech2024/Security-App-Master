@@ -21,6 +21,7 @@ import { IoMdDocument } from 'react-icons/io';
 import { GrCertificate, GrResources } from 'react-icons/gr';
 import { FaPeopleGroup } from 'react-icons/fa6';
 import { TbReport } from 'react-icons/tb';
+import { GiHazardSign } from 'react-icons/gi';
 /* import { closeModalLoader, showModalLoader } from '../../utilities/TsxUtils';
 import DbPatrol from '../../firebase_configs/DB/DbPatrol'; */
 
@@ -119,6 +120,13 @@ const Home = () => {
           icon={<AiOutlineSchedule className="text-3xl text-primaryGold" />}
           name="Shift Scheduling"
         />
+
+        <HomeItem
+          path={PageRoutes.FLHA_LIST}
+          icon={<GiHazardSign className="text-3xl text-primaryGold" />}
+          name="FLHA"
+        />
+
         {settings?.SettingIsCalloutEnabled !== false && (
           <HomeItem
             path={PageRoutes.CALL_OUT_LIST}

@@ -86,6 +86,8 @@ import EmployeeRoute from './pages/employee/EmployeeRoute';
 import AuditDashboard from './pages/audit/AuditDashboard';
 import LeaveRequestList from './pages/hrm/leave_management/LeaveRequestList';
 import { useShowLoader } from './hooks/useShowLoader';
+import FLHAList from './pages/flha/FLHAList';
+import FLHAView from './pages/flha/FLHAView';
 
 function App() {
   useOnAuthStateChanged();
@@ -257,6 +259,8 @@ function App() {
 
             <Route path={PageRoutes.SCHEDULES} Component={Schedule} />
             <Route path={PageRoutes.SHIFT_LIST} Component={ShiftList} />
+            <Route path={PageRoutes.FLHA_LIST} Component={FLHAList} />
+            <Route path={PageRoutes.FLHA_VIEW} Component={FLHAView} />
             <Route
               path={PageRoutes.SHIFT_CREATE_OR_EDIT}
               Component={ShiftCreateOrEdit}

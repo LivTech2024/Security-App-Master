@@ -697,6 +697,55 @@ class DbShift {
 
     return getDocs(patrolLogsQuery);
   };
+
+  static getFLHAs = ({
+    lmt,
+    lastDoc,
+    cmpId,
+    endDate,
+    isLifeTime,
+    locationId,
+    startDate,
+  }: {
+    lmt: number;
+    lastDoc?: DocumentData | null;
+    cmpId: string;
+    locationId?: string | null;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+  }) => {
+    const flhaRef = collection(db, CollectionName.flha);
+
+    let queryParams: QueryConstraint[] = [
+      where('FLHACompanyId', '==', cmpId),
+      orderBy('FLHADate', 'desc'),
+    ];
+
+    if (locationId && locationId.length > 3) {
+      queryParams = [...queryParams, where('FLHALocationId', '==', locationId)];
+    }
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('FLHADate', '>=', startDate),
+        where('FLHADate', '<=', endDate),
+      ];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    const calloutQuery = query(flhaRef, ...queryParams);
+
+    return getDocs(calloutQuery);
+  };
 }
 
 export default DbShift;

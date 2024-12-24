@@ -66,6 +66,7 @@ export const DisplayCount = {
   EMERG_PROTOCOLS_LIST: 20,
   LEAVE_REQ_LIST: 20,
   LOGGEDIN_USERS_LIST: 20,
+  FLHA_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -99,6 +100,7 @@ export const REACT_QUERY_KEYS = {
   EMERG_PROTOCOLS_LIST: 'emerg-protocol-list',
   LEAVE_REQ_LIST: 'leave-req-list',
   LOGGEDIN_USERS_LIST: 'loggedin-user-list',
+  FLHA_LIST: 'flha-list',
 } as const;
 
 export const MinimumQueryCharacter = {
@@ -146,6 +148,8 @@ export const PageRoutes = {
   SHIFT_LIST: '/shift_list',
   SHIFT_VIEW: '/shift_view',
   SHIFT_CREATE_OR_EDIT: '/shift_create_or_edit',
+  FLHA_LIST: '/flha_list',
+  FLHA_VIEW: '/flha_view',
   EMPLOYEE_ROUTE: '/employee_route',
   EMPLOYEE_LIST: '/employee_list',
   EMPLOYEE_CREATE_OR_EDIT: '/employee_create_or_edit',
