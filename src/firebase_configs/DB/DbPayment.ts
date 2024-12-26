@@ -698,6 +698,58 @@ class DbPayment {
 
     return getDocs(invoiceQuery);
   };
+
+  static getExpenses = ({
+    cmpId,
+    lastDoc,
+    lmt,
+    endDate,
+    isLifeTime,
+    startDate,
+    branchId,
+  }: {
+    cmpId: string;
+    branchId?: string;
+    lastDoc?: DocumentData | null;
+    lmt?: number;
+    startDate?: Date | string | null;
+    endDate?: Date | string | null;
+    isLifeTime?: boolean;
+  }) => {
+    const expenseRef = collection(db, CollectionName.expenses);
+
+    let queryParams: QueryConstraint[] = [
+      where('ExpenseCompanyId', '==', cmpId),
+      orderBy('ExpenseDate', 'desc'),
+    ];
+
+    if (!isLifeTime) {
+      queryParams = [
+        ...queryParams,
+        where('ExpenseDate', '>=', startDate),
+        where('ExpenseDate', '<=', endDate),
+      ];
+    }
+
+    if (branchId) {
+      queryParams = [
+        ...queryParams,
+        where('ExpenseCompanyBranchId', '==', branchId),
+      ];
+    }
+
+    if (lastDoc) {
+      queryParams = [...queryParams, startAfter(lastDoc)];
+    }
+
+    if (lmt) {
+      queryParams = [...queryParams, limit(lmt)];
+    }
+
+    const invoiceQuery = query(expenseRef, ...queryParams);
+
+    return getDocs(invoiceQuery);
+  };
 }
 
 export default DbPayment;

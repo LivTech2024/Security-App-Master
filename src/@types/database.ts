@@ -815,7 +815,7 @@ export interface IFLHACollection {
 export interface IExpensesCollection {
   ExpenseId: string;
   ExpenseCompanyId: string;
-  ExpenseCompanyBranchId: string;
+  ExpenseCompanyBranchId?: string | null;
   ExpenseNumber: number;
   ExpenseCategory: string;
   ExpenseSubCategory?: string | null;
@@ -826,6 +826,7 @@ export interface IExpensesCollection {
   ExpensePaymentRef?: string | null;
   ExpenseDescription?: string | null;
   ExpenseDate: Timestamp | FieldValue;
+  ExpenseReceipt?: string;
   ExpenseCreatedAt: Timestamp | FieldValue;
   ExpenseModifiedAt: Timestamp | FieldValue;
 }

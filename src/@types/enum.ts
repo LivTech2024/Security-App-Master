@@ -68,6 +68,7 @@ export const DisplayCount = {
   LEAVE_REQ_LIST: 20,
   LOGGEDIN_USERS_LIST: 20,
   FLHA_LIST: 20,
+  EXPENSE_LIST: 20,
 } as const;
 
 export const REACT_QUERY_KEYS = {
@@ -80,6 +81,7 @@ export const REACT_QUERY_KEYS = {
   REPORT_LIST: 'report-list',
   REPORT_CATEGORIES: 'report-categories',
   INVOICE_LIST: 'invoice-list',
+  EXPENSE_LIST: 'expense-list',
   CLIENT_LIST: 'client-list',
   DOCUMENT_LIST: 'document-list',
   DOCUMENT_CATEGORIES: 'document-categories',
