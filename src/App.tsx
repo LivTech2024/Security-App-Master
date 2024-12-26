@@ -88,6 +88,8 @@ import LeaveRequestList from './pages/hrm/leave_management/LeaveRequestList';
 import { useShowLoader } from './hooks/useShowLoader';
 import FLHAList from './pages/flha/FLHAList';
 import FLHAView from './pages/flha/FLHAView';
+import ExpenseList from './pages/payments_and_billing/expense/ExpenseList';
+import ExpenseCreateOrEdit from './pages/payments_and_billing/expense/ExpenseCreateOrEdit';
 
 function App() {
   useOnAuthStateChanged();
@@ -339,6 +341,12 @@ function App() {
                   path={PageRoutes.INVOICE_GENERATE}
                   Component={InvoiceGenerate}
                 />
+                <Route path={PageRoutes.EXPENSE_LIST} Component={ExpenseList} />
+                <Route
+                  path={PageRoutes.EXPENSE_CREATE_OR_EDIT}
+                  Component={ExpenseCreateOrEdit}
+                />
+
                 <Route
                   path={PageRoutes.PAY_STUB_LIST}
                   Component={PayStubList}

@@ -811,3 +811,21 @@ export interface IFLHACollection {
     url: string; //url of the signature image
   }[];
 }
+
+export interface IExpensesCollection {
+  ExpenseId: string;
+  ExpenseCompanyId: string;
+  ExpenseCompanyBranchId: string;
+  ExpenseNumber: number;
+  ExpenseCategory: string;
+  ExpenseSubCategory?: string | null;
+  ExpenseAmount: number;
+  ExpensePaidAmount: number;
+  ExpenseBalanceAmount: number;
+  ExpensePaymentType: 'cash' | 'bank' | 'cheque';
+  ExpensePaymentRef?: string | null;
+  ExpenseDescription?: string | null;
+  ExpenseDate: Timestamp | FieldValue;
+  ExpenseCreatedAt: Timestamp | FieldValue;
+  ExpenseModifiedAt: Timestamp | FieldValue;
+}
