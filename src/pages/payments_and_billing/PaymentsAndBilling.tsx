@@ -2,6 +2,9 @@ import Button from '../../common/button/Button';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../@types/enum';
 import PageHeader from '../../common/PageHeader';
+import payStubImg from '../../../public/assets/pay_stub_receipt.svg';
+import invoicesImg from '../../../public/assets/printing_invoice.svg';
+import expensesImg from '../../../public/assets/expense.svg';
 
 const PaymentsAndBilling = () => {
   const navigate = useNavigate();
@@ -14,7 +17,7 @@ const PaymentsAndBilling = () => {
           onClick={() => navigate(PageRoutes.EXPENSE_LIST)}
           className="flex flex-col gap-4 p-4 rounded bg-gray-200 items-center shadow justify-between cursor-pointer"
         >
-          <img src="public/assets/expense.svg" alt="" className="w-[240px]" />
+          <img src={expensesImg} alt="" className="w-[240px]" />
           <Button
             type="black"
             label="Expenses"
@@ -27,11 +30,7 @@ const PaymentsAndBilling = () => {
           onClick={() => navigate(PageRoutes.INVOICE_LIST)}
           className="flex flex-col gap-4 p-4 rounded bg-gray-200 items-center shadow justify-between cursor-pointer"
         >
-          <img
-            src="/public/assets/printing_invoice.svg"
-            alt=""
-            className="w-[340px]"
-          />
+          <img src={invoicesImg} alt="" className="w-[340px]" />
           <Button
             type="black"
             label="Invoices"
@@ -43,11 +42,7 @@ const PaymentsAndBilling = () => {
           onClick={() => navigate(PageRoutes.PAY_STUB_LIST)}
           className="flex flex-col gap-4 p-4 rounded bg-gray-200 items-center shadow justify-between cursor-pointer"
         >
-          <img
-            src="public/assets/pay_stub_receipt.svg"
-            alt=""
-            className="w-[240px]"
-          />
+          <img src={payStubImg} alt="" className="w-[240px]" />
           <Button
             type="black"
             label="Pay-stubs"
