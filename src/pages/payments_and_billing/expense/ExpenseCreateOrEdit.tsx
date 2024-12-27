@@ -1,7 +1,7 @@
 import { openContextModal } from '@mantine/modals';
 import Button from '../../../common/button/Button';
 import PageHeader from '../../../common/PageHeader';
-import { useEditFormStore } from '../../../store';
+import { useAuthState, useEditFormStore, useUIState } from '../../../store';
 import InputSelect from '../../../common/inputs/InputSelect';
 import expenseCategory from '../../../../public/assets/json/ExpenseCategories.json';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
@@ -13,9 +13,15 @@ import {
 } from '../../../utilities/zod/schema';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { roundNumber } from '../../../utilities/misc';
 import { numberFormatter } from '../../../utilities/NumberFormater';
+import SelectBranch from '../../../common/SelectBranch';
+import { errorHandler } from '../../../utilities/CustomError';
+import DbPayment from '../../../firebase_configs/DB/DbPayment';
+import { showSnackbar } from '../../../utilities/TsxUtils';
+import { useNavigate } from 'react-router-dom';
+import { PageRoutes } from '../../../@types/enum';
 
 const ExpenseCreateOrEdit = () => {
   const { expenseEditData } = useEditFormStore();
@@ -32,13 +38,44 @@ const ExpenseCreateOrEdit = () => {
     resolver: zodResolver(expenseCreateSchema),
   });
 
+  const navigate = useNavigate();
+
+  const { company } = useAuthState();
+
+  const { setLoading } = useUIState();
+
+  const [selectedBranch, setSelectedBranch] = useState<string>('');
+
   const onSubmit = async (data: ExpenseCreateFormFields) => {
-    console.log(data, 'here');
+    if (!company) return;
+
+    try {
+      setLoading(true);
+
+      await DbPayment.createExpense(company.CompanyId, data);
+
+      showSnackbar({
+        message: 'Expense created successfully',
+        type: 'success',
+      });
+
+      setLoading(false);
+
+      navigate(PageRoutes.EXPENSE_LIST);
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      setLoading(false);
+    }
   };
 
   console.log(errors);
 
-  const [expenseAmt, paidAmt] = watch(['ExpenseAmount', 'ExpensePaidAmount']);
+  const [expenseAmt, paidAmt, paymentType] = watch([
+    'ExpenseAmount',
+    'ExpensePaidAmount',
+    'ExpensePaymentType',
+  ]);
 
   useEffect(() => {
     setValue('ExpenseBalanceAmount', roundNumber(expenseAmt - paidAmt));
@@ -96,6 +133,7 @@ const ExpenseCreateOrEdit = () => {
               value={watch('ExpenseCategory')}
               onChange={(e) => setValue('ExpenseCategory', e as string)}
               error={errors.ExpenseCategory?.message}
+              searchable
             />
 
             <InputWithTopHeader
@@ -113,6 +151,7 @@ const ExpenseCreateOrEdit = () => {
               name="ExpenseAmount"
               error={errors.ExpenseAmount?.message}
               decimalCount={2}
+              leadingIcon={<div>$</div>}
             />
           </div>
           <div className="bg-surface shadow rounded flex flex-col gap-4 p-4 w-full max-w-xl">
@@ -121,6 +160,7 @@ const ExpenseCreateOrEdit = () => {
               label="Expense Date"
               value={watch('ExpenseDate')}
               setValue={(e) => setValue('ExpenseDate', e as Date)}
+              error={errors.ExpenseDate?.message}
             />
             <InputWithTopHeader
               className="mx-0"
@@ -129,6 +169,11 @@ const ExpenseCreateOrEdit = () => {
               name="ExpenseNumber"
               error={errors.ExpenseNumber?.message}
               decimalCount={0}
+            />
+            <SelectBranch
+              selectedBranch={selectedBranch}
+              setSelectedBranch={setSelectedBranch}
+              label="Select Branch"
             />
           </div>
         </div>
@@ -167,6 +212,18 @@ const ExpenseCreateOrEdit = () => {
                     decimalCount={2}
                   />
                 </div>
+
+                {paymentType === 'cheque' && (
+                  <div className="flex items-center gap-4 justify-between w-full">
+                    <div className="text-lg">Payment Ref</div>
+                    <InputWithTopHeader
+                      className="mx-0"
+                      register={register}
+                      name="ExpensePaymentRef"
+                      error={errors.ExpensePaymentRef?.message}
+                    />
+                  </div>
+                )}
 
                 <div className="flex items-center gap-4 justify-between w-full">
                   <div className="text-base">Payment mode</div>

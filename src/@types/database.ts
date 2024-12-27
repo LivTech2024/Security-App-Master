@@ -826,7 +826,7 @@ export interface IExpensesCollection {
   ExpensePaymentRef?: string | null;
   ExpenseDescription?: string | null;
   ExpenseDate: Timestamp | FieldValue;
-  ExpenseReceipt?: string;
+  ExpenseReceipt?: string | null;
   ExpenseCreatedAt: Timestamp | FieldValue;
   ExpenseModifiedAt: Timestamp | FieldValue;
 }

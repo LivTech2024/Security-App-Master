@@ -19,11 +19,13 @@ import {
 import { db } from '../config';
 import { CollectionName } from '../../@types/enum';
 import {
+  ExpenseCreateFormFields,
   InvoiceFormFields,
   PayStubCreateFormFields,
 } from '../../utilities/zod/schema';
 import {
   IClientsCollection,
+  IExpensesCollection,
   IInvoiceItems,
   IInvoiceTaxList,
   IInvoicesCollection,
@@ -749,6 +751,32 @@ class DbPayment {
     const invoiceQuery = query(expenseRef, ...queryParams);
 
     return getDocs(invoiceQuery);
+  };
+
+  static createExpense = (cmpId: string, data: ExpenseCreateFormFields) => {
+    const expenseId = getNewDocId(CollectionName.expenses);
+    const expenseRef = doc(db, CollectionName.expenses, expenseId);
+
+    const newExpense: IExpensesCollection = {
+      ExpenseId: expenseId,
+      ExpenseCompanyId: cmpId,
+      ExpenseCompanyBranchId: data?.ExpenseCompanyBranchId || null,
+      ExpenseNumber: data.ExpenseNumber,
+      ExpenseCategory: data.ExpenseCategory,
+      ExpenseAmount: data.ExpenseAmount,
+      ExpensePaidAmount: data.ExpensePaidAmount,
+      ExpenseBalanceAmount: data.ExpenseBalanceAmount,
+      ExpensePaymentType: data.ExpensePaymentType,
+      ExpensePaymentRef: data.ExpensePaymentRef || null,
+      ExpenseDescription: data.ExpenseDescription || null,
+      ExpenseReceipt: null,
+      ExpenseSubCategory: data.ExpenseSubCategory || null,
+      ExpenseDate: removeTimeFromDate(data.ExpenseDate) as unknown as Timestamp,
+      ExpenseCreatedAt: serverTimestamp(),
+      ExpenseModifiedAt: serverTimestamp(),
+    };
+
+    return setDoc(expenseRef, newExpense);
   };
 }
 

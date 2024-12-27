@@ -622,7 +622,7 @@ export const expenseCreateSchema = z
     ExpenseAmount: z.coerce.number().min(1),
     ExpensePaidAmount: z.coerce.number(),
     ExpenseBalanceAmount: z.coerce.number(),
-    ExpensePaymentType: z.string(),
+    ExpensePaymentType: z.enum(['cash', 'cheque']),
     ExpensePaymentRef: z.string().optional().nullable(),
     ExpenseDescription: z.string().optional().nullable(),
     ExpenseDate: z.date(),
