@@ -7,6 +7,7 @@ import {
   IEmployeesCollection,
   IEquipmentAllocations,
   IEquipmentsCollection,
+  IExpensesCollection,
   IInvoicesCollection,
   IKeyAllocations,
   IKeysCollection,
@@ -150,6 +151,9 @@ interface EditFormState {
   invoiceEditData: IInvoicesCollection | null;
   setInvoiceEditData: (inv: IInvoicesCollection | null) => void;
 
+  expenseEditData: IExpensesCollection | null;
+  setExpenseEditData: (inv: IExpensesCollection | null) => void;
+
   payStubEditData: IPayStubsCollection | null;
   setPayStubEditData: (payStub: IPayStubsCollection | null) => void;
 
@@ -234,6 +238,11 @@ export const createEditFormSlice: StateCreator<EditFormState> = (set) => ({
   invoiceEditData: null,
   setInvoiceEditData: (inv) =>
     set((state) => ({ ...state, invoiceEditData: inv })),
+
+  //Expenses
+  expenseEditData: null,
+  setExpenseEditData: (expense) =>
+    set((state) => ({ ...state, expenseEditData: expense })),
 
   //payStub
   payStubEditData: null,

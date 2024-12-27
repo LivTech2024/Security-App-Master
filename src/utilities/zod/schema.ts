@@ -609,3 +609,32 @@ export const emergProtocolCreateSchema = z.object({
 export type EmergProtocolCreateFormFields = z.infer<
   typeof emergProtocolCreateSchema
 >;
+
+//*Expense create schema
+export const expenseCreateSchema = z
+  .object({
+    ExpenseCompanyBranchId: z.string().optional().nullable(),
+    ExpenseNumber: z.coerce.number().min(1),
+    ExpenseCategory: z
+      .string()
+      .min(3, { message: 'Expense category is required' }),
+    ExpenseSubCategory: z.string().optional().nullable(),
+    ExpenseAmount: z.coerce.number().min(1),
+    ExpensePaidAmount: z.coerce.number(),
+    ExpenseBalanceAmount: z.coerce.number(),
+    ExpensePaymentType: z.string(),
+    ExpensePaymentRef: z.string().optional().nullable(),
+    ExpenseDescription: z.string().optional().nullable(),
+    ExpenseDate: z.date(),
+  })
+  .superRefine(({ ExpensePaidAmount, ExpenseAmount }, ctx) => {
+    if (ExpenseAmount < ExpensePaidAmount) {
+      ctx.addIssue({
+        path: ['ExpensePaidAmount'],
+        message: `Paid amount cannot be greater than expense amount`,
+        code: 'custom',
+      });
+    }
+  });
+
+export type ExpenseCreateFormFields = z.infer<typeof expenseCreateSchema>;

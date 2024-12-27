@@ -118,7 +118,7 @@ const ExpenseList = () => {
         rightSection={
           <Button
             type="black"
-            label="Generate New Expense"
+            label="Create New Expense"
             onClick={() => {
               navigate(PageRoutes.EXPENSE_CREATE_OR_EDIT);
             }}

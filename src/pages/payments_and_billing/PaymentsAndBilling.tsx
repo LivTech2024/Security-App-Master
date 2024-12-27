@@ -22,22 +22,7 @@ const PaymentsAndBilling = () => {
             className="w-full"
           />
         </div>
-        <div
-          onClick={() => navigate(PageRoutes.PAY_STUB_LIST)}
-          className="flex flex-col gap-4 p-4 rounded bg-gray-200 items-center shadow justify-between cursor-pointer"
-        >
-          <img
-            src="public/assets/pay_stub_receipt.svg"
-            alt=""
-            className="w-[240px]"
-          />
-          <Button
-            type="black"
-            label="Pay-stubs"
-            onClick={() => navigate(PageRoutes.PAY_STUB_LIST)}
-            className="w-full"
-          />
-        </div>
+
         <div
           onClick={() => navigate(PageRoutes.INVOICE_LIST)}
           className="flex flex-col gap-4 p-4 rounded bg-gray-200 items-center shadow justify-between cursor-pointer"
@@ -51,6 +36,22 @@ const PaymentsAndBilling = () => {
             type="black"
             label="Invoices"
             onClick={() => navigate(PageRoutes.INVOICE_LIST)}
+            className="w-full"
+          />
+        </div>
+        <div
+          onClick={() => navigate(PageRoutes.PAY_STUB_LIST)}
+          className="flex flex-col gap-4 p-4 rounded bg-gray-200 items-center shadow justify-between cursor-pointer"
+        >
+          <img
+            src="public/assets/pay_stub_receipt.svg"
+            alt=""
+            className="w-[240px]"
+          />
+          <Button
+            type="black"
+            label="Pay-stubs"
+            onClick={() => navigate(PageRoutes.PAY_STUB_LIST)}
             className="w-full"
           />
         </div>

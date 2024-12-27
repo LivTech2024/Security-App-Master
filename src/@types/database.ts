@@ -822,7 +822,7 @@ export interface IExpensesCollection {
   ExpenseAmount: number;
   ExpensePaidAmount: number;
   ExpenseBalanceAmount: number;
-  ExpensePaymentType: 'cash' | 'bank' | 'cheque';
+  ExpensePaymentType: 'cash' | 'cheque';
   ExpensePaymentRef?: string | null;
   ExpenseDescription?: string | null;
   ExpenseDate: Timestamp | FieldValue;

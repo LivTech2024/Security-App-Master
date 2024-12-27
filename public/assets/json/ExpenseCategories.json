@@ -1,0 +1,78 @@
+[
+    {
+        "label": "Accounting Fees",
+        "value": "Accounting Fees"
+    },
+    {
+        "label": "Consulting Charges",
+        "value": "Consulting Charges"
+    },
+    {
+        "label": "Education and Training",
+        "value": "Education and Training"
+    },
+    {
+        "label": "Electricity",
+        "value": "Electricity"
+    },
+    {
+        "label": "Employee Salary",
+        "value": "Employee Salary"
+    },
+    {
+        "label": "Fuel",
+        "value": "Fuel"
+    },
+    {
+        "label": "Interest Expense",
+        "value": "Interest Expense"
+    },
+    {
+        "label": "Insurance",
+        "value": "Insurance"
+    },
+    {
+        "label": "Legal Charges",
+        "value": "Legal Charges"
+    },
+    {
+        "label": "Marketing",
+        "value": "Marketing"
+    },
+    {
+        "label": "Meals and Entertainment",
+        "value": "Meals and Entertainment"
+    },
+    {
+        "label": "Miscellaneous Expense",
+        "value": "Miscellaneous Expense"
+    },
+    {
+        "label": "Office Supply",
+        "value": "Office Supply"
+    },
+    {
+        "label": "Payment Processing Fee",
+        "value": "Payment Processing Fee"
+    },
+    {
+        "label": "Phone and Internet",
+        "value": "Phone and Internet"
+    },
+    {
+        "label": "Power and Utility",
+        "value": "Power and Utility"
+    },
+    {
+        "label": "Rent",
+        "value": "Rent"
+    },
+    {
+        "label": "Repair and Maintenance",
+        "value": "Repair and Maintenance"
+    },
+    {
+        "label": "Others",
+        "value": "Others"
+    }
+]
