@@ -816,7 +816,7 @@ export interface IExpensesCollection {
   ExpenseId: string;
   ExpenseCompanyId: string;
   ExpenseCompanyBranchId?: string | null;
-  ExpenseNumber: number;
+  ExpenseNumber: string;
   ExpenseCategory: string;
   ExpenseSubCategory?: string | null;
   ExpenseAmount: number;

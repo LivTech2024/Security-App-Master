@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuthState } from '../../../store';
+import { useAuthState, useEditFormStore } from '../../../store';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -34,6 +34,8 @@ const ExpenseList = () => {
   const [isLifeTime, setIsLifeTime] = useState(false);
 
   const { company } = useAuthState();
+
+  const { setExpenseEditData } = useEditFormStore();
 
   const {
     data: snapshotData,
@@ -170,6 +172,7 @@ const ExpenseList = () => {
                   <td
                     onClick={() => {
                       navigate(PageRoutes.EXPENSE_CREATE_OR_EDIT);
+                      setExpenseEditData(expense);
                     }}
                     className="align-top cursor-pointer px-4 py-2 text-start "
                   >
@@ -180,6 +183,7 @@ const ExpenseList = () => {
                   <td
                     onClick={() => {
                       navigate(PageRoutes.EXPENSE_CREATE_OR_EDIT);
+                      setExpenseEditData(expense);
                     }}
                     className="align-top cursor-pointer px-4 py-2 text-start "
                   >
@@ -190,6 +194,7 @@ const ExpenseList = () => {
                   <td
                     onClick={() => {
                       navigate(PageRoutes.EXPENSE_CREATE_OR_EDIT);
+                      setExpenseEditData(expense);
                     }}
                     className="align-top cursor-pointer px-4 py-2 text-start"
                   >
@@ -201,6 +206,7 @@ const ExpenseList = () => {
                   <td
                     onClick={() => {
                       navigate(PageRoutes.EXPENSE_CREATE_OR_EDIT);
+                      setExpenseEditData(expense);
                     }}
                     className="align-top cursor-pointer px-4 py-2 text-start"
                   >
@@ -211,6 +217,7 @@ const ExpenseList = () => {
                   <td
                     onClick={() => {
                       navigate(PageRoutes.EXPENSE_CREATE_OR_EDIT);
+                      setExpenseEditData(expense);
                     }}
                     className="align-top cursor-pointer px-4 py-2 text-start"
                   >
@@ -218,6 +225,7 @@ const ExpenseList = () => {
                   </td>
                   <td
                     onClick={() => {
+                      setExpenseEditData(expense);
                       navigate(PageRoutes.EXPENSE_CREATE_OR_EDIT);
                     }}
                     className="align-top cursor-pointer px-4 py-2 text-start "

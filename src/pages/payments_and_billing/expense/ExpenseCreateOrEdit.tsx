@@ -72,6 +72,28 @@ const ExpenseCreateOrEdit = () => {
     }
   };
 
+  const onDelete = async () => {
+    if (!isEdit) return;
+    try {
+      setLoading(true);
+
+      await DbPayment.deleteExpense(expenseEditData.ExpenseId);
+
+      showSnackbar({
+        message: 'Expense deleted successfully',
+        type: 'success',
+      });
+
+      setLoading(false);
+
+      navigate(PageRoutes.EXPENSE_LIST);
+    } catch (error) {
+      console.log(error);
+      errorHandler(error);
+      setLoading(false);
+    }
+  };
+
   console.log(errors);
 
   const [expenseAmt, paidAmt, paymentType] = watch([
@@ -112,9 +134,9 @@ const ExpenseCreateOrEdit = () => {
                     closeOnClickOutside: true,
                     innerProps: {
                       title: 'Confirm',
-                      body: 'Are you sure to delete this invoice',
+                      body: 'Are you sure to delete this expense',
                       onConfirm: () => {
-                        // onDelete();
+                        onDelete();
                       },
                     },
                     size: '30%',

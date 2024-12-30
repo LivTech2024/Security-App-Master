@@ -705,6 +705,31 @@ class DbPayment {
     return getDocs(invoiceQuery);
   };
 
+  //*Expense
+  static isExpenseNumberExist = async (
+    cmpId: string,
+    expenseNo: string,
+    expenseId?: string
+  ) => {
+    const expenseRef = collection(db, CollectionName.expenses);
+
+    let queryParams: QueryConstraint[] = [
+      where('ExpenseCompanyId', '==', cmpId),
+      where('ExpenseNumber', '==', expenseNo),
+    ];
+
+    if (expenseId) {
+      queryParams = [...queryParams, where('ExpenseId', '!=', expenseId)];
+    }
+    queryParams = [...queryParams, limit(1)];
+
+    const expenseQuery = query(expenseRef, ...queryParams);
+
+    const snapshot = await getDocs(expenseQuery);
+
+    return !snapshot.empty;
+  };
+
   static getExpenses = ({
     cmpId,
     lastDoc,
@@ -764,6 +789,15 @@ class DbPayment {
   ) => {
     let receptImgUrl: string | null = null;
     try {
+      const expenseNoExist = await this.isExpenseNumberExist(
+        cmpId,
+        data.ExpenseNumber
+      );
+
+      if (expenseNoExist) {
+        throw new CustomError('This expense number already exist');
+      }
+
       const expenseId = getNewDocId(CollectionName.expenses);
       const expenseRef = doc(db, CollectionName.expenses, expenseId);
 
@@ -820,6 +854,22 @@ class DbPayment {
       }
       throw error;
     }
+  };
+
+  static deleteExpense = async (expenseId: string) => {
+    await runTransaction(db, async (transaction) => {
+      const expenseRef = doc(db, CollectionName.expenses, expenseId);
+      const snapshot = await transaction.get(expenseRef);
+      const expenseData = snapshot.data() as IExpensesCollection;
+
+      transaction.delete(expenseRef);
+
+      if (expenseData.ExpenseReceipt) {
+        await CloudStorageImageHandler.deleteImageByUrl(
+          expenseData.ExpenseReceipt
+        );
+      }
+    });
   };
 }
 

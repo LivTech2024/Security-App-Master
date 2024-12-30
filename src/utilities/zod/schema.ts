@@ -614,7 +614,10 @@ export type EmergProtocolCreateFormFields = z.infer<
 export const expenseCreateSchema = z
   .object({
     ExpenseCompanyBranchId: z.string().optional().nullable(),
-    ExpenseNumber: z.coerce.number().min(1),
+    ExpenseNumber: z
+      .string()
+      .min(1, { message: 'Expense number should be at least 1 character' })
+      .max(6, { message: 'Expense number should be at most 6 character' }),
     ExpenseCategory: z
       .string()
       .min(3, { message: 'Expense category is required' }),
