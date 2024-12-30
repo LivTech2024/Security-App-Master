@@ -19,6 +19,7 @@ import TableShimmer from '../../common/shimmer/TableShimmer';
 import { numberFormatter } from '../../utilities/NumberFormater';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../common/PageHeader';
+import SelectBranch from '../../common/SelectBranch';
 
 const Clients = () => {
   const { company } = useAuthState();
@@ -26,6 +27,8 @@ const Clients = () => {
   const { setClientEditData } = useEditFormStore();
 
   const [query, setQuery] = useState('');
+
+  const [selectedBranch, setSelectedBranch] = useState('');
 
   const [debouncedQuery] = useDebouncedValue(query, 200);
 
@@ -42,6 +45,7 @@ const Clients = () => {
       REACT_QUERY_KEYS.CLIENT_LIST,
       debouncedQuery,
       company!.CompanyId,
+      selectedBranch,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbClient.getClients({
@@ -49,6 +53,7 @@ const Clients = () => {
         lastDoc: pageParam,
         searchQuery: debouncedQuery,
         cmpId: company!.CompanyId,
+        branchId: selectedBranch,
       });
       return snapshot.docs;
     },
@@ -130,6 +135,10 @@ const Clients = () => {
           value={query}
           setValue={setQuery}
           placeholder="Search client"
+        />
+        <SelectBranch
+          selectedBranch={selectedBranch}
+          setSelectedBranch={setSelectedBranch}
         />
       </div>
 

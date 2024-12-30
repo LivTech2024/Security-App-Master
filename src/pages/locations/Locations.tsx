@@ -26,12 +26,9 @@ import { MdOutlineWarningAmber } from 'react-icons/md';
 const Locations = () => {
   const navigate = useNavigate();
 
-  const { company, client } = useAuthState();
+  const { company } = useAuthState();
 
   const { setLocationEditData } = useEditFormStore();
-
-  //const [query, setQuery] = useState("");
-  console.log(client, 'here');
 
   const [debouncedQuery] = useDebouncedValue('', 200);
 
