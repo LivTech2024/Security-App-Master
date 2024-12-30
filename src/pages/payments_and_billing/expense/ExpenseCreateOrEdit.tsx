@@ -1,7 +1,12 @@
 import { openContextModal } from '@mantine/modals';
 import Button from '../../../common/button/Button';
 import PageHeader from '../../../common/PageHeader';
-import { useAuthState, useEditFormStore, useUIState } from '../../../store';
+import {
+  useAuthState,
+  useEditFormStore,
+  usePaymentState,
+  useUIState,
+} from '../../../store';
 import InputSelect from '../../../common/inputs/InputSelect';
 import expenseCategory from '../../../../public/assets/json/ExpenseCategories.json';
 import InputWithTopHeader from '../../../common/inputs/InputWithTopHeader';
@@ -14,20 +19,24 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { roundNumber } from '../../../utilities/misc';
+import { roundNumber, toDate } from '../../../utilities/misc';
 import { numberFormatter } from '../../../utilities/NumberFormater';
-import SelectBranch from '../../../common/SelectBranch';
 import { errorHandler } from '../../../utilities/CustomError';
 import DbPayment from '../../../firebase_configs/DB/DbPayment';
 import { showSnackbar } from '../../../utilities/TsxUtils';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../../@types/enum';
 import { FaImage } from 'react-icons/fa';
+import { AiOutlinePlus } from 'react-icons/ai';
 
 const ExpenseCreateOrEdit = () => {
   const { expenseEditData } = useEditFormStore();
 
+  const { recentExpenseNumber } = usePaymentState();
+
   const isEdit = !!expenseEditData;
+
+  console.log(recentExpenseNumber, 'here');
 
   const {
     register,
@@ -37,17 +46,29 @@ const ExpenseCreateOrEdit = () => {
     handleSubmit,
   } = useForm<ExpenseCreateFormFields>({
     resolver: zodResolver(expenseCreateSchema),
+    defaultValues: isEdit
+      ? {
+          ExpenseAmount: expenseEditData.ExpenseAmount,
+          ExpenseBalanceAmount: expenseEditData.ExpenseBalanceAmount,
+          ExpenseCategory: expenseEditData.ExpenseCategory,
+          ExpenseCompanyBranchId: expenseEditData.ExpenseCompanyBranchId,
+          ExpenseDate: toDate(expenseEditData.ExpenseDate),
+          ExpenseDescription: expenseEditData.ExpenseDescription,
+          ExpenseNumber: expenseEditData.ExpenseNumber,
+          ExpensePaidAmount: expenseEditData.ExpensePaidAmount,
+          ExpensePaymentRef: expenseEditData.ExpensePaymentRef,
+          ExpensePaymentType: expenseEditData.ExpensePaymentType,
+        }
+      : { ExpenseNumber: String(recentExpenseNumber + 1) },
   });
 
   const navigate = useNavigate();
 
-  const { company } = useAuthState();
+  const { company, companyBranches } = useAuthState();
 
   const { setLoading } = useUIState();
 
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
-
-  const [selectedBranch, setSelectedBranch] = useState<string>('');
 
   const onSubmit = async (data: ExpenseCreateFormFields) => {
     if (!company) return;
@@ -55,12 +76,24 @@ const ExpenseCreateOrEdit = () => {
     try {
       setLoading(true);
 
-      await DbPayment.createExpense(company.CompanyId, data, receiptImage);
-
-      showSnackbar({
-        message: 'Expense created successfully',
-        type: 'success',
-      });
+      if (isEdit) {
+        await DbPayment.updateExpense({
+          cmpId: company.CompanyId,
+          data,
+          receiptImg: receiptImage,
+          expenseId: expenseEditData.ExpenseId,
+        });
+        showSnackbar({
+          message: 'Expense updated successfully',
+          type: 'success',
+        });
+      } else {
+        await DbPayment.createExpense(company.CompanyId, data, receiptImage);
+        showSnackbar({
+          message: 'Expense created successfully',
+          type: 'success',
+        });
+      }
 
       setLoading(false);
 
@@ -206,10 +239,31 @@ const ExpenseCreateOrEdit = () => {
               error={errors.ExpenseNumber?.message}
               decimalCount={0}
             />
-            <SelectBranch
-              selectedBranch={selectedBranch}
-              setSelectedBranch={setSelectedBranch}
-              label="Select Branch"
+            <InputSelect
+              label="Branch"
+              data={companyBranches.map((branch) => {
+                return {
+                  label: branch.CompanyBranchName,
+                  value: branch.CompanyBranchId,
+                };
+              })}
+              value={watch('ExpenseCompanyBranchId') || ''}
+              onChange={(e) => setValue('ExpenseCompanyBranchId', e as string)}
+              searchable
+              nothingFoundMessage={
+                <div
+                  onClick={() => {
+                    navigate(PageRoutes.COMPANY_BRANCHES);
+                  }}
+                  className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <AiOutlinePlus size={18} />
+                    <span>Add new branch</span>
+                  </div>
+                </div>
+              }
+              error={errors.ExpenseCompanyBranchId?.message}
             />
           </div>
         </div>

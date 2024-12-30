@@ -806,7 +806,7 @@ class DbPayment {
           {
             base64: receiptImg,
             path:
-              CloudStoragePaths.COMPANIES_EXPENSES_receipts +
+              CloudStoragePaths.COMPANIES_EXPENSES_RECEIPTS +
               '/' +
               CloudStorageImageHandler.generateImageName(
                 expenseId,
@@ -856,6 +856,81 @@ class DbPayment {
     }
   };
 
+  static updateExpense = async ({
+    cmpId,
+    data,
+    expenseId,
+    receiptImg,
+  }: {
+    cmpId: string;
+    expenseId: string;
+    data: ExpenseCreateFormFields;
+    receiptImg: string | null;
+  }) => {
+    try {
+      const expenseNoExist = await this.isExpenseNumberExist(
+        cmpId,
+        data.ExpenseNumber,
+        expenseId
+      );
+
+      if (expenseNoExist) {
+        throw new CustomError('This expense number already exist');
+      }
+
+      const expenseRef = doc(db, CollectionName.expenses, expenseId);
+
+      let receptImgUrl = receiptImg;
+
+      if (receiptImg && !receiptImg.startsWith('https')) {
+        const imageReceipt = [
+          {
+            base64: receiptImg,
+            path:
+              CloudStoragePaths.COMPANIES_EXPENSES_RECEIPTS +
+              '/' +
+              CloudStorageImageHandler.generateImageName(
+                expenseId,
+                'receipt_img'
+              ),
+          },
+        ];
+
+        const receiptImageUrlTemp =
+          await CloudStorageImageHandler.getImageDownloadUrls(
+            imageReceipt,
+            ImageResolution.COMPANY_EXPENSES_RECEIPT_IMG_HEIGHT,
+            ImageResolution.COMPANY_EXPENSES_RECEIPT_IMG_WIDTH
+          );
+
+        receptImgUrl = receiptImageUrlTemp[0];
+      }
+
+      const updatedExpense: Partial<IExpensesCollection> = {
+        ExpenseCompanyBranchId: data?.ExpenseCompanyBranchId || null,
+        ExpenseNumber: data.ExpenseNumber,
+        ExpenseCategory: data.ExpenseCategory,
+        ExpenseAmount: data.ExpenseAmount,
+        ExpensePaidAmount: data.ExpensePaidAmount,
+        ExpenseBalanceAmount: data.ExpenseBalanceAmount,
+        ExpensePaymentType: data.ExpensePaymentType,
+        ExpensePaymentRef: data.ExpensePaymentRef || null,
+        ExpenseDescription: data.ExpenseDescription || null,
+        ExpenseReceipt: receptImgUrl,
+        ExpenseSubCategory: data.ExpenseSubCategory || null,
+        ExpenseDate: removeTimeFromDate(
+          data.ExpenseDate
+        ) as unknown as Timestamp,
+        ExpenseModifiedAt: serverTimestamp(),
+      };
+
+      return updateDoc(expenseRef, updatedExpense);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
+
   static deleteExpense = async (expenseId: string) => {
     await runTransaction(db, async (transaction) => {
       const expenseRef = doc(db, CollectionName.expenses, expenseId);
@@ -870,6 +945,21 @@ class DbPayment {
         );
       }
     });
+  };
+
+  static getRecentExpenseNumber = async (cmpId: string) => {
+    const expenseRef = collection(db, CollectionName.expenses);
+    const expenseQuery = query(
+      expenseRef,
+      where('ExpenseCompanyId', '==', cmpId),
+      orderBy('ExpenseNumber', 'desc'),
+      limit(1)
+    );
+
+    const expenseSnapshot = await getDocs(expenseQuery);
+    const expenseData = expenseSnapshot.docs[0]?.data() as IExpensesCollection;
+
+    return expenseData;
   };
 }
 

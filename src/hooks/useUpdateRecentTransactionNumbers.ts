@@ -4,7 +4,7 @@ import DbPayment from '../firebase_configs/DB/DbPayment';
 
 const useUpdateRecentTransactionNumbers = () => {
   const { company } = useAuthState();
-  const { setRecentInvoiceNumber } = usePaymentState();
+  const { setRecentInvoiceNumber, setRecentExpenseNumber } = usePaymentState();
 
   useEffect(() => {
     if (!company) return;
@@ -15,6 +15,16 @@ const useUpdateRecentTransactionNumbers = () => {
         setRecentInvoiceNumber(Number(InvoiceNumber));
       }
     });
+
+    DbPayment.getRecentExpenseNumber(company.CompanyId)
+      .then((data) => {
+        if (data) {
+          const { ExpenseNumber } = data;
+          setRecentExpenseNumber(Number(ExpenseNumber));
+          console.log('updating', ExpenseNumber);
+        }
+      })
+      .catch((err) => console.log('Error in expense recent number', err));
   }, [company]);
 };
 

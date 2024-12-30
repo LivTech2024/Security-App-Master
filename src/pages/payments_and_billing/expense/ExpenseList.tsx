@@ -19,6 +19,7 @@ import NoSearchResult from '../../../common/NoSearchResult';
 import { formatDate } from '../../../utilities/misc';
 import { numberFormatter } from '../../../utilities/NumberFormater';
 import TableShimmer from '../../../common/shimmer/TableShimmer';
+import useUpdateRecentTransactionNumbers from '../../../hooks/useUpdateRecentTransactionNumbers';
 
 const ExpenseList = () => {
   const navigate = useNavigate();
@@ -113,6 +114,9 @@ const ExpenseList = () => {
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
 
+  //*Hook to fetch recent expense number
+  useUpdateRecentTransactionNumbers();
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
@@ -122,6 +126,7 @@ const ExpenseList = () => {
             type="black"
             label="Create New Expense"
             onClick={() => {
+              setExpenseEditData(null);
               navigate(PageRoutes.EXPENSE_CREATE_OR_EDIT);
             }}
             className="px-4 py-2"

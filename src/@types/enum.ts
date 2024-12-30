@@ -126,7 +126,7 @@ export const CloudStoragePaths = {
   EMPLOYEES_IMAGES: 'employees/images/',
   EMPLOYEES_DOCUMENTS: 'employees/documents',
   COMPANIES_LOGOS: 'companies/logos',
-  COMPANIES_EXPENSES_receipts: 'companies/expenses/receipts',
+  COMPANIES_EXPENSES_RECEIPTS: 'companies/expenses/receipts',
   DOCUMENTS: 'documents',
   CLIENT_IMAGES: 'clients/images',
   CLIENT_DOCUMENTS: 'clients/documents',
