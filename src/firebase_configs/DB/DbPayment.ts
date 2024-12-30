@@ -17,7 +17,11 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '../config';
-import { CollectionName } from '../../@types/enum';
+import {
+  CloudStoragePaths,
+  CollectionName,
+  ImageResolution,
+} from '../../@types/enum';
 import {
   ExpenseCreateFormFields,
   InvoiceFormFields,
@@ -36,7 +40,7 @@ import {
   IShiftsCollection,
 } from '../../@types/database';
 import CustomError from '../../utilities/CustomError';
-import { getNewDocId } from './utils';
+import CloudStorageImageHandler, { getNewDocId } from './utils';
 import { removeTimeFromDate } from '../../utilities/misc';
 import DbEmployee from './DbEmployee';
 import {
@@ -753,30 +757,69 @@ class DbPayment {
     return getDocs(invoiceQuery);
   };
 
-  static createExpense = (cmpId: string, data: ExpenseCreateFormFields) => {
-    const expenseId = getNewDocId(CollectionName.expenses);
-    const expenseRef = doc(db, CollectionName.expenses, expenseId);
+  static createExpense = async (
+    cmpId: string,
+    data: ExpenseCreateFormFields,
+    receiptImg: string | null
+  ) => {
+    let receptImgUrl: string | null = null;
+    try {
+      const expenseId = getNewDocId(CollectionName.expenses);
+      const expenseRef = doc(db, CollectionName.expenses, expenseId);
 
-    const newExpense: IExpensesCollection = {
-      ExpenseId: expenseId,
-      ExpenseCompanyId: cmpId,
-      ExpenseCompanyBranchId: data?.ExpenseCompanyBranchId || null,
-      ExpenseNumber: data.ExpenseNumber,
-      ExpenseCategory: data.ExpenseCategory,
-      ExpenseAmount: data.ExpenseAmount,
-      ExpensePaidAmount: data.ExpensePaidAmount,
-      ExpenseBalanceAmount: data.ExpenseBalanceAmount,
-      ExpensePaymentType: data.ExpensePaymentType,
-      ExpensePaymentRef: data.ExpensePaymentRef || null,
-      ExpenseDescription: data.ExpenseDescription || null,
-      ExpenseReceipt: null,
-      ExpenseSubCategory: data.ExpenseSubCategory || null,
-      ExpenseDate: removeTimeFromDate(data.ExpenseDate) as unknown as Timestamp,
-      ExpenseCreatedAt: serverTimestamp(),
-      ExpenseModifiedAt: serverTimestamp(),
-    };
+      if (receiptImg) {
+        const imageReceipt = [
+          {
+            base64: receiptImg,
+            path:
+              CloudStoragePaths.COMPANIES_EXPENSES_receipts +
+              '/' +
+              CloudStorageImageHandler.generateImageName(
+                expenseId,
+                'receipt_img'
+              ),
+          },
+        ];
 
-    return setDoc(expenseRef, newExpense);
+        const receiptImgUrlTemp =
+          await CloudStorageImageHandler.getImageDownloadUrls(
+            imageReceipt,
+            ImageResolution.COMPANY_EXPENSES_RECEIPT_IMG_HEIGHT,
+            ImageResolution.COMPANY_EXPENSES_RECEIPT_IMG_WIDTH
+          );
+
+        receptImgUrl = receiptImgUrlTemp[0];
+      }
+
+      const newExpense: IExpensesCollection = {
+        ExpenseId: expenseId,
+        ExpenseCompanyId: cmpId,
+        ExpenseCompanyBranchId: data?.ExpenseCompanyBranchId || null,
+        ExpenseNumber: data.ExpenseNumber,
+        ExpenseCategory: data.ExpenseCategory,
+        ExpenseAmount: data.ExpenseAmount,
+        ExpensePaidAmount: data.ExpensePaidAmount,
+        ExpenseBalanceAmount: data.ExpenseBalanceAmount,
+        ExpensePaymentType: data.ExpensePaymentType,
+        ExpensePaymentRef: data.ExpensePaymentRef || null,
+        ExpenseDescription: data.ExpenseDescription || null,
+        ExpenseReceipt: receptImgUrl,
+        ExpenseSubCategory: data.ExpenseSubCategory || null,
+        ExpenseDate: removeTimeFromDate(
+          data.ExpenseDate
+        ) as unknown as Timestamp,
+        ExpenseCreatedAt: serverTimestamp(),
+        ExpenseModifiedAt: serverTimestamp(),
+      };
+
+      return setDoc(expenseRef, newExpense);
+    } catch (error) {
+      console.log(error);
+      if (receptImgUrl) {
+        await CloudStorageImageHandler.deleteImageByUrl(receptImgUrl);
+      }
+      throw error;
+    }
   };
 }
 

@@ -13,7 +13,7 @@ import {
 } from '../../../utilities/zod/schema';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { roundNumber } from '../../../utilities/misc';
 import { numberFormatter } from '../../../utilities/NumberFormater';
 import SelectBranch from '../../../common/SelectBranch';
@@ -22,6 +22,7 @@ import DbPayment from '../../../firebase_configs/DB/DbPayment';
 import { showSnackbar } from '../../../utilities/TsxUtils';
 import { useNavigate } from 'react-router-dom';
 import { PageRoutes } from '../../../@types/enum';
+import { FaImage } from 'react-icons/fa';
 
 const ExpenseCreateOrEdit = () => {
   const { expenseEditData } = useEditFormStore();
@@ -44,6 +45,8 @@ const ExpenseCreateOrEdit = () => {
 
   const { setLoading } = useUIState();
 
+  const [receiptImage, setReceiptImage] = useState<string | null>(null);
+
   const [selectedBranch, setSelectedBranch] = useState<string>('');
 
   const onSubmit = async (data: ExpenseCreateFormFields) => {
@@ -52,7 +55,7 @@ const ExpenseCreateOrEdit = () => {
     try {
       setLoading(true);
 
-      await DbPayment.createExpense(company.CompanyId, data);
+      await DbPayment.createExpense(company.CompanyId, data, receiptImage);
 
       showSnackbar({
         message: 'Expense created successfully',
@@ -80,6 +83,17 @@ const ExpenseCreateOrEdit = () => {
   useEffect(() => {
     setValue('ExpenseBalanceAmount', roundNumber(expenseAmt - paidAmt));
   }, [expenseAmt, paidAmt]);
+
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setReceiptImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
@@ -235,6 +249,37 @@ const ExpenseCreateOrEdit = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="flex flex-col gap-4 bg-surface p-4 rounded shadow">
+          <div className="font-semibold">Upload receipt image</div>
+          <label
+            htmlFor="img"
+            className="flex flex-col items-center justify-center border border-dashed border-black rounded-md p-4 cursor-pointer"
+          >
+            {receiptImage ? (
+              <img
+                src={receiptImage}
+                alt={'Void check'}
+                className="w-1/2 max-h-[800px] rounded"
+              />
+            ) : (
+              <>
+                <FaImage className="text-3xl" />
+                <span className="text-textPrimaryBlue cursor-pointer">
+                  Upload receipt
+                </span>
+              </>
+            )}
+            <input
+              id="img"
+              type="file"
+              accept="image/*"
+              hidden
+              className="hidden"
+              onChange={handleImageUpload}
+            />
+          </label>
         </div>
       </div>
     </div>

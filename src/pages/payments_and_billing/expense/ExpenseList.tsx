@@ -224,13 +224,18 @@ const ExpenseList = () => {
                   >
                     {numberFormatter(expense.ExpensePaidAmount, true)}
                   </td>
-                  <td
-                    onClick={() => {
-                      navigate(PageRoutes.EXPENSE_CREATE_OR_EDIT);
-                    }}
-                    className="align-top cursor-pointer px-4 py-2 text-start "
-                  >
-                    "N/A"
+                  <td className="align-top cursor-pointer px-4 py-2 text-end">
+                    {expense.ExpenseReceipt ? (
+                      <a
+                        href={expense.ExpenseReceipt}
+                        target="_blank"
+                        className="text-textPrimaryBlue underline"
+                      >
+                        Click here
+                      </a>
+                    ) : (
+                      'N/A'
+                    )}
                   </td>
                 </tr>
               );
