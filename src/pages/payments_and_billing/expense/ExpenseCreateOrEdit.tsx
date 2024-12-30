@@ -150,6 +150,16 @@ const ExpenseCreateOrEdit = () => {
     }
   };
 
+  useEffect(() => {
+    if (isEdit) {
+      if (expenseEditData.ExpenseReceipt) {
+        setReceiptImage(expenseEditData.ExpenseReceipt);
+      }
+      return;
+    }
+    setReceiptImage(null);
+  }, [isEdit, expenseEditData]);
+
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
       <PageHeader
@@ -192,7 +202,7 @@ const ExpenseCreateOrEdit = () => {
         }
       />
 
-      <div className=" p-4 flex flex-col gap-4">
+      <div className=" flex flex-col gap-4">
         <div className="flex items-start justify-between w-full gap-4">
           <div className="bg-surface shadow rounded flex flex-col gap-4 p-4 w-full max-w-xl">
             <div className="font-semibold">Expense Details</div>
