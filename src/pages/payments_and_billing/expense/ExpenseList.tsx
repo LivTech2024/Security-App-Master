@@ -20,6 +20,7 @@ import { formatDate } from '../../../utilities/misc';
 import { numberFormatter } from '../../../utilities/NumberFormater';
 import TableShimmer from '../../../common/shimmer/TableShimmer';
 import useUpdateRecentTransactionNumbers from '../../../hooks/useUpdateRecentTransactionNumbers';
+import SelectBranch from '../../../common/SelectBranch';
 
 const ExpenseList = () => {
   const navigate = useNavigate();
@@ -33,6 +34,8 @@ const ExpenseList = () => {
   );
 
   const [isLifeTime, setIsLifeTime] = useState(false);
+
+  const [selectedBranch, setSelectedBranch] = useState('');
 
   const { company } = useAuthState();
 
@@ -53,6 +56,7 @@ const ExpenseList = () => {
       isLifeTime,
       startDate,
       endDate,
+      selectedBranch,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbPayment.getExpenses({
@@ -62,6 +66,7 @@ const ExpenseList = () => {
         isLifeTime,
         startDate,
         endDate,
+        branchId: selectedBranch,
       });
       return snapshot.docs;
     },
@@ -144,6 +149,10 @@ const ExpenseList = () => {
             startDate={startDate}
           />
         </div>
+        <SelectBranch
+          selectedBranch={selectedBranch}
+          setSelectedBranch={setSelectedBranch}
+        />
       </div>
 
       <table className="rounded overflow-hidden w-full">

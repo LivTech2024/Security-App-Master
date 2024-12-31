@@ -38,6 +38,7 @@ import InputSelect from '../../../common/inputs/InputSelect';
 import useFetchClients from '../../../hooks/fetch/useFetchClients';
 import { downloadPdf } from '../../../utilities/pdf/common/downloadPdf';
 import { Company } from '../../../store/slice/auth.slice';
+import SelectBranch from '../../../common/SelectBranch';
 
 enum InvoiceStatus {
   settled = 'settled',
@@ -71,6 +72,8 @@ const InvoiceList = () => {
 
   const [selectedStatus, setSelectedStatus] = useState<InvoiceStatus | ''>('');
 
+  const [selectedBranch, setSelectedBranch] = useState('');
+
   const { company } = useAuthState();
 
   const {
@@ -89,6 +92,7 @@ const InvoiceList = () => {
       startDate,
       endDate,
       clientId,
+      selectedBranch,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbPayment.getInvoices({
@@ -99,6 +103,7 @@ const InvoiceList = () => {
         startDate,
         endDate,
         clientId,
+        branchId: selectedBranch,
       });
       return snapshot.docs;
     },
@@ -244,6 +249,7 @@ const InvoiceList = () => {
             setStartDate={setStartDate}
             startDate={startDate}
           />
+
           <div className="flex font-semibold gap-2 items-center">
             <span className="text-textSecondary"> Total Invoice Amount: </span>
             {numberFormatter(
@@ -254,6 +260,10 @@ const InvoiceList = () => {
         </div>
         <div className="flex flex-col items-end gap-4">
           <div className="flex items-center gap-4 w-full justify-end">
+            <SelectBranch
+              selectedBranch={selectedBranch}
+              setSelectedBranch={setSelectedBranch}
+            />
             <InputSelect
               placeholder="Select Client"
               searchable
