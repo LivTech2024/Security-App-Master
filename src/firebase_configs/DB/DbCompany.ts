@@ -617,12 +617,14 @@ class DbCompany {
     searchQuery,
     cmpId,
     clientId,
+    branchId,
   }: {
     lmt?: number;
     lastDoc?: DocumentData | null;
     searchQuery?: string;
     cmpId?: string | null;
     clientId?: string | null;
+    branchId?: string | null;
   }) => {
     const locationRef = collection(db, CollectionName.locations);
 
@@ -634,6 +636,13 @@ class DbCompany {
 
     if (clientId) {
       queryParams = [...queryParams, where('LocationClientId', '==', clientId)];
+    }
+
+    if (branchId) {
+      queryParams = [
+        ...queryParams,
+        where('LocationCompanyBranchId', '==', branchId),
+      ];
     }
 
     if (searchQuery && searchQuery.length > 0) {

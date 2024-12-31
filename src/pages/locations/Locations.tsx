@@ -22,6 +22,7 @@ import dayjs from 'dayjs';
 import { toDate } from '../../utilities/misc';
 import { Tooltip } from '@mantine/core';
 import { MdOutlineWarningAmber } from 'react-icons/md';
+import SelectBranch from '../../common/SelectBranch';
 
 const Locations = () => {
   const navigate = useNavigate();
@@ -31,6 +32,8 @@ const Locations = () => {
   const { setLocationEditData } = useEditFormStore();
 
   const [debouncedQuery] = useDebouncedValue('', 200);
+
+  const [selectedBranch, setSelectedBranch] = useState('');
 
   const {
     data: snapshotData,
@@ -45,6 +48,7 @@ const Locations = () => {
       REACT_QUERY_KEYS.LOCATION_LIST,
       debouncedQuery,
       company!.CompanyId,
+      selectedBranch,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbCompany.getLocations({
@@ -52,6 +56,7 @@ const Locations = () => {
         lastDoc: pageParam,
         searchQuery: debouncedQuery,
         cmpId: company!.CompanyId,
+        branchId: selectedBranch,
       });
       return snapshot.docs;
     },
@@ -136,6 +141,13 @@ const Locations = () => {
           />
         }
       />
+
+      <div className="bg-surface shadow rounded p-4 w-full flex items-center gap-4 justify-between">
+        <SelectBranch
+          selectedBranch={selectedBranch}
+          setSelectedBranch={setSelectedBranch}
+        />
+      </div>
 
       <table className="rounded overflow-hidden w-full">
         <thead className="bg-primary text-surface text-sm">

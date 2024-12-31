@@ -8,9 +8,15 @@ interface Props {
   limit?: number;
   searchQuery?: string | null;
   clientId?: string | null;
+  branchId?: string | null;
 }
 
-const useFetchLocations = ({ limit, searchQuery, clientId }: Props) => {
+const useFetchLocations = ({
+  limit,
+  searchQuery,
+  clientId,
+  branchId,
+}: Props) => {
   const [data, setData] = useState<ILocationsCollection[]>([]);
 
   const { company, client } = useAuthState();
@@ -34,6 +40,7 @@ const useFetchLocations = ({ limit, searchQuery, clientId }: Props) => {
             : undefined,
         cmpId: company?.CompanyId || null,
         clientId: clientId || null,
+        branchId,
       });
       return snapshot.docs
         .map((doc) => {
@@ -53,7 +60,7 @@ const useFetchLocations = ({ limit, searchQuery, clientId }: Props) => {
     } catch (error) {
       console.log(error);
     }
-  }, [limit, company, searchQuery, clientId, client]);
+  }, [limit, company, searchQuery, clientId, client, branchId]);
 
   return { data };
 };

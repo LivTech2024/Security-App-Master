@@ -17,6 +17,7 @@ import PatrolListTable from '../../component/patrolling/PatrolListTable';
 import PageHeader from '../../common/PageHeader';
 import Button from '../../common/button/Button';
 import SelectLocation from '../../common/SelectLocation';
+import SelectBranch from '../../common/SelectBranch';
 
 export const PatrolStatus = ({
   status,
@@ -58,6 +59,8 @@ const PatrollingList = () => {
 
   const [selectedLocation, setSelectedLocation] = useState('');
 
+  const [selectedBranch, setSelectedBranch] = useState('');
+
   const {
     data: snapshotData,
     fetchNextPage,
@@ -72,6 +75,7 @@ const PatrollingList = () => {
       debouncedQuery,
       company!.CompanyId,
       selectedLocation,
+      selectedBranch,
     ],
     queryFn: async ({ pageParam }) => {
       const snapshot = await DbPatrol.getPatrols({
@@ -80,6 +84,7 @@ const PatrollingList = () => {
         searchQuery: debouncedQuery,
         cmpId: company!.CompanyId,
         locationId: selectedLocation,
+        branchId: selectedBranch,
       });
       return snapshot.docs;
     },
@@ -153,6 +158,10 @@ const PatrollingList = () => {
       />
 
       <div className="flex justify-between w-full p-4 rounded bg-surface shadow items-center">
+        <SelectBranch
+          selectedBranch={selectedBranch}
+          setSelectedBranch={setSelectedBranch}
+        />
         <SelectLocation
           selectedLocation={selectedLocation}
           setSelectedLocation={setSelectedLocation}

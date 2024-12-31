@@ -7,14 +7,17 @@ import useFetchLocations from '../hooks/fetch/useFetchLocations';
 const SelectLocation = ({
   selectedLocation,
   setSelectedLocation,
+  selectedBranchId,
 }: {
   selectedLocation: string;
   setSelectedLocation: React.Dispatch<React.SetStateAction<string>>;
+  selectedBranchId?: string | null;
 }) => {
   const { client } = useAuthState();
 
   const { data: locations } = useFetchLocations({
     clientId: client ? client.ClientId : null,
+    branchId: selectedBranchId,
   });
 
   useEffect(() => {
