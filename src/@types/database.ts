@@ -134,6 +134,14 @@ export interface IShiftLinkedPatrolsChildCollection {
   LinkedPatrolCompletedHitCount?: number;
 }
 
+export interface IShiftsWellnessReportChildCollection {
+  WellnessEmpId: string;
+  WellnessEmpName: string;
+  WellnessReportedAt: Timestamp | FieldValue;
+  WellnessComment?: string | null;
+  WellnessImg?: string | null;
+}
+
 export interface IShiftsCollection {
   ShiftId: string;
   ShiftName: string;
@@ -155,13 +163,7 @@ export interface IShiftsCollection {
   ShiftCompanyBranchId: string;
   ShiftAcknowledgedByEmpId: string[];
   ShiftTask: IShiftTasksChild[];
-  ShiftGuardWellnessReport: {
-    WellnessEmpId: string;
-    WellnessEmpName: string;
-    WellnessReportedAt: Timestamp | FieldValue;
-    WellnessComment?: string | null;
-    WellnessImg?: string | null;
-  }[];
+  ShiftGuardWellnessReport: IShiftsWellnessReportChildCollection[];
   ShiftPhotoUploadIntervalInMinutes?: number | null;
   ShiftCurrentStatus: {
     Status: 'pending' | 'started' | 'completed';

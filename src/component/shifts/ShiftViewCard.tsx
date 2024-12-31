@@ -13,9 +13,12 @@ import {
 import DbShift from '../../firebase_configs/DB/DbShift';
 import { RxUpdate } from 'react-icons/rx';
 import UpdateShiftTimeModal from './modal/UpdateShiftTimeModal';
-import { useNavigate } from 'react-router-dom';
-import { PageRoutes } from '../../@types/enum';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { IDevelopmentDetails, PageRoutes } from '../../@types/enum';
 import { openContextModal } from '@mantine/modals';
+import Button from '../../common/button/Button';
+import { useUIState } from '../../store';
+import { FaCheck } from 'react-icons/fa';
 
 const ShiftViewCard = ({
   data,
@@ -30,6 +33,12 @@ const ShiftViewCard = ({
   empRoutes: IEmployeeRouteCollection[];
   setShouldRefetch: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const { setLoading } = useUIState();
+
+  const [searchParam] = useSearchParams();
+
+  const dev = searchParam.get('dev');
+
   const markShiftEnded = async (empId: string) => {
     try {
       showModalLoader({});
@@ -363,13 +372,17 @@ const ShiftViewCard = ({
       ) : null}
 
       {/* Show wellness report data */}
-      {data?.ShiftGuardWellnessReport.length ? (
-        <div className="flex flex-col gap-1 mt-4">
-          <p className="font-semibold">Wellness report</p>
-          <div className="flex flex-wrap gap-6">
+
+      <div className="flex flex-col gap-1 mt-4">
+        <p className="font-semibold">Wellness report</p>
+        {data?.ShiftGuardWellnessReport.length ? (
+          <div className="flex flex-wrap gap-6 ">
             {data?.ShiftGuardWellnessReport?.map((res, idx) => {
               return (
-                <div key={idx} className="flex flex-col">
+                <div
+                  key={idx}
+                  className="flex flex-col bg-onHoverBg shadow rounded p-4"
+                >
                   {res.WellnessEmpName && (
                     <div>Employee Name: {res?.WellnessEmpName}</div>
                   )}
@@ -382,7 +395,7 @@ const ShiftViewCard = ({
                   {res.WellnessComment && (
                     <div>Comment: {res?.WellnessComment}</div>
                   )}
-                  {res.WellnessImg && (
+                  {res.WellnessImg ? (
                     <div>
                       Image:{' '}
                       <a
@@ -396,13 +409,64 @@ const ShiftViewCard = ({
                         />
                       </a>{' '}
                     </div>
+                  ) : (
+                    <div>
+                      <FaCheck className="w-[100px] h-[100px] text-textPrimaryGreen" />
+                    </div>
                   )}
                 </div>
               );
             })}
           </div>
-        </div>
-      ) : null}
+        ) : dev == IDevelopmentDetails.DEV_NAME ? (
+          <div className="flex items-center flex-wrap gap-4 mt-4">
+            {data.ShiftCurrentStatus.filter(
+              (s) => s.Status === 'completed'
+            ).map((s) => {
+              return (
+                <div
+                  key={s.StatusReportedById}
+                  className="flex flex-col bg-onHoverBg p-4 rounded "
+                >
+                  <div>Employee: {s.StatusReportedByName}</div>
+                  <Button
+                    label="Complete"
+                    onClick={() => {
+                      openContextModal({
+                        modal: 'confirmModal',
+                        withCloseButton: false,
+                        centered: true,
+                        closeOnClickOutside: true,
+                        innerProps: {
+                          title: 'Confirm',
+                          body: `Are you sure to complete wellness report of ${s.StatusReportedByName}`,
+                          onConfirm: async () => {
+                            setLoading(true);
+                            await DbShift.completeWellnessCheck(
+                              data.ShiftId,
+                              s.StatusReportedById || ''
+                            );
+                            setShouldRefetch(true);
+                            setLoading(false);
+                          },
+                        },
+                        size: '30%',
+                        styles: {
+                          body: { padding: '0px' },
+                        },
+                      });
+                    }}
+                    type="black"
+                    className="mt-1 text-xs px-2 py-[6px]"
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div>N/A</div>
+        )}
+      </div>
 
       {/* Show Emp route details */}
       {empRoutes.length ? (
