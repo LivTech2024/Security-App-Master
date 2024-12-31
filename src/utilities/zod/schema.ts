@@ -93,6 +93,7 @@ export type CompanyUpdateFormFields = z.infer<typeof companyUpdateSchema>;
 //*Location  create schema
 export const locationCreateSchema = z.object({
   LocationClientId: z.string().min(3),
+  LocationCompanyBranchId: z.string().optional().nullable(),
   LocationName: z
     .string()
     .min(3, { message: 'Location name should be minimum 3 characters' }),

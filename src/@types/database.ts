@@ -325,6 +325,7 @@ export interface ILocationManagersChildCollection {
 export interface ILocationsCollection {
   LocationId: string;
   LocationCompanyId: string;
+  LocationCompanyBranchId?: string | null;
   LocationClientId: string;
   LocationName: string;
   LocationSearchIndex: string[];

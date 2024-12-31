@@ -394,6 +394,7 @@ class DbCompany {
         LocationSendEmailForEachShift,
         LocationSendEmailToClient,
         LocationCalloutDetails,
+        LocationCompanyBranchId,
       } = data;
 
       const nameSearchIndex = fullTextSearchIndex(
@@ -436,6 +437,7 @@ class DbCompany {
         LocationSendEmailForEachShift,
         LocationSendEmailToClient,
         LocationCalloutDetails,
+        LocationCompanyBranchId: LocationCompanyBranchId || null,
         LocationModifiedAt: serverTimestamp(),
         LocationCreatedAt: serverTimestamp(),
       };
@@ -483,6 +485,7 @@ class DbCompany {
       LocationSendEmailForEachShift,
       LocationSendEmailToClient,
       LocationCalloutDetails,
+      LocationCompanyBranchId,
     } = data;
 
     const nameSearchIndex = fullTextSearchIndex(
@@ -536,6 +539,7 @@ class DbCompany {
         LocationSendEmailForEachShift,
         LocationSendEmailToClient,
         LocationCalloutDetails,
+        LocationCompanyBranchId: LocationCompanyBranchId || null,
         LocationModifiedAt: serverTimestamp(),
       };
 

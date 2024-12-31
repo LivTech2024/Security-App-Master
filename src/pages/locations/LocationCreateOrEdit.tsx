@@ -40,11 +40,12 @@ import { Library } from '@googlemaps/js-api-loader';
 import SwitchWithSideHeader from '../../common/switch/SwitchWithSideHeader';
 import { MdAccessTime, MdKeyboardArrowRight } from 'react-icons/md';
 import LocationManagerForm from '../../component/locations/LocationManagerForm';
+import { AiOutlinePlus } from 'react-icons/ai';
 
 const libraries: Library[] = ['places'];
 
 const LocationCreateOrEdit = () => {
-  const { company } = useAuthState();
+  const { company, companyBranches } = useAuthState();
 
   const { locationEditData } = useEditFormStore();
 
@@ -82,6 +83,8 @@ const LocationCreateOrEdit = () => {
               locationEditData?.LocationCalloutDetails?.CalloutCostPerHour ||
               45,
           },
+          LocationCompanyBranchId:
+            locationEditData.LocationCompanyBranchId || '',
         }
       : {
           LocationSendEmailForEachPatrol: true,
@@ -358,6 +361,7 @@ const LocationCreateOrEdit = () => {
               name="LocationCoordinates.lng"
               error={methods.formState.errors.LocationCoordinates?.lng?.message}
             />
+
             <PlacesAutocomplete
               value={methods.watch('LocationAddress')}
               onChange={(val) => methods.setValue('LocationAddress', val)}
@@ -463,12 +467,41 @@ const LocationCreateOrEdit = () => {
             />
             <InputWithTopHeader
               label="Shift Hourly Rate"
-              className="mx-0 col-span-2"
+              className="mx-0"
               register={methods.register}
               name="LocationShiftHourlyRate"
               decimalCount={2}
               error={methods.formState.errors.LocationShiftHourlyRate?.message}
               leadingIcon={<div>$</div>}
+            />
+
+            <InputSelect
+              label="Branch"
+              data={companyBranches.map((branch) => {
+                return {
+                  label: branch.CompanyBranchName,
+                  value: branch.CompanyBranchId,
+                };
+              })}
+              value={methods.watch('LocationCompanyBranchId') || ''}
+              onChange={(e) =>
+                methods.setValue('LocationCompanyBranchId', e as string)
+              }
+              searchable
+              nothingFoundMessage={
+                <div
+                  onClick={() => {
+                    navigate(PageRoutes.COMPANY_BRANCHES);
+                  }}
+                  className="bg-primaryGold text-surface font-medium p-2 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <AiOutlinePlus size={18} />
+                    <span>Add new branch</span>
+                  </div>
+                </div>
+              }
+              error={methods.formState.errors.LocationCompanyBranchId?.message}
             />
 
             <SwitchWithSideHeader
