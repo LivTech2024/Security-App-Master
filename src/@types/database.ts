@@ -806,13 +806,18 @@ export interface IFLHACollection {
     question: string;
     response: 'YES' | 'NO';
   }[];
-  FLHAEmployeeSignature: string; //url of the signature image
+  FLHAEmployeeStartSignature: string; //url of the signature image
+  FLHAEmployeeEndSignature: string;
   FLHASupervisorSignature: string; //url of the signature image
   FLHAAdditionalSignatures: {
     date: Timestamp | FieldValue;
     name: string;
     url: string; //url of the signature image
   }[];
+  FLHAStatus:
+    | 'pending' // (Start signature of employee)
+    | 'started' // (End signature of employee)
+    | 'completed'; // (Signature added by supervisor)
 }
 
 export interface IExpensesCollection {
