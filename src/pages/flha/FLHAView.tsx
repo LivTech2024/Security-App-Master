@@ -5,9 +5,19 @@ import NoSearchResult from '../../common/NoSearchResult';
 import { IFLHACollection } from '../../@types/database';
 import DbShift from '../../firebase_configs/DB/DbShift';
 import { formatDate } from '../../utilities/misc';
+import generateFLHAHtml from '../../utilities/pdf/generateFLHAPdf';
+import { htmlToPdf } from '../../API/HtmlToPdf';
+import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
+import { errorHandler } from '../../utilities/CustomError';
+import { useAuthState, useUIState } from '../../store';
+import Button from '../../common/button/Button';
 
 const FLHAView = () => {
   const [searchParam] = useSearchParams();
+
+  const { company } = useAuthState();
+
+  const { setLoading: showLoader } = useUIState();
 
   const flhaId = searchParam.get('id');
 
@@ -25,6 +35,25 @@ const FLHAView = () => {
       setLoading(false);
     });
   }, [flhaId]);
+
+  const handleDownloadClick = async () => {
+    if (!data || !company) return;
+    try {
+      showLoader(true);
+
+      const html = generateFLHAHtml(data, company);
+
+      const response = await htmlToPdf({ file_name: 'FLHA.pdf', html });
+
+      downloadPdf(response, 'FLHA.pdf');
+
+      showLoader(false);
+    } catch (error) {
+      showLoader(false);
+      errorHandler(error);
+      console.log(error);
+    }
+  };
 
   if (!data && !loading) {
     return (
@@ -46,7 +75,12 @@ const FLHAView = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6">
-      <PageHeader title="Field Level Hazard Assessment" />
+      <PageHeader
+        title="Field Level Hazard Assessment"
+        rightSection={
+          <Button label="Download" onClick={handleDownloadClick} type="black" />
+        }
+      />
       <div className="bg-surface shadow-md rounded-lg p-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
