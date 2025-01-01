@@ -10,6 +10,7 @@ import {
   IClientsCollection,
   IEmployeesCollection,
   IEquipmentsCollection,
+  IExpensesCollection,
   IInvoicesCollection,
   ILocationsCollection,
   IPatrolLogsCollection,
@@ -41,6 +42,7 @@ const AuditDashboard = () => {
     employees: IEmployeesCollection[];
     equipments: IEquipmentsCollection[];
     payStubs: IPayStubsCollection[];
+    expenses: IExpensesCollection[];
     invoices: IInvoicesCollection[];
     shifts: IShiftsCollection[];
     patrolLogs: IPatrolLogsCollection[];
@@ -49,6 +51,7 @@ const AuditDashboard = () => {
     locations: [],
     employees: [],
     equipments: [],
+    expenses: [],
     invoices: [],
     payStubs: [],
     shifts: [],
@@ -92,10 +95,16 @@ const AuditDashboard = () => {
           ),
         }}
         TotalEquipments={auditData.equipments.length}
-        TotalExpense={auditData.payStubs.reduce(
-          (acc, obj) => acc + Number(obj.PayStubNetPay.Amount),
-          0
-        )}
+        TotalExpense={
+          auditData.payStubs.reduce(
+            (acc, obj) => acc + Number(obj.PayStubNetPay.Amount),
+            0
+          ) +
+          auditData.expenses.reduce(
+            (acc, obj) => acc + Number(obj.ExpenseAmount),
+            0
+          )
+        }
         TotalIncome={auditData.invoices.reduce(
           (acc, obj) => acc + obj.InvoiceReceivedAmount,
           0

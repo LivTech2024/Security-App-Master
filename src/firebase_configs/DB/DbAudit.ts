@@ -2,6 +2,7 @@ import {
   IClientsCollection,
   IEmployeesCollection,
   IEquipmentsCollection,
+  IExpensesCollection,
   IInvoicesCollection,
   ILocationsCollection,
   IPatrolLogsCollection,
@@ -33,6 +34,7 @@ class DbAudit {
       employees: IEmployeesCollection[] = [],
       equipments: IEquipmentsCollection[] = [],
       payStubs: IPayStubsCollection[] = [],
+      expenses: IExpensesCollection[] = [],
       invoices: IInvoicesCollection[] = [],
       shifts: IShiftsCollection[] = [];
     const patrolLogs: IPatrolLogsCollection[] = [],
@@ -42,6 +44,13 @@ class DbAudit {
 
     try {
       const invoiceTask = DbPayment.getInvoices({
+        cmpId,
+        branchId,
+        endDate,
+        startDate,
+      });
+
+      const expenseTask = DbPayment.getExpenses({
         cmpId,
         branchId,
         endDate,
@@ -80,6 +89,7 @@ class DbAudit {
 
       const [
         invoiceSnapshot,
+        expenseSnapshot,
         payStubSnapshot,
         employeesSnapshot,
         equipmentSnapshot,
@@ -88,6 +98,7 @@ class DbAudit {
         patrolSnapshot,
       ] = await Promise.all([
         invoiceTask,
+        expenseTask,
         payStubTask,
         employeesTask,
         equipmentTask,
@@ -98,6 +109,10 @@ class DbAudit {
 
       invoices = invoiceSnapshot.docs.map(
         (doc) => doc.data() as IInvoicesCollection
+      );
+
+      expenses = expenseSnapshot.docs.map(
+        (doc) => doc.data() as IExpensesCollection
       );
 
       payStubs = payStubSnapshot.docs.map(
@@ -153,6 +168,7 @@ class DbAudit {
         employees,
         equipments,
         payStubs,
+        expenses,
         invoices,
         shifts,
         patrolLogs,
@@ -165,6 +181,7 @@ class DbAudit {
         employees,
         equipments,
         payStubs,
+        expenses,
         invoices,
         shifts,
         patrolLogs,
