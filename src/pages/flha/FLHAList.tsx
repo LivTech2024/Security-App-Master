@@ -185,17 +185,17 @@ const FLHAList = () => {
                 <tr key={flha.FLHAID} className="">
                   <td
                     onClick={() =>
-                      navigate(PageRoutes.FLHA_VIEW + `&id=${flha.FLHAID}`)
+                      navigate(PageRoutes.FLHA_VIEW + `?id=${flha.FLHAID}`)
                     }
-                    className="px-4 py-2 align-top text-start"
+                    className="px-4 py-2 align-top text-start cursor-pointer"
                   >
                     {flha.FLHALocationName}
                   </td>
                   <td
                     onClick={() =>
-                      navigate(PageRoutes.FLHA_VIEW + `&id=${flha.FLHAID}`)
+                      navigate(PageRoutes.FLHA_VIEW + `?id=${flha.FLHAID}`)
                     }
-                    className="px-4 py-2 align-top text-center"
+                    className="px-4 py-2 align-top text-center cursor-pointer"
                   >
                     <span className="line-clamp-3">
                       {flha.FLHAEmployeeName}
@@ -203,17 +203,17 @@ const FLHAList = () => {
                   </td>
                   <td
                     onClick={() =>
-                      navigate(PageRoutes.FLHA_VIEW + `&id=${flha.FLHAID}`)
+                      navigate(PageRoutes.FLHA_VIEW + `?id=${flha.FLHAID}`)
                     }
-                    className="px-4 py-2 align-top text-end"
+                    className="px-4 py-2 align-top text-end cursor-pointer"
                   >
                     {formatDate(flha.FLHADate, 'DD MMM-YY')}
                   </td>
                   <td
                     onClick={() =>
-                      navigate(PageRoutes.FLHA_VIEW + `&id=${flha.FLHAID}`)
+                      navigate(PageRoutes.FLHA_VIEW + `?id=${flha.FLHAID}`)
                     }
-                    className="px-4 py-2 align-top text-start"
+                    className="px-4 py-2 align-top text-start cursor-pointer"
                   >
                     <span className="line-clamp-3">
                       {flha.FLHAShiftStartTime}
@@ -223,7 +223,7 @@ const FLHAList = () => {
                     onClick={() =>
                       navigate(PageRoutes.FLHA_VIEW + `?id=${flha.FLHAID}`)
                     }
-                    className="px-4 py-2 align-top text-start"
+                    className="px-4 py-2 align-top text-start cursor-pointer"
                   >
                     <span className="line-clamp-3">
                       {flha.FLHAShiftEndTime}
