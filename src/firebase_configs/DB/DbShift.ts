@@ -31,7 +31,6 @@ import {
 } from '../../@types/database';
 import {
   getRandomNumbers,
-  parseTime,
   removeTimeFromDate,
   toDate,
 } from '../../utilities/misc';
@@ -759,64 +758,50 @@ class DbShift {
   };
 
   static completeWellnessCheck = async (shiftId: string, empId: string) => {
-    console.log('here');
     const shiftRef = doc(db, CollectionName.shifts, shiftId);
     const shiftSnap = await getDoc(shiftRef);
 
     const shiftData = shiftSnap.data() as IShiftsCollection;
-    const { ShiftStartTime, ShiftEndTime, ShiftDate, ShiftCurrentStatus } =
-      shiftData;
-    console.log(ShiftCurrentStatus, empId);
-    if (
-      ShiftCurrentStatus.find((s) => s.StatusReportedById === empId)?.Status !==
-      'completed'
-    ) {
+    const { ShiftCurrentStatus } = shiftData;
+
+    const shiftStatusOfEmp = ShiftCurrentStatus.find(
+      (s) => s.StatusReportedById === empId
+    );
+
+    if (!shiftStatusOfEmp || shiftStatusOfEmp?.Status !== 'completed') {
       throw new CustomError('Shift for this employee is not ended yet');
     }
-    const { hour: startHour, minute: startMinute } = parseTime(ShiftStartTime);
-    const { hour: endHour, minute: endMinute } = parseTime(ShiftEndTime);
 
-    let shiftStartTimeWithDate = dayjs()
-      .date(toDate(ShiftDate).getDate())
-      .month(toDate(ShiftDate).getMonth())
-      .hour(startHour)
-      .minute(startMinute)
-      .second(0)
-      .toDate();
+    let StatusStartedTime = toDate(shiftStatusOfEmp.StatusStartedTime);
+    const StatusReportedTime = toDate(shiftStatusOfEmp.StatusReportedTime);
 
-    const shiftEndTimeWithDate = dayjs()
-      .date(toDate(ShiftDate).getDate())
-      .month(toDate(ShiftDate).getMonth())
-      .hour(endHour)
-      .minute(endMinute)
-      .second(0)
-      .toDate();
+    const { StatusReportedByName } = shiftStatusOfEmp;
+
+    if (!StatusStartedTime || !StatusReportedTime || !StatusReportedByName) {
+      throw new CustomError('Shift status of this employee is missing');
+    }
 
     let wellnessReport: IShiftsWellnessReportChildCollection[] = [];
 
     while (
-      dayjs(shiftStartTimeWithDate)
-        .add(1, 'hour')
-        .isBefore(shiftEndTimeWithDate)
+      dayjs(StatusStartedTime).add(1, 'hour').isBefore(StatusReportedTime)
     ) {
       wellnessReport = [
         ...wellnessReport,
         {
           WellnessEmpId: empId,
-          WellnessEmpName:
-            ShiftCurrentStatus.find((s) => s.StatusReportedById === empId)
-              ?.StatusReportedByName || '',
-          WellnessReportedAt: dayjs(shiftStartTimeWithDate)
+          WellnessEmpName: StatusReportedByName || '',
+          WellnessReportedAt: dayjs(StatusStartedTime)
             .add(1, 'hour')
             .toDate() as unknown as Timestamp,
           WellnessComment: 'Safe',
           WellnessImg: '',
         },
       ];
-      shiftStartTimeWithDate = dayjs(shiftStartTimeWithDate)
-        .add(1, 'hour')
-        .toDate();
+      StatusStartedTime = dayjs(StatusStartedTime).add(1, 'hour').toDate();
     }
+
+    console.log(wellnessReport, 'report here');
 
     await updateDoc(shiftRef, { ShiftGuardWellnessReport: wellnessReport });
   };

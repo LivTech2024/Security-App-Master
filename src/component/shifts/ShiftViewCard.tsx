@@ -446,7 +446,7 @@ const ShiftViewCard = ({
                               data.ShiftId,
                               s.StatusReportedById || ''
                             );
-                            setShouldRefetch(true);
+                            setShouldRefetch((prev) => !prev);
                             setLoading(false);
                           },
                         },
