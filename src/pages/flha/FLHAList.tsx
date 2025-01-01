@@ -1,9 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { useAuthState } from '../../store';
+import { useAuthState, useUIState } from '../../store';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { DisplayCount, PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
+import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
 import DbShift from '../../firebase_configs/DB/DbShift';
 import { DocumentData } from 'firebase/firestore';
 import { IFLHACollection } from '../../@types/database';
@@ -14,11 +13,15 @@ import SelectLocation from '../../common/SelectLocation';
 import NoSearchResult from '../../common/NoSearchResult';
 import { formatDate } from '../../utilities/misc';
 import TableShimmer from '../../common/shimmer/TableShimmer';
+import { errorHandler } from '../../utilities/CustomError';
+import generateFLHAHtml from '../../utilities/pdf/generateFLHAPdf';
+import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
+import { htmlToPdf } from '../../API/HtmlToPdf';
 
 const FLHAList = () => {
-  const navigate = useNavigate();
-
   const { company } = useAuthState();
+
+  const { setLoading } = useUIState();
 
   const [selectedLocation, setSelectedLocation] = useState('');
 
@@ -109,6 +112,26 @@ const FLHAList = () => {
       fetchNextPage();
     }
   }, [fetchNextPage, inView, hasNextPage, isFetching]);
+
+  const handleDownloadClick = async (data: IFLHACollection) => {
+    if (!company) return;
+    try {
+      setLoading(true);
+
+      const html = generateFLHAHtml(data, company);
+
+      const response = await htmlToPdf({ file_name: 'FLHA.pdf', html });
+
+      downloadPdf(response, 'FLHA.pdf');
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      errorHandler(error);
+      console.log(error);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 p-6">
       <PageHeader title="Field Level Hazard Assessments" />
@@ -136,32 +159,27 @@ const FLHAList = () => {
               Employee
             </th>
             <th className="uppercase px-4 py-2 w-[20%] text-end">Shift Date</th>
-            <th className="uppercase px-4 py-2 w-[15%] text-end">
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
               Shift Start Time
             </th>
 
-            <th className="uppercase px-4 py-2 w-[15%] text-end">
+            <th className="uppercase px-4 py-2 w-[15%] text-start">
               Shift End Time
             </th>
+            <th className="uppercase px-4 py-2 w-[15%] text-end">PDF</th>
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-[#5856560f]">
           {data.length === 0 && !isLoading ? (
             <tr>
-              <td colSpan={5}>
+              <td colSpan={6}>
                 <NoSearchResult />
               </td>
             </tr>
           ) : (
             data.map((flha) => {
               return (
-                <tr
-                  onClick={() =>
-                    navigate(PageRoutes.FLHA_VIEW + `?id=${flha.FLHAID}`)
-                  }
-                  key={flha.FLHAID}
-                  className="cursor-pointer "
-                >
+                <tr key={flha.FLHAID} className="">
                   <td className="px-4 py-2 align-top text-start">
                     {flha.FLHALocationName}
                   </td>
@@ -173,22 +191,28 @@ const FLHAList = () => {
                   <td className="px-4 py-2 align-top text-end">
                     {formatDate(flha.FLHADate, 'DD MMM-YY')}
                   </td>
-                  <td className="px-4 py-2 align-top text-end">
+                  <td className="px-4 py-2 align-top text-start">
                     <span className="line-clamp-3">
                       {flha.FLHAShiftStartTime}
                     </span>
                   </td>
-                  <td className="px-4 py-2 align-top text-end">
+                  <td className="px-4 py-2 align-top text-start">
                     <span className="line-clamp-3">
                       {flha.FLHAShiftEndTime}
                     </span>
+                  </td>
+                  <td
+                    onClick={() => handleDownloadClick(flha)}
+                    className="px-4 py-2 align-top text-end text-textPrimaryBlue underline cursor-pointer"
+                  >
+                    Download
                   </td>
                 </tr>
               );
             })
           )}
           <tr ref={ref}>
-            <td colSpan={5}>
+            <td colSpan={6}>
               {(isLoading || isFetchingNextPage) &&
                 Array.from({ length: 10 }).map((_, idx) => (
                   <TableShimmer key={idx} />

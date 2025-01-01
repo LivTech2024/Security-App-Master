@@ -58,7 +58,7 @@ function generateFLHAHtml(
             ).join('')}
         </tbody>
     </table>
-    <h4>Hazards</h4>
+    <h4>CHECK OFF HAZARDS THAT APPLY TO LOCATION, LIST IN HAZARDS COLUMN, INDICATE PRIORITY RANKING AND IDENTIFY MEASURES TO CONTROL/ELIMINATE</h4>
     <table>
         <thead>
             <tr>
