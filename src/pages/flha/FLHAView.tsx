@@ -4,7 +4,6 @@ import PageHeader from '../../common/PageHeader';
 import NoSearchResult from '../../common/NoSearchResult';
 import { IFLHACollection } from '../../@types/database';
 import DbShift from '../../firebase_configs/DB/DbShift';
-import { formatDate } from '../../utilities/misc';
 import generateFLHAHtml from '../../utilities/pdf/generateFLHAPdf';
 import { htmlToPdf } from '../../API/HtmlToPdf';
 import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
@@ -55,6 +54,19 @@ const FLHAView = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const writeHTML = (frame: any) => {
+    if (!data || !company) return;
+    const html = generateFLHAHtml(data, company);
+    if (!frame) {
+      return;
+    }
+    const doc = frame.contentDocument;
+    doc.open();
+    doc.write(html);
+    doc.close();
+  };
+
   if (!data && !loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -81,39 +93,12 @@ const FLHAView = () => {
           <Button label="Download" onClick={handleDownloadClick} type="black" />
         }
       />
-      <div className="bg-surface shadow-md rounded-lg p-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="font-semibold">Shift Name:</p>
-            <p>{data?.FLHAShiftName || 'N/A'}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift Date:</p>
-            <p>{data?.FLHADate ? formatDate(data?.FLHADate) : 'N/A'}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift Start Time:</p>
-            <p>{data?.FLHAShiftStartTime || 'N/A'}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Shift End Time:</p>
-            <p>{data?.FLHAShiftEndTime || 'N/A'}</p>
-          </div>
-
-          <div>
-            <p className="font-semibold">Employee Name:</p>
-            <p>{data?.FLHAEmployeeName || 'N/A'}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Location:</p>
-            <p>{data?.FLHALocationName || 'N/A'}</p>
-          </div>
-
-          <div>
-            <p className="font-semibold">Location Name:</p>
-            <p>{data?.FLHALocationName || 'N/A'}</p>
-          </div>
-        </div>
+      <div className="bg-surface shadow-md rounded-lg p-4 h-[calc(100vh-200px)]">
+        <iframe
+          className="bg-surface"
+          ref={writeHTML}
+          style={{ minWidth: '100%', height: '100%' }}
+        ></iframe>
       </div>
     </div>
   );

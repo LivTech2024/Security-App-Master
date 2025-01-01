@@ -2,7 +2,7 @@ import { useAuthState, useUIState } from '../../store';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { DisplayCount, REACT_QUERY_KEYS } from '../../@types/enum';
+import { DisplayCount, PageRoutes, REACT_QUERY_KEYS } from '../../@types/enum';
 import DbShift from '../../firebase_configs/DB/DbShift';
 import { DocumentData } from 'firebase/firestore';
 import { IFLHACollection } from '../../@types/database';
@@ -17,9 +17,12 @@ import { errorHandler } from '../../utilities/CustomError';
 import generateFLHAHtml from '../../utilities/pdf/generateFLHAPdf';
 import { downloadPdf } from '../../utilities/pdf/common/downloadPdf';
 import { htmlToPdf } from '../../API/HtmlToPdf';
+import { useNavigate } from 'react-router-dom';
 
 const FLHAList = () => {
   const { company } = useAuthState();
+
+  const navigate = useNavigate();
 
   const { setLoading } = useUIState();
 
@@ -180,23 +183,48 @@ const FLHAList = () => {
             data.map((flha) => {
               return (
                 <tr key={flha.FLHAID} className="">
-                  <td className="px-4 py-2 align-top text-start">
+                  <td
+                    onClick={() =>
+                      navigate(PageRoutes.FLHA_VIEW + `&id=${flha.FLHAID}`)
+                    }
+                    className="px-4 py-2 align-top text-start"
+                  >
                     {flha.FLHALocationName}
                   </td>
-                  <td className="px-4 py-2 align-top text-center">
+                  <td
+                    onClick={() =>
+                      navigate(PageRoutes.FLHA_VIEW + `&id=${flha.FLHAID}`)
+                    }
+                    className="px-4 py-2 align-top text-center"
+                  >
                     <span className="line-clamp-3">
                       {flha.FLHAEmployeeName}
                     </span>
                   </td>
-                  <td className="px-4 py-2 align-top text-end">
+                  <td
+                    onClick={() =>
+                      navigate(PageRoutes.FLHA_VIEW + `&id=${flha.FLHAID}`)
+                    }
+                    className="px-4 py-2 align-top text-end"
+                  >
                     {formatDate(flha.FLHADate, 'DD MMM-YY')}
                   </td>
-                  <td className="px-4 py-2 align-top text-start">
+                  <td
+                    onClick={() =>
+                      navigate(PageRoutes.FLHA_VIEW + `&id=${flha.FLHAID}`)
+                    }
+                    className="px-4 py-2 align-top text-start"
+                  >
                     <span className="line-clamp-3">
                       {flha.FLHAShiftStartTime}
                     </span>
                   </td>
-                  <td className="px-4 py-2 align-top text-start">
+                  <td
+                    onClick={() =>
+                      navigate(PageRoutes.FLHA_VIEW + `?id=${flha.FLHAID}`)
+                    }
+                    className="px-4 py-2 align-top text-start"
+                  >
                     <span className="line-clamp-3">
                       {flha.FLHAShiftEndTime}
                     </span>
